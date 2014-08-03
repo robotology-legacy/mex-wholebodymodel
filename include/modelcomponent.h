@@ -1,18 +1,20 @@
 /*
- * Copyright 2014 <copyright holder> <email>
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * 
+ * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Authors: Naveen Kuppuswamy
+ * email: naveen.kuppuswamy@iit.it
+ *
+ * The development of this software was supported by the FP7 EU projects
+ * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
+ * http://www.codyco.eu
+ *
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
  */
 
 #ifndef MODELCOMPONENT_H
@@ -20,10 +22,14 @@
 
 #include <iostream>
 #include <mex.h>
+
+#include <wbi/iWholeBodyModel.h>
+
 #include <wbi/wbiUtil.h>
-//#include <wbi/iWholeBodyModel.h>
-#include<wbiIcub/icubWholeBodyModel.h>
-//#include "robotwholebodymodel.h"
+
+// #include <boost/concept_check.hpp>
+#include <Eigen/Core>
+// #include<wbiIcub/icubWholeBodyModel.h>
 
 // #include "modelstate.h"
 
@@ -34,30 +40,30 @@ public:
   
   static ModelComponent* getInstance();
   
-  virtual const int numReturns() = 0;
   virtual bool allocateReturnSpace(int, mxArray*[]) = 0;
-  virtual bool display(int, const mxArray *[]) = 0;
   virtual bool compute(int, const mxArray *[]) = 0;
+  //virtual bool display(int, const mxArray *[]) = 0;
+  
+  const unsigned int numReturns();
+  const unsigned int numArguments();
+  
+  
   ~ModelComponent();
   
 protected:
   
-  bool setState(double * , double * , double *, wbi::Frame);
-  
-  ModelComponent(wbi::iWholeBodyModel*);  
-//   int numArguments;
-//   mxArray *argumentMexArray;
-  /*
-  static double *q;
-  static double *dq;
-  static double *dxb;
-  static wbi::Frame xBase;*/
-//   
+  bool setState(double * , double * , double *, wbi::Frame);  
+  ModelComponent(wbi::iWholeBodyModel*, const unsigned int, const unsigned int);  
   int numDof;
+  
+  const unsigned int numArgs;
+  const unsigned int numRets;
   wbi::iWholeBodyModel *robotModel;
-//   ModelState *modelState;
   
-  
+  Eigen::Matrix4d H_w2b;
+  wbi::Frame H_base_wrfLink,xB;
+
+  int ROBOT_BASE_FRAME_LINK;
   
 };
 

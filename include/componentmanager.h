@@ -33,7 +33,7 @@
 #include "modelmassmatrix.h"
 // #include "modelstateupdater.h"
 #include "modelgeneralisedbiasforces.h"
-#include "modelstate.h"
+// #include "modelstate.h"
 #include "modeldjdq.h"
 #include "modeljacobian.h"
 
@@ -54,7 +54,7 @@ private:
   static ComponentManager *componentManager;
   void initialise(void);
   
-  ModelState *modelState;
+  //ModelState *modelState;
   ModelComponent *currentComponent;
   ModelJointLimits *modelJointLimits;
   ModelMassMatrix *modelMassMatrix;
@@ -62,15 +62,11 @@ private:
   ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
   ModelDjDq *modelDjDq;
   ModelJacobian *modelJacobian;
- 
-  //ModelStateSetter *stateSetter;
-  //ModelGeneralisedForces *modelGeneralisedForces;
   
   int numDof;
   
   static wbi::iWholeBodyModel *robotModel;
   std::map <std::string, ModelComponent*> componentList;
-  //std::vector<std::string> componentListNames;
 };
 
 }

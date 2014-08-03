@@ -28,17 +28,22 @@ ModelJointLimits* ModelJointLimits::modelJointLimits = NULL;
 
 
 
-ModelJointLimits::ModelJointLimits(wbi::iWholeBodyModel * m) : ModelComponent(m),numReturnArguments(2)//(int n, mxArray *p), 
+ModelJointLimits::ModelJointLimits(wbi::iWholeBodyModel * m) : ModelComponent(m,2,0)
 {
+#ifdef DEBUG
   mexPrintf("ModelJointLimits constructed \n");
+#endif
+  
   ModelComponent::robotModel = m;
-  //std::cout<<"in child constructor jointLimits \n";
-//   numDof = robotModel->getDoFs();
+  
 }
 
 bool ModelJointLimits::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
+#ifdef DEBUG
   mexPrintf("Trying to allocateReturnSpace in ModelJointLimits\n");
+#endif
+
   bool returnVal = false;
   if(nlhs!=2)
   {
@@ -46,15 +51,13 @@ bool ModelJointLimits::allocateReturnSpace(int nlhs, mxArray* plhs[])
   }
   
     //p[0] =  mxCreateNumericMatrix(numDof, 1, mxDOUBLE_CLASS, mxREAL);//
-    plhs[0]=mxCreateDoubleMatrix(numDof,1, mxREAL);
-    plhs[1]=mxCreateDoubleMatrix(numDof,1, mxREAL);
-    returnVal = true;  
+  plhs[0]=mxCreateDoubleMatrix(numDof,1, mxREAL);
+  plhs[1]=mxCreateDoubleMatrix(numDof,1, mxREAL);
+  returnVal = true;  
   
-    jointLowerLimit = mxGetPr(plhs[0]);
-    jointUpperLimit = mxGetPr(plhs[1]);
-    returnVal = true;
-  
-  
+  jointLowerLimit = mxGetPr(plhs[0]);
+  jointUpperLimit = mxGetPr(plhs[1]);
+  returnVal = true;
   return(returnVal);
 }
 
@@ -74,7 +77,8 @@ ModelJointLimits* ModelJointLimits::getInstance(wbi::iWholeBodyModel * m)
   }
   return(modelJointLimits);
 }
-
+/*
+ * REIMPLEMENT IN FUTURE
 bool ModelJointLimits::display(int nrhs, const mxArray *prhs[])
 {
   mexPrintf("Trying to display ModelJointLimits\n");
@@ -91,10 +95,14 @@ bool ModelJointLimits::display(int nrhs, const mxArray *prhs[])
   }
   
   return(true);
-}
+}*/
+
 bool ModelJointLimits::compute(int nrhs, const mxArray *prhs[])
 {
+#ifdef DEBUG
    mexPrintf("Trying to compute ModelJointLimits\n");
+#endif
+   
   double temp1[numDof],temp2[numDof];
   robotModel->getJointLimits(temp1,temp2);
   
@@ -105,9 +113,4 @@ bool ModelJointLimits::compute(int nrhs, const mxArray *prhs[])
   }
 
   return(true);
-}
-
-const int ModelJointLimits::numReturns(void)
-{
-  return(numReturnArguments);
 }

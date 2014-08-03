@@ -17,16 +17,24 @@
  * 
  */
 
-#include "modelmassmatrix.h"
+//global includes
+
+//library includes 
 #include <wbi/iWholeBodyModel.h>
+#include <wbiIcub/icubWholeBodyModel.h>
+
+//local includes
+#include "modelmassmatrix.h"
+
 using namespace mexWBIComponent;
 
 ModelMassMatrix * ModelMassMatrix::modelMassMatrix; 
 
-ModelMassMatrix::ModelMassMatrix(wbi::iWholeBodyModel *m): ModelComponent(m),numReturnArguments(1)
+ModelMassMatrix::ModelMassMatrix(wbi::iWholeBodyModel *m): ModelComponent(m,1,1)
 {
+#ifdef DEBUG
   mexPrintf("ModelMassMatrix constructed \n");
-//   numDof = robotModel->getDoFs();
+#endif
 }
 
 ModelMassMatrix::~ModelMassMatrix()
@@ -34,41 +42,21 @@ ModelMassMatrix::~ModelMassMatrix()
 
 }
 
-//  static ModelMassMatrix* getInstance(wbi::iWholeBodyModel *);
-//   virtual int numReturns();
-//   virtual void display();
-//   virtual void compute();
-//   
-//  virtual bool allocateReturnSpace(int, mxArray *[]);
-
 bool ModelMassMatrix::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
 #ifdef DEBUG
   mexPrintf("Trying to allocateReturnSpace in ModelMassMatrix\n");
 #endif
   bool returnVal = false;
-  if(nlhs!=1)
-  {
-     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumOutputs","1 output argument required for massmatrix");
-  }
-//   if(nlhs>=1)
+//   if(nlhs!=1)
 //   {
-//     
-    //plhs[0] =  mxCreateNumericMatrix(modelState->dof()+6, modelState->dof()+6, mxDOUBLE_CLASS, mxREAL);//
-    plhs[0]=mxCreateDoubleMatrix(numDof+6,numDof+6, mxREAL);
-    //plhs[1]=mxCreateDoubleMatrix(numDof,1, mxREAL);
-  
-    massMatrix = mxGetPr(plhs[0]);
-   // jointUpperLimit = mxGetPr(plhs[1]);
-    returnVal = true;
+//      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumOutputs","1 output argument required for massmatrix");
 //   }
+  plhs[0]=mxCreateDoubleMatrix(numDof+6,numDof+6, mxREAL);
   
+  massMatrix = mxGetPr(plhs[0]);
+  returnVal = true;
   return(returnVal);
-}
-
-const int ModelMassMatrix::numReturns()
-{
-  return(numReturnArguments);
 }
 
 ModelMassMatrix * ModelMassMatrix::getInstance(wbi::iWholeBodyModel *m) 
@@ -80,7 +68,7 @@ ModelMassMatrix * ModelMassMatrix::getInstance(wbi::iWholeBodyModel *m)
   return(modelMassMatrix);
 }
 
-
+/*
 bool ModelMassMatrix::display(int nrhs, const mxArray * prhs[])
 {
 #ifdef DEBUG
@@ -116,7 +104,7 @@ bool ModelMassMatrix::display(int nrhs, const mxArray * prhs[])
   delete(mm);
     //robotModel->computeMassMatrix()
   return(true);
-}
+}*/
 
 bool ModelMassMatrix::compute(int nrhs, const mxArray * prhs[])
 {
@@ -133,10 +121,10 @@ bool ModelMassMatrix::compute(int nrhs, const mxArray * prhs[])
 
 bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
 {
-  if(nrhs<2)
-  {
-     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Atleast two input arguments required for mass-matrix");
-  }
+//   if(nrhs<2)
+//   {
+//      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Atleast two input arguments required for mass-matrix");
+//   }
   
   if(mxGetM(prhs[1]) != numDof || mxGetN(prhs[1]) != 1)
   {
@@ -152,11 +140,10 @@ bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
     mexPrintf(" %f",q[i]);
   }
 #endif  
-  Eigen::Matrix4d H_w2b;
-  int LINK_FOOT_WRF;
-  wbi::Frame H_base_wrfLink,xB;
-  robotModel->getLinkId ("l_sole", LINK_FOOT_WRF);
-  robotModel->computeH(q,wbi::Frame(),LINK_FOOT_WRF, H_base_wrfLink);
+  //int LINK_FOOT_WRF;
+  
+  
+  robotModel->computeH(q,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
   
   H_base_wrfLink.setToInverse().get4x4Matrix (H_w2b.data());
   xB.set4x4Matrix (H_w2b.data());
