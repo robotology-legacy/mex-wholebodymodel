@@ -30,7 +30,7 @@ using namespace mexWBIComponent;
 
 ModelGeneralisedBiasForces * ModelGeneralisedBiasForces::modelGeneralisedBiasForces;
 
-ModelGeneralisedBiasForces::ModelGeneralisedBiasForces(wbi::iWholeBodyModel * m) : ModelComponent(m,3,1)
+ModelGeneralisedBiasForces::ModelGeneralisedBiasForces(wbi::iWholeBodyModel * m) : ModelComponent(m,3,0,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelGeneralisedBiasForces constructed\n");
@@ -73,6 +73,27 @@ bool ModelGeneralisedBiasForces::compute(int nrhs, const mxArray* prhs[])
   processArguments(nrhs,prhs);
   return(true);
 }
+
+bool ModelGeneralisedBiasForces::computeFast(int nrhs, const mxArray* prhs[])
+{
+  
+#ifdef DEBUG
+   mexPrintf("Trying to fast compute generalised bias forces\n");
+#endif
+
+    q = modelState->q();
+    dq = modelState->dq();
+    xB = modelState->baseFrame();
+    dxb = modelState->dxb();
+   
+    if(!robotModel->computeGeneralizedBiasForces(q,xB,dq,dxb,g,h))
+    {
+      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI computeGeneralizedBiasForces call");
+    }
+    return(true);
+}
+
+
 /*
 bool ModelGeneralisedBiasForces::display(int nrhs, const mxArray* prhs[])
 {
@@ -115,7 +136,11 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
   
   if(h != NULL)
   {
-    robotModel->computeGeneralizedBiasForces(q,xB,dq,dxb,g,h);
+    if(!robotModel->computeGeneralizedBiasForces(q,xB,dq,dxb,g,h))
+    {
+      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI computeGeneralizedBiasForces call");
+    }
+    
     
   }
 }

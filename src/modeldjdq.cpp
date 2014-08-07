@@ -32,7 +32,7 @@ using namespace mexWBIComponent;
 
 ModelDjDq * ModelDjDq::modelDjDq;
 
-ModelDjDq::ModelDjDq(wbi::iWholeBodyModel * m) : ModelComponent(m,4,1)
+ModelDjDq::ModelDjDq(wbi::iWholeBodyModel * m) : ModelComponent(m,4,1,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelGeneralisedBiasForces constructed\n");
@@ -79,6 +79,34 @@ bool ModelDjDq::compute(int nrhs, const mxArray* prhs[])
 
   return(true);
 }
+
+bool ModelDjDq::computeFast(int nrhs, const mxArray* prhs[])
+{
+#ifdef DEBUG
+    mexPrintf("Trying to compute ModelDjDq\n");
+#endif
+    
+  if(!mxIsChar(prhs[1]))
+  {
+     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
+  }
+    
+  q = modelState->q();
+  dq = modelState->dq();
+  dxb = modelState->dxb();
+  xB = modelState->baseFrame();
+  refLink = mxArrayToString(prhs[1]);
+  int refLinkID;
+  robotModel->getLinkId (refLink, refLinkID);
+  
+  if(!robotModel->computeDJdq(q,xB,dq,dxb,refLinkID,Djdq))
+  {
+     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI DJDq call");
+  }
+
+  return(true);
+}
+
 /*
 bool ModelDjDq::display(int nrhs, const mxArray* prhs[])
 {
@@ -91,6 +119,8 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
 //   {
 //      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Atleast 5 input arguments required for modelDjDq");
 //   }
+  
+
   
   if(mxGetM(prhs[1]) != numDof || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != numDof || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != 6 || mxGetN(prhs[3]) != 1 || !(mxIsChar(prhs[4])))
   {
@@ -118,9 +148,9 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
   
   if(Djdq != NULL)
   {
-    int refFoot;
-    robotModel->getLinkId(refLink,refFoot);
-    if(!robotModel->computeDJdq(q,xB,dq,dxb,refFoot,Djdq))
+    int refLinkID;
+    robotModel->getLinkId(refLink,refLinkID);
+    if(!robotModel->computeDJdq(q,xB,dq,dxb,refLinkID,Djdq))
     {
        mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI DJDq call");
     }

@@ -31,12 +31,12 @@
 #include "modelcomponent.h"
 #include "modeljointlimits.h"
 #include "modelmassmatrix.h"
-// #include "modelstateupdater.h"
+#include "modelstateupdater.h"
 #include "modelgeneralisedbiasforces.h"
-// #include "modelstate.h"
+#include "modelstate.h"
 #include "modeldjdq.h"
 #include "modeljacobian.h"
-
+#include "modelinitialise.h"
 
 namespace mexWBIComponent
 {
@@ -54,14 +54,15 @@ private:
   static ComponentManager *componentManager;
   void initialise(void);
   
-  //ModelState *modelState;
+  ModelState *modelState;
   ModelComponent *currentComponent;
   ModelJointLimits *modelJointLimits;
   ModelMassMatrix *modelMassMatrix;
-//   ModelStateUpdater *modelStateUpdater;
+  ModelStateUpdater *modelStateUpdater;
   ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
   ModelDjDq *modelDjDq;
   ModelJacobian *modelJacobian;
+  ModelInitialise *modelInitialise;
   
   int numDof;
   

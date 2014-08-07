@@ -24,16 +24,17 @@
 #include<wbiIcub/icubWholeBodyModel.h>
 
 // local includes
-// #include "modelstate.h"
+#include "modelstate.h"
 #include "modelcomponent.h"
 
 using namespace mexWBIComponent;
 
-ModelComponent::ModelComponent(wbi::iWholeBodyModel *w, const unsigned int args, const unsigned int rets) : numArgs(args),numRets(rets)
+ModelComponent::ModelComponent(wbi::iWholeBodyModel *w, const unsigned int args, const unsigned int altArgs, const unsigned int rets) : numArgs(args),numRets(rets),numAltArgs(altArgs)
 {
   robotModel =  w; 
   numDof = robotModel->getDoFs();
   robotModel->getLinkId ("l_sole", ROBOT_BASE_FRAME_LINK);
+  modelState = ModelState::getInstance(numDof);
 }
 
 
@@ -53,4 +54,8 @@ const unsigned int ModelComponent::numReturns()
 const unsigned int ModelComponent::numArguments()
 {
   return(numArgs);
+}
+const unsigned int ModelComponent::numAltArguments()
+{
+  return(numAltArgs);
 }

@@ -31,7 +31,7 @@
 #include <Eigen/Core>
 // #include<wbiIcub/icubWholeBodyModel.h>
 
-// #include "modelstate.h"
+#include "modelstate.h"
 
 namespace mexWBIComponent{
   
@@ -42,10 +42,12 @@ public:
   
   virtual bool allocateReturnSpace(int, mxArray*[]) = 0;
   virtual bool compute(int, const mxArray *[]) = 0;
+  virtual bool computeFast(int, const mxArray *[]) = 0;
   //virtual bool display(int, const mxArray *[]) = 0;
   
   const unsigned int numReturns();
   const unsigned int numArguments();
+  const unsigned int numAltArguments();
   
   
   ~ModelComponent();
@@ -53,10 +55,11 @@ public:
 protected:
   
   bool setState(double * , double * , double *, wbi::Frame);  
-  ModelComponent(wbi::iWholeBodyModel*, const unsigned int, const unsigned int);  
+  ModelComponent(wbi::iWholeBodyModel*, const unsigned int, const unsigned int, const unsigned int);  
   int numDof;
   
   const unsigned int numArgs;
+  const unsigned int numAltArgs;
   const unsigned int numRets;
   wbi::iWholeBodyModel *robotModel;
   
@@ -64,6 +67,7 @@ protected:
   wbi::Frame H_base_wrfLink,xB;
 
   int ROBOT_BASE_FRAME_LINK;
+  ModelState *modelState;
   
 };
 

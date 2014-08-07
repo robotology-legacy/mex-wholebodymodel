@@ -28,7 +28,7 @@ ModelJointLimits* ModelJointLimits::modelJointLimits = NULL;
 
 
 
-ModelJointLimits::ModelJointLimits(wbi::iWholeBodyModel * m) : ModelComponent(m,2,0)
+ModelJointLimits::ModelJointLimits(wbi::iWholeBodyModel * m) : ModelComponent(m,2,0,0)
 {
 #ifdef DEBUG
   mexPrintf("ModelJointLimits constructed \n");
@@ -104,6 +104,21 @@ bool ModelJointLimits::compute(int nrhs, const mxArray *prhs[])
 #endif
    
   double temp1[numDof],temp2[numDof];
+  robotModel->getJointLimits(temp1,temp2);
+  
+  for(int i = 0; i<numDof; i++)
+  {
+      jointLowerLimit[i] = temp1[i];
+      jointUpperLimit[i] = temp2[i];
+  }
+
+  return(true);
+}
+
+bool ModelJointLimits::computeFast(int, const mxArray*[])
+{
+  
+    double temp1[numDof],temp2[numDof];
   robotModel->getJointLimits(temp1,temp2);
   
   for(int i = 0; i<numDof; i++)

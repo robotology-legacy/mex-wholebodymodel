@@ -56,6 +56,8 @@ ComponentManager::ComponentManager()
    componentList["generalised-forces"] = modelGeneralisedBiasForces;
    componentList["djdq"] = modelDjDq;
    componentList["jacobian"] = modelJacobian;
+   componentList["update-state"] = modelStateUpdater;
+   componentList["model-initialise"] = modelInitialise;
   
 }
 
@@ -79,14 +81,15 @@ void ComponentManager::initialise()
   robotModel->addJoints(wbiIcub::ICUB_MAIN_DYNAMIC_JOINTS);
   mexPrintf("iCub WholeBodyModel initialised \n");
   
-//modelState = ModelState::getInstance(robotModel->getDoFs());
+  modelState = ModelState::getInstance(robotModel->getDoFs());
   
   modelJointLimits = ModelJointLimits::getInstance(robotModel);
   modelMassMatrix = ModelMassMatrix::getInstance(robotModel);
-//modelStateUpdater = ModelStateUpdater::getInstance(robotModel);
+  modelStateUpdater = ModelStateUpdater::getInstance(robotModel);
   modelGeneralisedBiasForces = ModelGeneralisedBiasForces::getInstance(robotModel);
   modelDjDq = ModelDjDq::getInstance(robotModel);
   modelJacobian = ModelJacobian::getInstance(robotModel);
+  modelInitialise = ModelInitialise::getInstance(robotModel);
 }
 
 int ComponentManager::getDofs()
@@ -110,23 +113,32 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
      mexPrintf("Searching for the component '%s', of size  %d\n",str,sizeof(str));
 #endif 
 
-     std::map<std::string,ModelComponent*>::iterator search = componentList.find(str);
-    if(search == componentList.end())
-    {
-       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Requested component not found. Please request a valid component");
-     }
-     activeComponent = search->second;
-     if(nlhs!=activeComponent->numReturns() || nrhs != (1+activeComponent->numArguments()))
-    {
+  std::map<std::string,ModelComponent*>::iterator search = componentList.find(str);
+  if(search == componentList.end())
+  {
+    mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Requested component not found. Please request a valid component");
+  }
+  activeComponent = search->second;
+  if(nlhs!=activeComponent->numReturns())
+  {
+    mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Error in number of returned parameters in requested component, check docs");
+  }        
+  if(nrhs != (1+activeComponent->numArguments()) && nrhs != (1+activeComponent->numAltArguments()))
+  {
      mexPrintf("Requested component uses  uses %d arguments and returns %d items",activeComponent->numArguments(),activeComponent->numReturns());
-     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Error in number of arguments and returns in requested component, check docs");
-    }
-	
-//    if(nlhs>=1)
-//        {
-    activeComponent->allocateReturnSpace(nlhs,plhs);
+     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Error in number of arguments, check docs");
+  }
+  activeComponent->allocateReturnSpace(nlhs,plhs);	
+    
+  if(nrhs == (1+activeComponent->numAltArguments()))
+  {
+    activeComponent->computeFast(nrhs,prhs);
+  }
+  else
+  {	
     activeComponent->compute( nrhs, prhs);
     returnVal = true;
+  }
 //        }
 /*       else
        {

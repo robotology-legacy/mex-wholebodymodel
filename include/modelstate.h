@@ -17,37 +17,37 @@
  * Public License for more details
  */
 
-#ifndef MODELDJDQ_H
-#define MODELDJDQ_H
+#ifndef MODELSTATE_H
+#define MODELSTATE_H
 
-#include "modelcomponent.h"
+#include <iostream>
+#include <wbi/wbiUtil.h>
+#include <wbi/iWholeBodyModel.h>
+
 
 namespace mexWBIComponent
 {
-class ModelDjDq : public ModelComponent
+class ModelState
 {
 public:
-   static ModelDjDq* getInstance(wbi::iWholeBodyModel *);
-  
-  virtual bool allocateReturnSpace(int, mxArray*[]);
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
-    
-    //virtual bool display(int, const mxArray *[]);
-  ~ModelDjDq();
-  
+   ~ModelState();
+   static ModelState * getInstance(int);
+   bool setState(double *,double*,double*,wbi::Frame);
+   
+   double * q();
+   double * dq();
+   double * dxb();
+   wbi::Frame baseFrame();
+   int dof();
+   
+   
 private:
-  ModelDjDq(wbi::iWholeBodyModel *);
-  static ModelDjDq *modelDjDq;
-  bool processArguments(int, const mxArray *[]);
-  
-  double *q;
-  double *dq;
-  double *dxb;
-  double *Djdq;
-  char *refLink;
+  ModelState(int);
+  static ModelState * modelState;
+  double *qS, *dqS, *dxbS;
+  wbi::Frame baseS;
+  int numDof;
 };
-
 }
 
-#endif // MODELDJDQ_H
+#endif // MODELSTATE_H

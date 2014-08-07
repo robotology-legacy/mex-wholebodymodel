@@ -29,7 +29,7 @@ using namespace mexWBIComponent;
 
 ModelJacobian * ModelJacobian::modelJacobian; 
 
-ModelJacobian::ModelJacobian(wbi::iWholeBodyModel *m): ModelComponent(m,2,1)
+ModelJacobian::ModelJacobian(wbi::iWholeBodyModel *m): ModelComponent(m,2,1,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelJacobian constructed \n");
@@ -113,6 +113,36 @@ bool ModelJacobian::compute(int nrhs, const mxArray * prhs[])
 #endif
   return(true);
 }
+
+bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
+{
+#ifdef DEBUG
+  mexPrintf("Trying to fastCompute ModelJacobian \n");
+#endif
+  
+  if(!mxIsChar(prhs[1]))
+  {
+     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
+  }
+    
+  q = modelState->q();
+  xB = modelState->baseFrame();
+  refLink = mxArrayToString(prhs[1]);
+  int refLinkID;
+  robotModel->getLinkId (refLink, refLinkID);
+  
+
+  if(!(robotModel->computeJacobian(q,xB,refLinkID,j)))
+  {
+     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
+  }
+  
+#ifdef DEBUG
+  mexPrintf("ModelJacobian fastComputed\n");
+#endif
+  return(true);
+}
+
 
 
 

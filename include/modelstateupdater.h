@@ -17,37 +17,35 @@
  * Public License for more details
  */
 
-#ifndef MODELDJDQ_H
-#define MODELDJDQ_H
+#ifndef MODELSTATEUPDATER_H
+#define MODELSTATEUPDATER_H
 
 #include "modelcomponent.h"
 
-namespace mexWBIComponent
-{
-class ModelDjDq : public ModelComponent
+namespace mexWBIComponent{
+
+class ModelStateUpdater : public ModelComponent
 {
 public:
-   static ModelDjDq* getInstance(wbi::iWholeBodyModel *);
+  static ModelStateUpdater* getInstance(wbi::iWholeBodyModel *);
   
+//   virtual const int numReturns();
   virtual bool allocateReturnSpace(int, mxArray*[]);
+//   virtual bool display(int, const mxArray *[]);
   virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
-    
-    //virtual bool display(int, const mxArray *[]);
-  ~ModelDjDq();
   
+  
+  ~ModelStateUpdater();
 private:
-  ModelDjDq(wbi::iWholeBodyModel *);
-  static ModelDjDq *modelDjDq;
-  bool processArguments(int, const mxArray *[]);
-  
-  double *q;
-  double *dq;
-  double *dxb;
-  double *Djdq;
-  char *refLink;
+  ModelStateUpdater(wbi::iWholeBodyModel *);
+  static ModelStateUpdater *modelStateUpdater;
+//   const int numReturnArguments;
+    
+  bool setState(int, const mxArray *[]);
+//   wbi::Frame updateBaseFrame(double *);
+//   Eigen::Matrix4d H_w2b;
 };
-
 }
 
-#endif // MODELDJDQ_H
+#endif // MODELSTATEUPDATER_H

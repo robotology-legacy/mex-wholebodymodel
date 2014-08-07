@@ -34,6 +34,7 @@ public:
 //   virtual bool display(int, const mxArray *[]);
   
   virtual bool compute(int, const mxArray *[]);  
+  virtual bool computeFast(int, const mxArray *[]);
   virtual bool allocateReturnSpace(int, mxArray *[]);
 
   ~ModelMassMatrix();  

@@ -1,10 +1,21 @@
+addpath('./../build');
 %Running a 10,000 run trial
 totTime = 0;numRuns = 10000;
 
-refLink1 = 'r_sole';tic;
+refLink1 = 'r_sole';
 refLink2 = 'l_gripper';
 
-disp('Num Trials :');disp(numRuns);
+
+fprintf('Starting normal mode trial \n-------------------------- \n');
+
+tic;
+wholeBodyModel('model-initialise');
+initTime = toc();
+
+fprintf('Initialisation time : %e secs\n',initTime);
+fprintf('Num Trials : %d \n Starting Trial...\n',numRuns);
+tic;
+
 for i = 1:numRuns
     
     %Setting State to random values
@@ -20,5 +31,39 @@ for i = 1:numRuns
 end
 totTime = toc();
 %Benchmarks
-disp('Total Time : ');disp(totTime);
-disp('Average Time :');disp(totTime/numRuns);
+fprintf('Normal-Mode Trial Total Time : %f secs \n',totTime);
+fprintf('Normal-Mode Trial Average Time : %e secs\n',totTime/numRuns);
+
+clear all;
+
+fprintf('\n\nStarting optimised mode trial \n-------------------------- \n');
+
+totTime = 0;numRuns = 10000;
+tic;
+wholeBodyModel('model-initialise');
+initTime = toc();
+fprintf('Initialisation time : %e secs \n Starting Trial...\n ',initTime);
+
+refLink1 = 'r_sole';
+refLink2 = 'l_gripper';
+
+tic;
+for i = 1:numRuns
+    
+    %Setting State to random values
+    q = rand(32,1);dq = rand(32,1);dxb = rand(6,1);
+    
+    wholeBodyModel('update-state',q,dq,dxb);
+    
+    %Mex-WholeBodyModel Components
+    M = wholeBodyModel('mass-matrix');    
+    H = wholeBodyModel('generalised-forces');    
+    DjDq1 = wholeBodyModel('djdq',refLink1);
+    DjDq2 = wholeBodyModel('djdq',refLink2);    
+    J = wholeBodyModel('jacobian',refLink1);J = wholeBodyModel('jacobian',refLink2);
+    J = wholeBodyModel('jacobian',refLink1);J = wholeBodyModel('jacobian',refLink2);
+end
+totTime = toc();
+%Benchmarks
+fprintf('Optimised-Mode Trial Total Time : %f secs\n',totTime);
+fprintf('Optimised-Mode Trial Average Time : %e secs \n',totTime/numRuns);
