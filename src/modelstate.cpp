@@ -29,23 +29,26 @@ double * ModelState::dq;
 double * ModelState::dxb;
 int ModelState::numDof;*/
 
-ModelState::ModelState(int ndof)
+ModelState::ModelState(int ndof) //: qS[ndof],dqS[ndof],dxbS[ndof]
 {
   
   numDof = ndof;
-  qS = new double(ndof);
-  dqS = new double(ndof);
-  dxbS = new double(6);
+ //qS = new double(ndof);
+ //dqS = new double(ndof);
+ //dxbS = new double(6);
   
+//#ifdef DEBUG
   mexPrintf("ModelState constructed with %d \n",ndof); 
+//#endif
 }
 
 ModelState::~ModelState()
 {
 
-  delete(qS);
-  delete(dqS);
-  delete(dxbS);
+ // delete(qS);
+ // delete(dqS);
+ // delete(dxbS);
+  mexPrintf("ModelState destructed\n"); 
 }
 
 ModelState *  ModelState::getInstance(int nd)
@@ -84,16 +87,19 @@ bool ModelState::setState(double *q_t,double *dq_t,double *dxb_t, wbi::Frame F)
 
 double * ModelState::q()
 {
-  return(qS);
+//   return(qS);
+  return(&qS[0]);
 }
 
 double * ModelState::dq()
 {
-  return(dqS);
+//   return(dqS);
+  return(&dqS[0]);
 }
 double * ModelState::dxb()
 {
-  return(dxbS);
+//   return(dxbS);
+  return(&dxbS[0]);
 }
 wbi::Frame ModelState::baseFrame()
 {

@@ -49,7 +49,9 @@ ComponentManager* ComponentManager::getInstance()
 
 ComponentManager::ComponentManager()
 {
+#ifdef DEBUG
    mexPrintf("ComponentManager constructed \n");
+#endif
    initialise(); 
    componentList["joint-limits"] = modelJointLimits;
    componentList["mass-matrix"] = modelMassMatrix;
@@ -71,6 +73,13 @@ ComponentManager::~ComponentManager()
 #endif
 
   delete(modelJointLimits); 
+  delete(modelMassMatrix);
+  delete(modelStateUpdater);
+  delete(modelGeneralisedBiasForces);
+  delete(modelDjDq);
+  delete(modelJacobian);
+  delete(modelInitialise);
+  delete(modelState);
 }
 
 void ComponentManager::initialise()
@@ -83,9 +92,9 @@ void ComponentManager::initialise()
   
   modelState = ModelState::getInstance(robotModel->getDoFs());
   
+  modelStateUpdater = ModelStateUpdater::getInstance(robotModel);
   modelJointLimits = ModelJointLimits::getInstance(robotModel);
   modelMassMatrix = ModelMassMatrix::getInstance(robotModel);
-  modelStateUpdater = ModelStateUpdater::getInstance(robotModel);
   modelGeneralisedBiasForces = ModelGeneralisedBiasForces::getInstance(robotModel);
   modelDjDq = ModelDjDq::getInstance(robotModel);
   modelJacobian = ModelJacobian::getInstance(robotModel);

@@ -44,7 +44,7 @@ private:
     
   bool setState(int, const mxArray *[]);
 //   wbi::Frame updateBaseFrame(double *);
-//   Eigen::Matrix4d H_w2b;
+  Eigen::Matrix4d H_w2b;
 };
 }
 

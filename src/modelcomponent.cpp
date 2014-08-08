@@ -40,6 +40,7 @@ ModelComponent::ModelComponent(wbi::iWholeBodyModel *w, const unsigned int args,
 
 ModelComponent::~ModelComponent() 
 {
+  //delete(modelState);
 }
 
 ModelComponent* ModelComponent::getInstance()

@@ -44,7 +44,8 @@ public:
 private:
   ModelState(int);
   static ModelState * modelState;
-  double *qS, *dqS, *dxbS;
+  //double *qS, *dqS, *dxbS;
+  double qS[32],dqS[32],dxbS[6];
   wbi::Frame baseS;
   int numDof;
 };
