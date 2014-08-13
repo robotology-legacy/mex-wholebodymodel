@@ -37,6 +37,7 @@
 #include "modeldjdq.h"
 #include "modeljacobian.h"
 #include "modelinitialise.h"
+#include "modelforwardkinematics.h"
 
 namespace mexWBIComponent
 {
@@ -63,6 +64,7 @@ private:
   ModelDjDq *modelDjDq;
   ModelJacobian *modelJacobian;
   ModelInitialise *modelInitialise;
+  ModelForwardKinematics *modelForwardKinematics;
   
   int numDof;
   

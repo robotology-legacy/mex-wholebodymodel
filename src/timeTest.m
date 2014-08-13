@@ -16,18 +16,21 @@ fprintf('Initialisation time : %e secs\n',initTime);
 fprintf('Num Trials : %d \n Starting Trial...\n',numRuns);
 tic;
 
+qj = rand(32,1);
+xTb = wholeBodyModel('forward-kinematics',qj,refLink1)
+
 for i = 1:numRuns
     
     %Setting State to random values
-    q = rand(32,1);dq = rand(32,1);dxb = rand(6,1);
+    qj = rand(32,1);dqj = rand(32,1);dxb = rand(6,1);
     
     %Mex-WholeBodyModel Components
-    M = wholeBodyModel('mass-matrix',q);    
-    H = wholeBodyModel('generalised-forces',q,dq,dxb);    
-    DjDq1 = wholeBodyModel('djdq',q,dq,dxb,refLink1);
-    DjDq2 = wholeBodyModel('djdq',q,dq,dxb,refLink2);    
-    J = wholeBodyModel('jacobian',q,refLink1);J = wholeBodyModel('jacobian',q,refLink2);
-    J = wholeBodyModel('jacobian',q,refLink1);J = wholeBodyModel('jacobian',q,refLink2);
+    M = wholeBodyModel('mass-matrix',qj);    
+    H = wholeBodyModel('generalised-forces',qj,dqj,dxb);    
+    DjDq1 = wholeBodyModel('djdq',qj,dqj,dxb,refLink1);
+    DjDq2 = wholeBodyModel('djdq',qj,dqj,dxb,refLink2);    
+    J1 = wholeBodyModel('jacobian',qj,refLink1);J2 = wholeBodyModel('jacobian',qj,refLink2);
+    J3 = wholeBodyModel('jacobian',qj,refLink1);J4 = wholeBodyModel('jacobian',qj,refLink2);
 end
 totTime = toc();
 %Benchmarks
@@ -51,17 +54,17 @@ tic;
 for i = 1:numRuns
     
     %Setting State to random values
-    q = rand(32,1);dq = rand(32,1);dxb = rand(6,1);
+    qj = rand(32,1);dqj = rand(32,1);dxb = rand(6,1);
     
-    wholeBodyModel('update-state',q,dq,dxb);
+    wholeBodyModel('update-state',qj,dqj,dxb);
     
     %Mex-WholeBodyModel Components
     M = wholeBodyModel('mass-matrix');    
     H = wholeBodyModel('generalised-forces');    
     DjDq1 = wholeBodyModel('djdq',refLink1);
     DjDq2 = wholeBodyModel('djdq',refLink2);    
-    J = wholeBodyModel('jacobian',refLink1);J = wholeBodyModel('jacobian',refLink2);
-    J = wholeBodyModel('jacobian',refLink1);J = wholeBodyModel('jacobian',refLink2);
+    J1 = wholeBodyModel('jacobian',refLink1);J2 = wholeBodyModel('jacobian',refLink2);
+    J3 = wholeBodyModel('jacobian',refLink1);J4 = wholeBodyModel('jacobian',refLink2);
 end
 totTime = toc();
 %Benchmarks

@@ -44,7 +44,7 @@ ModelJacobian::~ModelJacobian()
 bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
 #ifdef DEBUG
-  mexPrintf("Trying to allocateReturnSpace in ModelMassMatrix\n");
+  mexPrintf("Trying to allocateReturnSpace in ModelJacobian\n");
 #endif
   
   bool returnVal = false;

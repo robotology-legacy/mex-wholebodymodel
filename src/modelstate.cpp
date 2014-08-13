@@ -37,9 +37,9 @@ ModelState::ModelState(int ndof) //: qS[ndof],dqS[ndof],dxbS[ndof]
  //dqS = new double(ndof);
  //dxbS = new double(6);
   
-//#ifdef DEBUG
+#ifdef DEBUG
   mexPrintf("ModelState constructed with %d \n",ndof); 
-//#endif
+#endif
 }
 
 ModelState::~ModelState()

@@ -60,6 +60,7 @@ ComponentManager::ComponentManager()
    componentList["jacobian"] = modelJacobian;
    componentList["update-state"] = modelStateUpdater;
    componentList["model-initialise"] = modelInitialise;
+   componentList["forward-kinematics"] = modelForwardKinematics;
   
 }
 
@@ -78,6 +79,7 @@ ComponentManager::~ComponentManager()
   delete(modelGeneralisedBiasForces);
   delete(modelDjDq);
   delete(modelJacobian);
+  delete(modelForwardKinematics);
   delete(modelInitialise);
   delete(modelState);
 }
@@ -98,6 +100,7 @@ void ComponentManager::initialise()
   modelGeneralisedBiasForces = ModelGeneralisedBiasForces::getInstance(robotModel);
   modelDjDq = ModelDjDq::getInstance(robotModel);
   modelJacobian = ModelJacobian::getInstance(robotModel);
+  modelForwardKinematics = ModelForwardKinematics::getInstance(robotModel);
   modelInitialise = ModelInitialise::getInstance(robotModel);
 }
 
