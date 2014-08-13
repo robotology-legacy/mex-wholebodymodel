@@ -31,13 +31,42 @@
 using namespace mexWBIComponent;
 
 //Global variables
-static ComponentManager *componentManager;
+static ComponentManager *componentManager = NULL;
 
 //=========================================================================================================================
 // Entry point function to library
 void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 {
-  componentManager = ComponentManager::getInstance();
+  if(componentManager==NULL)
+  {
+    // Initialisation of the component, i.e first call after a 'close all' or matlab start
+    if (nrhs < 1) {
+        mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Initialisation has not been performed correctly.");
+    }
+    
+
+  // Check to be sure input is of type char 
+    if (!(mxIsChar(prhs[0])))
+    {
+        mexErrMsgIdAndTxt( "MATLAB:mexatexit:inputNotString","Initialisation must include component.\n.");
+    }
+    
+    if(nrhs ==2)
+    {
+      if (!(mxIsChar(prhs[1])))
+      {
+        mexErrMsgIdAndTxt( "MATLAB:mexatexit:inputNotString","Initialisation must include component and a robot name.\n.");
+      }
+      
+      componentManager = ComponentManager::getInstance(mxArrayToString(prhs[1]));
+    }
+    
+    
+  }
+  else
+  {
+    componentManager = ComponentManager::getInstance();
+  }
   
 #ifdef DEBUG
   mexPrintf("starting to process function\n");

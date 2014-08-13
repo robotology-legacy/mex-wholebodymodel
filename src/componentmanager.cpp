@@ -35,10 +35,10 @@ using namespace mexWBIComponent;
 ComponentManager * ComponentManager::componentManager;
 wbi::iWholeBodyModel * ComponentManager::robotModel;
 
-ComponentManager* ComponentManager::getInstance()
+ComponentManager* ComponentManager::getInstance(char *robotName)
 {
   if(componentManager == NULL) {
-    componentManager = new ComponentManager;
+    componentManager = new ComponentManager(robotName);
   }
 #ifdef DEBUG
   mexPrintf("ComponentManager initialised \n");
@@ -47,12 +47,12 @@ ComponentManager* ComponentManager::getInstance()
 }
 
 
-ComponentManager::ComponentManager()
+ComponentManager::ComponentManager(char *robotName)
 {
 #ifdef DEBUG
    mexPrintf("ComponentManager constructed \n");
 #endif
-   initialise(); 
+   initialise(robotName); 
    componentList["joint-limits"] = modelJointLimits;
    componentList["mass-matrix"] = modelMassMatrix;
    componentList["generalised-forces"] = modelGeneralisedBiasForces;
@@ -84,13 +84,13 @@ ComponentManager::~ComponentManager()
   delete(modelState);
 }
 
-void ComponentManager::initialise()
+void ComponentManager::initialise(char * robotNameC)
 {
   std::string localName = "wbiTest";
-  std::string robotName = "icub";
+  std::string robotName = robotNameC;
   robotModel = new wbiIcub::icubWholeBodyModel(localName.c_str(),robotName.c_str(),iCub::iDynTree::iCubTree_version_tag(2,2,true));
   robotModel->addJoints(wbiIcub::ICUB_MAIN_DYNAMIC_JOINTS);
-  mexPrintf("iCub WholeBodyModel initialised \n");
+  mexPrintf("iCub WholeBodyModel initialised with robot : %s \n",robotName.c_str());
   
   modelState = ModelState::getInstance(robotModel->getDoFs());
   

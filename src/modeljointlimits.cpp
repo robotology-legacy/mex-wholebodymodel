@@ -28,7 +28,7 @@ ModelJointLimits* ModelJointLimits::modelJointLimits = NULL;
 
 
 
-ModelJointLimits::ModelJointLimits(wbi::iWholeBodyModel * m) : ModelComponent(m,2,0,0)
+ModelJointLimits::ModelJointLimits(wbi::iWholeBodyModel * m) : ModelComponent(m,0,0,2)
 {
 #ifdef DEBUG
   mexPrintf("ModelJointLimits constructed \n");
