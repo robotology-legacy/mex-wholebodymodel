@@ -45,15 +45,15 @@ class ComponentManager
 {
 public:
   
-  static ComponentManager *getInstance(char *robotName = "icub");
+  static ComponentManager *getInstance(std::string robotName = "icub");
   bool processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]);
    ~ComponentManager(void);
    
   int getDofs();
 private:
-  ComponentManager(char *);
+  ComponentManager(std::string);
   static ComponentManager *componentManager;
-  void initialise(char *);
+  void initialise(std::string);
   
   ModelState *modelState;
   ModelComponent *currentComponent;

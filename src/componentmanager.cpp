@@ -35,7 +35,7 @@ using namespace mexWBIComponent;
 ComponentManager * ComponentManager::componentManager;
 wbi::iWholeBodyModel * ComponentManager::robotModel;
 
-ComponentManager* ComponentManager::getInstance(char *robotName)
+ComponentManager* ComponentManager::getInstance(std::string robotName)
 {
   if(componentManager == NULL) {
     componentManager = new ComponentManager(robotName);
@@ -47,7 +47,7 @@ ComponentManager* ComponentManager::getInstance(char *robotName)
 }
 
 
-ComponentManager::ComponentManager(char *robotName)
+ComponentManager::ComponentManager(std::string robotName)
 {
 #ifdef DEBUG
    mexPrintf("ComponentManager constructed \n");
@@ -84,10 +84,10 @@ ComponentManager::~ComponentManager()
   delete(modelState);
 }
 
-void ComponentManager::initialise(char * robotNameC)
+void ComponentManager::initialise(std::string robotName)
 {
   std::string localName = "wbiTest";
-  std::string robotName = robotNameC;
+  //std::string robotName = robotNameC;
   robotModel = new wbiIcub::icubWholeBodyModel(localName.c_str(),robotName.c_str(),iCub::iDynTree::iCubTree_version_tag(2,2,true));
   robotModel->addJoints(wbiIcub::ICUB_MAIN_DYNAMIC_JOINTS);
   mexPrintf("iCub WholeBodyModel initialised with robot : %s \n",robotName.c_str());

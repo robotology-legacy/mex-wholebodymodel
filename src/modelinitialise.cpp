@@ -25,7 +25,7 @@ using namespace mexWBIComponent;
 
 ModelInitialise * ModelInitialise::modelInitialise;
 
-ModelInitialise::ModelInitialise(wbi::iWholeBodyModel*m) : ModelComponent(m,0,0,0)
+ModelInitialise::ModelInitialise(wbi::iWholeBodyModel*m) : ModelComponent(m,0,1,0)
 {
 
 }

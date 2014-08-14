@@ -60,7 +60,10 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
       
       componentManager = ComponentManager::getInstance(mxArrayToString(prhs[1]));
     }
-    
+    else
+    {
+      componentManager = ComponentManager::getInstance();
+    }
     
   }
   else
