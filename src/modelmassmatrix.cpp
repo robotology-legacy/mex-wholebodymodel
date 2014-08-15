@@ -30,7 +30,7 @@ using namespace mexWBIComponent;
 
 ModelMassMatrix * ModelMassMatrix::modelMassMatrix; 
 
-ModelMassMatrix::ModelMassMatrix(wbi::iWholeBodyModel *m): ModelComponent(m,1,0,1)
+ModelMassMatrix::ModelMassMatrix(): ModelComponent(1,0,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelMassMatrix constructed \n");
@@ -59,11 +59,11 @@ bool ModelMassMatrix::allocateReturnSpace(int nlhs, mxArray* plhs[])
   return(returnVal);
 }
 
-ModelMassMatrix * ModelMassMatrix::getInstance(wbi::iWholeBodyModel *m) 
+ModelMassMatrix * ModelMassMatrix::getInstance() 
 {
   if(modelMassMatrix == NULL)
   {
-    modelMassMatrix = new ModelMassMatrix(m);
+    modelMassMatrix = new ModelMassMatrix;
   }
   return(modelMassMatrix);
 }
@@ -123,6 +123,7 @@ bool ModelMassMatrix::computeFast(int nrhs, const mxArray* prhs[])
 #ifdef DEBUG
   mexPrintf("Trying to compute ModelMassMatrix \n");
 #endif
+  robotModel = modelState->robotModel();
   q = modelState->q();
   xB = modelState->baseFrame();  
   
@@ -152,7 +153,7 @@ bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions");
   }
-    
+  robotModel = modelState->robotModel();
   q = mxGetPr(prhs[1]);
 #ifdef DEBUG
   mexPrintf("q received \n");

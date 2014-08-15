@@ -31,7 +31,7 @@ class ModelJacobian : public ModelComponent
 public:
   
   
-  static ModelJacobian* getInstance(wbi::iWholeBodyModel *);
+  static ModelJacobian* getInstance();
 //   virtual const int numReturns();
 //   virtual bool display(int, const mxArray *[]);
   virtual bool compute(int, const mxArray *[]);  
@@ -40,7 +40,7 @@ public:
 
   ~ModelJacobian();  
 private:
-  ModelJacobian(wbi::iWholeBodyModel *);
+  ModelJacobian();
   static ModelJacobian* modelJacobian; 
   
   bool processArguments(int, const mxArray *[]);
@@ -49,7 +49,6 @@ private:
   double *q;
   char * refLink;
   
-  ModelJacobian();
 };
 }
 #endif // MODELJACOBIAN_H

@@ -24,7 +24,6 @@
 #include <string.h>
 
 // external headers
-#include<wbi/iWholeBodyModel.h>
 #include <mex.h>
 
 // local includes
@@ -49,7 +48,7 @@ public:
   bool processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]);
    ~ComponentManager(void);
    
-  int getDofs();
+  //int getDofs();
 private:
   ComponentManager(std::string);
   static ComponentManager *componentManager;
@@ -68,7 +67,7 @@ private:
   
   int numDof;
   
-  static wbi::iWholeBodyModel *robotModel;
+  //static wbi::iWholeBodyModel *robotModel;
   std::map <std::string, ModelComponent*> componentList;
 };
 

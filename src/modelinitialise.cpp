@@ -25,7 +25,7 @@ using namespace mexWBIComponent;
 
 ModelInitialise * ModelInitialise::modelInitialise;
 
-ModelInitialise::ModelInitialise(wbi::iWholeBodyModel*m) : ModelComponent(m,0,1,0)
+ModelInitialise::ModelInitialise() : ModelComponent(1,0,0)
 {
 
 }
@@ -41,19 +41,31 @@ bool ModelInitialise::allocateReturnSpace(int, mxArray*[])
   return(true);
 }
 
-ModelInitialise* ModelInitialise::getInstance(wbi::iWholeBodyModel*m)
+ModelInitialise* ModelInitialise::getInstance()
 {
   if(modelInitialise == NULL)
   {
-    modelInitialise = new ModelInitialise(m);
+    modelInitialise = new ModelInitialise();
   }
   return(modelInitialise);
 }
 
 bool ModelInitialise::compute(int nrhs, const mxArray* prhs[])
 {
-
-  // nothing to do really
+   
+  if(!mxIsChar(prhs[1]))
+  {
+     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
+  }
+  
+  std::string rName = mxArrayToString(prhs[1]);
+  
+  mexPrintf("Existing Robot name %s and ModelStates robot name %s \n",rName.c_str(),(modelState->robotName()).c_str());
+  
+  if(rName.compare(modelState->robotName())!=0)
+  {
+    modelState->robotModel(rName);
+  }
   return(true);
   
 }

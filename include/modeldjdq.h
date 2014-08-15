@@ -27,7 +27,7 @@ namespace mexWBIComponent
 class ModelDjDq : public ModelComponent
 {
 public:
-   static ModelDjDq* getInstance(wbi::iWholeBodyModel *);
+   static ModelDjDq* getInstance(void);
   
   virtual bool allocateReturnSpace(int, mxArray*[]);
   virtual bool compute(int, const mxArray *[]);
@@ -37,7 +37,7 @@ public:
   ~ModelDjDq();
   
 private:
-  ModelDjDq(wbi::iWholeBodyModel *);
+  ModelDjDq(void);
   static ModelDjDq *modelDjDq;
   bool processArguments(int, const mxArray *[]);
   

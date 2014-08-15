@@ -39,7 +39,7 @@ using namespace mexWBIComponent;
 
 ModelStateUpdater *ModelStateUpdater::modelStateUpdater;
 
-ModelStateUpdater::ModelStateUpdater(wbi::iWholeBodyModel *m) : ModelComponent(m,3,3,0)
+ModelStateUpdater::ModelStateUpdater() : ModelComponent(3,3,0)
 {
   //numDof = robotModel->getDoFs();
 #ifdef DEBUG
@@ -48,11 +48,11 @@ ModelStateUpdater::ModelStateUpdater(wbi::iWholeBodyModel *m) : ModelComponent(m
   
 }
 
-ModelStateUpdater * ModelStateUpdater::getInstance(wbi::iWholeBodyModel *m)
+ModelStateUpdater * ModelStateUpdater::getInstance()
 {
   if(modelStateUpdater == NULL)
   {
-    modelStateUpdater = new ModelStateUpdater(m);
+    modelStateUpdater = new ModelStateUpdater;
   }
   
   return(modelStateUpdater);
@@ -80,6 +80,7 @@ bool ModelStateUpdater::computeFast(int nrhs, const mxArray *prhs[])
 #ifdef DEBUG
   mexPrintf("Trying to compute ModelStateUpdater\n");
 #endif
+  robotModel = modelState->robotModel();
   bool retVal = setState(nrhs,prhs);
    return(retVal);
 //   return(true);
@@ -132,6 +133,7 @@ bool ModelStateUpdater::setState(int nrhs, const mxArray* prhs[])
 #ifdef DEBUG
        mexPrintf("Updating state\n");
 #endif
+     robotModel = modelState->robotModel();
 //        retVal = true;
      //double q_temp[numDof],dq_temp[numDof],dxb_temp[6];
      double *q_temp,*dq_temp,*dxb_temp;

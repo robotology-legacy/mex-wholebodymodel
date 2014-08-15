@@ -29,12 +29,13 @@
 
 using namespace mexWBIComponent;
 
-ModelComponent::ModelComponent(wbi::iWholeBodyModel *w, const unsigned int args, const unsigned int altArgs, const unsigned int rets) : numArgs(args),numRets(rets),numAltArgs(altArgs)
+ModelComponent::ModelComponent(const unsigned int args, const unsigned int altArgs, const unsigned int rets) : numArgs(args),numRets(rets),numAltArgs(altArgs)
 {
-  robotModel =  w; 
+  modelState = ModelState::getInstance();
+  robotModel =  modelState->robotModel();
   numDof = robotModel->getDoFs();
   robotModel->getLinkId ("l_sole", ROBOT_BASE_FRAME_LINK);
-  modelState = ModelState::getInstance(numDof);
+  
 }
 
 

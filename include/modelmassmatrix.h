@@ -30,7 +30,7 @@ class ModelMassMatrix : public ModelComponent
 {
 public:
   
-  static ModelMassMatrix* getInstance(wbi::iWholeBodyModel *);
+  static ModelMassMatrix* getInstance();
 //   virtual bool display(int, const mxArray *[]);
   
   virtual bool compute(int, const mxArray *[]);  
@@ -40,13 +40,12 @@ public:
   ~ModelMassMatrix();  
 private:
  // ModelJointLimits(int = 0, mxArray * = NULL );
-  ModelMassMatrix(wbi::iWholeBodyModel *);
+  ModelMassMatrix();
   static ModelMassMatrix* modelMassMatrix; 
   
   bool processArguments(int, const mxArray *[]);
   double *massMatrix;
   double *q;
-  ModelMassMatrix();
 };
 }
 #endif // MODELMASSMATRIX_H

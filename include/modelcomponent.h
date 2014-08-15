@@ -55,7 +55,7 @@ public:
 protected:
   
   bool setState(double * , double * , double *, wbi::Frame);  
-  ModelComponent(wbi::iWholeBodyModel*, const unsigned int, const unsigned int, const unsigned int);  
+  ModelComponent(const unsigned int, const unsigned int, const unsigned int);  
   int numDof;
   
   const unsigned int numArgs;

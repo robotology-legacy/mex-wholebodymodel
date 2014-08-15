@@ -38,7 +38,7 @@ class ModelInitialise : public ModelComponent
 public:
   
   ~ModelInitialise();
-  static ModelInitialise* getInstance(wbi::iWholeBodyModel *);
+  static ModelInitialise* getInstance();
   //virtual bool display(int, const mxArray *[]);
   virtual bool allocateReturnSpace(int, mxArray *[]); 
   virtual bool compute(int, const mxArray *[]);
@@ -47,7 +47,7 @@ public:
  
   
 private:
-  ModelInitialise(wbi::iWholeBodyModel *);
+  ModelInitialise();
   static ModelInitialise* modelInitialise;   
 };
 

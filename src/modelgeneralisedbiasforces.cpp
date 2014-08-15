@@ -30,7 +30,7 @@ using namespace mexWBIComponent;
 
 ModelGeneralisedBiasForces * ModelGeneralisedBiasForces::modelGeneralisedBiasForces;
 
-ModelGeneralisedBiasForces::ModelGeneralisedBiasForces(wbi::iWholeBodyModel * m) : ModelComponent(m,3,0,1)
+ModelGeneralisedBiasForces::ModelGeneralisedBiasForces() : ModelComponent(3,0,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelGeneralisedBiasForces constructed\n");
@@ -45,11 +45,11 @@ ModelGeneralisedBiasForces::~ModelGeneralisedBiasForces()
   delete(g);
 }
 
-ModelGeneralisedBiasForces * ModelGeneralisedBiasForces::getInstance(wbi::iWholeBodyModel * m)
+ModelGeneralisedBiasForces * ModelGeneralisedBiasForces::getInstance()
 {
   if(modelGeneralisedBiasForces == NULL)
   {
-    modelGeneralisedBiasForces = new ModelGeneralisedBiasForces(m);
+    modelGeneralisedBiasForces = new ModelGeneralisedBiasForces;
   }
   return(modelGeneralisedBiasForces);
 }
@@ -80,6 +80,7 @@ bool ModelGeneralisedBiasForces::computeFast(int nrhs, const mxArray* prhs[])
 #ifdef DEBUG
    mexPrintf("Trying to fast compute generalised bias forces\n");
 #endif
+   robotModel = modelState->robotModel();
 
     q = modelState->q();
     dq = modelState->dq();
@@ -116,7 +117,7 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state argument dimensions in ModelGeneralisedForces call");
   }
-    
+  robotModel = modelState->robotModel();
   q = mxGetPr(prhs[1]);
   dq = mxGetPr(prhs[2]);
   dxb = mxGetPr(prhs[3]);

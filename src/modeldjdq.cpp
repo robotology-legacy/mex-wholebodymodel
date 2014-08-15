@@ -32,7 +32,7 @@ using namespace mexWBIComponent;
 
 ModelDjDq * ModelDjDq::modelDjDq;
 
-ModelDjDq::ModelDjDq(wbi::iWholeBodyModel * m) : ModelComponent(m,4,1,1)
+ModelDjDq::ModelDjDq(void) : ModelComponent(4,1,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelGeneralisedBiasForces constructed\n");
@@ -44,11 +44,11 @@ ModelDjDq::~ModelDjDq()
   
 }
 
-ModelDjDq * ModelDjDq::getInstance(wbi::iWholeBodyModel * m)
+ModelDjDq * ModelDjDq::getInstance(void)
 {
   if(modelDjDq == NULL)
   {
-    modelDjDq = new ModelDjDq(m);
+    modelDjDq = new ModelDjDq;
   }
   return(modelDjDq);
 }
@@ -75,6 +75,7 @@ bool ModelDjDq::compute(int nrhs, const mxArray* prhs[])
 #ifdef DEBUG
   mexPrintf("Trying to compute ModelDjDq\n");
 #endif
+
   processArguments(nrhs,prhs);
 
   return(true);
@@ -85,12 +86,13 @@ bool ModelDjDq::computeFast(int nrhs, const mxArray* prhs[])
 #ifdef DEBUG
     mexPrintf("Trying to compute ModelDjDq\n");
 #endif
-    
+   
   if(!mxIsChar(prhs[1]))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
   }
-    
+
+  robotModel = modelState->robotModel();
   q = modelState->q();
   dq = modelState->dq();
   dxb = modelState->dxb();
@@ -126,7 +128,7 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions / inputs");
   }
-    
+  robotModel = modelState->robotModel();
   q = mxGetPr(prhs[1]);
   dq = mxGetPr(prhs[2]);
   dxb = mxGetPr(prhs[3]);

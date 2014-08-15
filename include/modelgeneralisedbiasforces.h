@@ -26,7 +26,7 @@ namespace mexWBIComponent
 class ModelGeneralisedBiasForces : public ModelComponent
 {
 public:
-   static ModelGeneralisedBiasForces* getInstance(wbi::iWholeBodyModel *);
+   static ModelGeneralisedBiasForces* getInstance();
   
   virtual bool allocateReturnSpace(int, mxArray*[]);
   virtual bool compute(int, const mxArray *[]);
@@ -36,7 +36,7 @@ public:
   ~ModelGeneralisedBiasForces();
   
 private:
-  ModelGeneralisedBiasForces(wbi::iWholeBodyModel *);
+  ModelGeneralisedBiasForces();
   static ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
   bool processArguments(int, const mxArray *[]);
   

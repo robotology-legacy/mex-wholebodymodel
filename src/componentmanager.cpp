@@ -33,7 +33,7 @@
 using namespace mexWBIComponent;
 
 ComponentManager * ComponentManager::componentManager;
-wbi::iWholeBodyModel * ComponentManager::robotModel;
+//wbi::iWholeBodyModel * ComponentManager::robotModel;
 
 ComponentManager* ComponentManager::getInstance(std::string robotName)
 {
@@ -66,7 +66,7 @@ ComponentManager::ComponentManager(std::string robotName)
 
 ComponentManager::~ComponentManager()
 {
-  delete(robotModel);
+  
 
 #ifdef DEBUG
   mexPrintf("icub WholeBodyModel destructed \n");
@@ -86,28 +86,23 @@ ComponentManager::~ComponentManager()
 
 void ComponentManager::initialise(std::string robotName)
 {
-  std::string localName = "wbiTest";
-  //std::string robotName = robotNameC;
-  robotModel = new wbiIcub::icubWholeBodyModel(localName.c_str(),robotName.c_str(),iCub::iDynTree::iCubTree_version_tag(2,2,true));
-  robotModel->addJoints(wbiIcub::ICUB_MAIN_DYNAMIC_JOINTS);
-  mexPrintf("iCub WholeBodyModel initialised with robot : %s \n",robotName.c_str());
   
-  modelState = ModelState::getInstance(robotModel->getDoFs());
-  
-  modelStateUpdater = ModelStateUpdater::getInstance(robotModel);
-  modelJointLimits = ModelJointLimits::getInstance(robotModel);
-  modelMassMatrix = ModelMassMatrix::getInstance(robotModel);
-  modelGeneralisedBiasForces = ModelGeneralisedBiasForces::getInstance(robotModel);
-  modelDjDq = ModelDjDq::getInstance(robotModel);
-  modelJacobian = ModelJacobian::getInstance(robotModel);
-  modelForwardKinematics = ModelForwardKinematics::getInstance(robotModel);
-  modelInitialise = ModelInitialise::getInstance(robotModel);
+  modelState = ModelState::getInstance(robotName);
+  //modelState->robotModel(robotModel);    
+  modelStateUpdater = ModelStateUpdater::getInstance();
+  modelJointLimits = ModelJointLimits::getInstance();
+  modelMassMatrix = ModelMassMatrix::getInstance();
+  modelGeneralisedBiasForces = ModelGeneralisedBiasForces::getInstance();
+  modelDjDq = ModelDjDq::getInstance();
+  modelJacobian = ModelJacobian::getInstance();
+  modelForwardKinematics = ModelForwardKinematics::getInstance();
+  modelInitialise = ModelInitialise::getInstance();
 }
 
-int ComponentManager::getDofs()
-{
-  return(robotModel->getDoFs());
-}
+// int ComponentManager::getDofs()
+// {
+//   return(robotModel->getDoFs());
+// }
 
 bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 {
@@ -145,6 +140,7 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
   if(nrhs == (1+activeComponent->numAltArguments()))
   {
     activeComponent->computeFast(nrhs,prhs);
+    returnVal = true;
   }
   else
   {	

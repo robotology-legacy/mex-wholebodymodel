@@ -27,7 +27,7 @@ namespace mexWBIComponent{
 class ModelStateUpdater : public ModelComponent
 {
 public:
-  static ModelStateUpdater* getInstance(wbi::iWholeBodyModel *);
+  static ModelStateUpdater* getInstance();
   
 //   virtual const int numReturns();
   virtual bool allocateReturnSpace(int, mxArray*[]);
@@ -38,7 +38,7 @@ public:
   
   ~ModelStateUpdater();
 private:
-  ModelStateUpdater(wbi::iWholeBodyModel *);
+  ModelStateUpdater();
   static ModelStateUpdater *modelStateUpdater;
 //   const int numReturnArguments;
     

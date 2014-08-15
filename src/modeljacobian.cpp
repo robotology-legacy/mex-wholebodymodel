@@ -29,7 +29,7 @@ using namespace mexWBIComponent;
 
 ModelJacobian * ModelJacobian::modelJacobian; 
 
-ModelJacobian::ModelJacobian(wbi::iWholeBodyModel *m): ModelComponent(m,2,1,1)
+ModelJacobian::ModelJacobian(): ModelComponent(2,1,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelJacobian constructed \n");
@@ -55,11 +55,11 @@ bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray* plhs[])
   return(returnVal);
 }
 
-ModelJacobian * ModelJacobian::getInstance(wbi::iWholeBodyModel *m) 
+ModelJacobian * ModelJacobian::getInstance() 
 {
   if(modelJacobian == NULL)
   {
-    modelJacobian = new ModelJacobian(m);
+    modelJacobian = new ModelJacobian;
   }
   return(modelJacobian);
 }
@@ -128,14 +128,16 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
   q = modelState->q();
   xB = modelState->baseFrame();
   refLink = mxArrayToString(prhs[1]);
+  robotModel = modelState->robotModel();
   int refLinkID;
   robotModel->getLinkId (refLink, refLinkID);
-  
+    modelState = ModelState::getInstance();
 
   if(!(robotModel->computeJacobian(q,xB,refLinkID,j)))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
   }
+
   
 #ifdef DEBUG
   mexPrintf("ModelJacobian fastComputed\n");
@@ -157,6 +159,7 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
   }
+  robotModel = modelState->robotModel();
     
   q = mxGetPr(prhs[1]);
   refLink = mxArrayToString(prhs[2]);

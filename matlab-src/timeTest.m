@@ -9,7 +9,7 @@ refLink2 = 'l_gripper';
 fprintf('Starting normal mode trial \n-------------------------- \n');
 
 tic;
-wholeBodyModel('model-initialise');
+wholeBodyModel('model-initialise','icubGazeboSim');
 initTime = toc();
 
 fprintf('Initialisation time : %e secs\n',initTime);
@@ -40,7 +40,7 @@ fprintf('\n\nStarting optimised mode trial \n-------------------------- \n');
 
 totTime = 0;numRuns = 10000;
 tic;
-wholeBodyModel('model-initialise');
+wholeBodyModel('model-initialise','icub');
 initTime = toc();
 fprintf('Initialisation time : %e secs \n Starting Trial...\n ',initTime);
 

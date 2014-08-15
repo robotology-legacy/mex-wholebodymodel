@@ -31,7 +31,7 @@
 using namespace mexWBIComponent;
 ModelForwardKinematics * ModelForwardKinematics::modelForwardKinematics;
 
-ModelForwardKinematics::ModelForwardKinematics(wbi::iWholeBodyModel *m) : ModelComponent(m,2,1,1)
+ModelForwardKinematics::ModelForwardKinematics() : ModelComponent(2,1,1)
 {
 
 }
@@ -76,7 +76,7 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray* prhs[])
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
   }
-    
+  robotModel = modelState->robotModel(); 
   q = mxGetPr(prhs[1]);
   refLink = mxArrayToString(prhs[2]);
 #ifdef DEBUG
@@ -118,7 +118,7 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray* prhs[])
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
   }
-    
+  robotModel = modelState->robotModel(); 
   q = modelState->q();
   xB = modelState->baseFrame();
   refLink = mxArrayToString(prhs[1]);
@@ -136,11 +136,11 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray* prhs[])
   return(true);
 }
 
-ModelForwardKinematics* ModelForwardKinematics::getInstance(wbi::iWholeBodyModel* m)
+ModelForwardKinematics* ModelForwardKinematics::getInstance()
 {
   if(modelForwardKinematics == NULL)
   {
-    modelForwardKinematics = new ModelForwardKinematics(m);
+    modelForwardKinematics = new ModelForwardKinematics();
   }
   return(modelForwardKinematics);
 

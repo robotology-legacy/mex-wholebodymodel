@@ -39,7 +39,7 @@ class ModelForwardKinematics : public ModelComponent
 public:
 
   ~ModelForwardKinematics();
-  static ModelForwardKinematics * getInstance(wbi::iWholeBodyModel *);
+  static ModelForwardKinematics * getInstance();
   
   virtual bool compute(int, const mxArray *[]);  
   virtual bool computeFast(int, const mxArray *[]);
@@ -47,7 +47,7 @@ public:
 
   
 private:
-  ModelForwardKinematics(wbi::iWholeBodyModel *);
+  ModelForwardKinematics();
   static ModelForwardKinematics *modelForwardKinematics;
   
   bool processArguments(int, const mxArray *[]);

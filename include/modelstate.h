@@ -31,7 +31,7 @@ class ModelState
 {
 public:
    ~ModelState();
-   static ModelState * getInstance(int);
+   static ModelState * getInstance(std::string = "icub");
    bool setState(double *,double*,double*,wbi::Frame);
    
    double * q();
@@ -39,15 +39,20 @@ public:
    double * dxb();
    wbi::Frame baseFrame();
    int dof();
-   
+   void robotModel(std::string);
+   wbi::iWholeBodyModel * robotModel(void);
+   std::string robotName(void);
    
 private:
-  ModelState(int);
+  ModelState(std::string);
   static ModelState * modelState;
   //double *qS, *dqS, *dxbS;
   double qS[32],dqS[32],dxbS[6];
   wbi::Frame baseS;
   int numDof;
+  std::string currentRobotName;
+  
+  static wbi::iWholeBodyModel *robotWBIModel;
 };
 }
 

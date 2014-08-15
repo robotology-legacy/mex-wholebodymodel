@@ -17,22 +17,32 @@
  * 
  */
 
-#include "modelstate.h"
-#include <wbi/iWholeBodyModel.h>
-using namespace mexWBIComponent;
+// global includes
+
+// library includes
 #include <mex.h>
+#include <wbiIcub/icubWholeBodyModel.h>
+#include <yarp/os/Network.h>
+
+// local includes
+#include "modelstate.h"
+
+using namespace mexWBIComponent;
 
 ModelState* ModelState::modelState;
+wbi::iWholeBodyModel * ModelState::robotWBIModel = NULL;
 /*
 double * ModelState::q;
 double * ModelState::dq;
 double * ModelState::dxb;
 int ModelState::numDof;*/
 
-ModelState::ModelState(int ndof) //: qS[ndof],dqS[ndof],dxbS[ndof]
+ModelState::ModelState(std::string robotName) //: qS[ndof],dqS[ndof],dxbS[ndof]
 {
-  
-  numDof = ndof;
+  //this-> 
+  yarp::os::Network::init();
+  robotModel(robotName);
+  numDof = robotWBIModel->getDoFs();
  //qS = new double(ndof);
  //dqS = new double(ndof);
  //dxbS = new double(6);
@@ -40,6 +50,8 @@ ModelState::ModelState(int ndof) //: qS[ndof],dqS[ndof],dxbS[ndof]
 #ifdef DEBUG
   mexPrintf("ModelState constructed with %d \n",ndof); 
 #endif
+  
+ 
 }
 
 ModelState::~ModelState()
@@ -48,14 +60,16 @@ ModelState::~ModelState()
  // delete(qS);
  // delete(dqS);
  // delete(dxbS);
+  yarp::os::Network::fini();
+  delete(robotWBIModel);
   mexPrintf("ModelState destructed\n"); 
 }
 
-ModelState *  ModelState::getInstance(int nd)
+ModelState *  ModelState::getInstance(std::string robotName)
 {
   if(modelState == NULL)
   {
-    modelState = new ModelState(nd);
+    modelState = new ModelState(robotName);
   }
   return(modelState);
 }
@@ -108,4 +122,35 @@ wbi::Frame ModelState::baseFrame()
 int ModelState::dof()
 {
   return(numDof);
+}
+
+wbi::iWholeBodyModel* ModelState::robotModel(void)
+{
+  return(robotWBIModel);
+}
+
+void  ModelState::robotModel(std::string robotName)
+{
+  if(robotWBIModel != NULL)
+  {
+    mexPrintf("Deleting older version of robot");
+    delete(robotWBIModel);
+  }
+  
+  currentRobotName = robotName;
+     std::string localName = "wbiTest";
+  //std::string robotName = robotNameC;
+  robotWBIModel = new wbiIcub::icubWholeBodyModel(localName.c_str(),robotName.c_str(),iCub::iDynTree::iCubTree_version_tag(2,2,true));
+  robotWBIModel->addJoints(wbiIcub::ICUB_MAIN_DYNAMIC_JOINTS);
+  mexPrintf("WholeBodyModel started with robot : %s \n",robotName.c_str());
+  if(!robotWBIModel->init())
+  {
+    mexPrintf("WholeBodyModel unable to initialise \n");
+  }
+  
+}
+
+std::string ModelState::robotName(void)
+{
+  return(currentRobotName);
 }

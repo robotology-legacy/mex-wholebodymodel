@@ -32,7 +32,7 @@ class ModelJointLimits : public ModelComponent
 public:
   
   ~ModelJointLimits();
-  static ModelJointLimits* getInstance(wbi::iWholeBodyModel *);
+  static ModelJointLimits* getInstance();
   //virtual bool display(int, const mxArray *[]);
   virtual bool allocateReturnSpace(int, mxArray *[]); 
   virtual bool compute(int, const mxArray *[]);
@@ -41,7 +41,7 @@ public:
  
   
 private:
-  ModelJointLimits(wbi::iWholeBodyModel *);
+  ModelJointLimits();
   static ModelJointLimits* modelJointLimits;   
   double *jointLowerLimit, *jointUpperLimit;
 };

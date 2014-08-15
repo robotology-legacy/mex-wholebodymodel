@@ -28,13 +28,13 @@ ModelJointLimits* ModelJointLimits::modelJointLimits = NULL;
 
 
 
-ModelJointLimits::ModelJointLimits(wbi::iWholeBodyModel * m) : ModelComponent(m,0,0,2)
+ModelJointLimits::ModelJointLimits() : ModelComponent(0,0,2)
 {
 #ifdef DEBUG
   mexPrintf("ModelJointLimits constructed \n");
 #endif
   
-  ModelComponent::robotModel = m;
+ // ModelComponent::robotModel = m;
   
 }
 
@@ -68,12 +68,12 @@ ModelJointLimits::~ModelJointLimits()
   //delete(jointLimits);
 }
 
-ModelJointLimits* ModelJointLimits::getInstance(wbi::iWholeBodyModel * m)
+ModelJointLimits* ModelJointLimits::getInstance()
 {
   if(modelJointLimits == NULL)  
   {
  
-    modelJointLimits  = new ModelJointLimits(m);
+    modelJointLimits  = new ModelJointLimits;
   }
   return(modelJointLimits);
 }
@@ -102,6 +102,7 @@ bool ModelJointLimits::compute(int nrhs, const mxArray *prhs[])
 #ifdef DEBUG
    mexPrintf("Trying to compute ModelJointLimits\n");
 #endif
+   robotModel = modelState->robotModel();
    
   double temp1[numDof],temp2[numDof];
   robotModel->getJointLimits(temp1,temp2);
@@ -119,6 +120,7 @@ bool ModelJointLimits::computeFast(int, const mxArray*[])
 {
   
     double temp1[numDof],temp2[numDof];
+    robotModel = modelState->robotModel();
   robotModel->getJointLimits(temp1,temp2);
   
   for(int i = 0; i<numDof; i++)
