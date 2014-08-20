@@ -1,4 +1,4 @@
-function [ JTransf ] = constraintBothFeetOnGround(tau, MInv, H)
+function [ fTot,J ] = constraintBothFeetOnGround(tau, M, H)
 %CONSTRAINTBOTHFEETONGROUND The combined constraint force due to having
 %both feet on the ground
 %   Detailed explanation goes here
@@ -22,10 +22,11 @@ function [ JTransf ] = constraintBothFeetOnGround(tau, MInv, H)
     
     J = [Jleft;Jright];
     
+    JMInv = J/M;
     djdq = [djdq1;djdq2];
     
-    f = ( J * MInv * J') * ( (J * MInv * ( H  + [zeros(6,1);tau])) - djdq);
+    fTot = ( JMInv * J') * ( (JMInv * ( H  + [zeros(6,1);tau])) - djdq);
     
-    JTransf = J'*f;
+    %JTransf = J'*f;
 end
 

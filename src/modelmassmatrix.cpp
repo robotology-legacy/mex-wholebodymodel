@@ -124,10 +124,10 @@ bool ModelMassMatrix::computeFast(int nrhs, const mxArray* prhs[])
   mexPrintf("Trying to compute ModelMassMatrix \n");
 #endif
   robotModel = modelState->robotModel();
-  q = modelState->q();
-  xB = modelState->baseFrame();  
+  qj = modelState->qj();
+  xB = modelState->rootRotoTrans();  
   
-  if(!robotModel->computeMassMatrix(q,xB,massMatrix))
+  if(!robotModel->computeMassMatrix(qj,xB,massMatrix))
   {
     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI MassMatrix call");
   }
@@ -154,26 +154,26 @@ bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions");
   }
   robotModel = modelState->robotModel();
-  q = mxGetPr(prhs[1]);
+  qj = mxGetPr(prhs[1]);
 #ifdef DEBUG
-  mexPrintf("q received \n");
+  mexPrintf("qj received \n");
 
   for(int i = 0; i< numDof;i++)
   {
-    mexPrintf(" %f",q[i]);
+    mexPrintf(" %f",qj[i]);
   }
 #endif  
   //int LINK_FOOT_WRF;
   
   
-  robotModel->computeH(q,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
+  robotModel->computeH(qj,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
   
   H_base_wrfLink.setToInverse().get4x4Matrix (H_w2b.data());
   xB.set4x4Matrix (H_w2b.data());
   
   if(massMatrix != NULL)
   {
-     if(!robotModel->computeMassMatrix(q,xB,massMatrix))
+     if(!robotModel->computeMassMatrix(qj,xB,massMatrix))
      {
 	mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI MassMatrix call");
      }

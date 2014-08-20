@@ -17,35 +17,34 @@
  * Public License for more details
  */
 
-#ifndef MODELMASSMATRIX_H
-#define MODELMASSMATRIX_H
+#ifndef MODELUPDATESTATE_H
+#define MODELUPDATESTATE_H
 
 #include "modelcomponent.h"
-#include "wbi/iWholeBodyModel.h"
-#include "wbi/wbiUtil.h"
-
 
 namespace mexWBIComponent{
-class ModelMassMatrix : public ModelComponent
+
+class ModelUpdateState : public ModelComponent
 {
 public:
+  static ModelUpdateState* getInstance();
   
-  static ModelMassMatrix* getInstance();
+  virtual bool allocateReturnSpace(int, mxArray*[]);
 //   virtual bool display(int, const mxArray *[]);
-  
-  virtual bool compute(int, const mxArray *[]);  
+  virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
-  virtual bool allocateReturnSpace(int, mxArray *[]);
-
-  ~ModelMassMatrix();  
-private:
- // ModelJointLimits(int = 0, mxArray * = NULL );
-  ModelMassMatrix();
-  static ModelMassMatrix* modelMassMatrix; 
   
-  bool processArguments(int, const mxArray *[]);
-  double *massMatrix;
-  double *qj;
+  
+  ~ModelUpdateState();
+private:
+  ModelUpdateState();
+  static ModelUpdateState *modelUpdateState;
+//   const int numReturnArguments;
+    
+  bool setState(int, const mxArray *[]);
+//   wbi::Frame updateBaseFrame(double *);
+  Eigen::Matrix4d H_w2b;
 };
 }
-#endif // MODELMASSMATRIX_H
+
+#endif // MODELUPDATESTATE_H

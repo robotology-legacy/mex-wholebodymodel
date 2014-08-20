@@ -46,7 +46,7 @@ private:
   bool processArguments(int, const mxArray *[]);
   
   double *j;
-  double *q;
+  double *qj;
   char * refLink;
   
 };

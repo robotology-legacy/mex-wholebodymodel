@@ -19,43 +19,45 @@
  * 
  */
 
-#ifndef MODELFORWARDKINEMATICS_H
-#define MODELFORWARDKINEMATICS_H
+#ifndef MODELGETSTATE_H
+#define MODELGETSTATE_H
 
+// global includes
 
-// Global Includes
+// library includes
+#include <wbi/iWholeBodyModel.h>
 
-// Library Includes
-#include<wbi/iWholeBodyModel.h>
-
-// Local Includes
+// local includes
+#include "mexwholebodymodelsettings.h"
 #include "modelcomponent.h"
 
-namespace mexWBIComponent
-{
-
-class ModelForwardKinematics : public ModelComponent
+namespace mexWBIComponent{
+  
+class ModelGetState : public ModelComponent
 {
 public:
-
-  ~ModelForwardKinematics();
-  static ModelForwardKinematics * getInstance();
+  static ModelGetState* getInstance();
   
-  virtual bool compute(int, const mxArray *[]);  
+  virtual bool allocateReturnSpace(int, mxArray*[]);
+//   virtual bool display(int, const mxArray *[]);
+  virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
-  virtual bool allocateReturnSpace(int, mxArray *[]);
-
   
+  
+  ~ModelGetState();
 private:
-  ModelForwardKinematics();
-  static ModelForwardKinematics *modelForwardKinematics;
+  ModelGetState();
+  static ModelGetState *modelGetState;
   
-  bool processArguments(int, const mxArray *[]);
+  wbi::Frame rootRotoTrans;
+  wbi::Rotation rootRoto;
+  double rootQuaternion[4];
   
-  double *xT;
-  double *qj;
-  char * refLink;
+  double* wTb;//[7];
+  double* qj;//[MEX_WBMODEL_MAX_NUM_JOINTS];
+  double* qjDot;//[MEX_WBMODEL_MAX_NUM_JOINTS];
+  double* vb; 
 };
 
 }
-#endif // MODELFORWARDKINEMATICS_H
+#endif // MODELGETSTATE_H

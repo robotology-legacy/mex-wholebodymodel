@@ -93,15 +93,15 @@ bool ModelDjDq::computeFast(int nrhs, const mxArray* prhs[])
   }
 
   robotModel = modelState->robotModel();
-  q = modelState->q();
-  dq = modelState->dq();
-  dxb = modelState->dxb();
-  xB = modelState->baseFrame();
+  qj = modelState->qj();
+  qjDot = modelState->qjDot();
+  vb = modelState->vb();
+  xB = modelState->rootRotoTrans();
   refLink = mxArrayToString(prhs[1]);
   int refLinkID;
   robotModel->getLinkId (refLink, refLinkID);
   
-  if(!robotModel->computeDJdq(q,xB,dq,dxb,refLinkID,Djdq))
+  if(!robotModel->computeDJdq(qj,xB,qjDot,vb,refLinkID,Djdq))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI DJDq call");
   }
@@ -129,21 +129,21 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions / inputs");
   }
   robotModel = modelState->robotModel();
-  q = mxGetPr(prhs[1]);
-  dq = mxGetPr(prhs[2]);
-  dxb = mxGetPr(prhs[3]);
+  qj = mxGetPr(prhs[1]);
+  qjDot = mxGetPr(prhs[2]);
+  vb = mxGetPr(prhs[3]);
   refLink = mxArrayToString(prhs[4]);
   
 #ifdef DEBUG
-  mexPrintf("q received \n");
+  mexPrintf("qj received \n");
 
   for(int i = 0; i< numDof;i++)
   {
-    mexPrintf(" %f",q[i]);
+    mexPrintf(" %f",qj[i]);
   }
 #endif  
 
-  robotModel->computeH(q,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
+  robotModel->computeH(qj,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
   
   H_base_wrfLink.setToInverse().get4x4Matrix (H_w2b.data());
   xB.set4x4Matrix (H_w2b.data());
@@ -152,7 +152,7 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
   {
     int refLinkID;
     robotModel->getLinkId(refLink,refLinkID);
-    if(!robotModel->computeDJdq(q,xB,dq,dxb,refLinkID,Djdq))
+    if(!robotModel->computeDJdq(qj,xB,qjDot,vb,refLinkID,Djdq))
     {
        mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI DJDq call");
     }

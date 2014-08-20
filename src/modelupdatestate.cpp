@@ -18,13 +18,18 @@
  */
 
 
+// global includes
+
+// library includes
 #include <wbi/iWholeBodyModel.h>
-
-#include "modelstateupdater.h"
-#include "modelstate.h"
-#include <yarp/math/Rand.h>
-
 #include <mex.h>
+
+// #include <yarp/math/Rand.h>
+
+// local includes
+#include "modelupdatestate.h"
+#include "modelstate.h"
+
 
 using namespace mexWBIComponent;
   
@@ -37,37 +42,37 @@ using namespace mexWBIComponent;
 //   
 //   static ModelStateSetter * modelStateSetter;
 
-ModelStateUpdater *ModelStateUpdater::modelStateUpdater;
+ModelUpdateState *ModelUpdateState::modelUpdateState;
 
-ModelStateUpdater::ModelStateUpdater() : ModelComponent(3,3,0)
+ModelUpdateState::ModelUpdateState() : ModelComponent(3,3,0)
 {
   //numDof = robotModel->getDoFs();
 #ifdef DEBUG
-  mexPrintf("ModelStateUpdater constructed \n");
+  mexPrintf("ModelUpdateState constructed \n");
 #endif
   
 }
 
-ModelStateUpdater * ModelStateUpdater::getInstance()
+ModelUpdateState * ModelUpdateState::getInstance()
 {
-  if(modelStateUpdater == NULL)
+  if(modelUpdateState == NULL)
   {
-    modelStateUpdater = new ModelStateUpdater;
+    modelUpdateState = new ModelUpdateState;
   }
   
-  return(modelStateUpdater);
+  return(modelUpdateState);
 }
 
 
-ModelStateUpdater::~ModelStateUpdater()
+ModelUpdateState::~ModelUpdateState()
 {
 
 }
 
-bool ModelStateUpdater::compute(int nrhs, const mxArray *prhs[])
+bool ModelUpdateState::compute(int nrhs, const mxArray *prhs[])
 {
 #ifdef DEBUG
-  mexPrintf("Trying to compute ModelStateUpdater\n");
+  mexPrintf("Trying to compute ModelUpdateState\n");
 #endif
   bool retVal = setState(nrhs,prhs);
    return(retVal);
@@ -75,10 +80,10 @@ bool ModelStateUpdater::compute(int nrhs, const mxArray *prhs[])
 
 }
 
-bool ModelStateUpdater::computeFast(int nrhs, const mxArray *prhs[])
+bool ModelUpdateState::computeFast(int nrhs, const mxArray *prhs[])
 {
 #ifdef DEBUG
-  mexPrintf("Trying to compute ModelStateUpdater\n");
+  mexPrintf("Trying to compute ModelUpdateState\n");
 #endif
   robotModel = modelState->robotModel();
   bool retVal = setState(nrhs,prhs);
@@ -95,7 +100,7 @@ bool ModelStateUpdater::computeFast(int nrhs, const mxArray *prhs[])
 // //   return(true);
 // }
 
-bool ModelStateUpdater::allocateReturnSpace(int nlhs, mxArray* plhs[])
+bool ModelUpdateState::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
 //   bool retVal = false;
 // //   if(nlhs==0)
@@ -108,13 +113,13 @@ bool ModelStateUpdater::allocateReturnSpace(int nlhs, mxArray* plhs[])
 //   return(retVal);
   
 #ifdef DEBUG
-  mexPrintf("Trying to allocate memory in ModelStateUpdater (nothing to do really)\n");
+  mexPrintf("Trying to allocate memory in ModelUpdateState (nothing to do really)\n");
 #endif
   return(true);
 
 }
 
-bool ModelStateUpdater::setState(int nrhs, const mxArray* prhs[])
+bool ModelUpdateState::setState(int nrhs, const mxArray* prhs[])
 {
 //   bool retVal = false;
 //   if(nrhs == 4)

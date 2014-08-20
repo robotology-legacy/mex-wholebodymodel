@@ -82,12 +82,12 @@ bool ModelGeneralisedBiasForces::computeFast(int nrhs, const mxArray* prhs[])
 #endif
    robotModel = modelState->robotModel();
 
-    q = modelState->q();
-    dq = modelState->dq();
-    xB = modelState->baseFrame();
-    dxb = modelState->dxb();
+    qj = modelState->qj();
+    qjDot = modelState->qjDot();
+    xB = modelState->rootRotoTrans();
+    vb = modelState->vb();
    
-    if(!robotModel->computeGeneralizedBiasForces(q,xB,dq,dxb,g,h))
+    if(!robotModel->computeGeneralizedBiasForces(qj,xB,qjDot,vb,g,h))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI computeGeneralizedBiasForces call");
     }
@@ -118,26 +118,26 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state argument dimensions in ModelGeneralisedForces call");
   }
   robotModel = modelState->robotModel();
-  q = mxGetPr(prhs[1]);
-  dq = mxGetPr(prhs[2]);
-  dxb = mxGetPr(prhs[3]);
+  qj = mxGetPr(prhs[1]);
+  qjDot = mxGetPr(prhs[2]);
+  vb = mxGetPr(prhs[3]);
   
 #ifdef DEBUG
-  mexPrintf("q received \n");
+  mexPrintf("qj received \n");
 
   for(int i = 0; i< numDof;i++)
   {
-    mexPrintf(" %f",q[i]);
+    mexPrintf(" %f",qj[i]);
   }
 #endif  
 
-  robotModel->computeH(q,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
+  robotModel->computeH(qj,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
     H_base_wrfLink.setToInverse().get4x4Matrix (H_w2b.data());
   xB.set4x4Matrix (H_w2b.data());
   
   if(h != NULL)
   {
-    if(!robotModel->computeGeneralizedBiasForces(q,xB,dq,dxb,g,h))
+    if(!robotModel->computeGeneralizedBiasForces(qj,xB,qjDot,vb,g,h))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI computeGeneralizedBiasForces call");
     }

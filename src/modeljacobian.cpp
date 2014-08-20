@@ -125,15 +125,15 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
   }
     
-  q = modelState->q();
-  xB = modelState->baseFrame();
+  qj = modelState->qj();
+  xB = modelState->rootRotoTrans();
   refLink = mxArrayToString(prhs[1]);
   robotModel = modelState->robotModel();
   int refLinkID;
   robotModel->getLinkId (refLink, refLinkID);
     modelState = ModelState::getInstance();
 
-  if(!(robotModel->computeJacobian(q,xB,refLinkID,j)))
+  if(!(robotModel->computeJacobian(qj,xB,refLinkID,j)))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
   }
@@ -161,18 +161,18 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
   }
   robotModel = modelState->robotModel();
     
-  q = mxGetPr(prhs[1]);
+  qj = mxGetPr(prhs[1]);
   refLink = mxArrayToString(prhs[2]);
 #ifdef DEBUG
-  mexPrintf("q received \n");
+  mexPrintf("qj received \n");
 
   for(int i = 0; i< numDof;i++)
   {
-    mexPrintf(" %f",q[i]);
+    mexPrintf(" %f",qj[i]);
   }
 #endif  
   
-  robotModel->computeH(q,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
+  robotModel->computeH(qj,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
   
   H_base_wrfLink.setToInverse().get4x4Matrix (H_w2b.data());
   xB.set4x4Matrix (H_w2b.data());
@@ -182,7 +182,7 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
     int refLinkID;
     robotModel->getLinkId (refLink, refLinkID);
      //robotModel->computeMassMatrix(q,xB,massMatrix);
-    if(!(robotModel->computeJacobian(q,xB,refLinkID,j)))
+    if(!(robotModel->computeJacobian(qj,xB,refLinkID,j)))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
     }

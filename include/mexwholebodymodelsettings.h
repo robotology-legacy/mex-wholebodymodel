@@ -17,35 +17,5 @@
  * Public License for more details
  */
 
-#ifndef MODELSTATEUPDATER_H
-#define MODELSTATEUPDATER_H
 
-#include "modelcomponent.h"
-
-namespace mexWBIComponent{
-
-class ModelStateUpdater : public ModelComponent
-{
-public:
-  static ModelStateUpdater* getInstance();
-  
-//   virtual const int numReturns();
-  virtual bool allocateReturnSpace(int, mxArray*[]);
-//   virtual bool display(int, const mxArray *[]);
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
-  
-  
-  ~ModelStateUpdater();
-private:
-  ModelStateUpdater();
-  static ModelStateUpdater *modelStateUpdater;
-//   const int numReturnArguments;
-    
-  bool setState(int, const mxArray *[]);
-//   wbi::Frame updateBaseFrame(double *);
-  Eigen::Matrix4d H_w2b;
-};
-}
-
-#endif // MODELSTATEUPDATER_H
+#define MEX_WBMODEL_MAX_NUM_JOINTS 35

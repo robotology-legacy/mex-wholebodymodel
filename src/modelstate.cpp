@@ -1,20 +1,20 @@
 /*
- * <one line to give the program's name and a brief idea of what it does.>
- * Copyright (C) 2014  <copyright holder> <email>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Authors: Naveen Kuppuswamy
+ * email: naveen.kuppuswamy@iit.it
+ *
+ * The development of this software was supported by the FP7 EU projects
+ * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
+ * http://www.codyco.eu
+ *
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
  */
 
 // global includes
@@ -31,11 +31,7 @@ using namespace mexWBIComponent;
 
 ModelState* ModelState::modelState;
 wbi::iWholeBodyModel * ModelState::robotWBIModel = NULL;
-/*
-double * ModelState::q;
-double * ModelState::dq;
-double * ModelState::dxb;
-int ModelState::numDof;*/
+
 
 ModelState::ModelState(std::string robotName) //: qS[ndof],dqS[ndof],dxbS[ndof]
 {
@@ -43,9 +39,6 @@ ModelState::ModelState(std::string robotName) //: qS[ndof],dqS[ndof],dxbS[ndof]
   yarp::os::Network::init();
   robotModel(robotName);
   numDof = robotWBIModel->getDoFs();
- //qS = new double(ndof);
- //dqS = new double(ndof);
- //dxbS = new double(6);
   
 #ifdef DEBUG
   mexPrintf("ModelState constructed with %d \n",ndof); 
@@ -75,21 +68,21 @@ ModelState *  ModelState::getInstance(std::string robotName)
 }
 
 
-bool ModelState::setState(double *q_t,double *dq_t,double *dxb_t, wbi::Frame F)
+bool ModelState::setState(double *qj_t,double *qjDot_t,double *vb_t, wbi::Frame F)
 {
 #ifdef DEBUG
   mexPrintf("Trying to update state\n");
 #endif
   for(int i = 0;i<numDof;i++)
   {
-    qS[i] = q_t[i];
-    dqS[i] = dq_t[i];
+    qjS[i] = qj_t[i];
+    qjDotS[i] = qjDot_t[i];
   }
   for(int i=0;i<6;i++)
   {
-    dxbS[i] = dxb_t[i];
+    vbS[i] = vb_t[i];
   }
-  baseS = F;
+  rootS = F;
   return(true);
 }
 //    setState(double *,double*,double*,wbi:Frame);
@@ -99,25 +92,25 @@ bool ModelState::setState(double *q_t,double *dq_t,double *dxb_t, wbi::Frame F)
 //    double * dxb();
 //    wbi::Frame baseFrame();
 
-double * ModelState::q()
+double * ModelState::qj()
 {
 //   return(qS);
-  return(&qS[0]);
+  return(&qjS[0]);
 }
 
-double * ModelState::dq()
+double * ModelState::qjDot()
 {
 //   return(dqS);
-  return(&dqS[0]);
+  return(&qjDotS[0]);
 }
-double * ModelState::dxb()
+double * ModelState::vb()
 {
 //   return(dxbS);
-  return(&dxbS[0]);
+  return(&vbS[0]);
 }
-wbi::Frame ModelState::baseFrame()
+wbi::Frame ModelState::rootRotoTrans()
 {
-  return(baseS);
+  return(rootS);
 }
 int ModelState::dof()
 {
@@ -141,8 +134,9 @@ void  ModelState::robotModel(std::string robotName)
      std::string localName = "wbiTest";
   //std::string robotName = robotNameC;
   robotWBIModel = new wbiIcub::icubWholeBodyModel(localName.c_str(),robotName.c_str(),iCub::iDynTree::iCubTree_version_tag(2,2,true));
-  robotWBIModel->addJoints(wbiIcub::ICUB_MAIN_DYNAMIC_JOINTS);
-  mexPrintf("WholeBodyModel started with robot : %s \n",robotName.c_str());
+ // robotWBIModel->addJoints(wbiIcub::ICUB_MAIN_DYNAMIC_JOINTS);
+  robotWBIModel->addJoints(wbiIcub::ICUB_MAIN_JOINTS);
+  mexPrintf("WholeBodyModel started with robot : %s, Num of Joints : %d \n",robotName.c_str(), robotWBIModel->getDoFs());
   if(!robotWBIModel->init())
   {
     mexPrintf("WholeBodyModel unable to initialise \n");

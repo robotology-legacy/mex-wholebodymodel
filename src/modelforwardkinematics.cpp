@@ -77,18 +77,18 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray* prhs[])
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
   }
   robotModel = modelState->robotModel(); 
-  q = mxGetPr(prhs[1]);
+  qj = mxGetPr(prhs[1]);
   refLink = mxArrayToString(prhs[2]);
 #ifdef DEBUG
-  mexPrintf("q received \n");
+  mexPrintf("qj received \n");
 
   for(int i = 0; i< numDof;i++)
   {
-    mexPrintf(" %f",q[i]);
+    mexPrintf(" %f",qj[i]);
   }
 #endif  
   
-  robotModel->computeH(q,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
+  robotModel->computeH(qj,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
   
   H_base_wrfLink.setToInverse().get4x4Matrix (H_w2b.data());
   xB.set4x4Matrix (H_w2b.data());
@@ -99,7 +99,7 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray* prhs[])
     robotModel->getLinkId (refLink, refLinkID);
      //robotModel->computeMassMatrix(q,xB,massMatrix);
     //if(!(robotModel->computeJacobian(q,xB,refLinkID,j)))
-    if(!(robotModel->forwardKinematics(q,xB,refLinkID,xT)))
+    if(!(robotModel->forwardKinematics(qj,xB,refLinkID,xT)))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the forwardKinematics call");
     }
@@ -119,14 +119,14 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray* prhs[])
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
   }
   robotModel = modelState->robotModel(); 
-  q = modelState->q();
-  xB = modelState->baseFrame();
+  qj = modelState->qj();
+  xB = modelState->rootRotoTrans();
   refLink = mxArrayToString(prhs[1]);
   int refLinkID;
   robotModel->getLinkId (refLink, refLinkID);
   
 
-  if(!(robotModel->forwardKinematics(q,xB,refLinkID,xT)))
+  if(!(robotModel->forwardKinematics(qj,xB,refLinkID,xT)))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the forwardKinematics call");
   }

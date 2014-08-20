@@ -41,9 +41,9 @@ private:
   static ModelDjDq *modelDjDq;
   bool processArguments(int, const mxArray *[]);
   
-  double *q;
-  double *dq;
-  double *dxb;
+  double *qj;
+  double *qjDot;
+  double *vb;
   double *Djdq;
   char *refLink;
 };

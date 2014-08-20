@@ -20,9 +20,15 @@
 #ifndef MODELSTATE_H
 #define MODELSTATE_H
 
+// global includes
 #include <iostream>
+
+// library includes
 #include <wbi/wbiUtil.h>
 #include <wbi/iWholeBodyModel.h>
+
+//local includes
+#include "mexwholebodymodelsettings.h"
 
 
 namespace mexWBIComponent
@@ -34,10 +40,10 @@ public:
    static ModelState * getInstance(std::string = "icub");
    bool setState(double *,double*,double*,wbi::Frame);
    
-   double * q();
-   double * dq();
-   double * dxb();
-   wbi::Frame baseFrame();
+   double * qj();
+   double * qjDot();
+   double * vb();
+   wbi::Frame rootRotoTrans();
    int dof();
    void robotModel(std::string);
    wbi::iWholeBodyModel * robotModel(void);
@@ -47,8 +53,8 @@ private:
   ModelState(std::string);
   static ModelState * modelState;
   //double *qS, *dqS, *dxbS;
-  double qS[32],dqS[32],dxbS[6];
-  wbi::Frame baseS;
+  double qjS[MEX_WBMODEL_MAX_NUM_JOINTS],qjDotS[MEX_WBMODEL_MAX_NUM_JOINTS],vbS[6];
+  wbi::Frame rootS;
   int numDof;
   std::string currentRobotName;
   

@@ -58,7 +58,8 @@ ComponentManager::ComponentManager(std::string robotName)
    componentList["generalised-forces"] = modelGeneralisedBiasForces;
    componentList["djdq"] = modelDjDq;
    componentList["jacobian"] = modelJacobian;
-   componentList["update-state"] = modelStateUpdater;
+   componentList["update-state"] = modelUpdateState;
+   componentList["get-state"] = modelGetState;
    componentList["model-initialise"] = modelInitialise;
    componentList["forward-kinematics"] = modelForwardKinematics;
   
@@ -75,7 +76,8 @@ ComponentManager::~ComponentManager()
 
   delete(modelJointLimits); 
   delete(modelMassMatrix);
-  delete(modelStateUpdater);
+  delete(modelUpdateState);
+  delete(modelGetState);
   delete(modelGeneralisedBiasForces);
   delete(modelDjDq);
   delete(modelJacobian);
@@ -89,7 +91,8 @@ void ComponentManager::initialise(std::string robotName)
   
   modelState = ModelState::getInstance(robotName);
   //modelState->robotModel(robotModel);    
-  modelStateUpdater = ModelStateUpdater::getInstance();
+  modelUpdateState = ModelUpdateState::getInstance();
+  modelGetState = ModelGetState::getInstance();
   modelJointLimits = ModelJointLimits::getInstance();
   modelMassMatrix = ModelMassMatrix::getInstance();
   modelGeneralisedBiasForces = ModelGeneralisedBiasForces::getInstance();

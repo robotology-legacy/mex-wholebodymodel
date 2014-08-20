@@ -40,9 +40,9 @@ private:
   static ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
   bool processArguments(int, const mxArray *[]);
   
-  double *q;
-  double *dq;
-  double *dxb;
+  double *qj;
+  double *qjDot;
+  double *vb;
   double *h;
   double *g;
 };
