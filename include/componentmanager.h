@@ -38,6 +38,7 @@
 #include "modeljacobian.h"
 #include "modelinitialise.h"
 #include "modelforwardkinematics.h"
+#include "modelvisualizetrajectory.h"
 
 namespace mexWBIComponent
 {
@@ -66,6 +67,7 @@ private:
   ModelJacobian *modelJacobian;
   ModelInitialise *modelInitialise;
   ModelForwardKinematics *modelForwardKinematics;
+  ModelVisualizeTrajectory *modelVisualizeTrajectory;
   
   int numDof;
   
