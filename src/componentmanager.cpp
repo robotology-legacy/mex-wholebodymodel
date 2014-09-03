@@ -62,6 +62,7 @@ ComponentManager::ComponentManager(std::string robotName)
    componentList["get-state"] = modelGetState;
    componentList["model-initialise"] = modelInitialise;
    componentList["forward-kinematics"] = modelForwardKinematics;
+   componentList["visualize-trajectory"] = modelVisualizeTrajectory;
   
 }
 
@@ -84,6 +85,7 @@ ComponentManager::~ComponentManager()
   delete(modelForwardKinematics);
   delete(modelInitialise);
   delete(modelState);
+  delete(modelVisualizeTrajectory);
 }
 
 void ComponentManager::initialise(std::string robotName)
@@ -100,6 +102,7 @@ void ComponentManager::initialise(std::string robotName)
   modelJacobian = ModelJacobian::getInstance();
   modelForwardKinematics = ModelForwardKinematics::getInstance();
   modelInitialise = ModelInitialise::getInstance();
+  modelVisualizeTrajectory = ModelVisualizeTrajectory::getInstance();
 }
 
 // int ComponentManager::getDofs()

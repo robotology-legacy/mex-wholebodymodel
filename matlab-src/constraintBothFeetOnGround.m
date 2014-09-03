@@ -1,4 +1,4 @@
-function [ fTot,J ] = constraintBothFeetOnGround(tau, M, H)
+function [ fTot,J ] = constraintBothFeetOnGround(qj,tau, M, H)
 %CONSTRAINTBOTHFEETONGROUND The combined constraint force due to having
 %both feet on the ground
 %   Detailed explanation goes here
@@ -9,8 +9,8 @@ function [ fTot,J ] = constraintBothFeetOnGround(tau, M, H)
    constraintLink1 = 'l_sole';
    constraintLink2 = 'r_sole';
     
-    Jleft = wholeBodyModel('jacobian',constraintLink1);
-    Jright = wholeBodyModel('jacobian',constraintLink1);
+    Jleft  = reshape(wholeBodyModel('jacobian',constraintLink1),31,6)';
+    Jright = reshape(wholeBodyModel('jacobian',constraintLink2),31,6)';
     
    % M = wholeBodyModel('mass-matrix');
    % MInv = M^(-1);
@@ -25,7 +25,7 @@ function [ fTot,J ] = constraintBothFeetOnGround(tau, M, H)
     JMInv = J/M;
     djdq = [djdq1;djdq2];
     
-    fTot = ( JMInv * J') * ( (JMInv * ( H  + [zeros(6,1);tau])) - djdq);
+    fTot = ( JMInv * J')\ ( (-JMInv * ( -H  + [zeros(6,1);tau])) - djdq);
     
     %JTransf = J'*f;
 end

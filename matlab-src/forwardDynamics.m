@@ -19,11 +19,13 @@ qjDot = v(7:end,:);
 %Mex-WholeBodyModel Components
 wholeBodyModel('update-state',qj,qjDot,[pDot_base;omega_base]);
 M = wholeBodyModel('mass-matrix');    
+%MTilde = wholeBodyModel('mass-matrix',qj);
+
 H = wholeBodyModel('generalised-forces');   
 
-MInv = M^(-1);
+%MInv = M^(-1);
 % RobotModel components
-[Fc,J] = constraintBothFeetOnGround(tau(t), M, H);
+[Fc,J] = constraintBothFeetOnGround(qj,tau(t), M, H);
 
 %getting qDot
 QDot_base = quaternionDerivative(omega_base, Q_base);%,param.QuaternionDerivativeParam);
@@ -31,7 +33,7 @@ QDot_base = quaternionDerivative(omega_base, Q_base);%,param.QuaternionDerivativ
 qDot = [pDot_base;QDot_base;qjDot];
 
 
-vDot = MInv * ( J'*Fc + [zeros(6,1);tau(t)] - H);
+vDot = M\ ( J'*Fc + [zeros(6,1);tau(t)] - H);
 
 %qvDot = zeros(13+2*n,1);
 qvDot = [qDot;vDot];

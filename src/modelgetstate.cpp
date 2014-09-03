@@ -95,18 +95,19 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
 #ifdef DEBUG
   mexPrintf("ModelGetState performing Compute");
 #endif
+  //double *qjTemp;//qjTemp[numDof];
   
   qj = modelState->qj();
   rootRotoTrans = modelState->rootRotoTrans();
   rootRotoTrans.R.getQuaternion(rootQuaternion);
   
-  for (i = 0; i<4 ; i++)
+  for (i = 0; i<3 ; i++)
   {
     wTb[i] = rootRotoTrans.p[i];
   }
-  for (i=0 ; i<3;i++)
+  for (i=0 ; i<4;i++)
   {
-    wTb[i] = rootQuaternion[i];
+    wTb[3+i] = rootQuaternion[i];
   }
   
   qjDot = modelState->qjDot();
@@ -128,13 +129,13 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
   rootRotoTrans.R.getQuaternion(rootQuaternion);
   //wbi::Rotation::getQuaternion(rootRotoTrans.R);
   
-  for (i = 0; i<4 ; i++)
+  for (i = 0; i<3 ; i++)
   {
     wTb[i] = rootRotoTrans.p[i];
   }
-  for (i=0 ; i<3;i++)
+  for (i=0 ; i<4;i++)
   {
-    wTb[i] = rootQuaternion[i];
+    wTb[3+i] = rootQuaternion[i];
   }
   
   qjDot = modelState->qjDot();

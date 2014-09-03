@@ -37,6 +37,7 @@ ModelState::ModelState(std::string robotName) //: qS[ndof],dqS[ndof],dxbS[ndof]
 {
   //this-> 
   yarp::os::Network::init();
+//   yarp::os::Network n;
   robotModel(robotName);
   numDof = robotWBIModel->getDoFs();
   
