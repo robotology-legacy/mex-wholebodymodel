@@ -36,7 +36,9 @@ ModelGeneralisedBiasForces::ModelGeneralisedBiasForces() : ModelComponent(3,0,1)
   mexPrintf("ModelGeneralisedBiasForces constructed\n");
 #endif
   g = new double(3);
-  g[0] = 0; g[1] = 0;g[2] = -9.81;
+  //g[0] = 0; g[1] = 0;g[2] = -9.81;
+  //since the foot frame is with x pointing upwards g must also be in that frame
+  g[0] = -9.81; g[1] = 0; g[2] = 0;
 }
 
 ModelGeneralisedBiasForces::~ModelGeneralisedBiasForces()
