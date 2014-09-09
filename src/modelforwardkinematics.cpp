@@ -20,7 +20,7 @@
  */
 
 // global includes
-
+#include<string.h>
 // library includes
 
 //local includes
@@ -96,7 +96,17 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray* prhs[])
   if(xT != NULL)
   {
     int refLinkID;
-    robotModel->getLinkId (refLink, refLinkID);
+    std::string com("com");
+  
+    if(com.compare(refLink)==0)
+    {
+      refLinkID = -1;
+    }
+    else
+    {
+      robotModel->getLinkId (refLink, refLinkID);
+    }
+    
      //robotModel->computeMassMatrix(q,xB,massMatrix);
     //if(!(robotModel->computeJacobian(q,xB,refLinkID,j)))
     if(!(robotModel->forwardKinematics(qj,xB,refLinkID,xT)))
@@ -123,8 +133,17 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray* prhs[])
   xB = modelState->rootRotoTrans();
   refLink = mxArrayToString(prhs[1]);
   int refLinkID;
-  robotModel->getLinkId (refLink, refLinkID);
   
+  std::string com("com");
+  
+  if(com.compare(refLink)==0)
+  {
+    refLinkID = -1;
+  }
+  else
+  {
+    robotModel->getLinkId (refLink, refLinkID);
+  }
 
   if(!(robotModel->forwardKinematics(qj,xB,refLinkID,xT)))
   {
