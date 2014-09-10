@@ -63,7 +63,7 @@ ComponentManager::ComponentManager(std::string robotName)
    componentList["model-initialise"] = modelInitialise;
    componentList["forward-kinematics"] = modelForwardKinematics;
    componentList["visualize-trajectory"] = modelVisualizeTrajectory;
-  
+   componentList["centroidal-momentum"] = modelCentroidalMomentum;
 }
 
 ComponentManager::~ComponentManager()
@@ -86,6 +86,7 @@ ComponentManager::~ComponentManager()
   delete(modelInitialise);
   delete(modelState);
   delete(modelVisualizeTrajectory);
+  delete(modelCentroidalMomentum);
 }
 
 void ComponentManager::initialise(std::string robotName)
@@ -103,6 +104,7 @@ void ComponentManager::initialise(std::string robotName)
   modelForwardKinematics = ModelForwardKinematics::getInstance();
   modelInitialise = ModelInitialise::getInstance();
   modelVisualizeTrajectory = ModelVisualizeTrajectory::getInstance();
+  modelCentroidalMomentum = ModelCentroidalMomentum::getInstance();
 }
 
 // int ComponentManager::getDofs()

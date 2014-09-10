@@ -39,6 +39,7 @@
 #include "modelinitialise.h"
 #include "modelforwardkinematics.h"
 #include "modelvisualizetrajectory.h"
+#include "modelcentroidalmomentum.h"
 
 namespace mexWBIComponent
 {
@@ -68,6 +69,7 @@ private:
   ModelInitialise *modelInitialise;
   ModelForwardKinematics *modelForwardKinematics;
   ModelVisualizeTrajectory *modelVisualizeTrajectory;
+  ModelCentroidalMomentum *modelCentroidalMomentum;
   
   int numDof;
   
