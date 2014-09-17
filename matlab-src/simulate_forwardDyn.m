@@ -148,14 +148,14 @@ for ind_exp1=1:ind_exp1max
             
         end
         
+        params.matfile.comTraj = params.results.comTraj;
+        params.matfile.contactForces = params.results.contactForces;
+        params.matfile.jointTorques = params.results.jointTorques;
+            
         if EXPERIMENT_MODE==1
             eval(strcat('params.results.exp',num2str(exp_count),'.comTraj = params.results.comTraj;'));
             eval(strcat('params.results.exp',num2str(exp_count),'.contactForces = params.results.contactForces;'));
-            eval(strcat('params.results.exp',num2str(exp_count),'.jointTorques = params.results.jointTorques;'));
-        else
-            params.matfile.comTraj = params.results.comTraj;
-            params.matfile.contactForces = params.results.contactForces;
-            params.matfile.jointTorques = params.results.jointTorques;
+            eval(strcat('params.results.exp',num2str(exp_count),'.jointTorques = params.results.jointTorques;'));            
         end
         
     end
