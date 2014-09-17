@@ -2,6 +2,13 @@ close all;
 clear all;
 clc;
 
+addpath('./../build');
+addpath('./icub_stls');
+addpath('./worker_functions');
+addpath('./experiment_results');
+
+wholeBodyModel('model-initialise','icubGazeboSim');
+
 % set the simulation parameters
 set_parameters;
 

@@ -2,7 +2,7 @@
 %% GENERAL
 params.n_dof = 25;                          % number of degrees of freedom (actuated)
 params.n_constraint = 2;                    % number of constraints
-params.coef_damp = 0;                     % Damping on the joints
+params.coef_damp = 0.5;                     % Damping on the joints
 
 %% INITIAL CONDITIONS
 params.torsoInit    = [-10.0 0.0 0.0]';

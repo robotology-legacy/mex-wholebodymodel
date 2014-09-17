@@ -1,11 +1,5 @@
-%cont_initialize
 
-addpath('./../build');
-addpath('./icub_stls');
-addpath('./worker_functions');
-addpath('./experiment_results');
 %%
-wholeBodyModel('model-initialise','icubGazeboSim');
 
 %[jl1, jl2] = wholeBodyModel('joint-limits');
 load('./jointLimits.mat');

@@ -30,8 +30,7 @@ for ind_exp1=1:ind_exp1max
         set(gui_edit_messages,'String',[{'Starting integration...'};get(gui_edit_messages,'String') ])
         drawnow;
         
-        options = odeset('RelTol',1e-3,'AbsTol',1e-6,'Minimum');
-        
+        options = odeset('RelTol',1e-3,'AbsTol',1e-6);
         [t,xout] = ode15s(@(t,qv)func_forwardDyn(t, qv, params),[params.sim_start_time params.sim_start_time+params.sim_duration],params.qvInit,options);
         
         %interpolation of the output
