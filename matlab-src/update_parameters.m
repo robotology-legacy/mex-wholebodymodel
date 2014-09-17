@@ -15,5 +15,12 @@ params.qvInit = [T_baseInit;params.qjInit;params.qjDotInit;params.v_baseInit];
 
 params.qvInit = [params.qvInit;0;0;0]; %intComError added 
 
+if EXPERIMENT_MODE==0
+    ind_exp1max=1;ind_exp2max=1;
+else
+    ind_exp1max = size(array_var_exp1,1);
+    ind_exp2max = size(array_var_exp2,1);    
+end
+
 %%
 disp('Parameters updated.');
