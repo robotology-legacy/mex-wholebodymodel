@@ -130,7 +130,18 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
   refLink = mxArrayToString(prhs[1]);
   robotModel = modelState->robotModel();
   int refLinkID;
-  robotModel->getLinkId (refLink, refLinkID);
+  std::string com("com");
+  
+  if(com.compare(refLink)==0)
+  {
+    refLinkID = -1;
+  }
+  else
+  {
+    robotModel->getLinkId (refLink, refLinkID);
+  }
+  
+  //robotModel->getLinkId (refLink, refLinkID);
     modelState = ModelState::getInstance();
 
   if(!(robotModel->computeJacobian(qj,xB,refLinkID,j)))
@@ -180,7 +191,17 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
   if(j != NULL)
   {
     int refLinkID;
-    robotModel->getLinkId (refLink, refLinkID);
+   // robotModel->getLinkId (refLink, refLinkID);
+    std::string com("com");
+  
+    if(com.compare(refLink)==0)
+    {
+      refLinkID = -1;
+    }
+    else
+    {
+      robotModel->getLinkId (refLink, refLinkID);
+    }
      //robotModel->computeMassMatrix(q,xB,massMatrix);
     if(!(robotModel->computeJacobian(qj,xB,refLinkID,j)))
     {

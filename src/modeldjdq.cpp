@@ -99,7 +99,17 @@ bool ModelDjDq::computeFast(int nrhs, const mxArray* prhs[])
   xB = modelState->rootRotoTrans();
   refLink = mxArrayToString(prhs[1]);
   int refLinkID;
-  robotModel->getLinkId (refLink, refLinkID);
+  //robotModel->getLinkId (refLink, refLinkID);
+  std::string com("com");
+  
+  if(com.compare(refLink)==0)
+  {
+    refLinkID = -1;
+  }
+  else
+  {
+    robotModel->getLinkId (refLink, refLinkID);
+  }
   
   if(!robotModel->computeDJdq(qj,xB,qjDot,vb,refLinkID,Djdq))
   {
@@ -151,7 +161,17 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
   if(Djdq != NULL)
   {
     int refLinkID;
-    robotModel->getLinkId(refLink,refLinkID);
+    //robotModel->getLinkId(refLink,refLinkID);
+    std::string com("com");
+  
+    if(com.compare(refLink)==0)
+    {
+      refLinkID = -1;
+    }
+    else
+    {
+      robotModel->getLinkId (refLink, refLinkID);
+    }
     if(!robotModel->computeDJdq(qj,xB,qjDot,vb,refLinkID,Djdq))
     {
        mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI DJDq call");
