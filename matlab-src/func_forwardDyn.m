@@ -64,7 +64,11 @@ qvDot = [qDot;vDot;CoMError]; %CoMError added to be integrated
 djdqcom = wholeBodyModel('djdq','com');
 xddcom_sim = params.controller.jacobian.com*vDot(:,:) + djdqcom;
 
-comTraj = [CoMError;xddcom_sim(1:3);xDDcomStar]';
+ddCoMError = xddcom_sim(1:3) - xDDcomStar;
+
+constraint_check = params.controller.jacobian.feet*vDot + params.controller.jdqd.feet;
+
+comTraj = [CoMError;ddCoMError;constraint_check]';
 
 
 end

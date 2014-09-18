@@ -1,7 +1,7 @@
 
 params.qjInit = pi*([params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit])/180;
 
-params.tSpan   = linspace(  params.sim_start_time,  params.sim_start_time+params.sim_duration,  params.sim_duration/params.sim_step);
+tSpan   = linspace(  params.sim_start_time,  params.sim_start_time+params.sim_duration,  params.sim_duration/params.sim_step);
 
 params.controller.Impedances  = [params.kImpTorso,params.kImpArms,params.kImpArms,params.kImpLegs,params.kImpLegs];
 

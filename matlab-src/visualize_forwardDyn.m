@@ -7,8 +7,7 @@ function visualize_forwardDyn(xout,params)
 %           vbase vjoint] along a time span.
 %   params - 
 
-% simtime =params.sim_duration;
-% simstep = params.sim_step;
+tSpan   = linspace(  params.sim_start_time,  params.sim_start_time+params.sim_duration,  params.sim_duration/params.sim_step);
 
 n = size(xout,1);
 q=xout(:,1:7);
@@ -67,9 +66,9 @@ set(gca,'ZColor',[0.2 0.2 0.1]);
 set(gca,'xdir','reverse')
 set(gca, 'drawmode', 'fast');
 
-traj_dat = zeros(size(params.tSpan,1),3);
+traj_dat = zeros(size(tSpan,1),3);
 ll=1;
-for kk = params.tSpan
+for kk = tSpan
     temp = params.controller.Desired_x_dx_ddx_CoM(kk);
     traj_dat(ll,:) = temp(:,1)';ll=ll+1;
 end
@@ -325,14 +324,14 @@ while ii<n+1
         vis_speed=vis_speed+1;
     end
     
-    if params.visualize_stop == 1;
-        params.visualize_stop=0;
-        break;
-    end
+%     if params.visualize_stop == 1;
+%         params.visualize_stop=0;
+%         break;
+%     end
     
-    if ii==n-1 && params.visualize_loop==1;
-        ii=1;
-    end
+%     if ii+vis_speed > n  && params.visualize_loop==1;
+%         ii=1;
+%     end
     
     ii=ii+vis_speed;
     

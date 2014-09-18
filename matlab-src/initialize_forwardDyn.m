@@ -25,14 +25,14 @@ params.qjInit = pi*([params.torsoInit;params.leftArmInit;params.rightArmInit;par
 % params.sim_start_time = 0;
 % params.sim_duration = 10;
 % params.sim_step = 0.1;
-params.tSpan   = linspace(  params.sim_start_time,  params.sim_start_time+params.sim_duration,  params.sim_duration/params.sim_step);
+tSpan   = linspace(  params.sim_start_time,  params.sim_start_time+params.sim_duration,  params.sim_duration/params.sim_step);
 params.qvInit   = [];
 params.current_time = 0;
 
 % params.coef_damp = 0.5;
 
 % visualize_stop = 0;%BOOLEAN
-% visualize_loop = 0; 
+visualize_loop = 0; 
 % VISUALIZER_ON = 1;
 
 %% EXPERIMENT
@@ -92,27 +92,27 @@ params.controller.qjInit           = params.qjInit;
 
 %% results
 
-params.matfile = matfile('results.mat','Writable',true);
+results_matfile = matfile('results.mat','Writable',true);
 
 if EXPERIMENT_MODE==1
     exp_count=0;
     for ind_exp1 = 1:ind_exp1max
         for ind_exp2 = 1:ind_exp2max
             exp_count=exp_count+1;
-            eval(strcat('params.results.exp',num2str(exp_count),'.',var_exp1,'= array_var_exp1(',num2str(ind_exp1),');'));
-            eval(strcat('params.results.exp',num2str(exp_count),'.',var_exp2,'= array_var_exp2(',num2str(ind_exp2),');'));
+            eval(strcat('results.exp',num2str(exp_count),'.',var_exp1,'= array_var_exp1(',num2str(ind_exp1),');'));
+            eval(strcat('results.exp',num2str(exp_count),'.',var_exp2,'= array_var_exp2(',num2str(ind_exp2),');'));
         end
     end
 end
 
-params.results.contactForces = [];
-params.results.jointTorques = [];
-params.results.comTraj = [];
+contactForces = [];
+jointTorques = [];
+comTraj = [];
 % plots
 params.PLOT.contactForces = 0;
 params.PLOT.jointTorques  = 0;
 params.PLOT.comTraj       = 0;
-
+params.PLOT.all           = 0;
 
 
 
