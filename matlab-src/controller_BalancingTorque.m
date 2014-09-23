@@ -35,7 +35,7 @@ xDDcomStar = Desired_x_dx_ddx_CoM(:,3) - Gains(1)*(xcom - Desired_x_dx_ddx_CoM(:
 Pr =  PosRightFoot(1:3) - xcom; % Application point of the contact force on the right foot w.r.t. CoM
 
 A  = [ eye(3),   zeros(3),eye(3), zeros(3);
-      -Sf(xcom),  eye(3), Sf(Pr), eye(3) ];
+      -skew(xcom),  eye(3), skew(Pr), eye(3) ];
 pinvA = pinv(A, PINV_TOL);
   
 HDotDes  = [ m*xDDcomStar ;
