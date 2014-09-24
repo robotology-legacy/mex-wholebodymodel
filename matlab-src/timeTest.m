@@ -20,7 +20,7 @@ tic;
 for i = 1:numRuns
     
     %Setting State to random values
-    q = rand(32,1);dq = rand(32,1);dxb = rand(6,1);
+    q = rand(25,1);dq = rand(25,1);dxb = rand(6,1);
     
     %Mex-WholeBodyModel Components
     M = wholeBodyModel('mass-matrix',q);    
@@ -52,7 +52,7 @@ tic;
 for i = 1:numRuns
     
     %Setting State to random values
-    q = rand(32,1);dq = rand(32,1);dxb = rand(6,1);
+    q = rand(25,1);dq = rand(25,1);dxb = rand(6,1);
     
     wholeBodyModel('update-state',q,dq,dxb);
     
