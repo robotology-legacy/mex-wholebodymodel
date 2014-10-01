@@ -53,18 +53,44 @@ end
 
 kin(:,:,1)= q; %use base data instead of fwdkin rootlink
 
-cla;
+for ii=4:-1:1
+    axes(params.plot_main(ii));
+        cla;
+%     set(gca,'Color',[0.8 0.8 0.8]);
+%     set(gca,'XColor',[0.8 0.8 0.8]);
+%     set(gca,'YColor',[0.8 0.8 0.8]);
+%     set(gca,'ZColor',[0.8 0.8 0.8]);
+%     set(gca,'xdir','reverse')
+%     set(gca, 'drawmode', 'fast');
+%     rotate3d(gca,'on');
+% 
+% %     plot_main(ii) = subplot('Position', plot_pos(ii,:));
+% %     delete(params.plot_objs(ii));
+% %     params.plot_objs(ii)=plot3(0,0,0,'.');
+% %     axis([-0.425 0.575 -0.5 0.5 0 1]); hold on;
+%     patch([-0.425 -0.425 0.575 0.575],[-0.5 0.5 0.5 -0.5],[0 0 0 0],[0.6 0.6 0.8]);
+    patch([-0.45 -0.45 0.45 0.45],[-0.37 0.53 0.53 -0.37],[0 0 0 0],[0.6 0.6 0.8]);
+%     
+%     figure(figure_main);
+drawnow
+% pause
+end
 
-plot3(0,0,0,'.');
-axis([-0.425 0.575 -0.5 0.5 0 1]); hold on;
-patch([-0.425 -0.425 0.575 0.575],[-0.5 0.5 0.5 -0.5],[0 0 0 0],[0.6 0.6 0.8]);
 
-set(gca,'Color',[0.4 0.4 0.43]);
-set(gca,'XColor',[0.1 0.4 0.1]);
-set(gca,'YColor',[0.4 0.1 0.1]);
-set(gca,'ZColor',[0.2 0.2 0.1]);
-set(gca,'xdir','reverse')
-set(gca, 'drawmode', 'fast');
+axes(params.plot_main(1));
+% get(gca,'Children')
+
+
+% plot3(0,0,0,'.');
+% axis([-0.425 0.575 -0.5 0.5 0 1]); hold on;
+% patch([-0.425 -0.425 0.575 0.575],[-0.5 0.5 0.5 -0.5],[0 0 0 0],[0.6 0.6 0.8],'FaceAlpha',0.8);
+% 
+% set(gca,'Color',[0.8 0.8 0.8]);
+% set(gca,'XColor',[0.8 0.8 0.8]);
+% set(gca,'YColor',[0.8 0.8 0.8]);
+% set(gca,'ZColor',[0.8 0.8 0.8]);
+% set(gca,'xdir','reverse')
+% set(gca, 'drawmode', 'fast');
 
 traj_dat = zeros(size(tSpan,1),3);
 ll=1;
@@ -86,13 +112,13 @@ plot_traj = plot3(traj_dat(:,1),traj_dat(:,2),traj_dat(:,3),'r');
 
 % root_link
 x(1)=kin(1,1,1);y(1)=kin(1,2,1);z(1)=kin(1,3,1);
-pos(1)=plot3(x(1),y(1),z(1),'w*');
+pos(1)=plot3(x(1),y(1),z(1),'w.');
 
 % joints
 for jj=2:n_plot-1
     
     [x(jj),y(jj),z(jj),R(:,:,jj)] = quat2rot(kin(1,:,jj));
-    pos(jj)=plot3(x(jj),y(jj),z(jj),'w*');
+    pos(jj)=plot3(x(jj),y(jj),z(jj),'w.');
     
 end
 % COM
@@ -116,9 +142,119 @@ xyzpairs(13,:) = [x(13) x(14) y(13) y(14) z(13) z(14)];
 
 
 lin = zeros(1,n_lin);
+lnkpatch = zeros(1,n_lin);
+xyzpatch.vertices = zeros(8,3);
+xyzpatch.faces = zeros(6,4);
+
+mult_patch = [0.07,0.03 ;
+              0.04,0.02 ;
+              0.03,0.02 ;
+              0.025,0.02 ;
+              0.04,0.02 ;
+              0.03,0.02 ;
+              0.025,0.02 ;
+              0.03,0.02 ;
+              0.025,0.02 ;
+              0.02,0.02 ;
+              0.03,0.02 ;
+              0.025,0.02 ;
+              0.02,0.02 ];
+
 for jj=1:n_lin
+    
     lin(jj) = line(xaxis,xyzpairs(jj,1:2),yaxis,xyzpairs(jj,3:4),zaxis,xyzpairs(jj,5:6),'erasemode','normal','linewidth',3,'color','black');
+    
+    % for patch
+    vectlnk= [xyzpairs(jj,2)-xyzpairs(jj,1),xyzpairs(jj,4)-xyzpairs(jj,3),xyzpairs(jj,6)-xyzpairs(jj,5)];
+    orthlnk= null(vectlnk);
+    orthlnk1 = mult_patch(jj,1)*orthlnk(:,1);
+    orthlnk2 = mult_patch(jj,2)*orthlnk(:,2);
+    qq1 = orthlnk1+orthlnk2;
+    qq2 = -orthlnk1+orthlnk2;
+    qq3 = -orthlnk1-orthlnk2;
+    qq4 = orthlnk1-orthlnk2;
+    
+    
+    
+    xyzpatch.vertices = [xyzpairs(jj,2)+qq1(1) , xyzpairs(jj,4)+qq1(2) , xyzpairs(jj,6)+qq1(3);
+                xyzpairs(jj,2)+qq2(1) , xyzpairs(jj,4)+qq2(2) , xyzpairs(jj,6)+qq2(3);
+                xyzpairs(jj,2)+qq3(1) , xyzpairs(jj,4)+qq3(2) , xyzpairs(jj,6)+qq3(3);
+                xyzpairs(jj,2)+qq4(1) , xyzpairs(jj,4)+qq4(2) , xyzpairs(jj,6)+qq4(3);              
+                xyzpairs(jj,1)+qq1(1) , xyzpairs(jj,3)+qq1(2) , xyzpairs(jj,5)+qq1(3);
+                xyzpairs(jj,1)+qq2(1) , xyzpairs(jj,3)+qq2(2) , xyzpairs(jj,5)+qq2(3);
+                xyzpairs(jj,1)+qq3(1) , xyzpairs(jj,3)+qq3(2) , xyzpairs(jj,5)+qq3(3);
+                xyzpairs(jj,1)+qq4(1) , xyzpairs(jj,3)+qq4(2) , xyzpairs(jj,5)+qq4(3)];
+            
+            
+    temp = xyzpatch.vertices(:,1);        
+    xyzpatch.vertices(:,1) = xyzpatch.vertices(:,3);
+    xyzpatch.vertices(:,3) = temp;
+    
+    xyzpatch.faces = [ 1 2 3 4;
+                        1 4 8 5;
+                        5 8 7 6;
+                        7 3 2 6;
+                        2 6 5 1;
+                        3 7 8 4];
+
+    lnkpatch(jj) = patch('vertices',xyzpatch.vertices,'faces',xyzpatch.faces,'FaceAlpha',0.2);
+    % end for patch
 end
+%%% for the feet
+
+% feet patches    
+jj=n_lin+1; %rightfeet
+
+orthlnk1 = [0 0.03 0]';
+orthlnk2 = [0 0 0.03]';
+
+qq1 = orthlnk1+2*orthlnk2;
+qq2 = -orthlnk1+2*orthlnk2;
+qq3 = -orthlnk1-orthlnk2;
+qq4 = orthlnk1-orthlnk2;
+
+xyzpatch.vertices = [xyzpairs(4,2)+qq1(1) , xyzpairs(4,4)+qq1(2) , xyzpairs(4,6)+qq1(3);
+    xyzpairs(4,2)+qq2(1) , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
+    xyzpairs(4,2)+qq3(1) , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
+    xyzpairs(4,2)+qq4(1) , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3);
+    xyzpairs(4,2)+qq1(1)+0.03 , xyzpairs(4,4)+qq1(2) , xyzpairs(4,6)+qq1(3);
+    xyzpairs(4,2)+qq2(1)+0.03 , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
+    xyzpairs(4,2)+qq3(1)+0.03 , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
+    xyzpairs(4,2)+qq4(1)+0.03 , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3)];
+
+temp = xyzpatch.vertices(:,1);        
+    xyzpatch.vertices(:,1) = xyzpatch.vertices(:,3);
+    xyzpatch.vertices(:,3) = temp;
+
+lnkpatch(jj) = patch('vertices',xyzpatch.vertices,'faces',xyzpatch.faces,'FaceAlpha',0.2);
+
+jj=n_lin+2; %leftfeet
+
+
+orthlnk1 = [0 0.03 0]';
+orthlnk2 = [0 0 0.03]';
+
+qq1 = orthlnk1+2*orthlnk2;
+qq2 = -orthlnk1+2*orthlnk2;
+qq3 = -orthlnk1-orthlnk2;
+qq4 = orthlnk1-orthlnk2;
+
+xyzpatch.vertices = [xyzpairs(7,2)+qq1(1) , xyzpairs(7,4)+qq1(2) , xyzpairs(7,6)+qq1(3);
+    xyzpairs(7,2)+qq2(1) , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
+    xyzpairs(7,2)+qq3(1) , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
+    xyzpairs(7,2)+qq4(1) , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3);
+    xyzpairs(7,2)+qq1(1)+0.03 , xyzpairs(7,4)+qq1(2) , xyzpairs(7,6)+qq1(3);
+    xyzpairs(7,2)+qq2(1)+0.03 , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
+    xyzpairs(7,2)+qq3(1)+0.03 , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
+    xyzpairs(7,2)+qq4(1)+0.03 , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3)];
+
+temp = xyzpatch.vertices(:,1);        
+    xyzpatch.vertices(:,1) = xyzpatch.vertices(:,3);
+    xyzpatch.vertices(:,3) = temp;
+lnkpatch(jj) = patch('vertices',xyzpatch.vertices,'faces',xyzpatch.faces,'FaceAlpha',0.2);
+
+
+%%%
 
 lin_mirror = zeros(1,n_lin);
 for jj=1:n_lin
@@ -130,6 +266,55 @@ for jj=1:n_plot
     [x(jj),y(jj),z(jj),R(:,:,jj)] = quat2rot(kin(ii,:,jj));
     set(pos(jj),xaxis,x(jj),yaxis,y(jj),zaxis,z(jj));
 end
+
+% copy objects to other views
+
+% copyobj([lnkpatch';lin'],params.plot_main(2));
+% view(3);
+% copyobj([lnkpatch';lin'],params.plot_main(3));
+% view(3);
+% copyobj([lnkpatch';lin'],params.plot_main(4));
+% view(3);
+% delete(params.plot_objs(2));    
+% params.plot_objs(2) = copyobj([lnkpatch';lin'],params.plot_main(2));
+% view(3);
+% delete(params.plot_objs(3));
+% params.plot_objs(3) = copyobj([lnkpatch';lin'],params.plot_main(3));
+% view(3);
+% delete(params.plot_objs(4));    
+% params.plot_objs(4) = copyobj([lnkpatch';lin'],params.plot_main(4));
+% view(3);
+
+
+if exist('params.plot_objs')    
+    delete(params.plot_objs{2});
+    delete(params.plot_objs{3});
+    delete(params.plot_objs{4});    
+end
+    
+
+params.plot_objs{1}=[lnkpatch';lin';pos';lin_mirror';plot_traj];
+
+axes(params.plot_main(2));
+params.plot_objs{2} = copyobj(params.plot_objs{1},params.plot_main(2));
+view(-90,90);
+axes(params.plot_main(3));
+params.plot_objs{3} = copyobj(params.plot_objs{1},params.plot_main(3));
+view(0,1);
+axes(params.plot_main(4));
+params.plot_objs{4} = copyobj(params.plot_objs{1},params.plot_main(4));
+view(-90,1);
+axes(params.plot_main(1));
+
+
+
+
+
+
+
+
+
+
 
 % ADD MESHES
 % %     if draw_meshes==1
@@ -243,6 +428,10 @@ end
 
 % params.draw_init = 0;
 
+
+
+
+
 % CONTINOUS PLOT
 
 set(plot_traj,xaxis,traj_dat(:,1),yaxis,traj_dat(:,2),zaxis,traj_dat(:,3));
@@ -273,13 +462,121 @@ while ii<n+1
     xyzpairs(12,:) = [x(13) x(12) y(13) y(12) z(13) z(12)];
     xyzpairs(13,:) = [x(13) x(14) y(13) y(14) z(13) z(14)];
     
+    
     for jj=1:n_lin
         set(lin(jj),xaxis,xyzpairs(jj,1:2),yaxis,xyzpairs(jj,3:4),zaxis,xyzpairs(jj,5:6));
+        
+        vectlnk= [xyzpairs(jj,2)-xyzpairs(jj,1),xyzpairs(jj,4)-xyzpairs(jj,3),xyzpairs(jj,6)-xyzpairs(jj,5)];
+        orthlnk= null(vectlnk);
+        orthlnk1 = mult_patch(jj,1)*orthlnk(:,1);
+        orthlnk2 = mult_patch(jj,2)*orthlnk(:,2);
+        qq1 = orthlnk1+orthlnk2;
+        qq2 = -orthlnk1+orthlnk2;
+        qq3 = -orthlnk1-orthlnk2;
+        qq4 = orthlnk1-orthlnk2;
+    
+    
+    
+    xyzpatch.vertices = [xyzpairs(jj,2)+qq1(1) , xyzpairs(jj,4)+qq1(2) , xyzpairs(jj,6)+qq1(3);
+                xyzpairs(jj,2)+qq2(1) , xyzpairs(jj,4)+qq2(2) , xyzpairs(jj,6)+qq2(3);
+                xyzpairs(jj,2)+qq3(1) , xyzpairs(jj,4)+qq3(2) , xyzpairs(jj,6)+qq3(3);
+                xyzpairs(jj,2)+qq4(1) , xyzpairs(jj,4)+qq4(2) , xyzpairs(jj,6)+qq4(3);              
+                xyzpairs(jj,1)+qq1(1) , xyzpairs(jj,3)+qq1(2) , xyzpairs(jj,5)+qq1(3);
+                xyzpairs(jj,1)+qq2(1) , xyzpairs(jj,3)+qq2(2) , xyzpairs(jj,5)+qq2(3);
+                xyzpairs(jj,1)+qq3(1) , xyzpairs(jj,3)+qq3(2) , xyzpairs(jj,5)+qq3(3);
+                xyzpairs(jj,1)+qq4(1) , xyzpairs(jj,3)+qq4(2) , xyzpairs(jj,5)+qq4(3)];
+            
+            
+    temp = xyzpatch.vertices(:,1);        
+    xyzpatch.vertices(:,1) = xyzpatch.vertices(:,3);
+    xyzpatch.vertices(:,3) = temp;
+    
+    set(lnkpatch(jj),'vertices',xyzpatch.vertices);
+    
     end
+% feet patches    
+jj=n_lin+1; %rightfeet
+
+orthlnk1 = [0 0.03 0]';
+orthlnk2 = [0 0 0.03]';
+
+qq1 = orthlnk1+2*orthlnk2;
+qq2 = -orthlnk1+2*orthlnk2;
+qq3 = -orthlnk1-orthlnk2;
+qq4 = orthlnk1-orthlnk2;
+
+xyzpatch.vertices = [xyzpairs(4,2)+qq1(1) , xyzpairs(4,4)+qq1(2) , xyzpairs(4,6)+qq1(3);
+    xyzpairs(4,2)+qq2(1) , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
+    xyzpairs(4,2)+qq3(1) , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
+    xyzpairs(4,2)+qq4(1) , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3);
+    xyzpairs(4,2)+qq1(1)+0.03 , xyzpairs(4,4)+qq1(2) , xyzpairs(4,6)+qq1(3);
+    xyzpairs(4,2)+qq2(1)+0.03 , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
+    xyzpairs(4,2)+qq3(1)+0.03 , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
+    xyzpairs(4,2)+qq4(1)+0.03 , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3)];
+
+temp = xyzpatch.vertices(:,1);        
+    xyzpatch.vertices(:,1) = xyzpatch.vertices(:,3);
+    xyzpatch.vertices(:,3) = temp;
+
+set(lnkpatch(jj),'vertices',xyzpatch.vertices);
+
+jj=n_lin+2; % left feet
+
+orthlnk1 = [0 0.03 0]';
+orthlnk2 = [0 0 0.03]';
+
+qq1 = orthlnk1+2*orthlnk2;
+qq2 = -orthlnk1+2*orthlnk2;
+qq3 = -orthlnk1-orthlnk2;
+qq4 = orthlnk1-orthlnk2;
+
+xyzpatch.vertices = [xyzpairs(7,2)+qq1(1) , xyzpairs(7,4)+qq1(2) , xyzpairs(7,6)+qq1(3);
+    xyzpairs(7,2)+qq2(1) , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
+    xyzpairs(7,2)+qq3(1) , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
+    xyzpairs(7,2)+qq4(1) , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3);
+    xyzpairs(7,2)+qq1(1)+0.03 , xyzpairs(7,4)+qq1(2) , xyzpairs(7,6)+qq1(3);
+    xyzpairs(7,2)+qq2(1)+0.03 , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
+    xyzpairs(7,2)+qq3(1)+0.03 , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
+    xyzpairs(7,2)+qq4(1)+0.03 , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3)];
+
+temp = xyzpatch.vertices(:,1);        
+    xyzpatch.vertices(:,1) = xyzpatch.vertices(:,3);
+    xyzpatch.vertices(:,3) = temp;
+
+set(lnkpatch(jj),'vertices',xyzpatch.vertices);
+
+% end feet patches    
+    
+    % copy objects to other views
+% delete(plot2objs);    
+% plot2objs = copyobj([lnkpatch';lin'],params.plot_main(2));
+% view(3);
+% delete(plot3objs);
+% plot3objs = copyobj([lnkpatch';lin'],params.plot_main(3));
+% view(3);
+% delete(plot4objs);
+% plot4objs = copyobj([lnkpatch';lin'],params.plot_main(4));
+% view(3);
+
+% params.plot_objs{1}=[lnkpatch';lin'];
+params.plot_objs{1}=[lnkpatch';lin';pos';lin_mirror';plot_traj];
+
+
+delete(params.plot_objs{2});    
+params.plot_objs{2} = copyobj(params.plot_objs{1},params.plot_main(2));
+
+delete(params.plot_objs{3});
+params.plot_objs{3} = copyobj(params.plot_objs{1},params.plot_main(3));
+
+delete(params.plot_objs{4});    
+params.plot_objs{4} = copyobj(params.plot_objs{1},params.plot_main(4));
+
+
     
     for jj=1:n_lin
         set(lin_mirror(jj),xaxis,-0.5*xyzpairs(jj,1:2),yaxis,xyzpairs(jj,3:4),zaxis,xyzpairs(jj,5:6));
     end
+    
     
     
     % %     % update meshes
@@ -340,3 +637,4 @@ end
 % set(params.gui.gui_edit_currentTime,'String','-');
 
 end
+

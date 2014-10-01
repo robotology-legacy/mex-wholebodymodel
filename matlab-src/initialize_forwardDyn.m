@@ -70,19 +70,20 @@ end
 % % params.kImpLegs  = [1 1 1 0.1 1 1];
 
 params.controller.Impedances  = [params.kImpTorso,params.kImpArms,params.kImpArms,params.kImpLegs,params.kImpLegs];
-    
-params.controller.MassMatrix       = zeros(params.n_dof+6);
-params.controller.invMassMatrix    = zeros(params.n_dof+6);
-params.controller.Coriolis         = zeros(params.n_dof+6,1);
-params.controller.Gravitation      = zeros(params.n_dof+6,1);
-params.controller.CentroidalMom    = zeros(6,1);
-params.controller.fkin.rightfoot   = zeros(7,1);
-params.controller.jacobian.feet    = zeros(params.n_constraint*6,params.n_dof+6);                           
-params.controller.JMinvconst       = zeros(params.n_constraint*6,params.n_dof+6);
-params.controller.JMinvJt          = params.controller.JMinvconst * transpose(params.controller.jacobian.feet);                            
-params.controller.jdqd.feet        = zeros(params.n_constraint*6,1);
-params.controller.fkin.com         = zeros(7,1);
-params.controller.jacobian.com     = zeros(params.n_constraint*6,params.n_dof+6);
+params.Impedances  = [params.kImpTorso,params.kImpArms,params.kImpArms,params.kImpLegs,params.kImpLegs];
+  
+% params.controller.MassMatrix       = zeros(params.n_dof+6);
+% params.controller.invMassMatrix    = zeros(params.n_dof+6);
+% params.controller.Coriolis         = zeros(params.n_dof+6,1);
+% params.controller.Gravitation      = zeros(params.n_dof+6,1);
+% params.controller.CentroidalMom    = zeros(6,1);
+% params.controller.fkin.rightfoot   = zeros(7,1);
+% params.controller.jacobian.feet    = zeros(params.n_constraint*6,params.n_dof+6);                           
+% params.controller.JMinvconst       = zeros(params.n_constraint*6,params.n_dof+6);
+% params.controller.JMinvJt          = params.controller.JMinvconst * transpose(params.controller.jacobian.feet);                            
+% params.controller.jdqd.feet        = zeros(params.n_constraint*6,1);
+% params.controller.fkin.com         = zeros(7,1);
+% params.controller.jacobian.com     = zeros(params.n_constraint*6,params.n_dof+6);
 params.controller.qjInit           = params.qjInit;    
 
 

@@ -19,22 +19,35 @@ initialize_forwardDyn;
 % initialize GUI
 figure_main = figure('Name', 'iCub Simulator', 'NumberTitle', 'off',...
     'Position', [50,400,600,650]);
+params.figure_main = figure_main;
 set(figure_main, 'MenuBar', 'none', 'BackingStore', 'off');
 set(figure_main, 'BackingStore', 'off');
-plot_main = subplot('Position', [0.1,0.25,0.80,0.70]);
+% plot_main = subplot('Position', [0.1,0.25,0.80,0.70]);
+params.plot_main =zeros(1,4);
+plot_pos = [0.51,0.20,0.45,0.40;
+            0.01,0.20,0.45,0.40;
+            0.51,0.62,0.45,0.40;
+            0.01,0.62,0.45,0.40];
 
-plot3(0,0,0,'.');
-axis([-0.425 0.575 -0.5 0.5 0 1]); hold on;
-patch([-0.425 -0.425 0.575 0.575],[-0.5 0.5 0.5 -0.5],[0 0 0 0],[0.6 0.6 0.8]);
+for ii=1:4
+    params.plot_main(ii) = subplot('Position', plot_pos(ii,:));
+    params.plot_objs{ii} = plot3(0,0,0,'.');
+    axis([-0.5 0.5 -0.42 0.58 0 1]); hold on;
+    patch([-0.45 -0.45 0.45 0.45],[-0.37 0.53 0.53 -0.37],[0 0 0 0],[0.6 0.6 0.8]);
+    set(gca,'Color',[0.8 0.8 0.8]);
+    set(gca,'XColor',[0.8 0.8 0.8]);
+    set(gca,'YColor',[0.8 0.8 0.8]);
+    set(gca,'ZColor',[0.8 0.8 0.8]);
+    set(gca,'xdir','reverse')
+    set(gca, 'drawmode', 'fast');
+    params.draw_init = 1;
+    rotate3d(gca,'on');
 
-set(gca,'Color',[0.4 0.4 0.43]);
-set(gca,'XColor',[0.1 0.4 0.1]);
-set(gca,'YColor',[0.4 0.1 0.1]);
-set(gca,'ZColor',[0.2 0.2 0.1]);
-set(gca,'xdir','reverse')
-set(gca, 'drawmode', 'fast');
-params.draw_init = 1;
-rotate3d(gca,'on');
+    figure(figure_main);
+end
+
+axes(params.plot_main(1))
+
 %
 % setup GUI
 gui_pushbutton_reset = uicontrol(figure_main,'Style','push','Pos',[20 20 45 24],...

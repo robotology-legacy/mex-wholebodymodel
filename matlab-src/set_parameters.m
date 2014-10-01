@@ -1,15 +1,15 @@
 
 %% GENERAL
 params.n_dof = 25;                          % number of degrees of freedom (actuated)
-params.n_constraint = 2;                    % number of constraints
+params.n_constraint = 2;                    % number of constraints (for now 1 or 2 - onleftfoot or onbothfeet respectively)
 params.coef_damp = 0.1;                     % Damping on the joints
 
 %% INITIAL CONDITIONS
-params.torsoInit    = [-10.0 0.0 0.0]';
-params.leftArmInit  = [19.7 29.7 0.0 44.9 0.0]';
-params.rightArmInit = [19.7 29.7 0.0 44.9 0.0]';
-params.leftLegInit  = [40.5 0.1 0.0 -18.5 -5.5 -0.1]';
-params.rightLegInit = [40.5 0.1 0.0 -18.5 -5.5 -0.1]';
+params.torsoInit    = [-10.0  0.0   0.0]';
+params.leftArmInit  = [ 19.7  29.7  0.0  44.9  0.0]';
+params.rightArmInit = [ 19.7  29.7  0.0  44.9  0.0]';
+params.leftLegInit  = [ 40.5   0.1  0.0 -18.5 -5.5 -0.1]';
+params.rightLegInit = [ 40.5   0.1  0.0 -18.5 -5.5 -0.1]';
 
 params.qjDotInit = zeros(params.n_dof,1);
 params.v_baseInit = zeros(6,1);
@@ -46,12 +46,21 @@ array_var_exp2 = {@(t)[0.459 0 0 ; 0.068 0 0 ; 0 0 0];
           
 % params.controller.Desired_x_dx_ddx_CoM = @(t)[0.459 0 0 ; 0.068 0 0 ; 0 0 0];
 
+% params.controller.Desired_x_dx_ddx_CoM = @(t)[0.42 0 0 ; 0.0 0 0 ; 0 0 0];
+
+
 params.controller.Desired_x_dx_ddx_CoM = @(t)[   0.45     0       0;
          sin((t+pi/2))*0.04+0.07     cos((t+pi/2))*0.04     -sin((t+pi/2))*0.04;
               sin(t)*0.02             cos(t)*0.02             -sin(t)*0.02];
+          
+% params.controller.Desired_x_dx_ddx_CoM = @(t)[   0.45     0       0;
+%          0.068 0 0;
+%               sin(2*t)*0.02             cos(2*t)*0.02*2             -sin(2*t)*0.02*2*2];          
 
 % params.controller.Gains  = [  10    0   2.5  0];% kp ki kd +1
-params.controller.Gains  = [  0.5    0   0.5  0.1];% kp ki kd +1
+% params.controller.Gains  = [  0.5    0   0.5  0.1];% kp ki kd +1
+params.controller.Gains  = [  10   0   1  0.1];
+params.Gains  = [  10   0   1  0.1];
 
 
 % Impadances acting in the null space of the desired contact forces 
