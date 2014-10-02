@@ -8,16 +8,17 @@ end
 t = varargin{1}.t;
 xout = varargin{1}.xout;
 params = varargin{1}.params;
+n_constraint = params.n_constraint;
 
 tSpan   = linspace(  params.sim_start_time,  params.sim_start_time+params.sim_duration,  params.sim_duration/params.sim_step);
 
 %computation of the requested results
 %         if params.PLOT.contactForces == 1;contactForces = zeros(size(tSpan,2),12);end;
-contactForces = zeros(size(tSpan,2),12);
+contactForces = zeros(size(tSpan,2),6*n_constraint);
 %         if params.PLOT.jointTorques  == 1;jointTorques = zeros(size(tSpan,2),params.n_dof);end;
 jointTorques = zeros(size(tSpan,2),params.n_dof);
 %         if params.PLOT.comTraj       == 1;comTraj = zeros(size(tSpan,2),9);end;
-comTraj = zeros(size(tSpan,2),18);
+comTraj = zeros(size(tSpan,2),6+n_constraint*6);
 
 for ii=1:size(tSpan,2)
     [ qvDot, F_contact,tau_ctrl, CoM] = func_forwardDyn(t(ii), xout(ii,:)', params );
@@ -39,22 +40,35 @@ end
 %             end
 figure_contactForces = figure('Name', strcat('iCub Simulator - Contact Forces - exp',exp_name), 'NumberTitle', 'off',...
     'Position', [675,550,1250,450]);
-subplot(2,2,1);
-plot(t,contactForces(:,1:3));
-title('Left Foot');xlabel('Time (s)');ylabel('Fc');legend('F_x','F_y','F_z');
-
-subplot(2,2,2);
-plot(t,contactForces(:,7:9));
-title('Right Foot');xlabel('Time (s)');ylabel('Fc');legend('F_x','F_y','F_z');
-
-subplot(2,2,3);
-plot(t,contactForces(:,4:6));
-title('Left Foot');xlabel('Time (s)');ylabel('Mc');legend('M_x','M_y','M_z');
-
-subplot(2,2,4);
-plot(t,contactForces(:,10:12));
-title('Right Foot');xlabel('Time (s)');ylabel('Mc');legend('M_x','M_y','M_z');
-
+switch n_constraint
+    case 1 % on left foot
+        subplot(1,2,1);
+        plot(t,contactForces(:,1:3));
+        title('Left Foot - Forces');xlabel('Time (s)');ylabel('Fc');legend('F_x','F_y','F_z');
+        
+        subplot(1,2,2);
+        plot(t,contactForces(:,4:6));
+        title('Left Foot - Moments');xlabel('Time (s)');ylabel('Mc');legend('M_x','M_y','M_z');
+    case 2 % on both feet
+        subplot(2,2,1);
+        plot(t,contactForces(:,1:3));
+        title('Left Foot - Forces');xlabel('Time (s)');ylabel('Fc');legend('F_x','F_y','F_z');
+        
+        subplot(2,2,3);
+        plot(t,contactForces(:,4:6));
+        title('Left Foot - Moments');xlabel('Time (s)');ylabel('Mc');legend('M_x','M_y','M_z');
+        
+        subplot(2,2,2);
+        plot(t,contactForces(:,7:9));
+        title('Right Foot - Forces');xlabel('Time (s)');ylabel('Fc');legend('F_x','F_y','F_z');
+        
+        subplot(2,2,4);
+        plot(t,contactForces(:,10:12));
+        title('Right Foot - Moments');xlabel('Time (s)');ylabel('Mc');legend('M_x','M_y','M_z');
+    otherwise
+        disp('Choose number of constraints properly (1 or 2)');
+        return
+end
 %         end
 
 %         if params.PLOT.jointTorques  == 1
@@ -103,7 +117,7 @@ plot(t,comTraj(:,4:6));
 title('ddx_{com} error');xlabel('Time (s)');ylabel('Acceleration error');legend('x','y','z');
 
 subplot(1,3,3);
-plot(t,comTraj(:,7:18));
+plot(t,comTraj(:,7:6+n_constraint*2));
 title('constraint Jddq + dJdq==0 check');xlabel('Time (s)');ylabel('0');
 
 
