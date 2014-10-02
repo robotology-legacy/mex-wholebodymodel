@@ -138,7 +138,7 @@ end
 % output
 % [x0 , desiredFeetContactForces]
 %%
-desiredFeetContactForces = pinvA*(HDotDes-grav);
+% desiredFeetContactForces = pinvA*(HDotDes-grav); % to ignore QP
 measuredFeetContactForces = desiredFeetContactForces;
 
 tauForDesiredFeetForces = PInv_JcMinvSt*(JcMinv*h - JcDqD - JcMinvJct*measuredFeetContactForces);
