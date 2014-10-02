@@ -1,4 +1,4 @@
-function [tau,CoMError,xDDcomStar] = controller_talha(q,v,m,h,g,H,Jc,JcMinv,JcMinvJct,JcDqD,J_CoM,pos_rightFoot,pos_CoM,IntErrorCoM,qjInit,Gains,Impedances,n_dof,n_constraint,t,prm)
+function [tau,CoMError,xDDcomStar] = controller_test_BalancingTorqueWithQP(q,v,m,h,g,H,Jc,JcMinv,JcMinvJct,JcDqD,J_CoM,pos_rightFoot,pos_CoM,IntErrorCoM,qjInit,Gains,Impedances,n_dof,n_constraint,t,prm)
 
 
 % t                       = prm.current_time;
