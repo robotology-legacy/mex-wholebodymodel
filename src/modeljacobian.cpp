@@ -183,10 +183,11 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
   }
 #endif  
   
-  robotModel->computeH(qj,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
+  //int robot_base_frame_link;
+  //wbi::Frame H_rootLink_wrBase;
+  //wbi::Frame H_baseLink_wrWorld;
   
-  H_base_wrfLink.setToInverse().get4x4Matrix (H_w2b.data());
-  xB.set4x4Matrix (H_w2b.data());
+  xB = computeRootWorldRotoTranslation(qj);
   
   if(j != NULL)
   {

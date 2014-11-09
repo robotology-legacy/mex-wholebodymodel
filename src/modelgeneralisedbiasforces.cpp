@@ -133,9 +133,7 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
   }
 #endif  
 
-  robotModel->computeH(qj,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
-    H_base_wrfLink.setToInverse().get4x4Matrix (H_w2b.data());
-  xB.set4x4Matrix (H_w2b.data());
+  xB = computeRootWorldRotoTranslation(qj);
   
   if(h != NULL)
   {

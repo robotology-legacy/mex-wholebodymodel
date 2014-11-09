@@ -49,12 +49,14 @@ public:
   const unsigned int numArguments();
   const unsigned int numAltArguments();
   
-  
+   
   ~ModelComponent();
   
 protected:
   
-  bool setState(double * , double * , double *, wbi::Frame);  
+ // bool setState(double * , double * , double *, wbi::Frame);  
+  bool changeWorldFrame(std::string,wbi::Frame);
+  wbi::Frame computeRootWorldRotoTranslation(double *);
   ModelComponent(const unsigned int, const unsigned int, const unsigned int);  
   int numDof;
   
@@ -64,9 +66,15 @@ protected:
   wbi::iWholeBodyModel *robotModel;
   
   Eigen::Matrix4d H_w2b;
-  wbi::Frame H_base_wrfLink,xB;
+  //wbi::Frame H_base_wrfLink,
+  wbi::Frame xB;
 
-  int ROBOT_BASE_FRAME_LINK;
+  int robot_base_frame_link;
+  wbi::Frame H_rootLink_wrWorld;
+  wbi::Frame H_baseLink_wrWorld;
+  //wbi::Frame H_rootLink_wrWorld;
+  
+  //ROBOT_BASE_FRAME_LINK;
   ModelState *modelState;
   
 };

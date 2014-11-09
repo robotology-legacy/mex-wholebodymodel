@@ -150,10 +150,8 @@ bool ModelUpdateState::setState(int nrhs, const mxArray* prhs[])
 //       dq_temp = new double(modelState->dof());
 //       dxb_temp = new double(6);
 //       
-      robotModel->computeH(q_temp,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
-  
-      H_base_wrfLink.setToInverse().get4x4Matrix (H_w2b.data());
-      xB.set4x4Matrix (H_w2b.data());
+
+      xB = computeRootWorldRotoTranslation(q_temp);
       
       modelState->setState(q_temp,dq_temp,dxb_temp,xB);
             

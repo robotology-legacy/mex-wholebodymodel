@@ -36,7 +36,7 @@ ModelComponent::ModelComponent(const unsigned int args, const unsigned int altAr
   numDof = robotModel->getDoFs();
   
   //robotModel->getLinkId ("root", ROBOT_BASE_FRAME_LINK);
-  robotModel->getLinkId ("l_sole", ROBOT_BASE_FRAME_LINK);
+  robotModel->getLinkId ("l_sole", robot_base_frame_link);
   
 }
 
@@ -62,4 +62,30 @@ const unsigned int ModelComponent::numArguments()
 const unsigned int ModelComponent::numAltArguments()
 {
   return(numAltArgs);
+}
+
+bool ModelComponent::changeWorldFrame(std::string baseLinkName, wbi::Frame F)
+{
+  //int refLinkID;
+  std::string com("com");
+  
+  if(com.compare(baseLinkName)==0)
+  {
+    robot_base_frame_link = -1;
+  }
+  else
+  {
+    robotModel->getLinkId (baseLinkName.c_str(), robot_base_frame_link);
+  }
+  
+  H_baseLink_wrWorld = F;
+  return(true);
+}
+
+wbi::Frame ModelComponent::computeRootWorldRotoTranslation(double* q_temp)
+{
+      robotModel->computeH(q_temp,H_baseLink_wrWorld,robot_base_frame_link, H_rootLink_wrWorld);
+      H_rootLink_wrWorld.setToInverse().get4x4Matrix (H_w2b.data());
+      xB.set4x4Matrix (H_w2b.data());
+      return(xB);
 }

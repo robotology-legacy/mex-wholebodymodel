@@ -164,12 +164,7 @@ bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
   }
 #endif  
   //int LINK_FOOT_WRF;
-  
-  
-  robotModel->computeH(qj,wbi::Frame(),ROBOT_BASE_FRAME_LINK, H_base_wrfLink);
-  
-  H_base_wrfLink.setToInverse().get4x4Matrix (H_w2b.data());
-  xB.set4x4Matrix (H_w2b.data());
+  xB = computeRootWorldRotoTranslation(qj);
   
   if(massMatrix != NULL)
   {

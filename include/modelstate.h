@@ -37,7 +37,7 @@ class ModelState
 {
 public:
    ~ModelState();
-   static ModelState * getInstance(std::string = "icub");
+   static ModelState * getInstance(std::string = "icubGazeboSim");
    bool setState(double *,double*,double*,wbi::Frame);
    
    double * qj();
