@@ -1,4 +1,4 @@
-addpath('./../build');
+%addpath('./../build');
 %Running a 10,000 run trial
 totTime = 0;numRuns = 10000;
 
@@ -16,13 +16,13 @@ fprintf('Initialisation time : %e secs\n',initTime);
 fprintf('Num Trials : %d \n Starting Trial...\n',numRuns);
 tic;
 
-qj = rand(32,1);
-xTb = wholeBodyModel('forward-kinematics',qj,refLink1)
+qj = rand(25,1);
+xTb = wholeBodyModel('forward-kinematics',qj,refLink1);
 
 for i = 1:numRuns
     
     %Setting State to random values
-    qj = rand(32,1);dqj = rand(32,1);dxb = rand(6,1);
+    qj = rand(25,1);dqj = rand(25,1);dxb = rand(6,1);
     
     %Mex-WholeBodyModel Components
     M = wholeBodyModel('mass-matrix',qj);    
@@ -54,7 +54,7 @@ tic;
 for i = 1:numRuns
     
     %Setting State to random values
-    qj = rand(32,1);dqj = rand(32,1);dxb = rand(6,1);
+    qj = rand(25,1);dqj = rand(25,1);dxb = rand(6,1);
     
     wholeBodyModel('update-state',qj,dqj,dxb);
     
