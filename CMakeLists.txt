@@ -89,6 +89,11 @@ link_directories(${CMAKE_BINARY_DIR})
 add_library(${PROJECTNAME} SHARED ${folder_source} ${folder_header})
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    endif()
+endif()
 
 #Removing default dynamic library extensions (.dll for Windows, .so for UNIX) and prefixes (lib) otherwise automatically prepended to the mex file.
 set_target_properties(${PROJECTNAME} PROPERTIES SUFFIX .${SFUNCTION_SUFFIX})
@@ -123,7 +128,6 @@ ${yarpWholeBodyInterface_LIBRARIES}
 ${paramHelp_LIBRARIES}
 ${iDynTree_LIBRARIES}
 ${YARP_LIBRARIES}
-${ICUB_LIBRARIES}
 ${MATLAB_LIBRARIES}
 ${skinDynLib_LIBRARIES}
 ${ctrlLib_LIBRARIES}
