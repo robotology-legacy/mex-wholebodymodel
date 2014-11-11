@@ -149,3 +149,26 @@ std::string ModelState::robotName(void)
 {
   return(currentRobotName);
 }
+
+//    void setBaseFrameLink(int);
+//    void setBaseToWorldFrameRotoTrans(wbi::Frame);
+//    
+//    int getBaseFrameLink(void);
+//    wbi::Frame getBaseToWorldFrameRotoTrans(void);
+   
+void ModelState::setBaseFrameLink(int bfl)
+{
+  robot_base_frame_link = bfl;
+}
+void ModelState::setBaseToWorldFrameRotoTrans(wbi::Frame trans)
+{
+  H_baseLink_wrWorld = trans;
+}
+int ModelState::getBaseFrameLink(void)
+{
+  return(robot_base_frame_link);
+} 
+wbi::Frame ModelState::getBaseToWorldFrameRotoTrans(void)
+{
+  return(H_baseLink_wrWorld);
+} 

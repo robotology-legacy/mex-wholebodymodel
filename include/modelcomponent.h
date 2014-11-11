@@ -69,10 +69,10 @@ protected:
   //wbi::Frame H_base_wrfLink,
   wbi::Frame xB;
 
-  int robot_base_frame_link;
+//   int robot_base_frame_link;
+//   wbi::Frame H_rootLink_wrWorld;
+//   wbi::Frame H_baseLink_wrWorld;
   wbi::Frame H_rootLink_wrWorld;
-  wbi::Frame H_baseLink_wrWorld;
-  //wbi::Frame H_rootLink_wrWorld;
   
   //ROBOT_BASE_FRAME_LINK;
   ModelState *modelState;

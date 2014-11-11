@@ -35,8 +35,10 @@ ModelComponent::ModelComponent(const unsigned int args, const unsigned int altAr
   robotModel =  modelState->robotModel();
   numDof = robotModel->getDoFs();
   
+  int robot_base_frame_link;
   //robotModel->getLinkId ("root", ROBOT_BASE_FRAME_LINK);
   robotModel->getLinkId ("l_sole", robot_base_frame_link);
+  modelState->setBaseFrameLink(robot_base_frame_link);
   
 }
 
@@ -68,7 +70,8 @@ bool ModelComponent::changeWorldFrame(std::string baseLinkName, wbi::Frame F)
 {
   //int refLinkID;
   std::string com("com");
-  
+  int robot_base_frame_link;
+  //mexPrintf("Old base frame : %d\n",modelState->getBaseFrameLink());
   if(com.compare(baseLinkName)==0)
   {
     robot_base_frame_link = -1;
@@ -77,15 +80,18 @@ bool ModelComponent::changeWorldFrame(std::string baseLinkName, wbi::Frame F)
   {
     robotModel->getLinkId (baseLinkName.c_str(), robot_base_frame_link);
   }
+  modelState->setBaseFrameLink(robot_base_frame_link);
+  mexPrintf("Base Frame Link ID set to : %d\n",modelState->getBaseFrameLink());
   
-  H_baseLink_wrWorld = F;
+  modelState->setBaseToWorldFrameRotoTrans(F);
   return(true);
 }
 
 wbi::Frame ModelComponent::computeRootWorldRotoTranslation(double* q_temp)
 {
-      robotModel->computeH(q_temp,H_baseLink_wrWorld,robot_base_frame_link, H_rootLink_wrWorld);
+      robotModel->computeH(q_temp,modelState->getBaseToWorldFrameRotoTrans(),modelState->getBaseFrameLink(), H_rootLink_wrWorld);
       H_rootLink_wrWorld.setToInverse().get4x4Matrix (H_w2b.data());
       xB.set4x4Matrix (H_w2b.data());
+    //  mexPrintf("Current base frame : %d\n",modelState->getBaseFrameLink());
       return(xB);
 }

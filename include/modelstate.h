@@ -40,6 +40,12 @@ public:
    static ModelState * getInstance(std::string = "icubGazeboSim");
    bool setState(double *,double*,double*,wbi::Frame);
    
+   void setBaseFrameLink(int);
+   void setBaseToWorldFrameRotoTrans(wbi::Frame);
+   
+   int getBaseFrameLink(void);
+   wbi::Frame getBaseToWorldFrameRotoTrans(void);
+   
    double * qj();
    double * qjDot();
    double * vb();
@@ -55,6 +61,11 @@ private:
   //double *qS, *dqS, *dxbS;
   double qjS[MEX_WBMODEL_MAX_NUM_JOINTS],qjDotS[MEX_WBMODEL_MAX_NUM_JOINTS],vbS[6];
   wbi::Frame rootS;
+  int robot_base_frame_link;
+  //wbi::Frame H_rootLink_wrWorld;
+  wbi::Frame H_baseLink_wrWorld;
+   
+  
   int numDof;
   std::string currentRobotName;
   
