@@ -113,7 +113,7 @@ bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray* prhs[])
    wbi::Rotation tempRot(tempR);
    wbi::Frame tempFrame(tempRot, tempP);
    //H_baseLink_wrWorld = temp;
-   H_baseLink_wrWorld = tempFrame;
+   //H_baseLink_wrWorld = tempFrame;
    mexPrintf("Roto translation of world from base frame applied \n"); 
 }
 
