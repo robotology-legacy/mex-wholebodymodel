@@ -2,8 +2,13 @@
 %Running a 10,000 run trial
 totTime = 0;numRuns = 10000;
 
-refLink1 = 'r_sole';
-refLink2 = 'l_gripper';
+refLink1 = 'r_hip_1';
+refLink2 = 'l_hip_1';
+
+% number of joint for iCubGenova03
+nj       = 25;   
+% number of joint for iCubHeidelberg01
+% nj       = 15;   
 
 
 fprintf('Starting normal mode trial \n-------------------------- \n');
@@ -16,13 +21,13 @@ fprintf('Initialisation time : %e secs\n',initTime);
 fprintf('Num Trials : %d \n Starting Trial...\n',numRuns);
 tic;
 
-qj = rand(25,1);
+qj = rand(nj,1);
 xTb = wholeBodyModel('forward-kinematics',qj,refLink1);
 
 for i = 1:numRuns
     
     %Setting State to random values
-    qj = rand(25,1);dqj = rand(25,1);dxb = rand(6,1);
+    qj = rand(nj,1);dqj = rand(nj,1);dxb = rand(6,1);
     
     %Mex-WholeBodyModel Components
     M = wholeBodyModel('mass-matrix',qj);    
@@ -37,8 +42,6 @@ totTime = toc();
 fprintf('Normal-Mode Trial Total Time : %f secs \n',totTime);
 fprintf('Normal-Mode Trial Average Time : %e secs\n',totTime/numRuns);
 
-clear all;
-
 fprintf('\n\nStarting optimised mode trial \n-------------------------- \n');
 
 totTime = 0;numRuns = 10000;
@@ -47,14 +50,14 @@ wholeBodyModel('model-initialise');
 initTime = toc();
 fprintf('Initialisation time : %e secs \n Starting Trial...\n ',initTime);
 
-refLink1 = 'r_sole';
-refLink2 = 'l_gripper';
+refLink1 = 'r_hip_1';
+refLink2 = 'l_hip_1';
 
 tic;
 for i = 1:numRuns
     
     %Setting State to random values
-    qj = rand(25,1);dqj = rand(25,1);dxb = rand(6,1);
+    qj = rand(nj,1);dqj = rand(nj,1);dxb = rand(6,1);
     
     wholeBodyModel('update-state',qj,dqj,dxb);
     
