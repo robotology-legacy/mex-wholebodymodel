@@ -24,7 +24,8 @@
 #include <mex.h>
 
 //library includes
-#include <wbiIcub/icubWholeBodyModel.h>
+//#include <wbiIcub/icubWholeBodyModel.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 //local includes
 #include "componentmanager.h"

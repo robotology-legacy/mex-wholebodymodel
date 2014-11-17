@@ -18,7 +18,8 @@
  */
 
 #include "../include/modeljointlimits.h"
-#include <wbiIcub/icubWholeBodyModel.h>
+// #include <wbiIcub/icubWholeBodyModel.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 #include <stdio.h>
 #include <mex.h>
 

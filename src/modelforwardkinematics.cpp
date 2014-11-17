@@ -22,6 +22,7 @@
 // global includes
 #include<string.h>
 // library includes
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 //local includes
 
@@ -101,7 +102,8 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray* prhs[])
     }
     else
     {
-      robotModel->getLinkId (refLink, refLinkID);
+//       robotModel->getLinkId (refLink, refLinkID);
+      robotModel->getFrameList().idToIndex(refLink, refLinkID);
     }
     
      //robotModel->computeMassMatrix(q,xB,massMatrix);
@@ -139,7 +141,8 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray* prhs[])
   }
   else
   {
-    robotModel->getLinkId (refLink, refLinkID);
+//     robotModel->getLinkId (refLink, refLinkID);
+    robotModel->getFrameList().idToIndex(refLink, refLinkID);
   }
 
   if(!(robotModel->forwardKinematics(qj,xB,refLinkID,xT)))

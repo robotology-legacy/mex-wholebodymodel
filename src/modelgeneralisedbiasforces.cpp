@@ -21,7 +21,8 @@
 
 //library includes
 #include <wbi/iWholeBodyModel.h>
-#include <wbiIcub/icubWholeBodyModel.h>
+// #include <wbiIcub/icubWholeBodyModel.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 //local includes
 #include "modelgeneralisedbiasforces.h"

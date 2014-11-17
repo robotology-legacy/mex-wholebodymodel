@@ -21,8 +21,11 @@
 
 // library includes
 #include <mex.h>
-#include <wbiIcub/icubWholeBodyModel.h>
+// #include <wbiIcub/icubWholeBodyModel.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
+#include <yarpWholeBodyInterface/yarpWbiUtil.h>
 #include <yarp/os/Network.h>
+#include <yarp/os/ResourceFinder.h>
 
 // local includes
 #include "modelstate.h"
@@ -134,10 +137,40 @@ void  ModelState::robotModel(std::string robotName)
   currentRobotName = robotName;
      std::string localName = "wbiTest";
   //std::string robotName = robotNameC;
-  robotWBIModel = new wbiIcub::icubWholeBodyModel(localName.c_str(),robotName.c_str(),iCub::iDynTree::iCubTree_version_tag(2,2,true));
- // robotWBIModel->addJoints(wbiIcub::ICUB_MAIN_DYNAMIC_JOINTS);
-  robotWBIModel->addJoints(wbiIcub::ICUB_MAIN_JOINTS);
+  //   robotWBIModel = new wbiIcub::icubWholeBodyModel(localName.c_str(),robotName.c_str(),iCub::iDynTree::iCubTree_version_tag(2,2,true));	
+  //   robotWBIModel->addJoints(wbiIcub::ICUB_MAIN_JOINTS);
+  yarp::os::ResourceFinder rf;
+  yarp::os::Property yarpWbiOptions;
+  //Get wbi options from the canonical file
+  if( !rf.check("yarp") )
+  {
+      fprintf(stderr,"[ERR] locomotionControl: impossible to open wholeBodyInterface: wbi_conf_file option missing");
+  }
+  
+  rf.setVerbose (true);
+  rf.setDefaultConfigFile ("yarpWholeBodyInterface.ini");
+//   rf.setDefaultContext ("icubGazeboSim");
+  
+  std::string wbiConfFile = rf.findFile("yarpWholeBodyInterface.ini");
+  yarpWbiOptions.fromConfigFile(wbiConfFile);
+  //Overwrite the robot parameter that could be present in wbi_conf_file
+  yarpWbiOptions.put("robot",robotName);
+  robotWBIModel = new yarpWbi::yarpWholeBodyModel(localName.c_str(), yarpWbiOptions);
+  
+  wbi::IDList RobotMainJoints;
+  std::string RobotMainJointsListName = "ROBOT_MAIN_JOINTS";
+  if( !yarpWbi::loadIdListFromConfig(RobotMainJointsListName,yarpWbiOptions,RobotMainJoints) )
+  {
+      fprintf(stderr, "[ERR] locomotionControl: impossible to load wbiId joint list with name %s\n",RobotMainJointsListName.c_str());
+  }	
+  robotWBIModel->addJoints(RobotMainJoints);
+  
+  
   mexPrintf("WholeBodyModel started with robot : %s, Num of Joints : %d \n",robotName.c_str(), robotWBIModel->getDoFs());
+  
+  
+  
+  
   if(!robotWBIModel->init())
   {
     mexPrintf("WholeBodyModel unable to initialise \n");

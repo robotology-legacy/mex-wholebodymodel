@@ -21,7 +21,8 @@
 #include <iostream>
 
 // library includes
-#include<wbiIcub/icubWholeBodyModel.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
+//#include<wbiIcub/icubWholeBodyModel.h>
 
 // local includes
 #include "modelstate.h"
@@ -37,7 +38,9 @@ ModelComponent::ModelComponent(const unsigned int args, const unsigned int altAr
   
   int robot_base_frame_link;
   //robotModel->getLinkId ("root", ROBOT_BASE_FRAME_LINK);
-  robotModel->getLinkId ("l_sole", robot_base_frame_link);
+  robotModel->getFrameList().idToIndex("l_sole",robot_base_frame_link);
+  //robotModel->getFrameList().wbiIdToNumericId("l_sole",robot_base_frame_link);
+  //robotModel->getLinkId ("l_sole", robot_base_frame_link);
   modelState->setBaseFrameLink(robot_base_frame_link);
   
 }
@@ -78,7 +81,9 @@ bool ModelComponent::changeWorldFrame(std::string baseLinkName, wbi::Frame F)
   }
   else
   {
-    robotModel->getLinkId (baseLinkName.c_str(), robot_base_frame_link);
+//     robotModel->getLinkId (baseLinkName.c_str(), robot_base_frame_link);
+      robotModel->getFrameList().idToIndex(baseLinkName.c_str(),robot_base_frame_link);
+      //wbiIdToNumericId(baseLinkName.c_str(),robot_base_frame_link);
   }
   modelState->setBaseFrameLink(robot_base_frame_link);
   mexPrintf("Base Frame Link ID set to : %d\n",modelState->getBaseFrameLink());

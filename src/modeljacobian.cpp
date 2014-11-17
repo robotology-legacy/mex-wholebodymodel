@@ -21,7 +21,8 @@
 
 //library includes
 #include <wbi/iWholeBodyModel.h>
-#include <wbiIcub/icubWholeBodyModel.h>
+// #include <wbiIcub/icubWholeBodyModel.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 //local includes
 
 #include "modeljacobian.h"
@@ -138,7 +139,8 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
   }
   else
   {
-    robotModel->getLinkId (refLink, refLinkID);
+    //robotModel->getLinkId (refLink, refLinkID);
+    robotModel->getFrameList().idToIndex(refLink, refLinkID);
   }
   
   //robotModel->getLinkId (refLink, refLinkID);
@@ -201,7 +203,8 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
     }
     else
     {
-      robotModel->getLinkId (refLink, refLinkID);
+      //robotModel->getLinkId (refLink, refLinkID);
+      robotModel->getFrameList().idToIndex(refLink, refLinkID);
     }
      //robotModel->computeMassMatrix(q,xB,massMatrix);
     if(!(robotModel->computeJacobian(qj,xB,refLinkID,j)))

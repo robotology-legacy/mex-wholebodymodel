@@ -21,8 +21,10 @@
 
 // library includes
 #include <wbi/iWholeBodyModel.h>
-#include <wbiIcub/icubWholeBodyModel.h>
-#include <wbiIcub/wbiIcubUtil.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
+//#include <wbiIcub/icubWholeBodyModel.h>
+//#include <wbiIcub/wbiIcubUtil.h>
+#include <yarpWholeBodyInterface/yarpWbiUtil.h>
 
 // project includes
 #include "modelcomponent.h"
@@ -108,7 +110,8 @@ bool ModelDjDq::computeFast(int nrhs, const mxArray* prhs[])
   }
   else
   {
-    robotModel->getLinkId (refLink, refLinkID);
+    //robotModel->getLinkId (refLink, refLinkID);
+    robotModel->getFrameList().idToIndex(refLink,refLinkID);
   }
   
   if(!robotModel->computeDJdq(qj,xB,qjDot,vb,refLinkID,Djdq))
@@ -167,7 +170,8 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
     }
     else
     {
-      robotModel->getLinkId (refLink, refLinkID);
+      //robotModel->getLinkId (refLink, refLinkID);
+      robotModel->getFrameList().idToIndex(refLink,refLinkID);
     }
     if(!robotModel->computeDJdq(qj,xB,qjDot,vb,refLinkID,Djdq))
     {

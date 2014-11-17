@@ -23,7 +23,8 @@
 # include <modelcomponent.h>
 #include <stdio.h>
 # include <mex.h>
-# include <wbiIcub/icubWholeBodyModel.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
+// # include <wbiIcub/icubWholeBodyModel.h>
 
 namespace mexWBIComponent{
 
