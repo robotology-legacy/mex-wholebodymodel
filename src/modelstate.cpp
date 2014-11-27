@@ -151,6 +151,8 @@ void  ModelState::robotModel(std::string robotName)
   rf.setDefaultConfigFile ("yarpWholeBodyInterface.ini");
 //   rf.setDefaultContext ("icubGazeboSim");
   
+  rf.configure(0,0);
+  
   std::string wbiConfFile = rf.findFile("yarpWholeBodyInterface.ini");
   yarpWbiOptions.fromConfigFile(wbiConfFile);
   //Overwrite the robot parameter that could be present in wbi_conf_file
@@ -158,7 +160,7 @@ void  ModelState::robotModel(std::string robotName)
   robotWBIModel = new yarpWbi::yarpWholeBodyModel(localName.c_str(), yarpWbiOptions);
   
   wbi::IDList RobotMainJoints;
-  std::string RobotMainJointsListName = "ROBOT_MAIN_JOINTS";
+  std::string RobotMainJointsListName = "ROBOT_MEX_WBI_TOOLBOX";
   if( !yarpWbi::loadIdListFromConfig(RobotMainJointsListName,yarpWbiOptions,RobotMainJoints) )
   {
       fprintf(stderr, "[ERR] locomotionControl: impossible to load wbiId joint list with name %s\n",RobotMainJointsListName.c_str());
