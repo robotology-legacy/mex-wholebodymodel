@@ -27,7 +27,7 @@ Minv          = M\eye(n_dof+6,n_dof+6);
 h             = wholeBodyModel('generalised-forces');  
 g             = wholeBodyModel('generalised-forces',qj,zeros(25,1),zeros(6,1)); 
 H             = wholeBodyModel('centroidal-momentum');
-pos_rightFoot = wholeBodyModel('forward-kinematics',qj,constraintLink2);
+pos_rightFoot = wholeBodyModel('forward-kinematics',constraintLink2);
  pos_rightFoot = pos_rightFoot(1:3);
 
 switch n_constraint
@@ -44,7 +44,7 @@ end
                          
 JcMinv = Jc*Minv;
 JcMinvJct = JcMinv * transpose(Jc);                                   
-pos_CoM =  wholeBodyModel('forward-kinematics',qj,'com');
+pos_CoM =  wholeBodyModel('forward-kinematics','com');
 pos_CoM = pos_CoM(1:3);
 J_CoM = reshape(wholeBodyModel('jacobian','com'),31,6)';
 J_CoMDqD = wholeBodyModel('djdq','com');
@@ -72,7 +72,7 @@ IntErrorCoM = qv(64:end,:);
 %% CONTROLLER
 
 % [tau_ctrl,CoMError,xDDcomStar] = controller_BalancingTorque(qj,v,IntErrorCoM,params.controller);
-
+% 
 [tau_ctrl,CoMError,xDDcomStar] = controller_BalancingTorque(qj,...
                                                             v,...
                                                             M(1,1),...
@@ -95,6 +95,9 @@ IntErrorCoM = qv(64:end,:);
                                                             t,...
                                                             params.controller);
                                                         
+                                                    
+                                                        
+% %                                                         
 % [tau_ctrl,CoMError,xDDcomStar] = controller_test_BalancingTorqueWithQP(qj,...
 %                                                             v,...
 %                                                             M(1,1),...
@@ -117,7 +120,7 @@ IntErrorCoM = qv(64:end,:);
 %                                                             t,...
 %                                                             params.controller);                                                        
                                                         
-
+%tau_ctrl = zeros(size(tau_ctrl));    
 t_damp = [zeros(6,31);params.coef_damp*[zeros(25,6),eye(25,25)]]*[zeros(6,1);qjDot];
     
 % F_contact = (params.controller.JMinvJt)\(params.controller.JMinvconst*(params.controller.Coriolis+t_damp-[zeros(6,1);tau_ctrl])-params.controller.jdqd.feet);

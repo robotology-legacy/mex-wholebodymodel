@@ -15,7 +15,7 @@ load('./jointLimits.mat');
 % params.leftLegInit  = [40.5 0.1 0.0 -18.5 -5.5 -0.1]';
 % params.rightLegInit = [40.5 0.1 0.0 -18.5 -5.5 -0.1]';
 
-params.qjInit = pi*([params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit])/180;
+%params.qjInit = pi*([params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit])/180;
 
 % params.qjDotInit = zeros(params.n_dof,1);
 % params.v_baseInit = zeros(6,1);
