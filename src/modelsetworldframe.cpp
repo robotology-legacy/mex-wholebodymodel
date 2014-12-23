@@ -86,7 +86,9 @@ bool ModelSetWorldFrame::compute(int nrhs, const mxArray* prhs[])
    wbi::Rotation tempRot(tempR);
    wbi::Frame tempFrame(tempRot, tempP);
    //H_baseLink_wrWorld = temp;
-   changeWorldFrame(refLinkName,tempFrame);
+   modelState->setReferenceFrameLink(refLinkName);
+   modelState->setReferenceToWorldFrameRotoTrans(tempFrame);
+//    changeWorldFrame(refLinkName,tempFrame);
    mexPrintf("Robot base link changed to %s\n",refLinkName.c_str()); 
 }
 bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray* prhs[])

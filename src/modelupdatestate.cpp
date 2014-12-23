@@ -151,9 +151,9 @@ bool ModelUpdateState::setState(int nrhs, const mxArray* prhs[])
 //       dxb_temp = new double(6);
 //       
 
-      xB = computeRootWorldRotoTranslation(q_temp);
+      //xB = computeRootWorldRotoTranslation(q_temp);
       
-      modelState->setState(q_temp,dq_temp,dxb_temp,xB);
+      modelState->setState(q_temp,dq_temp,dxb_temp);
             
 #ifdef DEBUG
       mexPrintf("Updated state : (q,dq)\n");

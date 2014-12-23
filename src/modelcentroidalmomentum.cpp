@@ -89,10 +89,10 @@ bool ModelCentroidalMomentum::computeFast(int nrhs, const mxArray* prhs[])
 
     qj = modelState->qj();
     qjDot = modelState->qjDot();
-    xB = modelState->rootRotoTrans();
+    world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);//modelState->//rootRotoTrans();
     vb = modelState->vb();
    
-    if(!robotModel->computeCentroidalMomentum(qj,xB,qjDot,vb,h))
+    if(!robotModel->computeCentroidalMomentum(qj,world_H_rootLink,qjDot,vb,h))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI computeCentroidalMomentum call");
     }
@@ -135,11 +135,11 @@ bool ModelCentroidalMomentum::processArguments(int nrhs, const mxArray* prhs[])
     mexPrintf(" %f",qj[i]);
   }
 #endif  
-  xB = computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
   
   if(h != NULL)
   {
-    if(!robotModel->computeCentroidalMomentum(qj,xB,qjDot,vb,h))
+    if(!robotModel->computeCentroidalMomentum(qj,world_H_rootLink,qjDot,vb,h))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI computeCentroidalMomentum call");
     }

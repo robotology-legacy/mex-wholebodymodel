@@ -36,17 +36,18 @@ ModelState* ModelState::modelState;
 wbi::iWholeBodyModel * ModelState::robotWBIModel = NULL;
 
 
-ModelState::ModelState(std::string robotName) //: qS[ndof],dqS[ndof],dxbS[ndof]
+ModelState::ModelState(std::string robotName) : robot_reference_frame_link_name("l_sole") //: qS[ndof],dqS[ndof],dxbS[ndof]
 {
   //this-> 
   yarp::os::Network::init();
 //   yarp::os::Network n;
   robotModel(robotName);
   numDof = robotWBIModel->getDoFs();
+  this->setReferenceFrameLink(this->robot_reference_frame_link_name);
   
-#ifdef DEBUG
-  mexPrintf("ModelState constructed with %d \n",ndof); 
-#endif
+// #ifdef DEBUG
+//   mexPrintf("ModelState constructed with %d \n",numDof); 
+// #endif
   
  
 }
@@ -72,7 +73,7 @@ ModelState *  ModelState::getInstance(std::string robotName)
 }
 
 
-bool ModelState::setState(double *qj_t,double *qjDot_t,double *vb_t, wbi::Frame F)
+bool ModelState::setState(double *qj_t,double *qjDot_t,double *vb_t)
 {
 #ifdef DEBUG
   mexPrintf("Trying to update state\n");
@@ -86,7 +87,7 @@ bool ModelState::setState(double *qj_t,double *qjDot_t,double *vb_t, wbi::Frame 
   {
     vbS[i] = vb_t[i];
   }
-  rootS = F;
+  //rootS = F;
   return(true);
 }
 //    setState(double *,double*,double*,wbi:Frame);
@@ -112,10 +113,10 @@ double * ModelState::vb()
 //   return(dxbS);
   return(&vbS[0]);
 }
-wbi::Frame ModelState::rootRotoTrans()
-{
-  return(rootS);
-}
+// wbi::Frame ModelState::rootRotoTrans()
+// {
+//   return(rootS);
+// }
 int ModelState::dof()
 {
   return(numDof);
@@ -135,7 +136,7 @@ void  ModelState::robotModel(std::string robotName)
   }
   
   currentRobotName = robotName;
-     std::string localName = "wbiTest";
+     std::string localName = "mexWBModel";
   //std::string robotName = robotNameC;
   //   robotWBIModel = new wbiIcub::icubWholeBodyModel(localName.c_str(),robotName.c_str(),iCub::iDynTree::iCubTree_version_tag(2,2,true));	
   //   robotWBIModel->addJoints(wbiIcub::ICUB_MAIN_JOINTS);
@@ -168,15 +169,13 @@ void  ModelState::robotModel(std::string robotName)
   robotWBIModel->addJoints(RobotMainJoints);
   
   
-  mexPrintf("WholeBodyModel started with robot : %s, Num of Joints : %d \n",robotName.c_str(), robotWBIModel->getDoFs());
-  
-  
-  
-  
   if(!robotWBIModel->init())
   {
-    mexPrintf("WholeBodyModel unable to initialise \n");
+    mexPrintf("WBI unable to initialise (usually means unable to connect to chosen robot)\n");
   }
+  
+  
+  mexPrintf("mexWholeBodyModel started with robot : %s, Num of Joints : %d \n",robotName.c_str(), robotWBIModel->getDoFs());
   
 }
 
@@ -191,19 +190,87 @@ std::string ModelState::robotName(void)
 //    int getBaseFrameLink(void);
 //    wbi::Frame getBaseToWorldFrameRotoTrans(void);
    
-void ModelState::setBaseFrameLink(int bfl)
+// void ModelState::setBaseFrameLink(int bfl)
+// {
+//   robot_base_frame_link = bfl;
+// }
+
+void ModelState::setReferenceFrameLink(std::string desLink)
 {
-  robot_base_frame_link = bfl;
+  robot_reference_frame_link_name = desLink;
+  
+  std::string com("com");
+  //int robot_base_frame_link;
+  //mexPrintf("Old base frame : %d\n",modelState->getBaseFrameLink());
+  if(com.compare(desLink)==0)
+  {
+    robot_reference_frame_link = -1;
+  }
+  else
+  {
+//     robotModel->getLinkId (baseLinkName.c_str(), robot_base_frame_link);
+      robotWBIModel->getFrameList().idToIndex(desLink.c_str(),robot_reference_frame_link);
+      //robotWBIModel->getFrameList().wbiIdToNumericId(desLink.c_str(),robot_base_frame_link);
+      //wbiIdToNumericId(baseLinkName.c_str(),robot_base_frame_link);
+  }
+  
+  
+  //robotModel->getFrameList().idToIndex(desLink.c_str(),robot_base_frame_link);
+  
 }
-void ModelState::setBaseToWorldFrameRotoTrans(wbi::Frame trans)
+
+void ModelState::setReferenceToWorldFrameRotoTrans(wbi::Frame trans)
 {
-  H_baseLink_wrWorld = trans;
+  world_H_reference = trans;
 }
-int ModelState::getBaseFrameLink(void)
+int ModelState::getReferenceFrameLink(void)
 {
-  return(robot_base_frame_link);
+  return(robot_reference_frame_link);
 } 
-wbi::Frame ModelState::getBaseToWorldFrameRotoTrans(void)
+std::string ModelState::getReferenceFrameLinkName(void)
 {
-  return(H_baseLink_wrWorld);
+  return(robot_reference_frame_link_name);
+}
+wbi::Frame ModelState::getReferenceToWorldFrameRotoTrans(void)
+{
+  return(world_H_reference);
 } 
+
+wbi::Frame ModelState::getRootWorldRotoTranslation(void)
+{
+  
+}
+
+
+wbi::Frame ModelState::computeRootWorldRotoTranslation(double* q_temp)
+{
+//  Root_H_referenceLink
+//       if(q_temp==NULL)
+//       {
+// 	q_temp = this->qj;
+//       }
+      ModelState::robotWBIModel->computeH(q_temp,wbi::Frame::identity(),robot_reference_frame_link, rootLink_H_ReferenceLink);
+      rootLink_H_ReferenceLink.setToInverse().get4x4Matrix (H_w2b.data());
+     // H_rootLink
+      referenceLink_H_rootLink.set4x4Matrix (H_w2b.data());
+      world_H_rootLink = world_H_reference*referenceLink_H_rootLink ;
+    //  mexPrintf("Current base frame : %d\n",modelState->getBaseFrameLink());
+      
+      
+//   mexPrintf("Inside modelState\nRootWorldRotoTrans\n");
+//   
+//   mexPrintf("world_H_root\n");
+//   mexPrintf((world_H_rootLink.R.toString()).c_str());
+//   mexPrintf(" = \n");
+//   
+//   mexPrintf("world_H_ReferenceLink\n");
+//   mexPrintf(( (world_H_reference).R.toString()).c_str());
+//   
+//   mexPrintf("\n X \n");
+//   
+//   mexPrintf("referenceLink_H_RootLink\n");
+//   mexPrintf((referenceLink_H_rootLink.R.toString()).c_str());
+//   
+//   mexPrintf("\n\n");
+  return(world_H_rootLink);
+}

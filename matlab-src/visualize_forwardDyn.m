@@ -16,25 +16,61 @@ qj=xout(:,8:32);
 draw_meshes = 0;
 vis_speed = 1;
 
-L = cell(15,1);
+% L = cell(15,1);
+% L{1} = 'root_link';
+% L{2} = 'r_hip_1';
+% % L{3} = 'r_shank';
+% L{3} = 'r_thigh'; %for the lulz
+% %L{3} = 'l_shoulder_1';
+% L{4} = 'r_sole';
+% L{5} = 'l_hip_1';
+% % L{6} = 'l_shank';
+% L{6} = 'l_thigh';
+% L{7} = 'l_sole';
+% % L{8} = 'neck_1';
+% L{8} = 'chest';
+% L{9} = 'r_shoulder_1';
+% L{10} = 'r_elbow_1';
+% L{11} = 'r_gripper';
+% L{12} = 'l_shoulder_1'; %for the lulz
+% %L{12} = 'r_thigh';
+% L{13} = 'l_elbow_1';
+% L{14} = 'l_gripper';
+% L{15} = 'com';
+
+
+%L{1} = 'root_link';
 L{1} = 'root_link';
+
 L{2} = 'r_hip_1';
-% L{3} = 'r_shank';
-L{3} = 'r_thigh';
+%L{3} = 'r_thigh';
+L{3} = 'r_shank';
 L{4} = 'r_sole';
+
 L{5} = 'l_hip_1';
-% L{6} = 'l_shank';
-L{6} = 'l_thigh';
+%L{6} = 'l_thigh'; 
+L{6} = 'l_shank'; 
 L{7} = 'l_sole';
-% L{8} = 'neck_1';
-L{8} = 'chest';
+
+
+%L{8} = 'chest';
+L{8} = 'neck_1';
+
 L{9} = 'r_shoulder_1';
 L{10} = 'r_elbow_1';
 L{11} = 'r_gripper';
-L{12} = 'l_shoulder_1';
+
+L{12} = 'l_shoulder_1'; %for the lulz
 L{13} = 'l_elbow_1';
 L{14} = 'l_gripper';
+
+
 L{15} = 'com';
+
+
+
+
+
 
 xaxis = 'zdata';
 yaxis = 'ydata';
@@ -44,7 +80,7 @@ n_plot = 15;
 n_lin = 13;
 
 kin = zeros(size(xout,1),7,n_plot);
-for jj=2:n_plot
+for jj=1:n_plot
     %     kin(:,:,jj)=zeros(n,7);
     for ii=1:n
         kin(ii,:,jj) = (wholeBodyModel('forward-kinematics',qj(ii,:)',L{jj}))';
@@ -131,10 +167,10 @@ xyzpairs(2,:) = [x(1) x(2) y(1) y(2) z(1) z(2)];
 xyzpairs(3,:) = [x(3) x(2) y(3) y(2) z(3) z(2)];
 xyzpairs(4,:) = [x(3) x(4) y(3) y(4) z(3) z(4)];
 xyzpairs(5,:) = [x(1) x(5) y(1) y(5) z(1) z(5)];
-xyzpairs(6,:) = [x(5) x(6) y(5) y(6) z(5) z(6)];
+xyzpairs(6,:) = [x(6) x(5) y(6) y(5) z(6) z(5)];
 xyzpairs(7,:) = [x(6) x(7) y(6) y(7) z(6) z(7)];
-xyzpairs(8,:) = [x(9) x(8) y(9) y(8) z(9) z(8)];
-xyzpairs(9,:) = [x(9) x(10) y(9) y(10) z(9) z(10)];
+xyzpairs(8,:) = [x(8) x(9) y(8) y(9) z(8) z(9)];
+xyzpairs(9,:) = [x(10) x(9) y(10) y(9) z(10) z(9)];
 xyzpairs(10,:) = [x(10) x(11) y(10) y(11) z(10) z(11)];
 xyzpairs(11,:) = [x(8) x(12) y(8) y(12) z(8) z(12)];
 xyzpairs(12,:) = [x(13) x(12) y(13) y(12) z(13) z(12)];
@@ -437,6 +473,11 @@ axes(params.plot_main(1));
 set(plot_traj,xaxis,traj_dat(:,1),yaxis,traj_dat(:,2),zaxis,traj_dat(:,3));
 ii=1;
 while ii<n+1
+    
+    %if(ii==n)
+    %    disp('-----');
+    %end
+    
     tic;  % visualizer step time start
     for jj=1:n_plot
         [x(jj),y(jj),z(jj),R(:,:,jj)] = quat2rot(kin(ii,:,jj));
@@ -603,7 +644,6 @@ params.plot_objs{4} = copyobj(params.plot_objs{1},params.plot_main(4));
     % %         set(h_patch(5),yaxis,y5i+(y(7)));
     % %         set(h_patch(5),zaxis,z5i+(z(7)));
     % %     end
-    
     %     title(num2str(ii*params.sim_step));
     
     
@@ -633,8 +673,17 @@ params.plot_objs{4} = copyobj(params.plot_objs{1},params.plot_main(4));
     ii=ii+vis_speed;
     
 end
-
+disp('------------');
 % set(params.gui.gui_edit_currentTime,'String','-');
+
+
+%figure(2);
+% display the change in the root link rototranslation with integration
+
+%plot(t, 
+
+%figure(3);
+% diplay the com trajectory with integration
 
 end
 

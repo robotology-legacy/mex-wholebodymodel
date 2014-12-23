@@ -98,7 +98,8 @@ bool ModelDjDq::computeFast(int nrhs, const mxArray* prhs[])
   qj = modelState->qj();
   qjDot = modelState->qjDot();
   vb = modelState->vb();
-  xB = modelState->rootRotoTrans();
+  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  //xB = modelState->rootRotoTrans();
   refLink = mxArrayToString(prhs[1]);
   int refLinkID;
   //robotModel->getLinkId (refLink, refLinkID);
@@ -114,7 +115,7 @@ bool ModelDjDq::computeFast(int nrhs, const mxArray* prhs[])
     robotModel->getFrameList().idToIndex(refLink,refLinkID);
   }
   
-  if(!robotModel->computeDJdq(qj,xB,qjDot,vb,refLinkID,Djdq))
+  if(!robotModel->computeDJdq(qj,world_H_rootLink,qjDot,vb,refLinkID,Djdq))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI DJDq call");
   }
@@ -156,7 +157,7 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
   }
 #endif  
 
-  xB = computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
   
   if(Djdq != NULL)
   {
@@ -173,7 +174,7 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
       //robotModel->getLinkId (refLink, refLinkID);
       robotModel->getFrameList().idToIndex(refLink,refLinkID);
     }
-    if(!robotModel->computeDJdq(qj,xB,qjDot,vb,refLinkID,Djdq))
+    if(!robotModel->computeDJdq(qj,world_H_rootLink,qjDot,vb,refLinkID,Djdq))
     {
        mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI DJDq call");
     }
