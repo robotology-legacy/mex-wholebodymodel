@@ -38,18 +38,21 @@ class ModelState
 public:
    ~ModelState();
    static ModelState * getInstance(std::string = "icubGazeboSim");
-   bool setState(double *,double*,double*,wbi::Frame);
+   bool setState(double *,double*,double*);
    
-   void setBaseFrameLink(int);
-   void setBaseToWorldFrameRotoTrans(wbi::Frame);
-   
-   int getBaseFrameLink(void);
-   wbi::Frame getBaseToWorldFrameRotoTrans(void);
+   //void setBaseFrameLink(int);
+   void setReferenceFrameLink(std::string);
+   void setReferenceToWorldFrameRotoTrans(wbi::Frame);
+   std::string getReferenceFrameLinkName();
+   int getReferenceFrameLink(void);
+   wbi::Frame getReferenceToWorldFrameRotoTrans(void);
+   wbi::Frame getRootWorldRotoTranslation(void);
+   wbi::Frame computeRootWorldRotoTranslation(double* q_temp);
    
    double * qj();
    double * qjDot();
    double * vb();
-   wbi::Frame rootRotoTrans();
+//    wbi::Frame rootRotoTrans();
    int dof();
    void robotModel(std::string);
    wbi::iWholeBodyModel * robotModel(void);
@@ -60,16 +63,30 @@ private:
   static ModelState * modelState;
   //double *qS, *dqS, *dxbS;
   double qjS[MEX_WBMODEL_MAX_NUM_JOINTS],qjDotS[MEX_WBMODEL_MAX_NUM_JOINTS],vbS[6];
-  wbi::Frame rootS;
-  int robot_base_frame_link;
+//   wbi::Frame rootS;
+  int robot_reference_frame_link;
   //wbi::Frame H_rootLink_wrWorld;
-  wbi::Frame H_baseLink_wrWorld;
-   
+  //wbi::Frame H_referenceLink_wrWorld;
+   //wbi::Frame world_H_root;
+   wbi::Frame world_H_reference;
   
   int numDof;
   std::string currentRobotName;
+  std::string robot_reference_frame_link_name;
   
   static wbi::iWholeBodyModel *robotWBIModel;
+  
+  Eigen::Matrix4d H_w2b;
+  //wbi::Frame H_base_wrfLink,
+  //wbi::Frame xB;
+
+//   int robot_base_frame_link;
+//   wbi::Frame H_rootLink_wrWorld;
+//   wbi::Frame H_baseLink_wrWorld;
+  wbi::Frame world_H_rootLink;
+  wbi::Frame rootLink_H_ReferenceLink;
+  wbi::Frame referenceLink_H_rootLink;
+  
 };
 }
 

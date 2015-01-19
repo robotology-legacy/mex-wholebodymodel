@@ -133,7 +133,7 @@ quadprog(quadraticTerm, linearTerm, ...
 % objVal+0.5*(grav-HDotDes)'*(grav-HDotDes)
 % exitFlag
 if exitFlag~=1
-    disp('qp sicti');
+    disp('qp failed to find solution');
 end
 % output
 % [x0 , desiredFeetContactForces]

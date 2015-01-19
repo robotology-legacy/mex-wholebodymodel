@@ -21,7 +21,8 @@
 
 //library includes 
 #include <wbi/iWholeBodyModel.h>
-#include <wbiIcub/icubWholeBodyModel.h>
+// #include <wbiIcub/icubWholeBodyModel.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 //local includes
 #include "modelmassmatrix.h"
@@ -125,9 +126,10 @@ bool ModelMassMatrix::computeFast(int nrhs, const mxArray* prhs[])
 #endif
   robotModel = modelState->robotModel();
   qj = modelState->qj();
-  xB = modelState->rootRotoTrans();  
+  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  //xB = modelState->rootRotoTrans();  
   
-  if(!robotModel->computeMassMatrix(qj,xB,massMatrix))
+  if(!robotModel->computeMassMatrix(qj,world_H_rootLink,massMatrix))
   {
     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI MassMatrix call");
   }
@@ -164,11 +166,11 @@ bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
   }
 #endif  
   //int LINK_FOOT_WRF;
-  xB = computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
   
   if(massMatrix != NULL)
   {
-     if(!robotModel->computeMassMatrix(qj,xB,massMatrix))
+     if(!robotModel->computeMassMatrix(qj,world_H_rootLink,massMatrix))
      {
 	mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI MassMatrix call");
      }

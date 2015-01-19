@@ -26,6 +26,7 @@
 
 // local includes
 #include "modelgetstate.h"
+#include <boost/concept_check.hpp>
 
 using namespace mexWBIComponent;
 
@@ -98,12 +99,44 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
   //double *qjTemp;//qjTemp[numDof];
   
   qj = modelState->qj();
-  rootRotoTrans = modelState->rootRotoTrans();
-  rootRotoTrans.R.getQuaternion(rootQuaternion);
+  //rootRotoTrans = modelState->rootRotoTrans();
+  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+//   modelState->computeRootWorldRotoTranslation(qj);
   
-  for (i = 0; i<3 ; i++)
+#ifdef DEBUG
+
+  mexPrintf("Inside getState\nRootWorldRotoTrans\n");
+  
+  mexPrintf("world_H_root\n");
+  mexPrintf((world_H_rootLink.R.toString()).c_str());
+  mexPrintf(" = \n");
+  
+  mexPrintf("world_H_ReferenceLink\n");
+  mexPrintf(( (modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str());
+  
+  mexPrintf("\n X \n");
+  
+  mexPrintf("referenceLink_H_RootLink\n");
+  mexPrintf((referenceLink_H_rootLink.R.toString()).c_str());
+  
+  mexPrintf("\n\n");
+
+#endif
+  //rootQuaternion = 
+  world_H_rootLink.R.getQuaternion(rootQuaternion);
+  //wbi::Rotation::getQuaternion(rootRotoTrans.R);
+
+#ifdef DEBUG
+      std::stringstream ssR;
+    ssR<<"Quat : ["<<rootQuaternion[0]<<","<<rootQuaternion[1]<<","<<rootQuaternion[2]<<","<<rootQuaternion[3]<<"]\n";
+    std::string sR = ssR.str();
+    
+    mexPrintf(sR.c_str());
+#endif
+    
+    for (i = 0; i<3 ; i++)
   {
-    wTb[i] = rootRotoTrans.p[i];
+    wTb[i] = world_H_rootLink.p[i];
   }
   for (i=0 ; i<4;i++)
   {
@@ -124,14 +157,43 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
 #endif
   
   qj = modelState->qj();
-  rootRotoTrans = modelState->rootRotoTrans();
+  //rootRotoTrans = computeRootWorldRotoTranslation(qj);
+  
+ // world_H_rootLink = computeRootWorldRotoTranslation(qj);
+
+  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+#ifdef DEBUG
+  mexPrintf("Inside getState\nRootWorldRotoTrans\n");
+  
+  mexPrintf("world_H_root\n");
+  mexPrintf((world_H_rootLink.R.toString()).c_str());
+  mexPrintf(" = \n");
+  
+  mexPrintf("world_H_ReferenceLink\n");
+  mexPrintf(( (modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str());
+  
+  mexPrintf("\n X \n");
+  
+  mexPrintf("referenceLink_H_RootLink\n");
+  mexPrintf((referenceLink_H_rootLink.R.toString()).c_str());
+  
+  mexPrintf("\n\n");
   //rootQuaternion = 
-  rootRotoTrans.R.getQuaternion(rootQuaternion);
+#endif
+
+  (modelState->getRootWorldRotoTranslation()).R.getQuaternion(rootQuaternion);
+#ifdef DEBUG
   //wbi::Rotation::getQuaternion(rootRotoTrans.R);
   
+      std::stringstream ssR;
+    ssR<<"Quat : ["<<rootQuaternion[0]<<","<<rootQuaternion[1]<<","<<rootQuaternion[2]<<","<<rootQuaternion[3]<<"]\n";
+    std::string sR = ssR.str();
+    mexPrintf(sR.c_str());
+#endif
+    
   for (i = 0; i<3 ; i++)
   {
-    wTb[i] = rootRotoTrans.p[i];
+    wTb[i] = world_H_rootLink.p[i];
   }
   for (i=0 ; i<4;i++)
   {

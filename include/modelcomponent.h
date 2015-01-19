@@ -55,8 +55,8 @@ public:
 protected:
   
  // bool setState(double * , double * , double *, wbi::Frame);  
-  bool changeWorldFrame(std::string,wbi::Frame);
-  wbi::Frame computeRootWorldRotoTranslation(double *);
+//   bool changeWorldFrame(std::string,wbi::Frame);
+//   wbi::Frame computeRootWorldRotoTranslation(double *);
   ModelComponent(const unsigned int, const unsigned int, const unsigned int);  
   int numDof;
   
@@ -67,12 +67,14 @@ protected:
   
   Eigen::Matrix4d H_w2b;
   //wbi::Frame H_base_wrfLink,
-  wbi::Frame xB;
+  //wbi::Frame xB;
 
 //   int robot_base_frame_link;
 //   wbi::Frame H_rootLink_wrWorld;
 //   wbi::Frame H_baseLink_wrWorld;
-  wbi::Frame H_rootLink_wrWorld;
+  wbi::Frame world_H_rootLink;
+//   wbi::Frame rootLink_H_ReferenceLink;
+//   wbi::Frame referenceLink_H_rootLink;
   
   //ROBOT_BASE_FRAME_LINK;
   ModelState *modelState;

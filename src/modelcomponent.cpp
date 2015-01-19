@@ -21,7 +21,8 @@
 #include <iostream>
 
 // library includes
-#include<wbiIcub/icubWholeBodyModel.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
+//#include<wbiIcub/icubWholeBodyModel.h>
 
 // local includes
 #include "modelstate.h"
@@ -35,11 +36,13 @@ ModelComponent::ModelComponent(const unsigned int args, const unsigned int altAr
   robotModel =  modelState->robotModel();
   numDof = robotModel->getDoFs();
   
-  int robot_base_frame_link;
+  //int robot_base_frame_link;
   //robotModel->getLinkId ("root", ROBOT_BASE_FRAME_LINK);
-  robotModel->getLinkId ("l_sole", robot_base_frame_link);
-  modelState->setBaseFrameLink(robot_base_frame_link);
-  
+  //robotModel->getFrameList().idToIndex("l_sole",robot_base_frame_link);
+  //robotModel->getFrameList().wbiIdToNumericId("l_sole",robot_base_frame_link);
+  //robotModel->getLinkId ("l_sole", robot_base_frame_link);
+  std::string startingFrame = "l_sole";
+  modelState->setReferenceFrameLink(startingFrame);   
 }
 
 
@@ -65,33 +68,14 @@ const unsigned int ModelComponent::numAltArguments()
 {
   return(numAltArgs);
 }
-
-bool ModelComponent::changeWorldFrame(std::string baseLinkName, wbi::Frame F)
+/*
+bool ModelComponent::changeWorldFrame(std::string referenceLinkName, wbi::Frame F)
 {
   //int refLinkID;
-  std::string com("com");
-  int robot_base_frame_link;
-  //mexPrintf("Old base frame : %d\n",modelState->getBaseFrameLink());
-  if(com.compare(baseLinkName)==0)
-  {
-    robot_base_frame_link = -1;
-  }
-  else
-  {
-    robotModel->getLinkId (baseLinkName.c_str(), robot_base_frame_link);
-  }
-  modelState->setBaseFrameLink(robot_base_frame_link);
-  mexPrintf("Base Frame Link ID set to : %d\n",modelState->getBaseFrameLink());
-  
-  modelState->setBaseToWorldFrameRotoTrans(F);
-  return(true);
-}
 
-wbi::Frame ModelComponent::computeRootWorldRotoTranslation(double* q_temp)
-{
-      robotModel->computeH(q_temp,modelState->getBaseToWorldFrameRotoTrans(),modelState->getBaseFrameLink(), H_rootLink_wrWorld);
-      H_rootLink_wrWorld.setToInverse().get4x4Matrix (H_w2b.data());
-      xB.set4x4Matrix (H_w2b.data());
-    //  mexPrintf("Current base frame : %d\n",modelState->getBaseFrameLink());
-      return(xB);
-}
+  modelState->setReferenceFrameLink(referenceLinkName);
+  mexPrintf("Reference Frame Link ID set to : %s\n",(modelState->getReferenceFrameLinkName()).c_str());
+  
+  modelState->setReferenceToWorldFrameRotoTrans(F);
+  return(true);
+}*/

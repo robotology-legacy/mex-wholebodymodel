@@ -21,7 +21,8 @@
 
 //library includes
 #include <wbi/iWholeBodyModel.h>
-#include <wbiIcub/icubWholeBodyModel.h>
+// #include <wbiIcub/icubWholeBodyModel.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 //local includes
 
 #include "modeljacobian.h"
@@ -126,7 +127,8 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
   }
     
   qj = modelState->qj();
-  xB = modelState->rootRotoTrans();
+  //xB = modelState->rootRotoTrans();
+  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
   refLink = mxArrayToString(prhs[1]);
   robotModel = modelState->robotModel();
   int refLinkID;
@@ -138,13 +140,14 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
   }
   else
   {
-    robotModel->getLinkId (refLink, refLinkID);
+    //robotModel->getLinkId (refLink, refLinkID);
+    robotModel->getFrameList().idToIndex(refLink, refLinkID);
   }
   
   //robotModel->getLinkId (refLink, refLinkID);
     modelState = ModelState::getInstance();
 
-  if(!(robotModel->computeJacobian(qj,xB,refLinkID,j)))
+  if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j)))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
   }
@@ -187,7 +190,7 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
   //wbi::Frame H_rootLink_wrBase;
   //wbi::Frame H_baseLink_wrWorld;
   
-  xB = computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
   
   if(j != NULL)
   {
@@ -201,10 +204,11 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
     }
     else
     {
-      robotModel->getLinkId (refLink, refLinkID);
+      //robotModel->getLinkId (refLink, refLinkID);
+      robotModel->getFrameList().idToIndex(refLink, refLinkID);
     }
      //robotModel->computeMassMatrix(q,xB,massMatrix);
-    if(!(robotModel->computeJacobian(qj,xB,refLinkID,j)))
+    if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j)))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
     }

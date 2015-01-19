@@ -21,7 +21,8 @@
 
 //library includes
 #include <wbi/iWholeBodyModel.h>
-#include <wbiIcub/icubWholeBodyModel.h>
+// #include <wbiIcub/icubWholeBodyModel.h>
+#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 //local includes
 #include "modelgeneralisedbiasforces.h"
@@ -86,10 +87,11 @@ bool ModelGeneralisedBiasForces::computeFast(int nrhs, const mxArray* prhs[])
 
     qj = modelState->qj();
     qjDot = modelState->qjDot();
-    xB = modelState->rootRotoTrans();
+    //xB = modelState->rootRotoTrans();
+    world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
     vb = modelState->vb();
    
-    if(!robotModel->computeGeneralizedBiasForces(qj,xB,qjDot,vb,g,h))
+    if(!robotModel->computeGeneralizedBiasForces(qj,world_H_rootLink,qjDot,vb,g,h))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI computeGeneralizedBiasForces call");
     }
@@ -133,11 +135,11 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
   }
 #endif  
 
-  xB = computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
   
   if(h != NULL)
   {
-    if(!robotModel->computeGeneralizedBiasForces(qj,xB,qjDot,vb,g,h))
+    if(!robotModel->computeGeneralizedBiasForces(qj,world_H_rootLink,qjDot,vb,g,h))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI computeGeneralizedBiasForces call");
     }

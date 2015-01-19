@@ -49,9 +49,9 @@ private:
   ModelGetState();
   static ModelGetState *modelGetState;
   
-  wbi::Frame rootRotoTrans;
+  /*wbi::Frame rootRotoTrans;
   wbi::Rotation rootRoto;
-  double rootQuaternion[4];
+  */double rootQuaternion[4];
   
   double* wTb;//[7];
   double* qj;//[MEX_WBMODEL_MAX_NUM_JOINTS];
