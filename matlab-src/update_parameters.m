@@ -1,7 +1,7 @@
 
 params.qjInit = pi*([params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit])/180;
+% params.qjInit = zeros(size(params.qjInit)); % this may be too close to joint limits for some joints
 
-params.qjInit = zeros(size(params.qjInit));
 tSpan   = linspace(  params.sim_start_time,  params.sim_start_time+params.sim_duration,  params.sim_duration/params.sim_step);
 
 params.controller.Impedances  = [params.kImpTorso,params.kImpArms,params.kImpArms,params.kImpLegs,params.kImpLegs];

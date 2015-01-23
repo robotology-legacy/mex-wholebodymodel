@@ -51,23 +51,6 @@ J_CoMDqD = wholeBodyModel('djdq','com');
 qjInit = params.qjInit;
 IntErrorCoM = qv(64:end,:);
 
-% params.controller.MassMatrix = wholeBodyModel('mass-matrix');
-% params.controller.invMassMatrix = params.controller.MassMatrix\eye(n_dof+3*n_constraint,n_dof+3*n_constraint);
-% params.controller.Coriolis = wholeBodyModel('generalised-forces');  
-% params.controller.Gravitation = wholeBodyModel('generalised-forces',qj,zeros(25,1),zeros(6,1)); 
-% params.controller.CentroidalMom = wholeBodyModel('centroidal-momentum');
-% params.controller.fkin.rightfoot = wholeBodyModel('forward-kinematics',qj,constraintLink2);
-% params.controller.jacobian.feet = [reshape(wholeBodyModel('jacobian',constraintLink1),31,6)';
-%                                 reshape(wholeBodyModel('jacobian',constraintLink2),31,6)'];                            
-% params.controller.JMinvconst = params.controller.jacobian.feet/params.controller.MassMatrix;
-% params.controller.JMinvJt = params.controller.JMinvconst * transpose(params.controller.jacobian.feet);                            
-% params.controller.jdqd.feet = [wholeBodyModel('djdq',constraintLink1);
-%                             wholeBodyModel('djdq',constraintLink2)];
-% params.controller.fkin.com = wholeBodyModel('forward-kinematics',qj,'com');
-% params.controller.jacobian.com = reshape(wholeBodyModel('jacobian','com'),31,6)';
-% params.controller.qjInit = params.qjInit;
-% 
-% IntErrorCoM = qv(64:end,:);
 
 %% CONTROLLER
 
@@ -120,17 +103,16 @@ IntErrorCoM = qv(64:end,:);
 %                                                             t,...
 %                                                             params.controller);                                                        
                                                         
-%tau_ctrl = zeros(size(tau_ctrl));    
+% tau_ctrl = zeros(size(tau_ctrl));    
+
 t_damp = [zeros(6,31);params.coef_damp*[zeros(25,6),eye(25,25)]]*[zeros(6,1);qjDot];
     
-% F_contact = (params.controller.JMinvJt)\(params.controller.JMinvconst*(params.controller.Coriolis+t_damp-[zeros(6,1);tau_ctrl])-params.controller.jdqd.feet);
 F_contact = (JcMinvJct)\(JcMinv*(h+t_damp-[zeros(6,1);tau_ctrl])-JcDqD);
 
 QDot_base = quaternionDerivative(omega_base, Q_base);%,param.QuaternionDerivativeParam);
 
 qDot = [pDot_base;QDot_base;qjDot];
 
-% vDot = params.controller.invMassMatrix*(transpose(params.controller.jacobian.feet)*F_contact + [zeros(6,1);tau_ctrl]-params.controller.Coriolis - t_damp);
 vDot = Minv*(transpose(Jc)*F_contact + [zeros(6,1);tau_ctrl]-h - t_damp);
 
 qvDot = [qDot;vDot;CoMError]; %CoMError added to be integrated
