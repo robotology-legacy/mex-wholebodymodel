@@ -1,42 +1,60 @@
-function [ qvDot ] = forwardDynamics(t, qv, param )
-%FORWARDDYNAMICS Forward dynamics of WBI ICub
-%   This is the forward dynamics of the WBI Icub meant for integration in a
-%   ode pkg function. 
+function [ dchi ] = forwardDynamics( t,chi,param )
+%FORWARDDYNAMICS Forward dynamics of the wholeBodyModel
+%
+%   This is the forward dynamics of the model loaded in the
+%   wholeBodyInterface from the URDF description
 
-n = param.ndof;
-tau = param.tau;
+%% extraction of state
+ndof = param.ndof;
 
-q = qv(1:7+n,:);
-p_base = q(1:3,:); % Linear Position of Floating Base
-Q_base = q(4:7,:); % Orientation of Floating Base (quaternions)
-qj = q(8:end,:); % Joint angles
+%x_b = chi(1:3,:);
+qt_b = chi(4:7,:);
+qj = chi(8:ndof+7,:);
+%x = [x_b;qt_b;qj];
 
-v = qv(8+n:end,:);
-pDot_base = v(1:3,:); % Linear velocity of Floating Base
-omega_base = v(4:6,:); % Rotational velocity of Floating base
-qjDot = v(7:end,:);
+dx_b = chi(ndof+8:ndof+10,:);
+omega_b = chi(ndof+11:ndof+13,:);
+dqj = chi(ndof+14:2*ndof+13,:);
 
-%Mex-WholeBodyModel Components
-wholeBodyModel('update-state',qj,qjDot,[pDot_base;omega_base]);
-M = wholeBodyModel('mass-matrix');    
-%MTilde = wholeBodyModel('mass-matrix',qj);
+%dx = [dqj;dx_b;omega_b];
+%v = dx;
+%chi = [x;dx];
 
-H = wholeBodyModel('generalised-forces');   
+%% MexWholeBodyModel calls
+wbm_updateState(qj,dqj,[dx_b;omega_b]);
+M = wbm_massMatrix();
+h = wbm_generalisedBiasForces();
+%g = wbm_modelGeneralisedForces(qj,zeros(25,1),zeros(6,1)); 
+%H = wbm_centroidalMomentum();
 
-%MInv = M^(-1);
-% RobotModel components
-[Fc,J] = constraintBothFeetOnGround(qj,tau(t), M, H);
+%% Building up contraints jacobian and djdq
+numConstraints = length(param.constraintLinkNames);
+Jc = zeros(6*numConstraints,6+ndof);
+dJcDq = zeros(6*numConstraints,1);
+for i=1:numConstraints
+    Jc(6*(i-1)+1:6*i,:) = wbm_jacobian(param.constraintLinkNames{i});
+    dJcDq(6*(i-1)+1:6*i,:) = wbm_djdq(param.constraintLinkNames{i});
+end
 
-%getting qDot
-QDot_base = quaternionDerivative(omega_base, Q_base);%,param.QuaternionDerivativeParam);
 
-qDot = [pDot_base;QDot_base;qjDot];
+%% control torque
+tau = param.tau(t);
 
 
-vDot = M\ ( J'*Fc + [zeros(6,1);tau(t)] - H);
+%% Contact forces computation
+JcMinv = Jc/M;
+JcMinvJct = JcMinv * Jc';   
 
-%qvDot = zeros(13+2*n,1);
-qvDot = [qDot;vDot];
+tauDamp = -param.dampingCoeff*qj;
+  
+fc = (JcMinvJct)\(JcMinv*(h-[tau+tauDamp;zeros(6,1)])-dJcDq);
+dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
+
+%dx = [dqj;dx_b;dqt_b];
+dx = [dx_b;dqt_b;dqj];
+dv = M\(Jc'*fc + [tau+tauDamp; zeros(6,1)]-h);
+
+dchi = [dx;dv];  
 
 end
 
