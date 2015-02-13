@@ -1,8 +1,24 @@
 function [ dchi ] = forwardDynamics( t,chi,param )
 %FORWARDDYNAMICS Forward dynamics of the wholeBodyModel
 %
-%   This is the forward dynamics of the model loaded in the
-%   wholeBodyInterface from the URDF description
+%   This is the forward dynamics of the model loaded in the 
+%   wholeBodyInterface from the URDF description. The dynamic model is
+%   described as an explicit ordinary differential equation of the form:
+%
+%                dchi = forwardDynamics( t,chi)
+%
+%   where chi is to variable to be integrated. For a floating base
+%   articulated chain, the variable chi conatins the following
+%   subvariables:
+%
+%   x_b:      the cartesian position of the base (R^3)
+%   qt_b:     the quaternion describing the orientation of the base (global parametrization of SO(3))
+%   qj:       the joint positions (R^ndof)
+%   dx_b:     the cartesian velocoty of the base (R^3)
+%   omega_b:  the velocity describing the orientation of the base (so(3))
+%   dqj:      the joint velocities (R^ndof)
+
+
 
 %% extraction of state
 ndof = param.ndof;
