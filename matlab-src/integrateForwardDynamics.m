@@ -4,7 +4,7 @@ addpath('./../build/');
 addpath('./worker_functions');
 
 %% initialise mexWholeBodyModel
-wbm_initialise('icubGazeboSim');
+wbm_modelInitialise('icubGazeboSim');
 
 
 %% setup params
@@ -25,11 +25,13 @@ params.dqjInit = zeros(params.ndof,1);
 %params.qt_bInit = zeros(4,1);
 params.dx_bInit = zeros(3,1);
 params.omega_bInit = zeros(3,1);
+params.dampingCoeff = 0.75;
 
 wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
 [qj,T_bInit,dqj,vb] = wholeBodyModel('get-state');
 params.chiInit = [T_bInit;params.qjInit;...
                     params.dx_bInit;params.omega_bInit;params.dqjInit];
+params.dampingCoeff = 0.1;
 
 %% contact constraints                
 params.constraintLinkNames = {'l_sole','r_sole'};                
@@ -42,9 +44,10 @@ params.tau = @(t)gInit(1:params.ndof);
 %% setup integration
 forwardDynFunc = @(t,chi)forwardDynamics(t,chi,params);
 tStart = 0;
-tEnd = 10;
+tEnd = 1;
 
 %% integrate forward dynamics
+disp('starting integration');
 options = odeset('RelTol',1e-3,'AbsTol',1e-6);
 [t,chi] = ode15s(forwardDynFunc,[tStart tEnd],params.chiInit,options);
 
