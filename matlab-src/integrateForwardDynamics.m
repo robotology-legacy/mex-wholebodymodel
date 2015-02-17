@@ -29,7 +29,10 @@ params.dampingCoeff = 0.75;
 
 wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
 [qj,T_bInit,dqj,vb] = wholeBodyModel('get-state');
-params.chiInit = [T_bInit;params.qjInit;...
+% flipping quaternion organisation (to real followed by imaginary
+% convention)
+T_bInit_mod = [T_bInit(1:3);T_bInit(7);T_bInit(4:6)];
+params.chiInit = [T_bInit_mod;params.qjInit;...
                     params.dx_bInit;params.omega_bInit;params.dqjInit];
 params.dampingCoeff = 0.1;
 

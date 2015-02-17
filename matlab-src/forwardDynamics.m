@@ -14,7 +14,7 @@ function [ dchi ] = forwardDynamics( t,chi,param )
 %   x_b:      the cartesian position of the base (R^3)
 %   qt_b:     the quaternion describing the orientation of the base (global parametrization of SO(3))
 %   qj:       the joint positions (R^ndof)
-%   dx_b:     the cartesian velocoty of the base (R^3)
+%   dx_b:     the cartesian velocity of the base (R^3)
 %   omega_b:  the velocity describing the orientation of the base (so(3))
 %   dqj:      the joint velocities (R^ndof)
 
@@ -29,7 +29,7 @@ qj = chi(8:ndof+7,:);
 %x = [x_b;qt_b;qj];
 
 dx_b = chi(ndof+8:ndof+10,:);
-omega_b = chi(ndof+11:ndof+13,:);
+omega_W = chi(ndof+11:ndof+13,:);
 dqj = chi(ndof+14:2*ndof+13,:);
 
 %dx = [dqj;dx_b;omega_b];
@@ -37,7 +37,7 @@ dqj = chi(ndof+14:2*ndof+13,:);
 %chi = [x;dx];
 
 %% MexWholeBodyModel calls
-wbm_updateState(qj,dqj,[dx_b;omega_b]);
+wbm_updateState(qj,dqj,[dx_b;omega_W]);
 M = wbm_massMatrix();
 h = wbm_generalisedBiasForces();
 %g = wbm_modelGeneralisedForces(qj,zeros(25,1),zeros(6,1)); 
@@ -64,6 +64,23 @@ JcMinvJct = JcMinv * Jc';
 tauDamp = -param.dampingCoeff*qj;
   
 fc = (JcMinvJct)\(JcMinv*(h-[tau+tauDamp;zeros(6,1)])-dJcDq);
+
+% need to apply root-to-world rotation to the spatial angular velocity omega_W to
+% obtain angular velocity in body frame omega_b. This is then used in the
+% quaternion derivative computation.
+[~,T_b,~,~] = wholeBodyModel('get-state');
+
+%righting quaternion ordering to [real;imaginary]^T since get-state
+%returns the opposite ordering
+%qt_b_mod = [T_b(7);T_b(4:6)];
+qt_b_mod_s = T_b(7);
+qt_b_mod_r = T_b(4:6);
+
+%reconstructing rotation of root to world from the quaternion
+R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
+
+omega_b = R_b'*omega_W;
+
 dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
 
 %dx = [dqj;dx_b;dqt_b];
