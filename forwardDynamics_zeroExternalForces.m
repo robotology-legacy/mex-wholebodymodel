@@ -1,4 +1,4 @@
-function [ dchi , h , hg,fc, kinEnergy ] = forwardDynamics_zeroExternalForces( t,chi,param )
+function [ dchi ] = forwardDynamics_zeroExternalForces( t,chi,param )
 %FORWARDDYNAMICS Forward dynamics of the wholeBodyModel
 %
 %   This is the forward dynamics of the model loaded in the 
@@ -23,7 +23,7 @@ function [ dchi , h , hg,fc, kinEnergy ] = forwardDynamics_zeroExternalForces( t
 %% extraction of state
 ndof = param.ndof;
 
-x_b = chi(1:3,:);
+%x_b = chi(1:3,:);
 qt_b = chi(4:7,:);
 qj = chi(8:ndof+7,:);
 %x = [x_b;qt_b;qj];
@@ -34,37 +34,14 @@ dqj = chi(ndof+14:2*ndof+13,:);
 
 %dx = [dqj;dx_b;omega_b];
 %v = dx;
-v = [dx_b;omega_W;dqj];
 %chi = [x;dx];
 
-
 %% MexWholeBodyModel calls
-
-
 wbm_updateState(qj,dqj,[dx_b;omega_W]);
-
-
-
-%reconstructing rotation of root to world from the quaternion
-[~,T_b,~,~] = wholeBodyModel('get-state');
-
-%righting quaternion ordering to [real;imaginary]^T since get-state
-%returns the opposite ordering
-%qt_b_mod = [T_b(7);T_b(4:6)];
-qt_b_mod_s = T_b(7);
-qt_b_mod_r = T_b(4:6);
-R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
-
-
-wbm_setWorldFrame(R_b,x_b);
-
-wbm_updateState(qj,dqj,[dx_b;omega_W]);
-
 M = wbm_massMatrix();
 h = wbm_generalisedBiasForces();
-hg = wbm_generalisedBiasForces(qj,zeros(25,1),zeros(6,1)); 
-h = h-hg;
-%h = zeros(size(h));
+g = wbm_modelGeneralisedForces(qj,zeros(25,1),zeros(6,1)); 
+h = h-g;
 %H = wbm_centroidalMomentum();
 
 %% Building up contraints jacobian and djdq
@@ -85,28 +62,33 @@ tau = param.tau(t);
 JcMinv = Jc/M;
 JcMinvJct = JcMinv * Jc';   
 
-tauDamp = -param.dampingCoeff*dqj;
+tauDamp = -param.dampingCoeff*qj;
   
 fc = (JcMinvJct)\(JcMinv*(h-[tau+tauDamp;zeros(6,1)])-dJcDq);
 
 % need to apply root-to-world rotation to the spatial angular velocity omega_W to
 % obtain angular velocity in body frame omega_b. This is then used in the
 % quaternion derivative computation.
+[~,T_b,~,~] = wholeBodyModel('get-state');
 
+%righting quaternion ordering to [real;imaginary]^T since get-state
+%returns the opposite ordering
+%qt_b_mod = [T_b(7);T_b(4:6)];
+qt_b_mod_s = T_b(7);
+qt_b_mod_r = T_b(4:6);
 
+%reconstructing rotation of root to world from the quaternion
+R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
 
-%omega_b = omega_W;% R_b*omega_W;
 omega_b = R_b*omega_W;
+
 dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
-%dqt_b = zeros(size(qt_b));%quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
 
 %dx = [dqj;dx_b;dqt_b];
 dx = [dx_b;dqt_b;dqj];
-%dv = M\(Jc'*fc + [tau+tauDamp; zeros(6,1)]-h);
-dv = M\([tau+tauDamp; zeros(6,1)]-h);
+dv = M\(Jc'*fc + [tau+tauDamp; zeros(6,1)]-h);
+
 dchi = [dx;dv];  
-kinEnergy = 0.5*v'*M*v;
-%dchi = zeros(size(dchi));
-dchi = dchi;
+
 end
 
