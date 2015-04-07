@@ -33,7 +33,7 @@ using namespace mexWBIComponent;
 
 ModelSetWorldLink *ModelSetWorldLink::modelSetWorldLink;
 
-ModelSetWorldLink::ModelSetWorldLink(): ModelComponent(3,2,0)
+ModelSetWorldLink::ModelSetWorldLink(): ModelComponent(4,2,0)
 {
   //numDof = robotModel->getDoFs();
 #ifdef DEBUG
@@ -64,16 +64,17 @@ bool ModelSetWorldLink::allocateReturnSpace(int a, mxArray* m[])
 
 bool ModelSetWorldLink::compute(int nrhs, const mxArray* prhs[])
 {
-  if(!mxIsChar(prhs[1]) || mxGetM(prhs[2]) != 9 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != 3 || mxGetN(prhs[3]) != 1)
+  if(!mxIsChar(prhs[1]) || mxGetM(prhs[2]) != 9 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != 3 || mxGetN(prhs[3]) != 1 || mxGetM(prhs[4]) != 3 || mxGetN(prhs[4]) != 1)
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
   }
   
-   double *R_temp,*p_temp;
+   double *R_temp,*p_temp,*g_temp;
    
    std::string refLinkName = mxArrayToString(prhs[1]);
    R_temp = (double *)mxGetPr(prhs[2]);
    p_temp = (double *)mxGetPr(prhs[3]);
+   g_temp = (double *)mxGetPr(prhs[4]);
 
    double tempR[9],tempP[3];
    for(int i = 0;i<9;i++)
@@ -94,6 +95,8 @@ bool ModelSetWorldLink::compute(int nrhs, const mxArray* prhs[])
    //H_baseLink_wrWorld = temp;
    modelState->setReferenceFrameLink(refLinkName);
    modelState->setReferenceToWorldFrameRotoTrans(tempFrame);
+   modelState->setGravity(g_temp);
+   
 //    changeWorldFrame(refLinkName,tempFrame);
 //    mexPrintf("Robot base link changed to %s\n",refLinkName.c_str()); 
 }

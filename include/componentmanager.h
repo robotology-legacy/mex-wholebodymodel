@@ -41,6 +41,7 @@
 #include "modelvisualizetrajectory.h"
 #include "modelcentroidalmomentum.h"
 #include "modelsetworldframe.h"
+#include "modelsetworldlink.h"
 
 namespace mexWBIComponent
 {
@@ -72,6 +73,7 @@ private:
   ModelVisualizeTrajectory *modelVisualizeTrajectory;
   ModelCentroidalMomentum *modelCentroidalMomentum;
   ModelSetWorldFrame *modelSetWorldFrame;
+  ModelSetWorldLink *modelSetWorldLink;
   
   int numDof;
   

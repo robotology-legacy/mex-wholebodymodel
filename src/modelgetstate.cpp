@@ -97,8 +97,11 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
   mexPrintf("ModelGetState performing Compute");
 #endif
   //double *qjTemp;//qjTemp[numDof];
-  
-  qj = modelState->qj();
+ 
+  //qj = modelState->qj();
+  modelState->qj(qj);
+//  qjDot = modelState->qjDot();
+//  vb = modelState->vb();
   //rootRotoTrans = modelState->rootRotoTrans();
   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
 //   modelState->computeRootWorldRotoTranslation(qj);
@@ -143,8 +146,17 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
     wTb[3+i] = rootQuaternion[i];
   }
   
-  qjDot = modelState->qjDot();
-  vb = modelState->vb();
+ // qjDot = modelState->qjDot();
+ // vb = modelState->vb();
+  modelState->qjDot(qjDot);
+  modelState->vb(vb);
+  /*
+  for(int i = 0 ; i< numDof; i++)
+  {
+    mexPrintf("ModelGetState qj[%d] : %2.2f, qjDot[%d] : %2.2f\n",i,qj[i],i,qjDot[i]);
+  }
+  */
+  
   return(true);
 }
 
@@ -156,7 +168,8 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
   mexPrintf("ModelGetState performing Compute");
 #endif
   
-  qj = modelState->qj();
+  //qj = modelState->qj();
+  modelState->qj(qj);
   //rootRotoTrans = computeRootWorldRotoTranslation(qj);
   
  // world_H_rootLink = computeRootWorldRotoTranslation(qj);
@@ -200,6 +213,18 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
     wTb[3+i] = rootQuaternion[i];
   }
   
-  qjDot = modelState->qjDot();
-  vb = modelState->vb();
+  //qjDot = modelState->qjDot();
+  //vb = modelState->vb();
+
+  modelState->qjDot(qjDot);
+  modelState->vb(vb);
+  /*
+  
+  for(int i = 0 ; i< numDof; i++)
+  {
+    mexPrintf("ModelGetState qj[%d] : %2.2f, qjDot[%d] : %2.2f\n",i,qj[i],i,qjDot[i]);
+  }
+  */
+  
 }
+

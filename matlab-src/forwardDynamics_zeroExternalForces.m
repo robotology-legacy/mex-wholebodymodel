@@ -56,14 +56,21 @@ qt_b_mod_r = T_b(4:6);
 R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
 
 
-wbm_setWorldFrame(R_b,x_b);
+wbm_setWorldFrame(R_b,x_b,[0 0 0]');
 
 wbm_updateState(qj,dqj,[dx_b;omega_W]);
 
-M = wbm_massMatrix();
-h = wbm_generalisedBiasForces();
-hg = wbm_generalisedBiasForces(qj,zeros(25,1),zeros(6,1)); 
-h = h-hg;
+%M = wbm_massMatrix();
+%h = wbm_generalisedBiasForces();
+
+M = wbm_massMatrix(qj);
+h = wbm_generalisedBiasForces(qj,dqj,[dx_b;omega_W]);
+
+hg = h;
+g = h;
+%hg = wbm_generalisedBiasForces(qj,zeros(25,1),zeros(6,1)); 
+%h = h-hg;
+
 %h = zeros(size(h));
 %H = wbm_centroidalMomentum();
 
@@ -102,8 +109,8 @@ dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
 
 %dx = [dqj;dx_b;dqt_b];
 dx = [dx_b;dqt_b;dqj];
-%dv = M\(Jc'*fc + [tau+tauDamp; zeros(6,1)]-h);
-dv = M\([tau+tauDamp; zeros(6,1)]-h);
+dv = M\(Jc'*fc + [tau+tauDamp; zeros(6,1)]-h);
+%dv = M\([tau+tauDamp; zeros(6,1)]-h);
 dchi = [dx;dv];  
 kinEnergy = 0.5*v'*M*v;
 %dchi = zeros(size(dchi));

@@ -74,6 +74,7 @@ bool ModelUpdateState::compute(int nrhs, const mxArray *prhs[])
 #ifdef DEBUG
   mexPrintf("Trying to compute ModelUpdateState\n");
 #endif
+  robotModel = modelState->robotModel();
   bool retVal = setState(nrhs,prhs);
    return(retVal);
 //   return(true);
@@ -160,13 +161,8 @@ bool ModelUpdateState::setState(int nrhs, const mxArray* prhs[])
 
       int numDof = modelState->dof();
       
-      for(int i = 0; i < numDof ; i++)
+/*      for(int i = 0; i < numDof ; i++)
       {
-	//q_temp[i] = yarp::math::Rand::scalar(-1,1);
-	//dq_temp[i] = yarp::math::Rand::scalar(-1,1);
-	
-//  	q[i] = q_temp[i];
-// 	dq[i] = dq_temp[i];
 	mexPrintf("%d:[%lf,%lf]  ",i,q_temp[i],dq_temp[i]);
       }
       mexPrintf("\n(dxb) \n");
@@ -175,7 +171,7 @@ bool ModelUpdateState::setState(int nrhs, const mxArray* prhs[])
 // 	dxb[i] = dxb_temp[i];
 	//dxb_temp[i] = yarp::math::Rand::scalar(-1,1);
 	mexPrintf("%d:[%lf] ",i,dxb_temp[i]);
-      }
+      }*/
 //      modelState->setState(q_temp,dq_temp,dxb_temp,updateBaseFrame(q_temp) );
 //      ModelComponent::setState(q_temp,dq_temp,dxb_temp,updateBaseFrame(q_temp) );
       //(q);

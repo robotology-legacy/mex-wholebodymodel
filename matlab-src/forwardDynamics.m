@@ -79,7 +79,7 @@ qt_b_mod_r = T_b(4:6);
 %reconstructing rotation of root to world from the quaternion
 R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
 
-omega_b = R_b'*omega_W;
+omega_b = R_b*omega_W;
 
 dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
 

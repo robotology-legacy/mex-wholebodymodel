@@ -63,17 +63,16 @@ bool ModelSetWorldFrame::allocateReturnSpace(int a, mxArray* m[])
 
 bool ModelSetWorldFrame::compute(int nrhs, const mxArray* prhs[])
 {
-  if(!mxIsChar(prhs[1]) || mxGetM(prhs[2]) != 9 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != 3 || mxGetN(prhs[3]) != 1)
+  if(mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != 3 || mxGetN(prhs[3]) != 1)
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
   }
-  
-   double *R_temp,*p_temp;
-   
-   std::string refLinkName = mxArrayToString(prhs[1]);
-   R_temp = (double *)mxGetPr(prhs[2]);
-   p_temp = (double *)mxGetPr(prhs[3]);
 
+  double *R_temp,*p_temp, *g_temp;
+   R_temp = (double *)mxGetPr(prhs[1]);
+   p_temp = (double *)mxGetPr(prhs[2]);
+   g_temp = (double *)mxGetPr(prhs[3]);
+   
    double tempR[9],tempP[3];
    for(int i = 0;i<9;i++)
    {
@@ -85,11 +84,9 @@ bool ModelSetWorldFrame::compute(int nrhs, const mxArray* prhs[])
    }
    wbi::Rotation tempRot(tempR);
    wbi::Frame tempFrame(tempRot, tempP);
-   //H_baseLink_wrWorld = temp;
-   modelState->setReferenceFrameLink(refLinkName);
-   modelState->setReferenceToWorldFrameRotoTrans(tempFrame);
-//    changeWorldFrame(refLinkName,tempFrame);
-   mexPrintf("Robot base link changed to %s\n",refLinkName.c_str()); 
+   modelState->setRootWorldRotoTranslation(tempFrame);
+   modelState->setGravity(g_temp);
+//    mexPrintf("Robot base link changed to %s\n",refLinkName.c_str()); 
 }
 bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray* prhs[])
 {
@@ -116,7 +113,8 @@ bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray* prhs[])
    wbi::Frame tempFrame(tempRot, tempP);
    //H_baseLink_wrWorld = temp;
    //H_baseLink_wrWorld = tempFrame;
-   mexPrintf("Roto translation of world from base frame applied \n"); 
+   modelState->setRootWorldRotoTranslation(tempFrame);
+//    mexPrintf("Roto translation of world from base frame applied \n"); 
 }
 
  
