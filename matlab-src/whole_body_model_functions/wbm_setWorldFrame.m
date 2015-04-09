@@ -18,7 +18,7 @@ function []  = wbm_setWorldFrame( varargin )
         case 3
             wholeBodyModel('set-world-frame',reshape(varargin{1},[],1), varargin{2}, varargin{3});
         otherwise
-             disp('Incorrect number of arguments, check docs'); 
+             disp('setWorldFrame : Incorrect number of arguments, check docs'); 
     end
 end
 

@@ -17,6 +17,6 @@ function [ M ] = wbm_massMatrix( varargin )
         case 1
             M = wholeBodyModel('mass-matrix',varargin{1});
         otherwise
-            disp('Incorrect number of arguments, check docs');
+            disp('massMatrix : Incorrect number of arguments, check docs');
     end
 end

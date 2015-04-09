@@ -15,6 +15,6 @@ function [  ] = wbm_modelInitialise( varargin )
         case 1
             wholeBodyModel('model-initialise',varargin{1});
         otherwise
-            disp('Incorrect number of arguments, check docs');
+            disp('modelInitialise : Incorrect number of arguments, check docs');
     end
 end

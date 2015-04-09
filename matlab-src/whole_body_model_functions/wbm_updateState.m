@@ -16,7 +16,7 @@ function []  = wbm_updateState( varargin )
         case 3
             wholeBodyModel('update-state',varargin{1}, varargin{2}, varargin{3});
         otherwise
-             disp('Incorrect number of arguments, check docs'); 
+             disp('updateState : Incorrect number of arguments, check docs'); 
     end
 end
 

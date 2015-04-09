@@ -18,7 +18,7 @@ function [ Cqv ] = wbm_generalisedBiasForces( varargin )
         case 3
             Cqv = wholeBodyModel('generalised-forces',varargin{1},varargin{2},varargin{3});
         otherwise
-            disp('Incorrect number of arguments, check docs');
+            disp('generalisedBiasForces : Incorrect number of arguments, check docs');
     end       
 end
 

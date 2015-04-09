@@ -1,4 +1,4 @@
-function [p] = wbm_forwardKinematics(varargin)
+    `function [p] = wbm_forwardKinematics(varargin)
 %WBM_FORWARDKINEMATICS computes the forward kinematics rototranslation to a specified link in the current joint
 %   configuration. 
 %   Arguments :
@@ -20,7 +20,7 @@ function [p] = wbm_forwardKinematics(varargin)
         case 2
             p = wholeBodyModel('forward-kinematics',varargin{1},varargin{2});
         otherwise
-            disp('Incorrect number of arguments, check docs');        
+            disp('forwardKinematics : Incorrect number of arguments, check docs');        
     end
     
 end

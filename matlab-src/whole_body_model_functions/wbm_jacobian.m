@@ -18,6 +18,6 @@ function [ J ] = wbm_jacobian( varargin )
         case 2
             J = wholeBodyModel('jacobian',varargin{1},varargin{2});
         otherwise
-            disp('Incorrect number of arguments, check docs');
+            disp('jacobian : Incorrect number of arguments, check docs');
     end
 end

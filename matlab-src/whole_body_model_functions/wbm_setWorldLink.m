@@ -18,7 +18,7 @@ function []  = wbm_setWorldLink( varargin )
         case 4
             wholeBodyModel('set-world-link',varargin{1}, reshape(varargin{2},[],1), varargin{3}, varargin{4});
         otherwise
-             disp('Incorrect number of arguments, check docs'); 
+             disp('setWorldLink : Incorrect number of arguments, check docs'); 
     end
 end
 

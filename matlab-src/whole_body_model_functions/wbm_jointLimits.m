@@ -14,7 +14,7 @@ function [jl_lower,jl_upper]  = wbm_jointLimits( varargin )
         case 0
             [jl_lower,jl_upper]  = wholeBodyModel('joint-limits');
         otherwise
-             disp('Incorrect number of arguments, check docs'); 
+             disp('jointLimits : Incorrect number of arguments, check docs'); 
     end
 end
 

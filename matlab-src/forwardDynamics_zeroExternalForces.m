@@ -1,4 +1,4 @@
-function [ dchi , h , hg,fc, kinEnergy ] = forwardDynamics_zeroExternalForces( t,chi,param )
+function [ dchi , h , g,fc, kinEnergy ] = forwardDynamics_zeroExternalForces( t,chi,param )
 %FORWARDDYNAMICS Forward dynamics of the wholeBodyModel
 %
 %   This is the forward dynamics of the model loaded in the 
@@ -32,27 +32,24 @@ dx_b = chi(ndof+8:ndof+10,:);
 omega_W = chi(ndof+11:ndof+13,:);
 dqj = chi(ndof+14:2*ndof+13,:);
 
-%dx = [dqj;dx_b;omega_b];
-%v = dx;
 v = [dx_b;omega_W;dqj];
-%chi = [x;dx];
-
 
 %% MexWholeBodyModel calls
 
 
 wbm_updateState(qj,dqj,[dx_b;omega_W]);
 
-
-
 %reconstructing rotation of root to world from the quaternion
-[~,T_b,~,~] = wholeBodyModel('get-state');
+%[~,T_b,~,~] = wholeBodyModel('get-state');
 
 %righting quaternion ordering to [real;imaginary]^T since get-state
 %returns the opposite ordering
 %qt_b_mod = [T_b(7);T_b(4:6)];
-qt_b_mod_s = T_b(7);
-qt_b_mod_r = T_b(4:6);
+%qt_b_mod_s = T_b(7);
+%qt_b_mod_r = T_b(4:6);
+
+qt_b_mod_s = qt_b(1);
+qt_b_mod_r = qt_b(2:end);
 R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
 
 
@@ -60,16 +57,13 @@ wbm_setWorldFrame(R_b,x_b,[0 0 0]');
 
 wbm_updateState(qj,dqj,[dx_b;omega_W]);
 
-%M = wbm_massMatrix();
-%h = wbm_generalisedBiasForces();
+M = wbm_massMatrix();
+h = wbm_generalisedBiasForces();
 
-M = wbm_massMatrix(qj);
-h = wbm_generalisedBiasForces(qj,dqj,[dx_b;omega_W]);
+%M = wbm_massMatrix(qj);
+%h = wbm_generalisedBiasForces(qj,dqj,[dx_b;omega_W]);
 
-hg = h;
-g = h;
-%hg = wbm_generalisedBiasForces(qj,zeros(25,1),zeros(6,1)); 
-%h = h-hg;
+g = zeros(size(h));
 
 %h = zeros(size(h));
 %H = wbm_centroidalMomentum();
@@ -100,20 +94,13 @@ fc = (JcMinvJct)\(JcMinv*(h-[tau+tauDamp;zeros(6,1)])-dJcDq);
 % obtain angular velocity in body frame omega_b. This is then used in the
 % quaternion derivative computation.
 
-
-
-%omega_b = omega_W;% R_b*omega_W;
-omega_b = R_b*omega_W;
+omega_b = R_b*omega_W;% R_b*omega_W;
 dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
-%dqt_b = zeros(size(qt_b));%quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
 
-%dx = [dqj;dx_b;dqt_b];
 dx = [dx_b;dqt_b;dqj];
 dv = M\(Jc'*fc + [tau+tauDamp; zeros(6,1)]-h);
-%dv = M\([tau+tauDamp; zeros(6,1)]-h);
 dchi = [dx;dv];  
 kinEnergy = 0.5*v'*M*v;
 %dchi = zeros(size(dchi));
-dchi = dchi;
 end
 

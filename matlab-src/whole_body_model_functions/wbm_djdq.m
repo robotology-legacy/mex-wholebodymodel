@@ -18,7 +18,7 @@ function [ dJdq ] = wbm_djdq( varargin )
         case 4  
             dJdq = wholeBodyModel('djdq',varargin{1},varargin{2},varargin{3},varargin{4});
         otherwise
-            disp('Incorrect number of arguments, check docs');        
+            disp('djdq : Incorrect number of arguments, check docs');        
     end
         
 

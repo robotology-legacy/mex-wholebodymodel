@@ -18,7 +18,7 @@ function [ H ] = wbm_centroidalMomentum( varargin )
         case 3
             H = wholeBodyModel('centroidal-momentum',varargin{1},varargin{2},varargin{3});
         otherwise
-            disp('Incorrect number of arguments, check docs');
+            disp('centroidalMomentum : Incorrect number of arguments, check docs');
     end
 end
 
