@@ -6,9 +6,9 @@ function []  = wbm_setWorldFrame( varargin )
 %
 %   Arguments : 
 %       Optimised Mode : Does not exist
-%       Normal Mode :  link_name - string matching URDF name of the link (frame)
-%                      R - rotation from reference link to world frame (3 x 3)
-%                      p - translation from reference link to world frame (3 x 1) 
+%       Normal Mode :  R - rotation from rootLink to world frame (3 x 3)
+%                      p - translation from rootLink to world frame (3 x 1) 
+%                      g - gravity vector in world frame
 %   Returns :   None
 %
 % Author : Naveen Kuppuswamy (naveen.kuppuswamy@iit.it)

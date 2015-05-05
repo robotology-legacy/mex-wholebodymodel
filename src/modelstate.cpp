@@ -48,7 +48,7 @@ ModelState::ModelState(std::string robotName) : robot_reference_frame_link_name(
   this->setReferenceFrameLink(this->robot_reference_frame_link_name);
   
   gS = new double(3);
-  gS[0] = -9.81; gS[1] = 0; gS[2] = 0;
+  gS[0] = 0; gS[1] = 0; gS[2] = -9.81;
   //g[0] = 0; g[1] = 0; g[2] = 0;
 
   
@@ -264,7 +264,7 @@ void ModelState::setReferenceFrameLink(std::string desLink)
       //wbiIdToNumericId(baseLinkName.c_str(),robot_base_frame_link);
   }
   fixedLinkComputation = true;
-//   mexPrintf(" Using fixed link Computation of World_to_base \n");
+  // mexPrintf(" Using fixed link Computation of World_to_base \n");
   //robotModel->getFrameList().idToIndex(desLink.c_str(),robot_base_frame_link);
   
 }
@@ -313,7 +313,10 @@ wbi::Frame ModelState::computeRootWorldRotoTranslation(double* q_temp)
       referenceLink_H_rootLink.set4x4Matrix (H_w2b.data());
       world_H_rootLink = world_H_reference*referenceLink_H_rootLink ;
     //  mexPrintf("Current base frame : %d\n",modelState->getBaseFrameLink());
-      
+    
+  //  mexPrintf("world_H_root : ");
+  //  mexPrintf("[%2.2f,%2.2f,%2.2f]\n",world_H_rootLink.p[0],world_H_rootLink.p[1],world_H_rootLink.p[2]);
+
       
 //   mexPrintf("Inside modelState\nRootWorldRotoTrans\n");
 //   

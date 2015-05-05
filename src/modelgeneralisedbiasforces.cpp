@@ -92,6 +92,9 @@ bool ModelGeneralisedBiasForces::computeFast(int nrhs, const mxArray* prhs[])
     qj = modelState->qj();
     qjDot = modelState->qjDot();
     //xB = modelState->rootRotoTrans();
+    g = modelState->g();
+    
+   
     world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
     vb = modelState->vb();
    
@@ -140,6 +143,7 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
 #endif  
 
   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  g = modelState->g();
   
   if(h != NULL)
   {

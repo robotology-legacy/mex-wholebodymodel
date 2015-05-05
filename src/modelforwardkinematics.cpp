@@ -91,6 +91,7 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray* prhs[])
 #endif  
   
   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+ // mexPrintf("BaseFrame : [%2.2f,%2.2f,%2.2f]",world_H_rootLink.p[0],world_H_rootLink.p[1],world_H_rootLink.p[2]);
   
   if(xT != NULL)
   {
@@ -186,6 +187,7 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray* prhs[])
   qj = modelState->qj();
   //xB = modelState->rootRotoTrans();
   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+ // mexPrintf("BaseFrame : [%2.2f,%2.2f,%2.2f]\n",world_H_rootLink.p[0],world_H_rootLink.p[1],world_H_rootLink.p[2]);
   refLink = mxArrayToString(prhs[1]);
   int refLinkID;
   

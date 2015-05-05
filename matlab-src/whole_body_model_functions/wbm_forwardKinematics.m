@@ -1,9 +1,9 @@
-    `function [p] = wbm_forwardKinematics(varargin)
+ function [p] = wbm_forwardKinematics(varargin)
 %WBM_FORWARDKINEMATICS computes the forward kinematics rototranslation to a specified link in the current joint
 %   configuration. 
 %   Arguments :
 %       Optimised Mode : link_name - string matching URDF name of the link (frame)
-%       Normal Mode : qj - joint position (NumDoF x 1)
+%       Normal Mode : qj - joint positions (NumDoF x 1)
 %                     link_name - string matching URDF name of the link
 %                     (frame)
 %   Returns :   p - 7 dimensional vector of the rototranslation of link

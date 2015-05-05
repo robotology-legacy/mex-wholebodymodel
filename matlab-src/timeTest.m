@@ -1,7 +1,7 @@
 
 addpath('./../build');
 %Running a 10,000 run trial
-totTime = 0;numRuns = 10000;
+totTime = 0;numRuns = 1000;
 
 refLink1 = 'r_sole';
 refLink2 = 'l_gripper';
