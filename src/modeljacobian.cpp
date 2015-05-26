@@ -24,6 +24,7 @@
 // #include <wbiIcub/icubWholeBodyModel.h>
 #include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 //local includes
+#include <Eigen/Core>
 
 #include "modeljacobian.h"
 using namespace mexWBIComponent;
@@ -39,7 +40,10 @@ ModelJacobian::ModelJacobian(): ModelComponent(2,1,1)
 
 ModelJacobian::~ModelJacobian()
 {
-
+    if (temporaryJacobian) {
+        free(temporaryJacobian);
+        temporaryJacobian = 0;
+    }
 }
 
 bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray* plhs[])
@@ -51,6 +55,7 @@ bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray* plhs[])
   bool returnVal = false;
 
   plhs[0]=mxCreateDoubleMatrix(6,numDof+6, mxREAL);
+  temporaryJacobian = (double*)malloc(sizeof(double) * 6 * (numDof + 6));
   j = mxGetPr(plhs[0]);
   returnVal = true;
   return(returnVal);
@@ -147,11 +152,16 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
   //robotModel->getLinkId (refLink, refLinkID);
     modelState = ModelState::getInstance();
 
-  if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j)))
+  if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,temporaryJacobian)))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
   }
+    
+  Eigen::Map<Eigen::Matrix<double, 6, Eigen::Dynamic, Eigen::RowMajor> > inJacobian(temporaryJacobian, 6, numDof + 6);
 
+  Eigen::Map<Eigen::Matrix<double, 6, Eigen::Dynamic, Eigen::ColMajor> > outJacobian(j, 6, numDof + 6);
+    
+    outJacobian = inJacobian;
   
 #ifdef DEBUG
   mexPrintf("ModelJacobian fastComputed\n");
@@ -208,31 +218,18 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
       robotModel->getFrameList().idToIndex(refLink, refLinkID);
     }
      //robotModel->computeMassMatrix(q,xB,massMatrix);
-    if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j)))
+    if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,temporaryJacobian)))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
     }
+      
+    Eigen::Map<Eigen::Matrix<double, 6, Eigen::Dynamic, Eigen::RowMajor> > inJacobian(temporaryJacobian, 6, numDof + 6);
+
+    Eigen::Map<Eigen::Matrix<double, 6, Eigen::Dynamic, Eigen::ColMajor> > outJacobian(j, 6, numDof + 6);
+
+    outJacobian = inJacobian;
+      
   }
 //   mxFree(q);
   return(true);  
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
