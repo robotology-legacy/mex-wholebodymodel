@@ -25,6 +25,10 @@
 #include "wbi/wbiUtil.h"
 
 
+//local includes
+#include "mexwholebodymodelsettings.h"
+
+
 namespace mexWBIComponent{
 class ModelJacobian : public ModelComponent
 {
@@ -45,7 +49,8 @@ private:
   
   bool processArguments(int, const mxArray *[]);
   
-  double *j;
+  double *j_colMajor;
+  double j_rowMajor[6*(6+MEX_WBMODEL_MAX_NUM_JOINTS)];
   double *qj;
   char * refLink;
   

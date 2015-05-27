@@ -32,6 +32,7 @@ ModelJacobian * ModelJacobian::modelJacobian;
 
 ModelJacobian::ModelJacobian(): ModelComponent(2,1,1)
 {
+    // j_rowMajor = new double(6*(numDof+6));
 #ifdef DEBUG
   mexPrintf("ModelJacobian constructed \n");
 #endif
@@ -39,7 +40,7 @@ ModelJacobian::ModelJacobian(): ModelComponent(2,1,1)
 
 ModelJacobian::~ModelJacobian()
 {
-
+  //  delete(j_rowMajor);
 }
 
 bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray* plhs[])
@@ -51,7 +52,8 @@ bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray* plhs[])
   bool returnVal = false;
 
   plhs[0]=mxCreateDoubleMatrix(6,numDof+6, mxREAL);
-  j = mxGetPr(plhs[0]);
+  j_colMajor = mxGetPr(plhs[0]);
+ 
   returnVal = true;
   return(returnVal);
 }
@@ -147,12 +149,20 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
   //robotModel->getLinkId (refLink, refLinkID);
     modelState = ModelState::getInstance();
 
-  if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j)))
+  if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j_rowMajor)))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
   }
 
-  
+  int columnMajCtr = 0;
+  for (int i = 0; i<(numDof+6); i++)
+  {
+      for (int j = 0;j<6;j++)
+      {
+          j_colMajor[columnMajCtr] = j_rowMajor[i+j*(numDof+6)];
+          columnMajCtr = columnMajCtr+1;
+      }
+  }
 #ifdef DEBUG
   mexPrintf("ModelJacobian fastComputed\n");
 #endif
@@ -192,7 +202,7 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
   
   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
   
-  if(j != NULL)
+  if(j_rowMajor != NULL && j_colMajor != NULL)
   {
     int refLinkID;
    // robotModel->getLinkId (refLink, refLinkID);
@@ -208,12 +218,22 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
       robotModel->getFrameList().idToIndex(refLink, refLinkID);
     }
      //robotModel->computeMassMatrix(q,xB,massMatrix);
-    if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j)))
+    if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j_rowMajor)))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
     }
   }
 //   mxFree(q);
+  int columnMajCtr = 0;
+  for (int i = 0; i<(numDof+6); i++)
+  {
+      for (int j = 0;j<6;j++)
+      {
+          j_colMajor[columnMajCtr] = j_rowMajor[i+j*(numDof+6)];
+          columnMajCtr = columnMajCtr+1;
+      }
+  }
+
   return(true);  
 }
 
