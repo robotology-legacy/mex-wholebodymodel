@@ -47,6 +47,10 @@ ModelState::ModelState(std::string robotName) : robot_reference_frame_link_name(
   numDof = robotWBIModel->getDoFs();
   this->setReferenceFrameLink(this->robot_reference_frame_link_name);
   
+  
+  qjS = (double*)malloc(sizeof(double) * (numDof));
+  qjDotS = (double*)malloc(sizeof(double) * (numDof));
+  
   gS = new double(3);
   gS[0] = 0; gS[1] = 0; gS[2] = -9.81;
   //g[0] = 0; g[1] = 0; g[2] = 0;
@@ -65,6 +69,16 @@ ModelState::~ModelState()
  // delete(qS);
  // delete(dqS);
  // delete(dxbS);
+    
+  if(qjDotS != NULL){
+      free(qjDotS);
+          qjDotS = 0;
+  }
+
+  if(qjS != NULL){
+      free(qjS);
+          qjS = 0;
+  }
   yarp::os::Network::fini();
   delete(robotWBIModel);
   mexPrintf("ModelState destructed\n"); 

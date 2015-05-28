@@ -49,8 +49,13 @@ private:
   
   bool processArguments(int, const mxArray *[]);
   
+//<<<<<< HEAD
   double *j_colMajor;
-  double j_rowMajor[6*(6+MEX_WBMODEL_MAX_NUM_JOINTS)];
+  double *j_rowMajor;//[6*(6+MEX_WBMODEL_MAX_NUM_JOINTS)];
+//=======
+//   double *j;
+//   double *temporaryJacobian;
+// >>>>>>> 2079d9e9aecaad2016bf292be94bc8c6b2688f1a
   double *qj;
   char * refLink;
   

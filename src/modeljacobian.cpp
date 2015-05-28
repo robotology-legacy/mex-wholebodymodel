@@ -24,6 +24,7 @@
 // #include <wbiIcub/icubWholeBodyModel.h>
 #include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 //local includes
+#include <Eigen/Core>
 
 #include "modeljacobian.h"
 using namespace mexWBIComponent;
@@ -32,7 +33,7 @@ ModelJacobian * ModelJacobian::modelJacobian;
 
 ModelJacobian::ModelJacobian(): ModelComponent(2,1,1)
 {
-    // j_rowMajor = new double(6*(numDof+6));
+    j_rowMajor = NULL;
 #ifdef DEBUG
   mexPrintf("ModelJacobian constructed \n");
 #endif
@@ -40,7 +41,11 @@ ModelJacobian::ModelJacobian(): ModelComponent(2,1,1)
 
 ModelJacobian::~ModelJacobian()
 {
-  //  delete(j_rowMajor);
+
+    if(j_rowMajor != NULL){
+        free(j_rowMajor);
+            j_rowMajor = 0;
+    }
 }
 
 bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray* plhs[])
@@ -53,7 +58,11 @@ bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray* plhs[])
 
   plhs[0]=mxCreateDoubleMatrix(6,numDof+6, mxREAL);
   j_colMajor = mxGetPr(plhs[0]);
- 
+
+    if(j_rowMajor == NULL)
+  {
+      j_rowMajor = (double*)malloc(sizeof(double) * 6 * (numDof + 6));
+  }
   returnVal = true;
   return(returnVal);
 }
@@ -66,44 +75,6 @@ ModelJacobian * ModelJacobian::getInstance()
   }
   return(modelJacobian);
 }
-/*
-
-bool ModelJacobian::display(int nrhs, const mxArray * prhs[])
-{
-#ifdef DEBUG
-  mexPrintf("Trying to display ModelMassMatrix \n");
-#endif
-  bool processRet = processArguments(nrhs,prhs);
-  //processArguments(nrhs,prhs);
-  double *mm = new double((6) *(numDof));
-  
-  //robotModel->computeMassMatrix(modelState->q(),modelState->baseFrame(),mm);
-#ifdef DEBUG
-  mexPrintf("Trying to display ModelMassMatrix : call from wbi returned\n");
-#endif
-  double qState[numDof];
-  for( int i = 0; i<6; i++)
-  {
-    for(int k = 0; k<numDof+6; k++)
-    {
-	mm[i+k*numDof] = j[i+k*numDof];
-	//mm[i][j] = 0.5 + 0.1*i*j;
-#ifdef DEBUG
-	mexPrintf("%f ",mm[i+k*numDof]);
-#endif
-	
-      //mexPrintf("%f ",massMatrix[i+(j*numDof)]);
-    }
-#ifdef DEBUG
-    mexPrintf("\n ");
-#endif
-    
-  }
-  
-  delete(mm);
-    //robotModel->computeMassMatrix()
-  return(true);
-}*/
 
 bool ModelJacobian::compute(int nrhs, const mxArray * prhs[])
 {
@@ -146,14 +117,12 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
     robotModel->getFrameList().idToIndex(refLink, refLinkID);
   }
   
-  //robotModel->getLinkId (refLink, refLinkID);
     modelState = ModelState::getInstance();
 
   if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j_rowMajor)))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
   }
-
   int columnMajCtr = 0;
   for (int i = 0; i<(numDof+6); i++)
   {
@@ -218,10 +187,21 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
       robotModel->getFrameList().idToIndex(refLink, refLinkID);
     }
      //robotModel->computeMassMatrix(q,xB,massMatrix);
+// <<<<<<< HEAD
     if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j_rowMajor)))
+// =======
+//     if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,temporaryJacobian)))
+// >>>>>>> 2079d9e9aecaad2016bf292be94bc8c6b2688f1a
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
     }
+      
+//     Eigen::Map<Eigen::Matrix<double, 6, Eigen::Dynamic, Eigen::RowMajor> > inJacobian(temporaryJacobian, 6, numDof + 6);
+// 
+//     Eigen::Map<Eigen::Matrix<double, 6, Eigen::Dynamic, Eigen::ColMajor> > outJacobian(j, 6, numDof + 6);
+// 
+//     outJacobian = inJacobian;
+      
   }
 //   mxFree(q);
   int columnMajCtr = 0;
@@ -236,23 +216,3 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
 
   return(true);  
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

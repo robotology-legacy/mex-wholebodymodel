@@ -73,7 +73,7 @@ private:
   ModelState(std::string);
   static ModelState * modelState;
   //double *qS, *dqS, *dxbS;
-  double qjS[MEX_WBMODEL_MAX_NUM_JOINTS],qjDotS[MEX_WBMODEL_MAX_NUM_JOINTS],vbS[6];
+  double vbS[6],*qjS,*qjDotS;//;qjS[MEX_WBMODEL_MAX_NUM_JOINTS],qjDotS[MEX_WBMODEL_MAX_NUM_JOINTS],vbS[6];
 //   wbi::Frame rootS;
   int robot_reference_frame_link;
   //wbi::Frame H_rootLink_wrWorld;
