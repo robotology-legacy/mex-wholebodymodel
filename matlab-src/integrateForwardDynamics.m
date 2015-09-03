@@ -40,8 +40,8 @@ wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
     [qj,T_bInit,dqj,vb] = wholeBodyModel('get-state');
     % flipping quaternion organisation (to real followed by imaginary
     % convention)
-    T_bInit_mod = [T_bInit(1:3);T_bInit(7);T_bInit(4:6)];
-    params.chiInit = [T_bInit_mod;params.qjInit;...
+%    T_bInit_mod = [T_bInit(1:3);T_bInit(7);T_bInit(4:6)];
+    params.chiInit = [T_bInit;params.qjInit;...
                         params.dx_bInit;params.omega_bInit;params.dqjInit];
 
     %% contact constraints                
@@ -52,15 +52,15 @@ wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
     params.numConstraints= length(params.constraintLinkNames);
     %% control torques
     gInit = wbm_generalisedBiasForces(params.qjInit,zeros(25,1),zeros(6,1));
-    %params.tau = @(t)gInit(7:end);
-    params.tau = @(t)zeros(size(gInit(7:end)));
+  %  params.tau = @(t)gInit(7:end);
+     params.tau = @(t)zeros(size(gInit(7:end)));
     %params.tau = @(t)1.5*ones(size(gInit(7:end)));
     %params.tau = @(t)0.01*ones(size(gInit(1:params.ndof)));%gInit(1:params.ndof);
 
     %% setup integration
     forwardDynFunc = @(t,chi)forwardDynamics(t,chi,params);
     params.tStart = 0;
-    params.tEnd = 0.8;%1.5;
+    params.tEnd = 2;%1.5;
     params.sim_step = 0.01;
 
 
