@@ -31,7 +31,7 @@ using namespace mexWBIComponent;
 
 ModelMassMatrix * ModelMassMatrix::modelMassMatrix; 
 
-ModelMassMatrix::ModelMassMatrix(): ModelComponent(1,0,1)
+ModelMassMatrix::ModelMassMatrix(): ModelComponent(3,0,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelMassMatrix constructed \n");
@@ -68,44 +68,6 @@ ModelMassMatrix * ModelMassMatrix::getInstance()
   }
   return(modelMassMatrix);
 }
-
-/*
-bool ModelMassMatrix::display(int nrhs, const mxArray * prhs[])
-{
-#ifdef DEBUG
-  mexPrintf("Trying to display ModelMassMatrix \n");
-#endif
-  bool processRet = processArguments(nrhs,prhs);
-  //processArguments(nrhs,prhs);
-  double *mm = new double((numDof+6) *(numDof+6));
-  
-  //robotModel->computeMassMatrix(modelState->q(),modelState->baseFrame(),mm);
-#ifdef DEBUG
-  mexPrintf("Trying to display ModelMassMatrix : call from wbi returned\n");
-#endif
-  //double qState[numDof];
-  for( int i = 0; i<numDof+6; i++)
-  {
-    for(int j = 0; j<numDof+6; j++)
-    {
-	mm[i+j*numDof] = massMatrix[i+j*numDof];
-	//mm[i][j] = 0.5 + 0.1*i*j;
-#ifdef DEBUG
-	mexPrintf("%f ",mm[i+j*numDof]);
-#endif
-	
-      //mexPrintf("%f ",massMatrix[i+(j*numDof)]);
-    }
-#ifdef DEBUG
-    mexPrintf("\n ");
-#endif
-    
-  }
-  
-  delete(mm);
-    //robotModel->computeMassMatrix()
-  return(true);
-}*/
 
 bool ModelMassMatrix::compute(int nrhs, const mxArray * prhs[])
 {
@@ -146,27 +108,38 @@ bool ModelMassMatrix::computeFast(int nrhs, const mxArray* prhs[])
 
 bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
 {
-//   if(nrhs<2)
-//   {
-//      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Atleast two input arguments required for mass-matrix");
-//   }
-  
-  if(mxGetM(prhs[1]) != numDof || mxGetN(prhs[1]) != 1)
+
+  if(mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1)
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions");
   }
   robotModel = modelState->robotModel();
-  qj = mxGetPr(prhs[1]);
+  qj = mxGetPr(prhs[3]);
+  double *R_temp,*p_temp;
+  R_temp = (double *)mxGetPr(prhs[1]);
+  p_temp = (double *)mxGetPr(prhs[2]);
+  
+  double tempR[9],tempP[3];
+  for(int i = 0;i<9;i++)
+  {
+    tempR[i] = R_temp[i];
+    if(i<3)
+     {
+       tempP[i] = p_temp[i];
+     }
+  }
+  wbi::Rotation tempRot(tempR);
+  wbi::Frame tempFrame(tempRot, tempP);
+   
 #ifdef DEBUG
-  mexPrintf("qj received \n");
-
+  mexPrintf("qj received \n"); 
   for(int i = 0; i< numDof;i++)
   {
     mexPrintf(" %f",qj[i]);
   }
 #endif  
   //int LINK_FOOT_WRF;
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = tempFrame;//%modelState->computeRootWorldRotoTranslation(qj);
   
   if(massMatrix != NULL)
   {

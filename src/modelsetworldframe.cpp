@@ -86,7 +86,6 @@ bool ModelSetWorldFrame::compute(int nrhs, const mxArray* prhs[])
    wbi::Frame tempFrame(tempRot, tempP);
    modelState->setRootWorldRotoTranslation(tempFrame);
    modelState->setGravity(g_temp);
-//    mexPrintf("Robot base link changed to %s\n",refLinkName.c_str()); 
 }
 bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray* prhs[])
 {

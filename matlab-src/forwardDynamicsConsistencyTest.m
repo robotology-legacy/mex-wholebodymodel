@@ -47,17 +47,17 @@ disp(params.dqjInit');
 wbm_setWorldFrame(eye(3),[0 0 0]',[0 0 0]');
 
 wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit]);
-[qj,T_bInit,dqj,vb] = wholeBodyModel('get-state');
-% flipping quaternion organisation (to real followed by imaginary
-% convention)
-T_bInit_mod = [T_bInit(1:3);T_bInit(7);T_bInit(4:6)];
-params.chiInit = [T_bInit_mod;params.qjInit;...
+%[qj,T_bInit,dqj,vb] = wholeBodyModel('get-state');
+
+[qj,T_bInit,dqj,vb] = wbm_getState();
+[Ptemp,Rtemp] = frame2posrot(T_bInit);
+params.chiInit = [T_bInit;params.qjInit;...
                     params.dx_bInit;params.omega_bInit;params.dqjInit];
 %% contact constraints                
 params.constraintLinkNames = {};%{'l_sole','r_sole'};                
 
 %% control torques
-gInit = wbm_generalisedBiasForces(params.qjInit,zeros(25,1),zeros(6,1));
+gInit = wbm_generalisedBiasForces(Rtemp,Ptemp,params.qjInit,zeros(25,1),zeros(6,1));
 params.tau = @(t)zeros(params.ndof,1);%gInit(1:params.ndof);
 %params.tau = @(t)gInit(1:params.ndof);
 
