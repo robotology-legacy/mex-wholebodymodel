@@ -1,10 +1,12 @@
 classdef iCubWBMBasic < handle & matlab.mixin.Copyable
     properties(Access = private)
         wb_params@iCubWBMParams
+        %wb_bOptDefault@logical
     end
     
     properties(Access = private, Constant)
-        wb_strArgError = 'Wrong number of input arguments!';
+        wb_strWrongArgErr = 'Wrong number of input arguments!';
+        wb_strDataTypeErr = 'Wrong data type!';       
     end
     
     methods(Access = public)
@@ -46,7 +48,7 @@ classdef iCubWBMBasic < handle & matlab.mixin.Copyable
         
         function setState(q_j, dq_j, v_wb)            
             if (nargin ~= 3)
-                error('iCubWBMBasic::setState: %s', wb_strArgError);
+                error('iCubWBMBasic::setState: %s', obj.wb_strWrongArgErr);
             end 
             wholeBodyModel('update-state', q_j, dq_j, v_wb);
         end
@@ -58,89 +60,97 @@ classdef iCubWBMBasic < handle & matlab.mixin.Copyable
         
         function setWorldFrame(R_rootlnk_wf, p_rootlnk_wf, g_wf)
             if (nargin ~= 3)
-                error('iCubWBMBasic::setWorldFrame: %s', wb_strArgError);
+                error('iCubWBMBasic::setWorldFrame: %s', obj.wb_strWrongArgErr);
             end
-            R_rootlnk_wf_arr = reshape(R_rootlnk_wf, [], 1); % reshape the matrix to an 1-column array ...
-            wholeBodyModel('set-world-frame', R_rootlnk_wf_arr, p_rootlnk_wf, g_wf);
+            R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1); % reshape the matrix to an 1-column array ...
+            wholeBodyModel('set-world-frame', R_rlnk_wf_arr, p_rootlnk_wf, g_wf);
         end
         
         function setWorldLink(urdf_link_name, R_reflnk_wf, p_reflnk_wf, g_wf)
-            R_reflnk_wf_arr = reshape(R_reflnk_wf, [], 1);
+            R_rlnk_wf_arr = reshape(R_reflnk_wf, [], 1);
 
             switch nargin
                 case 4
-                    wholeBodyModel('set-world-link', urdf_link_name, R_reflnk_wf_arr, p_reflnk_wf, g_wf); % check arguments here!!!
+                    wholeBodyModel('set-world-link', urdf_link_name, R_rlnk_wf_arr, p_reflnk_wf, g_wf);
                 case 2
-                    wholeBodyModel('set-world-link', urdf_link_name, R_reflnk_wf_arr); % check arguments here!!!
+                    wholeBodyModel('set-world-link', R_rlnk_wf_arr, p_reflnk_wf);
                 otherwise
-                    error('iCubWBMBasic::setWorldLink: %s', wb_strArgError);
+                    error('iCubWBMBasic::setWorldLink: %s', obj.wb_strWrongArgErr);
             end
-        end
+        end    
         
-        function M = massMatrix(q_j)
-            if ~exist('q_j', 'var')
-                M = wholeBodyModel('mass-matrix');
-                return
+        function M = massMatrix(R_rootlnk_wf, p_rootlnk_wf, q_j)
+            switch nargin
+                case 3
+                    R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
+                    M = wholeBodyModel('mass-matrix', R_rlnk_wf_arr, p_rootlnk_wf, q_j);
+                case 0
+                    M = wholeBodyModel('mass-matrix');
+                otherwise
+                    error('iCubWBMBasic::massMatrix: %s', obj.wb_strWrongArgErr);
             end
-            M = wholeBodyModel('mass-matrix', q_j);
-        end
+        end       
         
         function [jl_lower, jl_upper] = getJointLimits(varargin)
             [jl_lower, jl_upper] = wholeBodyModel('joint-limits');
         end
         
-        function J = jacobian(urdf_link_name, q_j)
+        function J = jacobian(urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j)
             switch nargin
-                case 2
-                    J = wholeBodyModel('jacobian', urdf_link_name, q_j);                    
+                case 4
+                    J = wholeBodyModel('jacobian', R_rootlnk_wf, p_rootlnk_wf, q_j, urdf_link_name);                    
                 case 1
                     J = wholeBodyModel('jacobian', urdf_link_name);
                 otherwise
-                    error('iCubWBMBasic::jacobian: %s', wb_strArgError);
+                    error('iCubWBMBasic::jacobian: %s', obj.wb_strWrongArgErr);
             end
-        end     
-                        
-        function djdq = dJdq(urdf_link_name, q_j, dq_j, v_xb)
+        end
+        
+        function djdq = dJdq(urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
             switch nargin
-                case 4
-                    djdq = wholeBodyModel('djdq', urdf_link_name, q_j, dq_j, v_xb);
+                case 6
+                    R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
+                    djdq = wholeBodyModel('djdq', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_xb, urdf_link_name);
                 case 1
                     djdq = wholeBodyModel('djdq', urdf_link_name);
                 otherwise
-                    error('iCubWBMBasic::dJdq: %s', wb_strArgError);
+                    error('iCubWBMBasic::dJdq: %s', obj.wb_strWrongArgErr);
             end
         end
         
-        function H = centrodialMomentum(q_j, dq_j, v_xb)
+        function H = centrodialMomentum(R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
             switch nargin
-                case 3
-                    H = wholeBodyModel('centroidal-momentum', q_j, dq_j, v_xb);
+                case 5
+                    R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
+                    H = wholeBodyModel('centroidal-momentum', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_xb);
                 case 0 
                     H = wholeBodyModel('centroidal-momentum');
                 otherwise
-                    error('iCubWBMBasic::centrodialMomentum: %s', wb_strArgError);
+                    error('iCubWBMBasic::centrodialMomentum: %s', obj.wb_strWrongArgErr);
             end
         end
         
-        function p = forwardKinematics(urdf_link_name, q_j)
+        function p = forwardKinematics(urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j)
             switch nargin
-                case 2
-                    p = wholeBodyModel('forward-kinematics', urdf_link_name, q_j);
+                case 4
+                    R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
+                    p = wholeBodyModel('forward-kinematics', R_rlnk_wf_arr, p_rootlnk_wf, q_j, urdf_link_name);
                 case 1
                     p = wholeBodyModel('forward-kinematics', urdf_link_name);
                 otherwise
-                    error('iCubWBMBasic::forwardKinematics: %s', wb_strArgError);                    
+                    error('iCubWBMBasic::forwardKinematics: %s', obj.wb_strWrongArgErr);                    
             end            
         end
         
-        function C_qv = genBiasForces(q_j, dq_j, v_xb)
+        function C_qv = genBiasForces(R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
             switch nargin
-                case 3
-                    C_qv = wholeBodyModel('generalised-forces',);
+                case 5
+                    R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
+                    C_qv = wholeBodyModel('generalised-forces', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_xb);
                 case 0
-                    C_qv = wholeBodyModel('generalised-forces', q_j, dq_j, v_xb);
+                    C_qv = wholeBodyModel('generalised-forces');
                 otherwise
-                    error('iCubWBMBasic::genBiasForces: %s', wb_strArgError);
+                    error('iCubWBMBasic::genBiasForces: %s', obj.wb_strWrongArgErr);
             end
         end       
   
@@ -174,7 +184,7 @@ classdef iCubWBMBasic < handle & matlab.mixin.Copyable
     methods(Access = private)
         function initWBM(icub_wbm_params)
             if ~isa(icub_wbm_params, 'iCubWBMParams')
-                error('Wrong data type!');
+                error(obj.wb_strDataTypeErr);
             end
 
             % Initialization:
@@ -187,8 +197,9 @@ classdef iCubWBMBasic < handle & matlab.mixin.Copyable
             
             % initialize the mex-wholeBodyModel of the iCub-Robot
             % by using the Unified Robot Description Format (URDF):
+            %
             if isempty(icub_wbm_params.urdfRobotName)
-                % use the default URDF for the Gazebo simulator ...
+                % Optimized mode: use the default URDF for the Gazebo simulator ...
                 obj.wb_params.urdfRobotName = 'icubGazeboSim';
                 wholeBodyModel('model-initialise');                
             else
@@ -197,14 +208,18 @@ classdef iCubWBMBasic < handle & matlab.mixin.Copyable
                 wholeBodyModel('model-initialise', obj.wb_params.urdfRobotName);
             end
 
-            % set the the world frame to a given rototranslation from
-            % a chosen reference link:            
+            % set the world frame to a given rototranslation from a chosen
+            % reference link:
+            %            
+            R_rlnk_wf_arr = reshape(obj.wb_params.R_reflnk_wf, [], 1); % transform matrix to an 1-column array ...   
             if isempty(icub_wbm_params.urdfRefLinkName)
-                obj.wb_params.urdfRefLinkName = 'l_sole'; % default URDF reference link
+                % Optimized mode: use the default URDF reference link ...
+                obj.wb_params.urdfRefLinkName = 'l_sole'; % check if it is really the default ref. link!!
+                wholeBodyModel('set-world-link', R_rlnk_wf_arr, obj.wb_params.p_reflnk_wf);                
             else
                 obj.wb_params.urdfRefLinkName = icub_wbm_params.urdfRefLinkName;           
+                wholeBodyModel('set-world-link', obj.wb_params.urdfRefLinkName, R_rlnk_wf_arr, obj.wb_params.p_reflnk_wf, obj.wb_params.g_wf);
             end
-            wbm_setWorldLink(obj.wb_params.urdfRefLinkName, obj.wb_params.R_reflnk_wf, obj.wb_params.p_reflnk_wf);            
         end
 
     end
