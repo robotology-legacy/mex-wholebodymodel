@@ -38,7 +38,6 @@ public:
   virtual bool allocateReturnSpace(int, mxArray*[]);
   virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
-  //virtual bool display(int, const mxArray *[]) = 0;
 
   ~ModelSetWorldFrame();  
 private:  

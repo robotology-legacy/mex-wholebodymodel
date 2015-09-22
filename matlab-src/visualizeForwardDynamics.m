@@ -27,6 +27,7 @@ wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
     wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
 
 
+    
 % the list of link/joint names that are used to construct the robot in the visualizer                  
 L = cell(15,1);
 L{1}  = 'root_link'   ;
@@ -65,7 +66,7 @@ for jj=1:n_plot
        [pB,R] = frame2posrot(squeeze(q(ii,:)'));
        % set world to base
        wbm_setWorldFrame(R,pB,[0,0,-9.81]');
-       kin(ii,:,jj) = (wholeBodyModel('forward-kinematics',qj(ii,:)',L{jj}))'; % forward kinematics for the list of joints/links
+       kin(ii,:,jj) = (wbm_forwardKinematics(R,pB,qj(ii,:)',L{jj}))'; % forward kinematics for the list of joints/links
         
     end
     %q(jj,1:3)

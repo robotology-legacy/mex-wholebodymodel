@@ -31,7 +31,7 @@ using namespace mexWBIComponent;
 
 ModelGeneralisedBiasForces * ModelGeneralisedBiasForces::modelGeneralisedBiasForces;
 
-ModelGeneralisedBiasForces::ModelGeneralisedBiasForces() : ModelComponent(3,0,1)
+ModelGeneralisedBiasForces::ModelGeneralisedBiasForces() : ModelComponent(5,0,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelGeneralisedBiasForces constructed\n");
@@ -124,14 +124,29 @@ bool ModelGeneralisedBiasForces::display(int nrhs, const mxArray* prhs[])
 bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[])
 {
   
-  if(mxGetM(prhs[1]) != numDof || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != numDof || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != 6 || mxGetN(prhs[3]) != 1)
+  if(mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||  mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || mxGetM(prhs[4]) != numDof || mxGetN(prhs[4]) != 1 || mxGetM(prhs[5]) != 6 || mxGetN(prhs[5]) != 1)
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state argument dimensions in ModelGeneralisedForces call");
   }
+  double *R_temp,*p_temp;
+  R_temp = (double *)mxGetPr(prhs[1]);
+  p_temp = (double *)mxGetPr(prhs[2]);
+  
+  double tempR[9],tempP[3];
+  for(int i = 0;i<9;i++)
+  {
+    tempR[i] = R_temp[i];
+    if(i<3)
+     {
+       tempP[i] = p_temp[i];
+     }
+  }
+  wbi::Rotation tempRot(tempR);
+  wbi::Frame tempFrame(tempRot, tempP);
   robotModel = modelState->robotModel();
-  qj = mxGetPr(prhs[1]);
-  qjDot = mxGetPr(prhs[2]);
-  vb = mxGetPr(prhs[3]);
+  qj = mxGetPr(prhs[3]);
+  qjDot = mxGetPr(prhs[4]);
+  vb = mxGetPr(prhs[5]);
   
 #ifdef DEBUG
   mexPrintf("qj received \n");
@@ -142,7 +157,7 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
   }
 #endif  
 
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = tempFrame;//%modelState->computeRootWorldRotoTranslation(qj);
   g = modelState->g();
   
   if(h != NULL)
