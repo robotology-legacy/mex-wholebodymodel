@@ -24,7 +24,6 @@
 #include <mex.h>
 
 //library includes
-//#include <wbiIcub/icubWholeBodyModel.h>
 #include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 //local includes
@@ -34,7 +33,6 @@
 using namespace mexWBIComponent;
 
 ComponentManager * ComponentManager::componentManager;
-//wbi::iWholeBodyModel * ComponentManager::robotModel;
 
 ComponentManager* ComponentManager::getInstance(std::string robotName)
 {
@@ -98,7 +96,6 @@ void ComponentManager::initialise(std::string robotName)
 {
   
   modelState = ModelState::getInstance(robotName);
-  //modelState->robotModel(robotModel);    
   modelUpdateState = ModelUpdateState::getInstance();
   modelGetState = ModelGetState::getInstance();
   modelJointLimits = ModelJointLimits::getInstance();
@@ -114,10 +111,6 @@ void ComponentManager::initialise(std::string robotName)
   modelSetWorldLink= ModelSetWorldLink::getInstance();
 }
 
-// int ComponentManager::getDofs()
-// {
-//   return(robotModel->getDoFs());
-// }
 
 bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 {
@@ -162,13 +155,6 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
     activeComponent->compute( nrhs, prhs);
     returnVal = true;
   }
-//        }
-/*       else
-       {
-	 activeComponent->display(nrhs,prhs);
-	 returnVal = true;
-       } */  //modelJointLimits->allocateReturnSpace( nlhs, plhs);
-	  //modelJointLimits->display(nrhs, prhs);    
-//      }
+
     return(returnVal);
 }
