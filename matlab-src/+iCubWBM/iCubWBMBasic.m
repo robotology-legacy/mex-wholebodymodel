@@ -55,7 +55,16 @@ classdef iCubWBMBasic < handle & matlab.mixin.Copyable
         
         function [q_j, xTb, dq_j, v_xb] = getState(varargin)
             [q_j, xTbT, dq_j, v_xb] = wholeBodyModel('get-state');
-            xTb = [xTbT(1:3); xTbT(7); xTbT(4:6)];
+            xTb = [xTbT(1:3); xTbT(7); xTbT(4:6)]; % position correction of the outputs
+                                                   % (1. cart. position, 2. real part and
+                                                   %  3. imag. part of the quaternion)                                                  
+            %wb_state = iCubWBMState;
+            %wb_state.q_j = q_j;
+            %wb_state.dq_j = dq_j;
+            %wb_state.x_b = xTb(1:3);
+            %wb_state.qt_b = xTb(4:7);
+            %wb_state.dx_b = v_xb(1:3); % ??? to check!!!
+            %wb_state.omega_b = v_xb(4:6); % ??? to check!!!
         end
         
         function setWorldFrame(R_rootlnk_wf, p_rootlnk_wf, g_wf)
