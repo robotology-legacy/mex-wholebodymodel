@@ -11,5 +11,5 @@ the `ctest` command. If you want to print out the verbose output of the tests, l
 
 ### Add new tests
 To add new tests, just write a script that runs your test and raise and exception
-if the test fails (for example using the `assert` command). Then modify the
-[tests/runWBMTests.m](tests/runWBMTests.m) file to call your testing script.
+if the test fails (for example using the `assert` command or the [tests/WBAssertEqual.m](tests/wBAAssertEqual.m) function). 
+Then modify the [tests/WBMTests.m](tests/WBMTests.m) file to call your testing script.

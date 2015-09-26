@@ -1,11 +1,6 @@
 clear
 close all;
 
-%% setup path
-addpath('./whole_body_model_functions/');
-addpath('./../build/');
-addpath('./worker_functions');
-
 %% initialise mexWholeBodyModel
 wbm_modelInitialise('icubGazeboSim');
 

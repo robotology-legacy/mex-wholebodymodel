@@ -1,5 +1,3 @@
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runWBMTests.m
-               ${CMAKE_CURRENT_BINARY_DIR}/runWBMTests.m)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/addpathWBMTests.m.in
                ${CMAKE_CURRENT_BINARY_DIR}/addpathWBMTests.m)
 
