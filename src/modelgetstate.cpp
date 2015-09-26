@@ -125,9 +125,8 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
   mexPrintf("\n\n");
 
 #endif
-  //rootQuaternion = 
-  world_H_rootLink.R.getQuaternion(rootQuaternion);
-  //wbi::Rotation::getQuaternion(rootRotoTrans.R);
+
+  world_H_rootLink.R.getQuaternion(rootQuaternion[1], rootQuaternion[2], rootQuaternion[3], rootQuaternion[0]);
 
 #ifdef DEBUG
       std::stringstream ssR;
@@ -157,7 +156,7 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
   }
   */
   
-  return(true);
+  return true;
 }
 
 bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
@@ -194,7 +193,7 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
   //rootQuaternion = 
 #endif
 
-  (modelState->getRootWorldRotoTranslation()).R.getQuaternion(rootQuaternion);
+  (modelState->getRootWorldRotoTranslation()).R.getQuaternion(rootQuaternion[1], rootQuaternion[2], rootQuaternion[3], rootQuaternion[0]);
 #ifdef DEBUG
   //wbi::Rotation::getQuaternion(rootRotoTrans.R);
   
@@ -225,6 +224,6 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
     mexPrintf("ModelGetState qj[%d] : %2.2f, qjDot[%d] : %2.2f\n",i,qj[i],i,qjDot[i]);
   }
   */
-  
+    return true;
 }
 

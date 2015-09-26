@@ -146,7 +146,7 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray* prhs[])
     mexPrintf((R.toString()).c_str());
 #endif
     
-    R.getQuaternion(quatTemp);
+    R.getQuaternion(quatTemp[1],quatTemp[2],quatTemp[3],quatTemp[0]);
     xT[3] = quatTemp[0];
     xT[4] = quatTemp[1];
     xT[5] = quatTemp[2];
@@ -216,7 +216,7 @@ std::string temp2= refLink;
     xT[1] = xTemp[1];
     xT[2] = xTemp[2];
     
-    double axisAngTemp[] = {xTemp[3],xTemp[4],xTemp[5],xTemp[6]},quatTemp[4];
+    double axisAngTemp[] = {xTemp[3],xTemp[4],xTemp[5],xTemp[6]}, quatTemp[4];
     
     wbi::Rotation R = wbi::Rotation::axisAngle(axisAngTemp);
     
@@ -229,7 +229,7 @@ std::string temp2= refLink;
     mexPrintf((R.toString()).c_str());
 #endif
     
-    R.getQuaternion(quatTemp);
+    R.getQuaternion(quatTemp[1],quatTemp[2],quatTemp[3],quatTemp[0]);
     xT[3] = quatTemp[0];
     xT[4] = quatTemp[1];
     xT[5] = quatTemp[2];
