@@ -30,7 +30,7 @@ if( initCond == 1)
     params.qjInit = [params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit] * (pi/180);
 else
     % random pose within joint limits
-    load('./jointLimits.mat');
+    jointLimits;
     params.qjInit = jl1 + rand(25,1).*(jl2-jl1);
 end
 
@@ -56,15 +56,21 @@ fprintf('Converting to a set world frame... \n');
 
 wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
 
-[qj,T_b,dqj,vb] = wbm_getState();
+[qj,T_b_Got,dqj,vb] = wbm_getState();
                 
-[pos,rot] = frame2posrot(T_b);
+[posGot,rotGot] = frame2posrot(T_b_Got);
 fprintf('Post convertion rotation \n');
-disp(rot);
+disp(rotGot);
+WBMAssertEqual(posGot,pos);
+WBMAssertEqual(rotGot,rot);
 fprintf('Post conversion rotation check (R^T*R)\n');
-disp(rot'*rot);
+disp(rotGot'*rotGot);
+WBMAssertEqual(rotGot'*rotGot,eye(3,3));
 fprintf('Post conversion frame \n');
-disp(T_b');
+disp(T_b_Got');
+WBMAssertEqual(T_b_Got,T_b);
 fprintf('Post conversion quaternion norm \n');
-disp(norm(T_b(4:end)));
+disp(norm(T_b_Got(4:end)));
+WBMAssertEqual(norm(T_b_Got(4:end)),1);
+
                 

@@ -11,10 +11,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # MATLAB and YARP is searched before adding the different modules because they will be used by all of them
 find_package(YARP        REQUIRED)
-find_package(Matlab	 REQUIRED)
+find_package(Matlab REQUIRED
+             MAIN_PROGRAM
+             MX_LIBRARY)
 
-if(MATLAB_FOUND)
-        message(STATUS "Matlab was found!! The configuration may continue")
+if(Matlab_FOUND)
         set(MATLAB_LIBRARIES
                 ${MATLAB_MEX_LIBRARY}
                 ${MATLAB_MX_LIBRARY}
@@ -88,9 +89,9 @@ include_directories(${PROJECT_SOURCE_DIR}/include
                     ${ctrlLib_INCLUDE_DIRS}
                     ${EIGEN3_INCLUDE_DIR})
 
-include_directories("${MATLAB_ROOT}/simulink/include")
-include_directories("${MATLAB_ROOT}/extern/include")
-include_directories( ${MATLAB_INCLUDE_DIR})
+include_directories("${Matlab_ROOT_DIR}/simulink/include")
+include_directories("${Matlab_ROOT_DIR}/extern/include")
+include_directories( ${Matlab_INCLUDE_DIR})
 include_directories( ${YARP_INCLUDE_DIRS})
 include_directories( ${ICUB_INCLUDE_DIRS})
 
@@ -145,15 +146,14 @@ ${yarpWholeBodyInterface_LIBRARIES}
 ${paramHelp_LIBRARIES}
 ${iDynTree_LIBRARIES}
 ${YARP_LIBRARIES}
-${MATLAB_LIBRARIES}
+${Matlab_LIBRARIES}
 ${skinDynLib_LIBRARIES}
 ${ctrlLib_LIBRARIES}
 )
 
-#set(simContext wbit)
-#file(GLOB localContext ${CMAKE_CURRENT_SOURCE_DIR}/conf/wbit/*.ini)
-#yarp_install(FILES       ${localContext}
-#	     DESTINATION ${CODYCO_CONTEXTS_INSTALL_DIR}/${simContext})
-
-
 install(TARGETS ${PROJECTNAME} DESTINATION mex)
+
+# Enable testing and generate test target
+include( CTest )
+enable_testing()
+add_subdirectory(tests)
