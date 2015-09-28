@@ -1,4 +1,4 @@
-classdef iCubWBMParams
+classdef wbmBasicModelParams
     properties
        urdfRobotName@char
        urdfRefLinkName@char

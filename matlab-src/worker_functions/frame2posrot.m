@@ -1,5 +1,5 @@
 function [pos,dcm] = frame2posrot(qT)
-%FRAME2POSROT Converts the frame returned from%for standing pose wholeBodyModel into
+%FRAME2POSROT Converts the frame returned from standing pose wholeBodyModel into
 %individual positions and the DCM rotation matrix
 %   Arguments : 
 %   Normal Mode :  
@@ -16,13 +16,15 @@ function [pos,dcm] = frame2posrot(qT)
 % Genova, Dec 2015
 
 pos = qT(1:3);
+
 %qin = qT(4:end)';
+
 qt_b_mod_s = qT(4);
 qt_b_mod_r = qT(5:end);
 
 % Assuming q = [q_real; q_vec]
 
-dcm = zeros(3,3);%,size(qin,1));
+% dcm = zeros(3,3);%,size(qin,1));
 
 % dcm(1,1,:) = qin(:,1).^2 + qin(:,2).^2 - qin(:,3).^2 - qin(:,4).^2;
 % dcm(1,2,:) = 2.*(qin(:,2).*qin(:,3) + qin(:,1).*qin(:,4));
@@ -35,4 +37,5 @@ dcm = zeros(3,3);%,size(qin,1));
 % dcm(3,3,:) = qin(:,1).^2 - qin(:,2).^2 - qin(:,3).^2 + qin(:,4).^2;
 
 dcm = eye(3) + 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
+
 end
