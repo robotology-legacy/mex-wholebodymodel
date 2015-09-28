@@ -4,7 +4,9 @@ function [ M ] = wbm_massMatrix( varargin )
 %
 %   Arguments : 
 %       Optimised Mode :  No Arguments
-%       Normal Mode :   qj - joint position (NumDoF x 1)
+%       Normal Mode : R - rotation from rootLink to world frame (3 x 3)
+%                     p - translation from rootLink to world frame (3 x 1)
+%                     qj - joint position (NumDoF x 1)
 %
 %   Returns :   M -  ((NumDoF + 6) x (NumDoF + 6))
 %
@@ -14,8 +16,8 @@ function [ M ] = wbm_massMatrix( varargin )
     switch(nargin)
         case 0 
             M = wholeBodyModel('mass-matrix');
-        case 1
-            M = wholeBodyModel('mass-matrix',varargin{1});
+        case 3
+            M = wholeBodyModel('mass-matrix',reshape(varargin{1},[],1), varargin{2}, varargin{3});
         otherwise
             disp('massMatrix : Incorrect number of arguments, check docs');
     end

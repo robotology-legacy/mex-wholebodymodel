@@ -1,21 +1,7 @@
-% clear all
-% close all
-% clc
+function [] = visualizer_demo(t,chi,params)
 
-%% this is a program for visualizing old results saved in the "stored test trajectory" file.
-load('storedTestTrajectory.mat')
+% This is a program for visualizing the demo of the balancing and the floating base position in space
 
-% setup path
-addpath('./../whole_body_model_functions/');
-addpath('./../../../../build/');
-addpath('./../worker_functions');
-addpath('./../');
-
-% % initialise mexWholeBodyModel
-% wbm_modelInitialise('icubGazeboSim');
-% wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0, 0, -9.81]');
-
-%% visualize forward dynamics
 temp = 1;
 
 while(temp<10)
@@ -32,15 +18,18 @@ while(temp<10)
     set(figure_main, 'BackingStore', 'off');
  
     params.plot_main =zeros(1,4);
+    
     plot_pos = [0.51,0.20,0.45,0.40;
                 0.01,0.20,0.45,0.40;
                 0.51,0.62,0.45,0.40;
                 0.01,0.62,0.45,0.40];
 
     for ii=1:4
+    
         params.plot_main(ii) = subplot('Position', plot_pos(ii,:));
         params.plot_objs{ii} = plot3(0,0,0,'.');
-        axis([-0.5 0.5 -0.42 0.58 0 1]); hold on;
+        axis([-0.5 0.5 -0.42 0.58 0 1]);
+        hold on;
         patch([-0.45 -0.45 0.45 0.45],[-0.37 0.53 0.53 -0.37],[0 0 0 0],[0.6 0.6 0.8]);
         set(gca,'Color',[0.8 0.8 0.8]);
         set(gca,'XColor',[0.8 0.8 0.8]);
@@ -52,15 +41,16 @@ while(temp<10)
         rotate3d(gca,'on');
 
         figure(figure_main);
+        
     end
     
     axes(params.plot_main(1))
 
    %CoM trajectory
-    ndof = params.ndof;
-    x_b  = chi(:,1:3);
-    qt_b = chi(:,4:7);
-    qj = chi(:,8:ndof+7);
+    ndof  = params.ndof;
+    x_b   = chi(:,1:3);
+    qt_b  = chi(:,4:7);
+    qj    = chi(:,8:ndof+7);
 
     visualizeForwardDynamics([x_b,qt_b,qj],t,params);
     temp = 10;    
@@ -71,7 +61,6 @@ end
 %% plot base link positions
     figure(2);
     plot3(x_b(:,1),x_b(:,2),x_b(:,3));
-   %plot3(x_b(1000:end,1),x_b(1000:end,2),x_b(1000:end,3));
     hold on
     plot3(x_b(1,1),x_b(1,2),x_b(1,3),'ro');
     grid on;
@@ -90,3 +79,4 @@ end
     grid on;
     title('positions of the root link')
 
+end

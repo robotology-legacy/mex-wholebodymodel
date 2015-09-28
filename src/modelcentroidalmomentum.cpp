@@ -23,7 +23,6 @@
 
 // library includes
 #include <wbi/iWholeBodyModel.h>
-// #include <wbiIcub/icubWholeBodyModel.h>
 #include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 // local includes
@@ -33,21 +32,15 @@ using namespace mexWBIComponent;
 
 ModelCentroidalMomentum * ModelCentroidalMomentum::modelCentroidalMomentum;
 
-ModelCentroidalMomentum::ModelCentroidalMomentum() : ModelComponent(3,0,1)
+ModelCentroidalMomentum::ModelCentroidalMomentum() : ModelComponent(5,0,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelCentroidalMomentum constructed\n");
 #endif
-//   g = new double(3);
-//   //g[0] = 0; g[1] = 0;g[2] = -9.81;
-//   //since the foot frame is with x pointing upwards g must also be in that frame
-//   g[0] = -9.81; g[1] = 0; g[2] = 0;
 }
 
 ModelCentroidalMomentum::~ModelCentroidalMomentum()
-{/*
-  //delete(h);
-  delete(g);*/
+{
 }
 
 ModelCentroidalMomentum * ModelCentroidalMomentum::getInstance()
@@ -99,34 +92,32 @@ bool ModelCentroidalMomentum::computeFast(int nrhs, const mxArray* prhs[])
     return(true);
 }
 
-
-/*
-bool ModelGeneralisedBiasForces::display(int nrhs, const mxArray* prhs[])
-{
-  mexPrintf("Trying to display generalised bias forces, h:\n");
-  
-  double tempH[modelState->dof()+6];
-  robotModel->computeGeneralizedBiasForces(modelState->q(),modelState->baseFrame(),modelState->dq(),modelState->dxb(),g,tempH);
-  */
-  
-//   for (int i = 0;i<modelState->dof()+6;i++)
-//   {
-//     mexPrintf("%f ",tempH[i]);
-//   }
-//   return(true);
-// }
 bool ModelCentroidalMomentum::processArguments(int nrhs, const mxArray* prhs[])
 {
   
-  if(mxGetM(prhs[1]) != numDof || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != numDof || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != 6 || mxGetN(prhs[3]) != 1)
+  if(mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || mxGetM(prhs[4]) != numDof || mxGetN(prhs[4]) != 1 || mxGetM(prhs[5]) != 6 || mxGetN(prhs[5]) != 1)
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state argument dimensions in ModelCentroidalMomentum call");
   }
   robotModel = modelState->robotModel();
-  qj = mxGetPr(prhs[1]);
-  qjDot = mxGetPr(prhs[2]);
-  vb = mxGetPr(prhs[3]);
+  qj = mxGetPr(prhs[3]);
+  qjDot = mxGetPr(prhs[4]);
+  vb = mxGetPr(prhs[5]);
+    double *R_temp,*p_temp;
+  R_temp = (double *)mxGetPr(prhs[1]);
+  p_temp = (double *)mxGetPr(prhs[2]);
   
+  double tempR[9],tempP[3];
+  for(int i = 0;i<9;i++)
+  {
+    tempR[i] = R_temp[i];
+    if(i<3)
+     {
+       tempP[i] = p_temp[i];
+     }
+  }
+  wbi::Rotation tempRot(tempR);
+  wbi::Frame tempFrame(tempRot, tempP);
 #ifdef DEBUG
   mexPrintf("qj received \n");
 
@@ -135,7 +126,7 @@ bool ModelCentroidalMomentum::processArguments(int nrhs, const mxArray* prhs[])
     mexPrintf(" %f",qj[i]);
   }
 #endif  
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = tempFrame;//modelState->computeRootWorldRotoTranslation(qj);
   
   if(h != NULL)
   {

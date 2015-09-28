@@ -7,9 +7,10 @@ function [CFoot,dConstraints] = constraints(staticFrictionCoefficient,numberOfPo
 segmentAngle = pi/2 / (numberOfPoints - 1);
 
 % define angle
-angle = 0 : segmentAngle : (2 * pi - segmentAngle);
+angle  = 0 : segmentAngle : (2 * pi - segmentAngle);
 points = [cos(angle); sin(angle)];
-numberOfEquations = size(points, 2);
+
+numberOfEquations       = size(points, 2);
 assert(size(points, 2) == (4 * (numberOfPoints - 2) + 4));
 
 % Aineq*x <= b, with b is all zeros.
@@ -17,7 +18,7 @@ Aineq = zeros(numberOfEquations, 6);
 
 % define equations
 for i = 1 : numberOfEquations
-   firstPoint = points(:, i);
+   firstPoint  = points(:, i);
    secondPoint = points(:, rem(i, numberOfEquations) + 1);
    
    % define line passing through the above points

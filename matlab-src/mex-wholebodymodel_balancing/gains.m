@@ -1,32 +1,24 @@
-function [gainsPCOM, gainsICOM, gainsDCOM, gainMomentum, impedances, dampings,referenceParams,directionOfOscillation,noOscillationTime,...
-          forceFrictionCoefficient,numberOfPoints,torsionalFrictionCoefficient,...
-          footSize,fZmin, increasingRatesImp, qTildeMax]=gains(DOF, LEFT_RIGHT_FOOT_IN_CONTACT,DEMO_LEFT_AND_RIGHT)
+function [gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, referenceParams, directionOfOscillation, noOscillationTime,...
+          forceFrictionCoefficient, numberOfPoints, torsionalFrictionCoefficient,...
+          footSize, fZmin, increasingRatesImp, qTildeMax] = gains (DOF, LEFT_RIGHT_FOOT_IN_CONTACT, DEMO_LEFT_AND_RIGHT)
 
 
-directionOfOscillation            = [0;0;0];
+directionOfOscillation            = [0; 0; 0];
 referenceParams                   = [0.0  0.0];  %referenceParams(1) = amplitude of ascillations in meters 
                                                  %referenceParams(2) = frequency of ascillations in hertz
 
 noOscillationTime                 = 0;     % If DEMO_LEFT_AND_RIGHT = 1, the variable noOscillationTime is the time, in seconds, 
                                            % that the robot waits before starting the left-and-righ
                                            
-%smoothingTimeJacobians            = 0.5;
- qTildeMax                         = 20*pi/180;
+qTildeMax                         = 20*pi/180;
 
-%% PARAMETERS FOR TWO FEET ONE GROUND
-if (sum(LEFT_RIGHT_FOOT_IN_CONTACT) == 2)
+%% PARAMETERS FOR TWO FEET ON THE GROUND
+if LEFT_RIGHT_FOOT_IN_CONTACT == 2
     
     gainsPCOM                 = diag([ 50   50  50]);
-    gainsICOM                 = diag([  0    0   0]);
     gainsDCOM                 = 2*sqrt(gainsPCOM);
 
-%   minCoMx_y                 = [-0.1   -0.25 ];  
-%   maxCoMx_y                 = [ 0.1    0.05 ];
-%   satGainsPCOM              = 300;
-%   increasingRatesGainsPCOM  = [ 0     0    ];
-
-      gainMomentum              = 15;
-%     gainMomentum              = 1;
+    gainMomentum              = 1;
 
 % Impadances acting in the null space of the desired contact forces 
      
@@ -35,14 +27,11 @@ if (sum(LEFT_RIGHT_FOOT_IN_CONTACT) == 2)
 % 
 %      impArms             = [8    8    8   12  5  
 %                             0   0    0    0   0];
-%                          
-% %    impArms             = [8    8    8   12  
-% %                            0   0    0    0];
-%                         
+%                                                 
 %      impLeftLeg          = [ 35   20    30   350  550   0
 %                               0    0     0     0    0   0]; 
 % 
-%      impRightLeg         = [35   20    30    350  550   0
+%      impRightLeg         = [35   20    30    350   550   0
 %                              0    0     0      0    0   0];                             
 
        impTorso            = [ 50    50   50
@@ -56,53 +45,29 @@ if (sum(LEFT_RIGHT_FOOT_IN_CONTACT) == 2)
 
        impRightLeg         = [35   50    0.1    30   2   10
                                0    0     0      0   0    0]; 
-                                                
-%     intTorso             = [0   0    0];  
-%     
-%     intArms              = [0   0    0    0   0 ];
-%                         
-%     intLeftLeg           = [0   0    0    0    0  0]; 
-% 
-%     intRightLeg          = [0   0    0    0    0  0];                        
-                         
+                        
                          
     if (DEMO_LEFT_AND_RIGHT == 1)
+        
         directionOfOscillation = [0;1;0];
-        referenceParams        = [0.035 0.35];    %referenceParams(1) = amplitude of ascillations in meters
+        referenceParams        = [0.035 0.35];     %referenceParams(1) = amplitude of ascillations in meters
+    
     end
     
 end
 
-%% PARAMETERS FOR ONLY ONE FOOT ONE GROUND
-if (sum(LEFT_RIGHT_FOOT_IN_CONTACT) == 1)
+%% PARAMETERS FOR ONLY ONE FOOT ON THE GROUND
+if  LEFT_RIGHT_FOOT_IN_CONTACT == 1
     
     gainsPCOM                 = diag([120  140 120])/3;
-    gainsICOM                 = diag([  0    0   0]);
     gainsDCOM                 = diag([  1    1   1]);
 
-%   minCoMx_y                 = [-0.1   -0.25 ];  
-%   maxCoMx_y                 = [ 0.1    0.05 ];
-%   satGainsPCOM              = 300;
-%   increasingRatesGainsPCOM  = [ 0     0    ];
+    gainMomentum              = 1 ;
 
-      gainMomentum              = 250 ;
-%     gainMomentum              = 1 ;
-
-    % Impadances acting in the null space of the desired contact forces 
+% Impedances acting in the null space of the desired contact forces 
     
-%     intTorso            = [0   0    0];
-%     
-%     intArms             = [0   0    0    0   0];
-%                         
-%     intLeftLeg          = [0   0    0    0    0  0]; 
-% 
-%     intRightLeg         = [0   0    0    0    0  0];
-
 %     impTorso            = [  20    20   20
 %                               0     0    0]; 
-% 
-% %   impArms             = [ 13  13   13   5  
-% %                           0    0    0   0   ];
 % 
 %     impArms             = [ 13  13   13   5   5
 %                              0    0    0   0   0 ];
@@ -114,36 +79,31 @@ if (sum(LEFT_RIGHT_FOOT_IN_CONTACT) == 1)
 %                              0    0   0   0   0  0];    
 
 
-    impTorso            = [  20    20   20
-                              0     0    0]; 
+      impTorso            = [  20    20   20
+                                0     0    0]; 
 
-%   impArms             = [ 13  13   13   5  
-%                           0    0    0   0   ];
+      impArms             = [ 13  13   13   5   5
+                               0    0    0   0   0 ];
 
-    impArms             = [ 13  13   13   5   5
-                             0    0    0   0   0 ];
+      impLeftLeg          = [ 70   70  65  30  10  10
+                               0    0   0   0   0   0]; 
 
-    impLeftLeg          = [ 70   70  65  30  10  10
-                             0    0   0   0   0   0]; 
-
-    impRightLeg         = [ 20   20  20  10  10 10
-                             0    0   0   0   0  0];
+      impRightLeg         = [ 20   20  20  10  10  10
+                               0    0   0   0   0   0];
 
 end
 
 %% other calculations
-% satIntegral         = 0;
-% integralGains       = [intTorso,intArms,intArms,intLeftLeg,intRightLeg];
   impedances          = [impTorso(1,:),impArms(1,:),impArms(1,:),impLeftLeg(1,:),impRightLeg(1,:)];
-  
-% dampings            = zeros(1,DOF); 
+   
   dampings            = 0.25*ones(1,DOF);
 
   increasingRatesImp  = [impTorso(2,:),impArms(2,:),impArms(2,:),impLeftLeg(2,:),impRightLeg(2,:)];
-% impedencesSat       = [80   25    1400];
 
 if (size(impedances,2) ~= DOF)
+    
     error('Dimension mismatch between ROBOT_DOF and dimension of the variable impedences. Check these variables in the file gains.m');
+    
 end
 
 %% constraints for QP for balancing on both feet - friction cone - z-moment - in terms of f (not f0!)
@@ -159,6 +119,7 @@ footSize                     = [ -0.1 0.1   ;    % xMin, xMax
 
 fZmin                        = 10;
 
-%% The QP solver will search a solution fo that 
+% The QP solver will search a solution fo that 
 % satisfies the inequality Aineq_f F(fo) < bineq_f 
 
+end

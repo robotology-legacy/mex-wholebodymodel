@@ -40,33 +40,18 @@ v = [dx_b;omega_W;dqj];
 wbm_updateState(qj,dqj,[dx_b;omega_W]);
 
 %reconstructing rotation of root to world from the quaternion
-%[~,T_b,~,~] = wholeBodyModel('get-state');
+[~,T_b,~,~] = wbm_getState();
 
-%righting quaternion ordering to [real;imaginary]^T since get-state
-%returns the opposite ordering
-%qt_b_mod = [T_b(7);T_b(4:6)];
-%qt_b_mod_s = T_b(7);
-%qt_b_mod_r = T_b(4:6);
-
-qt_b_mod_s = qt_b(1);
-qt_b_mod_r = qt_b(2:end);
+qt_b_mod_s = T_b(4);
+qt_b_mod_r = T_b(5:end);
 R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
-
-
-%wbm_setWorldFrame(R_b,x_b,[0 0 0]');
-
-%wbm_updateState(qj,dqj,[dx_b;omega_W]);
+p_b = T_b(1:3);
 
 M = wbm_massMatrix();
 h = wbm_generalisedBiasForces();
 
-%M = wbm_massMatrix(qj);
-hDash = wbm_generalisedBiasForces(qj,dqj,[dx_b;omega_W]);
-g = wbm_generalisedBiasForces(qj,zeros(size(qj)),zeros(6,1));
-%g = zeros(size(h));
-
-%h = zeros(size(h));
-%H = wbm_centroidalMomentum();
+hDash = wbm_generalisedBiasForces(R_b,p_b,qj,dqj,[dx_b;omega_W]);
+g = wbm_generalisedBiasForces(R_b,p_b,qj,zeros(size(qj)),zeros(6,1));
 
 %% Building up contraints jacobian and djdq
 %numConstraints = length(param.constraintLinkNames);

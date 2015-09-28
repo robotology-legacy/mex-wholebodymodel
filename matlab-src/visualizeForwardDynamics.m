@@ -27,6 +27,7 @@ wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
     wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
 
 
+    
 % the list of link/joint names that are used to construct the robot in the visualizer                  
 L = cell(15,1);
 L{1}  = 'root_link'   ;
@@ -62,10 +63,10 @@ for jj=1:n_plot
     for ii=1:n % at each instance
        % fprintf('Link Name %s \n',L{jj})
        % convert base state to rotation
-       [pB(1),pB(2),pB(3),R] = quat2rot(squeeze(q(ii,:)));
+       [pB,R] = frame2posrot(squeeze(q(ii,:)'));
        % set world to base
        wbm_setWorldFrame(R,pB,[0,0,-9.81]');
-       kin(ii,:,jj) = (wholeBodyModel('forward-kinematics',qj(ii,:)',L{jj}))'; % forward kinematics for the list of joints/links
+       kin(ii,:,jj) = (wbm_forwardKinematics(R,pB,qj(ii,:)',L{jj}))'; % forward kinematics for the list of joints/links
         
     end
     %q(jj,1:3)
@@ -113,7 +114,10 @@ pos(1)=plot3(x(1),y(1),z(1),'w.');
 
 % plot the joints
 for jj=2:n_plot-1
-    [x(jj),y(jj),z(jj)] = quat2rot(kin(1,:,jj));
+    [Ptemp,Rtemp] = frame2posrot(kin(1,:,jj)');
+    x(jj) = Ptemp(1);
+    y(jj) = Ptemp(2);
+    z(jj) = Ptemp(3);
    
 %    if(jj == 7)
 %     col = 'ro';
@@ -130,7 +134,12 @@ end
 
 % plot the position of the center of mass
 jj=n_plot;
-[x(jj),y(jj),z(jj)] = quat2rot(kin(1,:,jj));
+%[x(jj),y(jj),z(jj)] = quat2rot(kin(1,:,jj));
+    [Ptemp,Rtemp] = frame2posrot(kin(1,:,jj)');
+    x(jj) = Ptemp(1);
+    y(jj) = Ptemp(2);
+    z(jj) = Ptemp(3);
+ 
 pos(jj)=plot3(x(jj),y(jj),z(jj),'g*');
 
 %% RELATED TO WORLD REFERENCE FRAME ISSUE (see line 44)
@@ -314,7 +323,11 @@ while ii<n+1 % the visualization instance
     
     % get the positions for the current instance
     for jj=1:n_plot
-        [x(jj),y(jj),z(jj),R(:,:,jj)] = quat2rot(kin(ii,:,jj));
+        %[x(jj),y(jj),z(jj),R(:,:,jj)] = quat2rot(kin(ii,:,jj));
+        [Ptemp,Rtemp] = frame2posrot(kin(ii,:,jj)');
+         x(jj) = Ptemp(1);
+          y(jj) = Ptemp(2);
+           z(jj) = Ptemp(3);
         set(pos(jj),xaxis,[x(jj)],yaxis,[y(jj)],zaxis,[z(jj)]);  
        % fprintf('%d, ',ii);
     end
