@@ -1,0 +1,27 @@
+About matlab balancing controller:
+
+-open the script 'integrateForwardDynamics.m' in mex-wholebodymodel_balancing folder
+
+-in the top of the code, choose between balancing on two feet or one foot, use QP solver and left   and right demo (available only for two feet on the ground)
+
+-there's also the possibility to visualize some graphics for analisys. Currently, the available graphics are: joints torques, norm of joints torques, f0, contact forces, position of left foot, CoM error. If others values are needed, is necessary to add the desiderd variables in "visualparam", which is a structure defined in forwardDynamics.m
+
+-in integrateForwardDynamics is possible to set the time of integration, too
+
+-every function related to the balancing controller is collected in balController.m and has an explanation of how is working in the top of the code. The function that computes torques and contact forces for balancing is controllerFCN. 
+
+-the structure of the code is intentionally similar to simulink balancing controller to allow simple integration between controllers
+
+-in gains.m is possible to set the amplitude and frequency for left and right demo and the values of CoM and postural gains for both two feet and one foot
+
+-in controllerFCN is possible to regulate the tolerances for QP and pseuduinverse 
+
+NOTE:
+balancing on one foot is supported only for left foot on the ground. however, the visualizer shows a demo in which the robot has right foot on the ground. Will be opened an issue about it soon.
+
+for very long time simulations (t=150s), there's a small derive in some graphs. this is probably due to numerical integration errors, some of them are already solved but is still an ongoing work.
+
+
+
+
+ 
