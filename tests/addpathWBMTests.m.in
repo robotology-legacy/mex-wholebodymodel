@@ -1,0 +1,8 @@
+% Add the compiled mex in the build directory
+addpath('${CMAKE_CURRENT_BINARY_DIR}/..');
+
+% Add the matlab files in the source directory
+addpath(genpath('${CMAKE_CURRENT_SOURCE_DIR}/../matlab-src'));
+
+% Add the test script in the source directory
+addpath('${CMAKE_CURRENT_SOURCE_DIR}')

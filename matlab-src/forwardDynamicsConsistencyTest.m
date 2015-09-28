@@ -1,6 +1,6 @@
 %% setup path
 addpath('./whole_body_model_functions/');
-addpath('./../build/');
+%addpath('./../build/');
 addpath('./worker_functions');
 
 %% initialise mexWholeBodyModel
@@ -13,7 +13,7 @@ params.ndof = 25;% 25;
 
 %% random initial conditions
 
-load('./jointLimits.mat');
+jointLimits;
 
 %if(exist('./randomIni.mat','file')==0)
     deltaJl = jl2 - jl1;

@@ -17,9 +17,7 @@ function [qj,xTb,qjDot,vb]  = wbm_getState( varargin )
     switch(nargin)
         case 0
             [qj,xTbT,qjDot,vb]  = wholeBodyModel('get-state');
-
             xTb = xTbT; %[xTbT(1:3);xTbT(7); xTbT(4:6)];
-
         otherwise
              disp('getState : Incorrect number of arguments, check docs'); 
     end
