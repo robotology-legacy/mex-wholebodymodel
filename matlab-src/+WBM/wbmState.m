@@ -1,4 +1,4 @@
-classdef iCubWBMState
+classdef wbmState
     properties
        q_j
        dq_j

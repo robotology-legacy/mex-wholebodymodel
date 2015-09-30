@@ -2,8 +2,8 @@ classdef wbmBasicRobotConfig
     properties
        ndof@int16
        nCstrs@int16
-       cstrLinkNames
+       cstrLinkNames = {};
        dampCoeff@double
-       qj_init = zeros(ndof,1);
+       wb_initState@wbmState
     end
 end
