@@ -12,17 +12,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # MATLAB and YARP is searched before adding the different modules because they will be used by all of them
 find_package(YARP        REQUIRED)
 find_package(Matlab REQUIRED
-             MAIN_PROGRAM
              MX_LIBRARY)
 
-if(Matlab_FOUND)
-        set(MATLAB_LIBRARIES
-                ${MATLAB_MEX_LIBRARY}
-                ${MATLAB_MX_LIBRARY}
-                ${MATLAB_ENG_LIBRARY}
-        )
-else()
-        message(FATAL_ERROR "Matlab not found")
+if(NOT Matlab_FOUND)
+    message(FATAL_ERROR "Matlab not found")
 endif()
 find_package(YCM                   REQUIRED)
 find_package(ICUB                   REQUIRED)
@@ -89,11 +82,9 @@ include_directories(${PROJECT_SOURCE_DIR}/include
                     ${ctrlLib_INCLUDE_DIRS}
                     ${EIGEN3_INCLUDE_DIR})
 
-include_directories("${Matlab_ROOT_DIR}/simulink/include")
-include_directories("${Matlab_ROOT_DIR}/extern/include")
-include_directories( ${Matlab_INCLUDE_DIR})
-include_directories( ${YARP_INCLUDE_DIRS})
-include_directories( ${ICUB_INCLUDE_DIRS})
+include_directories(${Matlab_INCLUDE_DIRS})
+include_directories(${YARP_INCLUDE_DIRS})
+include_directories(${ICUB_INCLUDE_DIRS})
 
 #Specify preprocessor flag for MATLAB MEX FILES Compilation.
 add_definitions(-DMATLAB_MEX_FILE)
