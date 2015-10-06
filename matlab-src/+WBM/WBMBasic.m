@@ -16,10 +16,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             if ~exist('wbm_params', 'var')
                 error('WBMBasic::WBMBasic: %s', obj.wb_strWrongArgErr);
             end
-            if ~isa(init_state, 'wbmState')
-                error('WBMBasic::WBMBasic: %s', obj.wb_strDataTypeErr);
-            end
-            
+                        
             if ~exist('init_wf_ctrl', 'var')
                 % set the WF from a given reference link as default ...
                 init_wf_ctrl = 'wf_reflnk';
@@ -128,7 +125,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             wbm_state.omega_b = v_b(4:6); % correct?!
         end
                 
-        function M = massMatrix(R_rootlnk_wf, p_rootlnk_wf, q_j)            
+        function M = massMatrix(obj, R_rootlnk_wf, p_rootlnk_wf, q_j)            
             switch nargin
                 case 3
                     % Normal mode:
@@ -146,7 +143,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             [jl_lower, jl_upper] = wholeBodyModel('joint-limits');
         end
         
-        function J = jacobian(urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j)
+        function J = jacobian(obj, urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j)
             switch nargin
                 case 4
                     R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
@@ -158,7 +155,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end
         end
         
-        function djdq = dJdq(urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
+        function djdq = dJdq(obj, urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
             switch nargin
                 case 6
                     R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
@@ -170,7 +167,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end
         end
         
-        function H = centrodialMomentum(R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
+        function H = centrodialMomentum(obj, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
             switch nargin
                 case 5
                     R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
@@ -182,7 +179,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end
         end
         
-        function p = forwardKinematics(urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j)
+        function p = forwardKinematics(obj, urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j)
             switch nargin
                 case 4
                     R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
@@ -194,7 +191,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end            
         end
         
-        function C_qv = genBiasForces(R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
+        function C_qv = genBiasForces(obj, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
             switch nargin
                 case 5
                     R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
@@ -217,10 +214,10 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             strParams = sprintf(['WBM parameters:\n\n'
                                  ' URDF robot name:     %s\n' ...
                                  ' URDF ref. link name: %s\n\n' ...
-                                 ' R (root link to world frame):\n\n %s\n\n' ...
-                                 ' p (root link to world frame):\n\n %s\n\n' ...
-                                 ' R (ref. link to world frame):\n\n %s\n\n' ...
-                                 ' p (ref. link to world frame):\n\n %s\n\n' ...
+                                 ' R (root link to world frame):\n\n  %s\n\n' ...
+                                 ' p (root link to world frame):\n\n  %s\n\n' ...
+                                 ' R (ref. link to world frame):\n\n  %s\n\n' ...
+                                 ' p (ref. link to world frame):\n\n  %s\n\n' ...
                                  ' g (world frame):\n\n %s\n\n'], ...
                                 obj.wb_params.urdfRobotName, obj.wb_params.urdfLinkName, ...
                                 mat2str(obj.wb_params.R_rootlnk_wf, precision), ...

@@ -10,17 +10,19 @@ classdef WBM < WBMBasic
     methods(Access = public)
         % Constructor:
         function obj = WBM(wbm_params, robot_config, init_wf_ctrl)
-            if (nargin < 2)
-                error('WBM::WBM: %s', obj.wb_strWrongArgErr);
+            args{1} = wbm_params;
+            if exist('init_wf_ctrl', 'var')
+                % set the given WF control value, else it will be used
+                % inernally the default value ...
+                args{2} = init_wf_ctrl;
             end
             % call the constructor of the superclass ...
-            if ~exist('init_wf_ctrl', 'var')
-                % use the default WF control value ...
-                obj = obj@WBMBasic(wbm_params);
-            else
-                obj = obj@WBMBasic(wbm_params, init_wf_ctrl);
+            obj = obj@WBMBasic(args{:});
+            
+            if ~exist('robot_config', 'var')
+                error('WBM::WBM: %s', obj.wb_strWrongArgErr);
             end
-             
+ 
             initConfig(robot_config);
             setState(obj.wb_config.initState.q_j, obj.wb_config.initState.dq_j, ...
                      obj.wb_config.initState.dx_b, obj.wb_config.initState.omega_b);            
@@ -39,7 +41,7 @@ classdef WBM < WBMBasic
             u_quat = q./norm(q);
         end
         
-        forwardDynamics()
+        forwardDynamics(t, chi)
         
         forwardDynamicsZeroExtForces()
         
@@ -53,8 +55,29 @@ classdef WBM < WBMBasic
             if ~exist('precision', 'var')
                 precision = 2;
             end
-            %strConfig = sprintf();
-
+                        
+            cellLnkNames = [num2cell(1:obj.wb_config.nCstrs); obj.wb_config.cstrLinkNames];
+            strLnkNamesLst = sprintf('  %d  %s\n', cellLnkNames{:});
+            
+            cellInitSt{1} = sprintf('  q_j:      %s\n', mat2str(obj.wb_config.initState.q_j, precision));
+            cellInitSt{2} = sprintf('  dq_j:     %s\n', mat2str(obj.wb_config.initState.dq_j, precision));
+            cellInitSt{3} = sprintf('  x_b:      %s\n', mat2str(obj.wb_config.initState.x_b, precision));
+            cellInitSt{4} = sprintf('  qt_b:     %s\n', mat2str(obj.wb_config.initState.qt_b, precision));
+            cellInitSt{5} = sprintf('  dx_b:     %s\n', mat2str(obj.wb_config.initState.dx_b, precision));
+            cellInitSt{6} = sprintf('  omega_b:  %s\n', mat2str(obj.wb_config.initState.omega_b, precision));
+            strInitState = strcat(cellInitSt{1}, cellInitSt{2}, cellInitSt{3}, ...
+                                  cellInitSt{4}, cellInitSt{5}, cellInitSt{6});
+                              
+            strConfig = sprintf(['Robot configuration:\n\n' ...
+                                 ' NDOFs:         %d\n' ...
+                                 ' # constraints: %d\n\n' ...
+                                 ' Constraint link names:\n\n%s\n' ...
+                                 ' damping coefficient: %f\n\n' ...
+                                 ' initial state:\n\n%s\n'], ...
+                                obj.wb_config.ndof, obj.wb_config.nCstrs, ...
+                                strLnkNamesLst, obj.wb_config.dampCoeff, ...
+                                strInitState);
+           disp(strConfig);
         end
         
     end
