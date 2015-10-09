@@ -18,8 +18,8 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end
                         
             if ~exist('init_wf_ctrl', 'var')
-                % set the WF from a given reference link as default ...
-                init_wf_ctrl = 'wf_reflnk';
+                % set the world frame to the current root link as default ...
+                init_wf_ctrl = 'wfRootLnk';
             end
             initWBM(wbm_params, init_wf_ctrl);
         end
@@ -91,38 +91,38 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
                                    R_rlnk_wf_arr, obj.wb_params.p_reflnk_wf, ...
                                    obj.wb_params.g_wf);
                 case 2
-                    % Optimized mode: use the default URDF reference link ...
-                    obj.wb_params.urdfRefLinkName = 'l_sole';                       % check if it is really the default ref. link!!
+                    % Optimized mode: use the previously set URDF-name of the
+                    % reference link or the default ...
                     wholeBodyModel('set-world-link', R_rlnk_wf_arr, obj.wb_params.p_reflnk_wf);
                 otherwise
                     error('WBMBasic::setWorldLink: %s', obj.wb_strWrongArgErr);
             end
         end
         
-        function setState(obj, q_j, dq_j, dx_b, omega_b)            
-            if (nargin ~= 4)
+        function setState(obj, q_j, dq_j, v_b)            
+            if (nargin ~= 3)
                 error('WBMBasic::setState: %s', obj.wb_strWrongArgErr);
             end
             %if ( (length(q_j) ~= length(dq_j)) || ...
-            %     (length(dx_b) + length(omega_b) ~= 6) )
+            %     (length(v_b) ~= 6) )
             %    error('WBMBasic::setState: %s', obj.wb_strVecSizeErr);
             %end
             
-            v_b = [dx_b; omega_b]; % correct?!
             wholeBodyModel('update-state', q_j, dq_j, v_b);
         end
         
-        function wbm_state = getState(varargin)
+        function [xTb, q_j, v_b, dq_j] = getState(varargin)
+        %function wbm_state = getState(varargin)
             % get the raw-data ...
             [q_j, xTb, dq_j, v_b] = wholeBodyModel('get-state');
            
-            wbm_state = wbmState;
-            wbm_state.q_j = q_j;
-            wbm_state.dq_j = dq_j;
-            wbm_state.x_b = xTb(1:3);
-            wbm_state.qt_b = xTb(4:7);
-            wbm_state.dx_b = v_b(1:3); % correct?!
-            wbm_state.omega_b = v_b(4:6); % correct?!
+            %wbm_state = wbmState;
+            %wbm_state.q_j = q_j;
+            %wbm_state.dq_j = dq_j;
+            %wbm_state.x_b = xTb(1:3);
+            %wbm_state.qt_b = xTb(4:7);
+            %wbm_state.dx_b = v_b(1:3);
+            %wbm_state.omega_b = v_b(4:6);
         end
                 
         function M = massMatrix(obj, R_rootlnk_wf, p_rootlnk_wf, q_j)            
@@ -155,11 +155,11 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end
         end
         
-        function djdq = dJdq(obj, urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
+        function djdq = dJdq(obj, urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_b)
             switch nargin
                 case 6
                     R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
-                    djdq = wholeBodyModel('djdq', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_xb, urdf_link_name);
+                    djdq = wholeBodyModel('djdq', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_b, urdf_link_name);
                 case 1
                     djdq = wholeBodyModel('djdq', urdf_link_name);
                 otherwise
@@ -167,11 +167,11 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end
         end
         
-        function H = centrodialMomentum(obj, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
+        function H = centrodialMomentum(obj, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_b)
             switch nargin
                 case 5
                     R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
-                    H = wholeBodyModel('centroidal-momentum', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_xb);
+                    H = wholeBodyModel('centroidal-momentum', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_b);
                 case 0 
                     H = wholeBodyModel('centroidal-momentum');
                 otherwise
@@ -191,11 +191,11 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end            
         end
         
-        function C_qv = genBiasForces(obj, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_xb)
+        function C_qv = genBiasForces(obj, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_b)
             switch nargin
                 case 5
                     R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
-                    C_qv = wholeBodyModel('generalised-forces', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_xb);
+                    C_qv = wholeBodyModel('generalised-forces', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_b);
                 case 0
                     C_qv = wholeBodyModel('generalised-forces');
                 otherwise
@@ -251,10 +251,10 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end
             
             % set the world frame (WF) to a given rototranslation from a
-            % chosen reference link:
+            % chosen link:
             switch init_wf_ctrl
-                case 'wf_reflnk'
-                    % from a reference link ...
+                case 'wfRefLnk'
+                    % use a reference link of the robot ...
                     if isempty(wbm_params.urdfRefLinkName)
                         % Optimized mode:
                         setWorldLink(wbm_params.R_reflnk_wf, wbm_params.p_reflnk_wf);                
@@ -263,8 +263,8 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
                         setWorldLink(wbm_params.urdfRefLinkName, wbm_params.R_reflnk_wf, ...
                                      wbm_params.p_reflnk_wf, wbm_params.g_wf);
                     end            
-                case 'wf_rootlnk'
-                    % from a root link ...
+                case 'wfRootLnk'
+                    % use the current root link for the WF ...
                     setWorldFrame(wbm_params.R_rootlnk_wf, wbm_params.p_rootlnk_wf, ...
                                   wbm_params.g_wf);
                 otherwise

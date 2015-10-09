@@ -31,21 +31,16 @@ classdef WBM < WBMBasic
         function newObj = copy(obj)
             newObj = copy@WBMBasic(obj);
         end
-        
-        function u_quat = axisAngle2UnitQuat(axang)
-            if (size(axang) ~= 4)
-                error('WBM::axisAngle2UnitQuat: %s', obj.wb_strVecSizeErr);
-            end
-            theta = axang(4);
-            q = [cos(theta/2); sin(theta/2).*axang(1:3)];
-            u_quat = q./norm(q);
+                
+        function [xTb_init, chi_init, g_init] = getInitConditions(obj)
+            % g_init??? notwendig?
         end
         
-        forwardDynamics(t, chi)
+        forwardDynamics(obj, t, ctrlTrqs, chi)
         
-        forwardDynamicsZeroExtForces()
+        forwardDynamicsZeroExtForces(obj, t, chi)
         
-        visualizeForwardDynamics()
+        visualizeForwardDynamics(obj, t, chi)
 
         function wbm_config = getWBMConfig(obj)
             wbm_config = obj.wb_config;
@@ -99,39 +94,8 @@ classdef WBM < WBMBasic
             
             % convert all angle-values of the joint positions
             % from degrees to radians ... 
-            obj.wb_config.initState.q_j = obj.wb_config.initState.q_j * (pi/180.0);
+            %obj.wb_config.initState.q_j = obj.wb_config.initState.q_j * (pi/180.0);
         end
-        
-        function dquat = quatDerivative(q, omega)
-            K = 1;
-            omegaCross = [0 -omega'; omega -skew(omega)];
-            dquat = 0.5*omegaCross*q + K*(1 - norm(q))*q;
-        end
-        
-        plotQuat(q)
                         
-        function [pos, R] = frame2posRot(qT)
-            if (size(qT) ~= 7)
-               error('WBM::frame2posRot: %s', obj.wb_strVecSizeErr);
-            end
-            pos = qT(1:3); % cartesian postion
-            qt_b_mod_s = qT(4); % scalar/real part
-            qt_b_mod_r = qT(5:end); % (imaginary) vector part
-            
-            % calculate the Direction Cosine Matrix (DCM):
-            %R = zeros(3);
-            R = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2*skew(qt_b_mod_r)^2;            
-            %R = quat2dcm(qt_b_mod_r)   % maybe it is better when we use
-                                        % there the buildin-method of matlab ...            
-        end
-        
-        function R = quat2rot(q)
-           R = quat2dcm(q);
-        end
-                
-        function X = skew(x)
-            X = [0 -x(3) x(2); x(3) 0 -x(1); -x(2) x(1) 0];            
-        end
-        
     end
 end
