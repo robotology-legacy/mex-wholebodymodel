@@ -1,6 +1,6 @@
 function [pos, dcm] = frame2posRotm(qT)
     if (length(qT) ~= 7)
-        error('frame2posRot: Wrong vector size!');
+        error('frame2posRotm: Wrong vector size!');
     end
 
     pos = qT(1:3);
@@ -10,7 +10,7 @@ function [pos, dcm] = frame2posRotm(qT)
         q = qT(4:end);
         dcm = quat2rotm(q);
     catch
-        % else ...
+        % else, for R2014b and earlier ...
         qt_b_mod_s = qT(4);     % scalar part
         qt_b_mod_r = qT(5:end); % (imaginary) vector part
 
