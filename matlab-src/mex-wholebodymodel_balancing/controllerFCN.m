@@ -1,7 +1,7 @@
-function [tauModel, Sigma, NA, fHdotDesC1C2, errorCoM, f0]   =  ...
+function [tauModel, Sigma, NA, fHdotDesC1C2, errorCoM, f0, tau2]   =  ...
           controllerFCN (LEFT_RIGHT_FOOT_IN_CONTACT, DOF, USE_QP_SOLVER, ConstraintsMatrix, bVectorConstraints,...
           q, qDes, v, M, h, H, posLeftFoot, posRightFoot, footSize, Jc, JcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
-          gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, pos_feet, lfoot_ini, rfoot_ini)
+          gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, pos_feet, lfoot_ini, rfoot_ini, xcom0, qDes0)
 
 % this is the function that computes the desired contact forces and torques
 % at joints. There's also the possibility to use QP program to calculate f0 
@@ -212,3 +212,33 @@ end
 %f                         = f_HDot + NA*f0;
 errorCoM                   = xcom - desired_x_dx_ddx_CoM(:,1);
 
+%% Calculation of tau for the comparison between linear and nonlinear system
+xDDcomStar0       =  - gainsPCOM*(xcom  - xcom0)...
+                     - gainsDCOM*(xDcom);
+
+HDotDes0          = [  m*xDDcomStar0;
+                        HDotDes_w  ];
+
+                    
+tauModel0         = PInv_JcMinvSt*(JcMinv*h) + ... 
+                    NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(impedances)*(q-qDes0) - diag(dampings)*qD);
+                
+                
+tau_non_lin       = tauModel0 + Sigma*pinvA*(HDotDes0 - grav);
+
+load('KS')
+load('KD')
+load('tau_reg')
+
+tau_lin           = tau_reg + KS*(q-qDes0) +KD*qD;
+
+
+tau2              = [tau_non_lin tau_lin];
+
+
+
+                
+                
+                
+                
+                

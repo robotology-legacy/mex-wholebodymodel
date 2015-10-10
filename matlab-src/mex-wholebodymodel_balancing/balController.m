@@ -12,7 +12,13 @@ LEFT_RIGHT_FOOT_IN_CONTACT  = param.numConstraints;
 %% initial variables
 DOF           = param.ndof;
 q             = controlParam.qj;
-qDes          = param.qjInit;
+
+%% add a small delta to qDes
+qDes0          = param.qjInit;
+amp            = 0.5*pi/180;
+freq           = 0.1;
+qDes           = qDes0 + amp*sin(2*pi*freq*t).*ones(25,1);
+
 v             = controlParam.v;
 
 M             = controlParam.M;
@@ -59,10 +65,10 @@ impedances = nonLinImp (qDes,q,qMin,qMax,impedances_ini,increasingRatesImp,qTild
 [ConstraintsMatrix,bVectorConstraints] = constraints (forceFrictionCoefficient,numberOfPoints,torsionalFrictionCoefficient,footSize,fZmin);
 
 %% balancing with noQpcontroller
-[tauModel,Sigma,NA,fHdotDesC1C2,errorCoM,f0]   =  ...
+[tauModel,Sigma,NA,fHdotDesC1C2,errorCoM,f0, tau2]   =  ...
  controllerFCN   (LEFT_RIGHT_FOOT_IN_CONTACT,DOF,USE_QP_SOLVER,ConstraintsMatrix,bVectorConstraints,...
                   q,qDes,v, M, h, H, posLeftFoot, posRightFoot,footSize, Jc, dJcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
-                  gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, pos_feet, lfoot_ini, rfoot_ini);      
+                  gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, pos_feet, lfoot_ini, rfoot_ini, xcomDes, qDes0);      
   
 %% calculating tau and fc
 fc  = fHdotDesC1C2 + NA*f0;
@@ -72,5 +78,6 @@ tau = tauModel + Sigma*fc;
 %%  parameters for the visualization
 cVisualParam.f0    = f0;
 cVisualParam.e_com = errorCoM;
+cVisualParam.tau2  = tau2;
 
 end

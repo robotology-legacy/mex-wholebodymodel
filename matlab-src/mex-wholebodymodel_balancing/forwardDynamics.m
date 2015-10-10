@@ -88,7 +88,7 @@ else
  
  disp('joint limits reached at time')    
  disp(t)
- error('joint limits reached '); 
+%  error('joint limits reached '); 
 
 end
 
@@ -144,7 +144,10 @@ dv      = M\(Jc'*fc + [zeros(6,1); tau]-h);
 % function
   visual_param.pos_feet  = [controlParam.lsole ; controlParam.rsole];
   visual_param.fc        = fc;
-  visual_param.tau       = tau;
+  
+  visual_param.tau      = cVisualParam.tau2(:,1);
+  visual_param.tau2     = cVisualParam.tau2(:,2);
+  
   visual_param.error_com = cVisualParam.e_com;
   visual_param.f0        = cVisualParam.f0;
 

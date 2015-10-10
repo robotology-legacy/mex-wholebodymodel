@@ -5,6 +5,10 @@ clc
 % This is the main program for integrating the forward dynamics of the
 % robot in matlab
 
+%NOTE: THE PROGRAM IS ALEADY MODIFIED TO COMPARE THE LINEARIZED TORQUES
+%WITH NONLINEAR. THE USER CAN JUST RUN INTEGRATEFORWARDDYNAMICS AND
+%VISUALIZER_GRAPHICS_LIN
+
 %% setup path
 % Don't forget to set the path properly depending on where are the folders in
 % your computer
@@ -24,10 +28,10 @@ addpath('./../');
  params.QP_solver                =  0;                                      %either 0 or 1
  
 % balancing on two feet or one foot
- params.feet_on_ground           =  2;                                      %either 1 or 2
+ params.feet_on_ground           =  1;                                      %either 1 or 2
 
 % for the visualization of torques, forces and other user-defined graphics 
- vis_graphics                    =  1;                                      %either 0 or 1
+ vis_graphics                    =  0;                                      %either 0 or 1
  
 %% setup params
 % this is assuming a 25DoF iCub
@@ -113,13 +117,13 @@ end
  forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,params);
     
  params.tStart   = 0;
- params.tEnd     = 5;   
- params.sim_step = 0.01;
+ params.tEnd     = 7.5;   
+ params.sim_step = 0.005;
 
 %% integrate forward dynamics
  disp('starting numerical integration');
  
- options = odeset('RelTol',1e-2,'AbsTol',1e-4);
+ options = odeset('RelTol',1e-6,'AbsTol',1e-6);
    
  [t,chi] = ode15s(forwardDynFunc,params.tStart:params.sim_step:params.tEnd,params.chiInit,options);
 

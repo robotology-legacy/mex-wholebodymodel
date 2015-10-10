@@ -59,7 +59,7 @@ end
 %% PARAMETERS FOR ONLY ONE FOOT ON THE GROUND
 if  LEFT_RIGHT_FOOT_IN_CONTACT == 1
     
-    gainsPCOM                 = diag([120  140 120])/3;
+    gainsPCOM                 = diag([50 50 50]);
     gainsDCOM                 = diag([  1    1   1]);
 
     gainMomentum              = 1 ;
@@ -90,13 +90,22 @@ if  LEFT_RIGHT_FOOT_IN_CONTACT == 1
 
       impRightLeg         = [ 20   20  20  10  10  10
                                0    0   0   0   0   0];
+                           
+                           
+    if (DEMO_LEFT_AND_RIGHT == 1)
+        
+        directionOfOscillation = [1;1;1];
+        referenceParams        = [0.00025 0.2];     %referenceParams(1) = amplitude of ascillations in meters
+    
+    end
+                           
 
 end
 
 %% other calculations
   impedances          = [impTorso(1,:),impArms(1,:),impArms(1,:),impLeftLeg(1,:),impRightLeg(1,:)];
    
-  dampings            = 0.25*ones(1,DOF);
+  dampings            = 1*ones(1,DOF);
 
   increasingRatesImp  = [impTorso(2,:),impArms(2,:),impArms(2,:),impLeftLeg(2,:),impRightLeg(2,:)];
 
