@@ -4,7 +4,7 @@ addpath('./whole_body_model_functions/');
 addpath('./worker_functions');
 
 %% initialise mexWholeBodyModel
-wbm_modelInitialise('icubGazeboSim');
+wbm_modelInitialiseFromURDF('icubGazeboSim');
 
 
 %% setup params
@@ -45,9 +45,7 @@ fprintf('Random Initial velocity\n');
 disp(params.dqjInit');
 
 wbm_setWorldFrame(eye(3),[0 0 0]',[0 0 0]');
-
 wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit]);
-%[qj,T_bInit,dqj,vb] = wholeBodyModel('get-state');
 
 [qj,T_bInit,dqj,vb] = wbm_getState();
 [Ptemp,Rtemp] = frame2posrot(T_bInit);

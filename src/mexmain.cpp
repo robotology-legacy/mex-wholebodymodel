@@ -19,7 +19,7 @@
 
 
 // global includes
-#include <iostream> 
+#include <iostream>
 #include <stdio.h>
 #include <mex.h>
 
@@ -43,34 +43,34 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     if (nrhs < 1) {
         mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Initialisation has not been performed correctly.");
     }
-    
 
-  // Check to be sure input is of type char 
+
+  // Check to be sure input is of type char
     if (!(mxIsChar(prhs[0])))
     {
         mexErrMsgIdAndTxt( "MATLAB:mexatexit:inputNotString","Initialisation must include component.\n.");
     }
-    
+
     if(nrhs ==2)
     {
       if (!(mxIsChar(prhs[1])))
       {
         mexErrMsgIdAndTxt( "MATLAB:mexatexit:inputNotString","Initialisation must include component and a robot name.\n.");
       }
-      
+
       componentManager = ComponentManager::getInstance(mxArrayToString(prhs[1]));
     }
     else
     {
       componentManager = ComponentManager::getInstance();
     }
-    
+
   }
   else
   {
     componentManager = ComponentManager::getInstance();
   }
-  
+
 #ifdef DEBUG
   mexPrintf("starting to process function\n");
 #endif
@@ -79,8 +79,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
         mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Required Component must be named.");
     }
     
-
-// Check to be sure input is of type char 
+// Check to be sure input is of type char
     if (!(mxIsChar(prhs[0]))){
         mexErrMsgIdAndTxt( "MATLAB:mexatexit:inputNotString","Input must be of type string.\n.");
     }
