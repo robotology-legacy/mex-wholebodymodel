@@ -12,7 +12,8 @@ LEFT_RIGHT_FOOT_IN_CONTACT  = param.numConstraints;
 %% initial variables
 DOF           = param.ndof;
 q             = controlParam.qj;
-qDes          = param.qjInit;
+doftestnum=3;
+qDes          = param.qjInit+min(t,1)*(-0-0.3*sin(t*2*pi/2.5)*[zeros(doftestnum-1,1);ones(1,1);zeros(25-doftestnum,1)]);
 v             = controlParam.v;
 
 M             = controlParam.M;
@@ -33,13 +34,15 @@ xcomDes       = param.com_ini(1:3);
 lfoot_ini     = param.lfoot_ini;
 rfoot_ini     = param.rfoot_ini;
 
+
 %% gains definition
 [gainsPCOM, gainsDCOM, gainMomentum, impedances_ini, dampings, referenceParams, directionOfOscillation, noOscillationTime,...
  forceFrictionCoefficient, numberOfPoints, torsionalFrictionCoefficient,...
  footSize, fZmin, increasingRatesImp, qTildeMax] = gains (DOF,LEFT_RIGHT_FOOT_IN_CONTACT,DEMO_LEFT_AND_RIGHT);
 
 %% com trajectory generator
-desired_x_dx_ddx_CoM = generTraj (xcomDes,t,referenceParams,directionOfOscillation,noOscillationTime);
+desired_x_dx_ddx_CoM = generTraj(xcomDes,t,referenceParams,directionOfOscillation,noOscillationTime);
+%disp(directionOfOscillation);
 
 %% stability test
 % this creates a perturbation on the desired position of center of mass

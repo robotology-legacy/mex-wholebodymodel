@@ -14,6 +14,7 @@ addpath('./../worker_functions');
 addpath('./../');
 
 %% initialise mexWholeBodyModel
+ setenv('YARP_ROBOT_NAME','icubGazeboSim')
  wbm_modelInitialise('icubGazeboSim');
  wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[0,0,-9.81]');
 
@@ -34,7 +35,7 @@ addpath('./../');
  params.ndof         = 25;
 
 % initial conditions                  
- params.leftArmInit  = [ -19.7   29.7  0.0  44.9   0.0]';          
+ params.leftArmInit  = [ 0   10  0.0  44.9   0.0]';          
  params.rightArmInit = [ -19.7   29.7  0.0  44.9   0.0]';         
  
  if     params.feet_on_ground == 2
@@ -113,7 +114,7 @@ end
  forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,params);
     
  params.tStart   = 0;
- params.tEnd     = 5;   
+ params.tEnd     = 4;   
  params.sim_step = 0.01;
 
 %% integrate forward dynamics

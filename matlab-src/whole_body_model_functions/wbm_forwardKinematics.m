@@ -1,4 +1,4 @@
- function [p] = wbm_forwardKinematics(varargin)
+function [p] = wbm_forwardKinematics(varargin)
 %WBM_FORWARDKINEMATICS computes the forward kinematics rototranslation to a specified link in the current joint
 %   configuration. 
 %   Arguments :

@@ -5,7 +5,7 @@ function  desired_x_dx_ddx_CoM   = generTraj (xCom0, t, referenceParams, directi
 
 if t > noOscillationTime
     
-    A = referenceParams(1);
+    A = referenceParams(1)/2;
     
 else
     
@@ -15,12 +15,12 @@ end
 
  f = referenceParams(2);
 
- xcomDes    =  xCom0 + A*sin(2*pi*f*t)*directionOfOscillation;
+ xcomDes    =  xCom0 + 0*A*[0;sin(2*pi*f*t);-1+cos(2*pi*f*t)];
 %xcomDes(1) =  xcomDes(1) + 0.01;
  
- xDcomDes   =  A*2*pi*f*cos(2*pi*f*t)*directionOfOscillation;
+ xDcomDes   =  0*2*pi*f*A*[0;cos(2*pi*f*t);-sin(2*pi*f*t)];
  
- xDDcomDes  = -A*(2*pi*f)^2*sin(2*pi*f*t)*directionOfOscillation;
+ xDDcomDes  = 0*(2*pi*f)^2*A*[0;-sin(2*pi*f*t);-cos(2*pi*f*t)];
 
  desired_x_dx_ddx_CoM = [xcomDes xDcomDes xDDcomDes];
  
