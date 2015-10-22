@@ -32,7 +32,9 @@ ModelInitialiseURDF::ModelInitialiseURDF() : ModelComponent(1,0,0)
 
 ModelInitialiseURDF::~ModelInitialiseURDF()
 {
-
+#ifdef DEBUG
+  mexPrintf("ModelInitialiseURDF destructed");
+#endif
 }
 
 bool ModelInitialiseURDF::allocateReturnSpace(int, mxArray*[])

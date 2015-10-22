@@ -43,7 +43,9 @@ ModelVisualizeTrajectory::ModelVisualizeTrajectory() : ModelComponent(3,3,0)
 
 ModelVisualizeTrajectory::~ModelVisualizeTrajectory()
 {
-
+#ifdef DEBUG
+  mexPrintf("ModelVisualizeTrajectory destructed\n");
+#endif
 }
 
 

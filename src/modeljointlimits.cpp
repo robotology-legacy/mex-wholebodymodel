@@ -65,16 +65,13 @@ bool ModelJointLimits::allocateReturnSpace(int nlhs, mxArray* plhs[])
 
 ModelJointLimits::~ModelJointLimits()
 {
-//   std::cout<<"in child desctructor jointLimits \n";
-  mexPrintf("ModelJointLimits destructed \n");
-  //delete(jointLimits);
+  mexPrintf("ModelJointLimits destructed\n");
 }
 
 ModelJointLimits* ModelJointLimits::getInstance()
 {
   if(modelJointLimits == NULL)
   {
-
     modelJointLimits  = new ModelJointLimits;
   }
   return(modelJointLimits);

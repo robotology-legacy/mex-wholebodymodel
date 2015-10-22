@@ -44,7 +44,9 @@ ModelSetWorldLink::ModelSetWorldLink(): ModelComponent(4,2,0)
 
 ModelSetWorldLink::~ModelSetWorldLink()
 {
-
+#ifdef DEBUG
+  mexPrintf("ModelSetWorldLink destructed\n");
+#endif
 }
 
 ModelSetWorldLink* ModelSetWorldLink::getInstance()

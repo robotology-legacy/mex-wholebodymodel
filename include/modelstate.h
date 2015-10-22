@@ -30,6 +30,8 @@
 //local includes
 #include "mexwholebodymodelsettings.h"
 
+#include <mex.h>
+
 
 namespace mexWBIComponent
 {
@@ -92,7 +94,7 @@ private:
   ModelState(std::string);
   static ModelState * modelState;
   //double *qS, *dqS, *dxbS;
-  double vbS[6],*qjS,*qjDotS;//;qjS[MEX_WBMODEL_MAX_NUM_JOINTS],qjDotS[MEX_WBMODEL_MAX_NUM_JOINTS],vbS[6];
+  double vbS[6],*qjS,*qjDotS, gS[3];//;qjS[MEX_WBMODEL_MAX_NUM_JOINTS],qjDotS[MEX_WBMODEL_MAX_NUM_JOINTS],vbS[6];
 //   wbi::Frame rootS;
   int robot_reference_frame_link;
   //wbi::Frame H_rootLink_wrWorld;
@@ -118,7 +120,6 @@ private:
   wbi::Frame world_H_rootLink;
   wbi::Frame rootLink_H_ReferenceLink;
   wbi::Frame referenceLink_H_rootLink;
-  double *gS;
 
 };
 

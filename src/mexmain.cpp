@@ -31,23 +31,28 @@
 using namespace mexWBIComponent;
 
 //Global variables
-static ComponentManager *componentManager = 0;
+
+/**
+ * just a local copy of the pointer that you get
+ * by ComponentManager::getInstance()
+ *
+ * To properly destroy, call ComponentManager::deleteInstance()
+ * and then set this pointer to 0.
+ */
+static ComponentManager *componentManagerLocalPointerCopy = 0;
 
 // Cleanup function to call when matlab exits or mex clears
 void MEXWBM_Matlab_ExitFcn(void)
 {
-  if( componentManager != 0 )
-  {
-    delete componentManager;
-    componentManager = 0;
-  }
+  ComponentManager::deleteInstance();
+  componentManagerLocalPointerCopy = 0;
 }
 
 //=========================================================================================================================
 // Entry point function to library
 void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 {
-  if(componentManager==0)
+  if(componentManagerLocalPointerCopy==0)
   {
     // Initialisation of the component, i.e first call after a 'close all' or matlab start
     if (nrhs < 1) {
@@ -67,11 +72,11 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
         mexErrMsgIdAndTxt( "MATLAB:mexatexit:inputNotString","Initialisation must include component and a robot name.\n.");
       }
 
-      componentManager = ComponentManager::getInstance(mxArrayToString(prhs[1]));
+      componentManagerLocalPointerCopy = ComponentManager::getInstance(mxArrayToString(prhs[1]));
     }
     else
     {
-      componentManager = ComponentManager::getInstance();
+      componentManagerLocalPointerCopy = ComponentManager::getInstance();
     }
 
     // Register function to call on Matlab close / mex clear
@@ -80,7 +85,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
   }
   else
   {
-    componentManager = ComponentManager::getInstance();
+    componentManagerLocalPointerCopy = ComponentManager::getInstance();
   }
 
 #ifdef DEBUG
@@ -95,7 +100,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     if (!(mxIsChar(prhs[0]))){
         mexErrMsgIdAndTxt( "MATLAB:mexatexit:inputNotString","Input must be of type string.\n.");
     }
-  componentManager->processFunctionCall(nlhs,plhs,nrhs,prhs);
+  componentManagerLocalPointerCopy->processFunctionCall(nlhs,plhs,nrhs,prhs);
 }
 
 

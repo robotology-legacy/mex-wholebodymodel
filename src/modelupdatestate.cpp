@@ -59,7 +59,9 @@ void ModelUpdateState::deleteInstance()
 
 ModelUpdateState::~ModelUpdateState()
 {
-
+#ifdef DEBUG
+  mexPrintf("ModelUpdateState destructed\n");
+#endif
 }
 
 bool ModelUpdateState::compute(int nrhs, const mxArray *prhs[])

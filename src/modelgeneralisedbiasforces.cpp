@@ -48,8 +48,6 @@ ModelGeneralisedBiasForces::ModelGeneralisedBiasForces() : ModelComponent(5,0,1)
 
 ModelGeneralisedBiasForces::~ModelGeneralisedBiasForces()
 {
-  //delete(h);
-  delete(g);
 }
 
 ModelGeneralisedBiasForces * ModelGeneralisedBiasForces::getInstance()

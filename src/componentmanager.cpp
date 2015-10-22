@@ -45,6 +45,12 @@ ComponentManager* ComponentManager::getInstance(std::string robotName)
   return(componentManager);
 }
 
+void ComponentManager::deleteInstance()
+{
+  deleteObject(&componentManager);
+}
+
+
 
 ComponentManager::ComponentManager(std::string robotName)
 {
@@ -71,7 +77,7 @@ ComponentManager::ComponentManager(std::string robotName)
 void ComponentManager::cleanup()
 {
 #ifdef DEBUG
-  mexPrintf("ComponentManager destructed \n");
+  mexPrintf("ComponentManager destructed\n");
 #endif
 
   ModelJointLimits::deleteInstance();
@@ -84,11 +90,11 @@ void ComponentManager::cleanup()
   ModelForwardKinematics::deleteInstance();
   ModelInitialise::deleteInstance();
   ModelInitialiseURDF::deleteInstance();
-  ModelState::deleteInstance();
   ModelVisualizeTrajectory::deleteInstance();
   ModelCentroidalMomentum::deleteInstance();
   ModelSetWorldFrame::deleteInstance();
   ModelSetWorldLink::deleteInstance();
+  ModelState::deleteInstance();
 }
 
 ComponentManager::~ComponentManager(void)
@@ -162,5 +168,5 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
     returnVal = true;
   }
 
-    return(returnVal);
+  return(returnVal);
 }

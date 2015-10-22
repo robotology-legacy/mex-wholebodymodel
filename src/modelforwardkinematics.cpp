@@ -40,7 +40,9 @@ ModelForwardKinematics::ModelForwardKinematics() : ModelComponent(4,1,1)
 
 ModelForwardKinematics::~ModelForwardKinematics()
 {
-
+#ifdef DEBUG
+  mexPrintf("ModelForwardKinematics destructed\n");
+#endif
 }
 
 void ModelForwardKinematics::deleteInstance()

@@ -51,6 +51,13 @@ class ComponentManager
 public:
 
   static ComponentManager *getInstance(std::string robotName = "icub");
+
+  /**
+   * Delete the (static) instance of this component,
+   * and set the instance pointer to NULL.
+   */
+  static void deleteInstance();
+
   bool processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]);
   void cleanup();
    ~ComponentManager(void);

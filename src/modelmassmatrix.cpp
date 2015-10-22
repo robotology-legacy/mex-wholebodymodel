@@ -40,7 +40,9 @@ ModelMassMatrix::ModelMassMatrix(): ModelComponent(3,0,1)
 
 ModelMassMatrix::~ModelMassMatrix()
 {
-
+#ifdef DEBUG
+  mexPrintf("ModelMassMatrix destructed\n");
+#endif
 }
 
 bool ModelMassMatrix::allocateReturnSpace(int nlhs, mxArray* plhs[])

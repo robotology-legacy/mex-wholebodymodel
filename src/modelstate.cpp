@@ -79,31 +79,49 @@ ModelState::ModelState(std::string robotName) : robot_reference_frame_link_name(
   qjS = (double*)malloc(sizeof(double) * (numDof));
   qjDotS = (double*)malloc(sizeof(double) * (numDof));
 
-  gS = new double(3);
   gS[0] = 0; gS[1] = 0; gS[2] = -9.81;
 
 }
 
 ModelState::~ModelState()
 {
+#ifdef DEBUG
+  mexPrintf("ModelState destructor called\n");
+#endif
 
-  if(qjDotS != NULL){
-      free(qjDotS);
-          qjDotS = 0;
-  }
-
-  if(qjS != NULL){
-      free(qjS);
-          qjS = 0;
-  }
-
-  if(gS != NULL)
+  if(qjDotS != 0)
   {
-    delete gS;
-    gS = NULL;
+      free(qjDotS);
+      qjDotS = 0;
   }
-  delete(robotWBIModel);
-  mexPrintf("ModelState destructed\n");
+
+#ifdef DEBUG
+  mexPrintf("free(qjDotS) called\n");
+#endif
+
+  if(qjS != NULL)
+  {
+      free(qjS);
+      qjS = 0;
+  }
+
+#ifdef DEBUG
+  mexPrintf("free(qjS) called\n");
+#endif
+
+#ifdef DEBUG
+  mexPrintf("free(gS) called\n");
+#endif
+
+  if(robotWBIModel != 0)
+  {
+    delete robotWBIModel;
+    robotWBIModel = 0;
+  }
+
+#ifdef DEBUG
+  mexPrintf("ModelState destructor returning\n");
+#endif
 }
 
 ModelState *  ModelState::getInstance(std::string robotName)
