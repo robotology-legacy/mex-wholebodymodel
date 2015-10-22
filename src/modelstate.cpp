@@ -40,20 +40,20 @@ wbi::iWholeBodyModel * ModelState::robotWBIModel = NULL;
 bool isRobotNameAFile(const std::string & robotName)
 {
   // Ugly hack: check the last four char of robotName :
-  // if it ends in .xxx (where xxx is is an classical extention)
+  // if it ends in .xxx or .xxxx (where xxx or xxxx is is an classical extention)
   // call the robotModelFromURDF , otherwise the usual robotModel
-  if( robotName.size() < 4 )
+  if( robotName.size() < 5 )
   {
     return false;
   }
 
-  if( robotName[robotName.size()-4] == '.' )
+  if( robotName[robotName.size()-4] == '.' || robotName[robotName.size()-5] == '.')
   {
     return true;
   }
   else
   {
-      return false;
+    return false;
   }
 }
 
@@ -63,10 +63,12 @@ ModelState::ModelState(std::string robotName) : robot_reference_frame_link_name(
 
   if( isRobotNameAFile(robotName) )
   {
+    std::cerr << "~~~~~~ robotModelFromURDF called in ModelState constructor, robotName " << robotName << std::endl;
     robotModelFromURDF(robotName);
   }
   else
   {
+    std::cerr << "~~~~~~ robotModel called in ModelState constructor, robotName " << robotName << " " <<  robotName[robotName.size()-4] << std::endl;
     robotModel(robotName);
   }
 
@@ -238,8 +240,10 @@ void  ModelState::robotModel(std::string robotName)
 
   std::string wbiConfFile = rf.findFile("yarpWholeBodyInterface.ini");
   yarpWbiOptions.fromConfigFile(wbiConfFile);
-  //Overwrite the robot parameter that could be present in wbi_conf_file
-  yarpWbiOptions.put("robot",robotName);
+
+  // Never get the limits from getLimitsFromControlBoard
+  // When using mex-wholebodymodel
+  yarpWbiOptions.unput("getLimitsFromControlBoard");
 
 
   robotWBIModel = new yarpWbi::yarpWholeBodyModel(localName.c_str(), yarpWbiOptions);

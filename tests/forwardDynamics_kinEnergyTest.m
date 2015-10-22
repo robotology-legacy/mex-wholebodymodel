@@ -1,7 +1,7 @@
 function [ dchi , h , g,fc, kinEnergy ] = forwardDynamics_zeroExternalForces( t,chi,param )
 %FORWARDDYNAMICS Forward dynamics of the wholeBodyModel
 %
-%   This is the forward dynamics of the model loaded in the 
+%   This is the forward dynamics of the model loaded in the
 %   wholeBodyInterface from the URDF description. The dynamic model is
 %   described as an explicit ordinary differential equation of the form:
 %
@@ -84,10 +84,10 @@ tau = param.tau(t);
 
 %% Contact forces computation
 JcMinv = Jc/M;
-JcMinvJct = JcMinv * Jc';   
+JcMinvJct = JcMinv * Jc';
 
 tauDamp = -param.dampingCoeff*dqj;
-  
+
 fc = (JcMinvJct)\(JcMinv*(h-[tau+tauDamp;zeros(6,1)])-dJcDq);
 
 % need to apply root-to-world rotation to the spatial angular velocity omega_W to
@@ -98,9 +98,8 @@ omega_b = R_b*omega_W;% R_b*omega_W;
 dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
 
 dx = [dx_b;dqt_b;dqj];
-M
 dv = M\(Jc'*fc + [tau+tauDamp; zeros(6,1)]-h);
-dchi = [dx;dv];  
+dchi = [dx;dv];
 kinEnergy = 0.5*v'*M*v;
 %dchi = zeros(size(dchi));
 end

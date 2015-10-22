@@ -1,3 +1,3 @@
+kinEnergyConservationTestAllModels;
 baseLinkFrameTest;
-disp('Papare')
 initialiseTest;

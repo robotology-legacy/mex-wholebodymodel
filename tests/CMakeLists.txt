@@ -13,4 +13,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runWBMTests.m
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/twoLinks.urdf
                ${CMAKE_CURRENT_BINARY_DIR}/twoLinks.urdf)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/icub.urdf
+               ${CMAKE_CURRENT_BINARY_DIR}/icub.urdf)
+
 add_test(NAME matlab_mex_wholebodymodel_tests COMMAND ${Matlab_MAIN_PROGRAM} -nodisplay -r "runWBMTests")

@@ -1,9 +1,9 @@
 clear
 close all;
 
-fprintf('Running initialiseTest');
+fprintf('Running initialiseTest\n');
 
-%% Try to load a model using the YARP_ROBOT_NAME before 
+%% Try to load a model using the YARP_ROBOT_NAME before
 wbm_modelInitialise('icubGazeboSim');
 
 %% check if the limits has size 25
@@ -21,5 +21,5 @@ WBMAssertEqual(min,[-2],'Error in getting lower joint limits from urdf file');
 WBMAssertEqual(max,[2],'Error in getting lower joint limits from urdf file');
 
 
-fprintf('initialiseFromURDFTest completed successfully');
+fprintf('initialiseTest completed successfully\n');
 
