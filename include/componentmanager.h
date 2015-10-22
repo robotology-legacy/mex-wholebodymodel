@@ -52,6 +52,7 @@ public:
 
   static ComponentManager *getInstance(std::string robotName = "icub");
   bool processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]);
+  void cleanup();
    ~ComponentManager(void);
 
   //int getDofs();

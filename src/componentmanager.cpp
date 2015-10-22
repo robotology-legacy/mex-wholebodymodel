@@ -68,31 +68,34 @@ ComponentManager::ComponentManager(std::string robotName)
    componentList["set-world-link"] = modelSetWorldLink;
 }
 
-ComponentManager::~ComponentManager()
+void ComponentManager::cleanup()
 {
-
-
 #ifdef DEBUG
-  mexPrintf("icub WholeBodyModel destructed \n");
   mexPrintf("ComponentManager destructed \n");
 #endif
 
-  delete(modelJointLimits);
-  delete(modelMassMatrix);
-  delete(modelUpdateState);
-  delete(modelGetState);
-  delete(modelGeneralisedBiasForces);
-  delete(modelDjDq);
-  delete(modelJacobian);
-  delete(modelForwardKinematics);
-  delete(modelInitialise);
-  delete(modelInitialiseURDF);
-  delete(modelState);
-  delete(modelVisualizeTrajectory);
-  delete(modelCentroidalMomentum);
-  delete(modelSetWorldFrame);
-  delete(modelSetWorldLink);
+  ModelJointLimits::deleteInstance();
+  ModelMassMatrix::deleteInstance();
+  ModelUpdateState::deleteInstance();
+  ModelGetState::deleteInstance();
+  ModelGeneralisedBiasForces::deleteInstance();
+  ModelDjDq::deleteInstance();
+  ModelJacobian::deleteInstance();
+  ModelForwardKinematics::deleteInstance();
+  ModelInitialise::deleteInstance();
+  ModelInitialiseURDF::deleteInstance();
+  ModelState::deleteInstance();
+  ModelVisualizeTrajectory::deleteInstance();
+  ModelCentroidalMomentum::deleteInstance();
+  ModelSetWorldFrame::deleteInstance();
+  ModelSetWorldLink::deleteInstance();
 }
+
+ComponentManager::~ComponentManager(void)
+{
+    cleanup();
+}
+
 
 void ComponentManager::initialise(std::string robotName)
 {

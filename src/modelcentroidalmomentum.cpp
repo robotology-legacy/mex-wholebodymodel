@@ -52,6 +52,12 @@ ModelCentroidalMomentum * ModelCentroidalMomentum::getInstance()
   return(modelCentroidalMomentum);
 }
 
+void ModelCentroidalMomentum::deleteInstance()
+{
+  deleteObject(&modelCentroidalMomentum);
+}
+
+
 bool ModelCentroidalMomentum::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
 #ifdef DEBUG

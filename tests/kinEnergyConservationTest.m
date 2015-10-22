@@ -1,6 +1,8 @@
 function [] = kinEnergyConservationTest( params )
     rng(0)
 
+    clear wholeBodyModel;
+
     %% initialise mexWholeBodyModel
     if( params.isURDF )
         wbm_modelInitialiseFromURDF(params.urdfFilePath);

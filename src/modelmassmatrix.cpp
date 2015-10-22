@@ -29,7 +29,7 @@
 
 using namespace mexWBIComponent;
 
-ModelMassMatrix * ModelMassMatrix::modelMassMatrix;
+ModelMassMatrix * ModelMassMatrix::modelMassMatrix = 0;
 
 ModelMassMatrix::ModelMassMatrix(): ModelComponent(3,0,1)
 {
@@ -70,6 +70,12 @@ ModelMassMatrix * ModelMassMatrix::getInstance()
   }
   return(modelMassMatrix);
 }
+
+void ModelMassMatrix::deleteInstance()
+{
+  deleteObject(&modelMassMatrix);
+}
+
 
 bool ModelMassMatrix::compute(int nrhs, const mxArray * prhs[])
 {

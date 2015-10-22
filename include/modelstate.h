@@ -38,6 +38,13 @@ class ModelState
 public:
    ~ModelState();
    static ModelState * getInstance(std::string = "icubGazeboSim");
+
+  /**
+   * Delete the (static) instance of this component,
+   * and set the instance pointer to NULL.
+   */
+   static void deleteInstance();
+
    bool setState(double *,double*,double*);
 
    //void setBaseFrameLink(int);
@@ -114,6 +121,21 @@ private:
   double *gS;
 
 };
+
+/**
+ * Helper function to delete instances
+ *
+ * @param pp pointer to the pointer to delete and set to 0
+ */
+template <class T> void deleteObject(T** pp)
+{
+    if( *pp != 0 )
+    {
+        delete *pp;
+        *pp = 0;
+    }
+}
+
 }
 
 #endif // MODELSTATE_H

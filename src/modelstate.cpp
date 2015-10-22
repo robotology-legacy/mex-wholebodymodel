@@ -59,16 +59,12 @@ bool isRobotNameAFile(const std::string & robotName)
 
 ModelState::ModelState(std::string robotName) : robot_reference_frame_link_name("l_sole"), fixedLinkComputation(false) //: qS[ndof],dqS[ndof],dxbS[ndof]
 {
-  yarp::os::Network::init();
-
   if( isRobotNameAFile(robotName) )
   {
-    std::cerr << "~~~~~~ robotModelFromURDF called in ModelState constructor, robotName " << robotName << std::endl;
     robotModelFromURDF(robotName);
   }
   else
   {
-    std::cerr << "~~~~~~ robotModel called in ModelState constructor, robotName " << robotName << " " <<  robotName[robotName.size()-4] << std::endl;
     robotModel(robotName);
   }
 
@@ -100,7 +96,12 @@ ModelState::~ModelState()
       free(qjS);
           qjS = 0;
   }
-  yarp::os::Network::fini();
+
+  if(gS != NULL)
+  {
+    delete gS;
+    gS = NULL;
+  }
   delete(robotWBIModel);
   mexPrintf("ModelState destructed\n");
 }
@@ -114,6 +115,10 @@ ModelState *  ModelState::getInstance(std::string robotName)
   return(modelState);
 }
 
+void ModelState::deleteInstance()
+{
+  deleteObject(&modelState);
+}
 
 bool ModelState::setState(double *qj_t,double *qjDot_t,double *vb_t)
 {

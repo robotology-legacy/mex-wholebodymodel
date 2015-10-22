@@ -61,6 +61,13 @@ ModelGeneralisedBiasForces * ModelGeneralisedBiasForces::getInstance()
   return(modelGeneralisedBiasForces);
 }
 
+void ModelGeneralisedBiasForces::deleteInstance()
+{
+  deleteObject(&modelGeneralisedBiasForces);
+}
+
+
+
 bool ModelGeneralisedBiasForces::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
 #ifdef DEBUG

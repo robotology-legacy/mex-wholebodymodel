@@ -24,7 +24,7 @@
 #include <mex.h>
 
 using namespace mexWBIComponent;
-ModelJointLimits* ModelJointLimits::modelJointLimits = NULL;
+ModelJointLimits* ModelJointLimits::modelJointLimits = 0;
 //const int ModelJointLimits::numReturnArguments = 2;
 
 
@@ -79,6 +79,12 @@ ModelJointLimits* ModelJointLimits::getInstance()
   }
   return(modelJointLimits);
 }
+
+void ModelJointLimits::deleteInstance()
+{
+  deleteObject(&modelJointLimits);
+}
+
 /*
  * REIMPLEMENT IN FUTURE
 bool ModelJointLimits::display(int nrhs, const mxArray *prhs[])

@@ -50,6 +50,12 @@ ModelInitialiseURDF* ModelInitialiseURDF::getInstance()
   return(modelInitialiseURDF);
 }
 
+void ModelInitialiseURDF::deleteInstance()
+{
+  deleteObject(&modelInitialiseURDF);
+}
+
+
 bool ModelInitialiseURDF::compute(int nrhs, const mxArray* prhs[])
 {
 

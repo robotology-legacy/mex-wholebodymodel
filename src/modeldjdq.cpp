@@ -55,6 +55,12 @@ ModelDjDq * ModelDjDq::getInstance(void)
   return(modelDjDq);
 }
 
+void ModelDjDq::deleteInstance()
+{
+  deleteObject(&modelDjDq);
+}
+
+
 bool ModelDjDq::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
 #ifdef DEBUG

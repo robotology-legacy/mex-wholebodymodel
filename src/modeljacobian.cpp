@@ -77,6 +77,12 @@ ModelJacobian * ModelJacobian::getInstance()
   return(modelJacobian);
 }
 
+void ModelJacobian::deleteInstance()
+{
+  deleteObject(&modelJacobian);
+}
+
+
 bool ModelJacobian::compute(int nrhs, const mxArray * prhs[])
 {
 #ifdef DEBUG

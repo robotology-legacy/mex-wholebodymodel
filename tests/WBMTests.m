@@ -1,3 +1,3 @@
-kinEnergyConservationTestAllModels;
 baseLinkFrameTest;
 initialiseTest;
+kinEnergyConservationTestAllModels;

@@ -35,7 +35,6 @@ namespace mexWBIComponent{
 
 class ModelComponent{
 public:
-
   static ModelComponent* getInstance();
 
   virtual bool allocateReturnSpace(int, mxArray*[]) = 0;

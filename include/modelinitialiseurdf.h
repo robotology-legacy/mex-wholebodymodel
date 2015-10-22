@@ -39,6 +39,13 @@ public:
 
   ~ModelInitialiseURDF();
   static ModelInitialiseURDF* getInstance();
+
+  /**
+   * Delete the (static) instance of this component,
+   * and set the instance pointer to NULL.
+   */
+  static void deleteInstance();
+
   //virtual bool display(int, const mxArray *[]);
   virtual bool allocateReturnSpace(int, mxArray *[]);
   virtual bool compute(int, const mxArray *[]);

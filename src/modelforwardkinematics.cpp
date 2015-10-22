@@ -43,6 +43,11 @@ ModelForwardKinematics::~ModelForwardKinematics()
 
 }
 
+void ModelForwardKinematics::deleteInstance()
+{
+  deleteObject(&modelForwardKinematics);
+}
+
 bool ModelForwardKinematics::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
 
