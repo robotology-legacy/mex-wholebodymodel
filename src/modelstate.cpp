@@ -258,6 +258,9 @@ void  ModelState::robotModel(std::string robotName)
     mexPrintf("WBI unable to initialise (usually means unable to connect to chosen robot)\n");
   }
 
+  // update the number of dofs
+  numDof = robotWBIModel->getDoFs();
+
   mexPrintf("mexWholeBodyModel started with robot : %s, Num of Joints : %d \n",robotName.c_str(), robotWBIModel->getDoFs());
 
 }
@@ -297,6 +300,9 @@ void  ModelState::robotModelFromURDF(std::string urdfFileName)
   {
     mexPrintf("WBI unable to initialise (usually means unable to connect to chosen robot)\n");
   }
+
+  // update the number of dofs
+  numDof = robotWBIModel->getDoFs();
 
   mexPrintf("mexWholeBodyModel started with robot loaded from urdf file : %s, Num of Joints : %d \n",urdfFileName.c_str(), robotWBIModel->getDoFs());
 

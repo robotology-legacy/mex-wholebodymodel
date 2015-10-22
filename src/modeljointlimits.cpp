@@ -44,6 +44,7 @@ bool ModelJointLimits::allocateReturnSpace(int nlhs, mxArray* plhs[])
 #ifdef DEBUG
   mexPrintf("Trying to allocateReturnSpace in ModelJointLimits\n");
 #endif
+  int numDof = modelState->dof();
 
   bool returnVal = false;
   if(nlhs!=2)
@@ -103,7 +104,9 @@ bool ModelJointLimits::compute(int nrhs, const mxArray *prhs[])
 #ifdef DEBUG
    mexPrintf("Trying to compute ModelJointLimits\n");
 #endif
-   robotModel = modelState->robotModel();
+  robotModel = modelState->robotModel();
+  int numDof = modelState->dof();
+
 
   double temp1[numDof],temp2[numDof];
   robotModel->getJointLimits(temp1,temp2);
@@ -119,9 +122,10 @@ bool ModelJointLimits::compute(int nrhs, const mxArray *prhs[])
 
 bool ModelJointLimits::computeFast(int, const mxArray*[])
 {
+  int numDof = modelState->dof();
 
-    double temp1[numDof],temp2[numDof];
-    robotModel = modelState->robotModel();
+  double temp1[numDof],temp2[numDof];
+  robotModel = modelState->robotModel();
   robotModel->getJointLimits(temp1,temp2);
 
   for(int i = 0; i<numDof; i++)

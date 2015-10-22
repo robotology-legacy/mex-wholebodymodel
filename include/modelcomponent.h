@@ -56,7 +56,6 @@ protected:
 //   bool changeWorldFrame(std::string,wbi::Frame);
 //   wbi::Frame computeRootWorldRotoTranslation(double *);
   ModelComponent(const unsigned int, const unsigned int, const unsigned int);
-  int numDof;
 
   const unsigned int numArgs;
   const unsigned int numAltArgs;
