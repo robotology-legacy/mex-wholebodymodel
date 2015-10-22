@@ -53,10 +53,6 @@ bool isRobotNameAFile(const std::string & robotName)
   }
   else
   {
-    return false;
-  }
-  else
-  {
       return false;
   }
 }
