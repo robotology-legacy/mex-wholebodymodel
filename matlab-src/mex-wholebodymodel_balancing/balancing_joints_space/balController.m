@@ -12,7 +12,7 @@ LEFT_RIGHT_FOOT_IN_CONTACT  = param.numConstraints;
 %% initial variables
 DOF           = param.ndof;
 q             = controlParam.qj;
-qDes          = param.qjInit + 0.75*pi/180*sin(2*pi*0.35*t) ;
+qDes          = param.qjInit + 0*pi/180*sin(2*pi*0.35*t) ;
 
 v             = controlParam.v;
 

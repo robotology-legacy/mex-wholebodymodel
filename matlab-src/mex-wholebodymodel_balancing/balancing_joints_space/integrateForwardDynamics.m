@@ -111,7 +111,7 @@ end
  
 %% setup integration
  params.tStart   = 0;
- params.tEnd     = 350;   
+ params.tEnd     = 14;   
  params.sim_step = 0.01;
 
  params.wait     = waitbar(0,'Integration in process');
@@ -121,7 +121,7 @@ end
 %% integrate forward dynamics
  disp('starting numerical integration');
  
- options = odeset('RelTol',1e-6,'AbsTol',1e-6);
+ options = odeset('RelTol',1e-12,'AbsTol',1e-12);
    
  [t,chi] = ode15s(forwardDynFunc,params.tStart:params.sim_step:params.tEnd,params.chiInit,options);
 

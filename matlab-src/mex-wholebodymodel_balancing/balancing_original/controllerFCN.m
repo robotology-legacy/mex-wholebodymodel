@@ -18,12 +18,12 @@ constraints     = LEFT_RIGHT_FOOT_IN_CONTACT;
 %reg             = 0.01;
 
 %% others variables
-gravAcc          = 9.81;
+gravAcc         = 9.81;
 
- m               = M(1,1);
- Mb              = M(1:6,1:6);
- Mbj             = M(1:6,7:end);
-%Mj              = M(7:end,7:end);
+ m              = M(1,1);
+ Mb             = M(1:6,1:6);
+ Mbj            = M(1:6,7:end);
+%Mj             = M(7:end,7:end);
 
 St              = [ zeros(6,ROBOT_DOF);
                     eye(ROBOT_DOF,ROBOT_DOF)];
@@ -110,7 +110,7 @@ SigmaNA          =  Sigma*NA;
 %% adding a correction term in the costraint equation
 % this is necessary to reduce the numerical errors in the costraint
 % equation. 
- k_corr_pos = 5;
+ k_corr_pos = 0;
  k_corr_vel = 2*sqrt(k_corr_pos);
  
  if     constraints == 1
@@ -209,8 +209,8 @@ elseif constraints == 2 && USE_QP_SOLVER == 0
 
 end
 
-%f                         = f_HDot + NA*f0;
-errorCoM                   = xcom - desired_x_dx_ddx_CoM(:,1);
+%f                    = f_HDot + NA*f0;
+errorCoM              = xcom - desired_x_dx_ddx_CoM(:,1);
 
 
 

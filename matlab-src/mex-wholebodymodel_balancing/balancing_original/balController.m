@@ -1,4 +1,4 @@
-function  [tau,fc, cVisualParam] = balController(t,param,controlParam)
+function  [tau, cVisualParam] = balController(t,param,controlParam)
 
 % this is the main function for the balancing controller. it contains the definition of every
 % parameters necessary for the controller and calls the other functions
@@ -14,7 +14,7 @@ DOF           = param.ndof;
 q             = controlParam.qj;
 qDes          = param.qjInit;
 
-qDes(3)       = qDes(3) + 0.75*pi/180*sin(2*pi*0.25*t);
+qDes(3)       = qDes(3) + 0*pi/180*sin(2*pi*0.25*t);
 
 v             = controlParam.v;
 
@@ -69,7 +69,6 @@ impedances = nonLinImp (qDes,q,qMin,qMax,impedances_ini,increasingRatesImp,qTild
   
 %% calculating tau and fc
 fc  = fHdotDesC1C2 + NA*f0;
-
 tau = tauModel + Sigma*fc;
 
 %%  parameters for the visualization

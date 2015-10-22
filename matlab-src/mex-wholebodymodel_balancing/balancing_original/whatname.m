@@ -1,6 +1,6 @@
 function name = whatname(name_group,k)
 
-%% Torso names
+% Torso names
 a1 = strcmp(name_group,'torso');
 
 if a1 == 1

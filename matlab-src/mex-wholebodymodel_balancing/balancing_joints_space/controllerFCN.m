@@ -210,7 +210,7 @@ f0                    = -pinv(SigmaNA, PINV_TOL)*(tauModel+Sigma*f_HDot);
 end
 
 %f                    = f_HDot + NA*f0;
-errorCoM              = xcom - desired_x_dx_ddx_CoM(:,1);
+errorCoM              = xcom- desired_x_dx_ddx_CoM(:,1);
 
 %% Joint space control
 Jct = Jc.';
@@ -219,12 +219,29 @@ Jct = Jc.';
 % J_total  = -J_CoM(1:3,1:6)*inv_base*Jc(1:6,7:end) + J_CoM(1:3,7:end);
 
   J_total  =  J_CoM(1:3,7:end);
-  dqj_des  =  pinv(J_total,PINV_TOL)*desired_x_dx_ddx_CoM(:,2);
+%    J_total  =  J_CoM(1:3,:);
+
+%   NJ = eye(25) - pinv(J_total,PINV_TOL)*J_total;
+  
+  dqj_des  =  pinv(J_total,PINV_TOL)*(desired_x_dx_ddx_CoM(:,2));
+  
+%   dqj_des = t_dqj_des(7:end) ;
+  
 % qddj_des =  pinv(J_total,PINV_TOL)*desired_x_dx_ddx_CoM(:,3);
 
-qTilde2 = q-qDes;
-qD2     = v(7:end);%-dqj_des;
+% qTilde2 = q - qDes2;
+
+qDesini = q;
+
+qDes3  = qDes + pinv(J_total,PINV_TOL)*(errorCoM);
+
+qTilde2 = q -qDes3;
+
+
+qD2     = v(7:end); %;- dqj_des;
  
+[errorCoM (xDcom - desired_x_dx_ddx_CoM(:,2))]
+
 % Mb    = M(1:6,1:6);
 % Mjb   = M(7:end,1:6);
 % M_bar = M(7:end,7:end)-Mjb*(eye(6)/Mb)*Mbj;
@@ -270,7 +287,7 @@ qD2     = v(7:end);%-dqj_des;
  B_bar = Bj -Mjb*(eye(6)/Mb)*Bbj;
  
 % tau_c  =  pinv(B_bar,PINV_TOL)*((h_new(7:end)+v_new(7:end)-Mjb*(eye(6)/Mb)*(h_new(1:6)+v_new(1:6)))+ (-diag(impedances)*qTilde2 -diag(dampings)*qD2));
-tau_c  =  pinv(B_bar,PINV_TOL)*(gen_new(7:end)-Mjb*(eye(6)/Mb)*(gen_new(1:6))+(-diag(impedances)*qTilde2 -diag(dampings)*qD2));
+tau_c  =  pinv(B_bar,PINV_TOL)*(gen_new(7:end)-Mjb*(eye(6)/Mb)*(gen_new(1:6))+(-diag(impedances)*10*qTilde2 -diag(dampings)*qD2));
 f_c    = (eye(6*constraints)/(JcMinvJct))*(JcMinv*h - JcMinv*St*tau_c -JcDv);
  
 
