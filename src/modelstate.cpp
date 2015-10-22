@@ -126,14 +126,14 @@ bool ModelState::setState(double *qj_t,double *qjDot_t,double *vb_t)
   mexPrintf("Trying to update state\n");
 #endif
 
-  for(int i = 0;i<numDof;i++)
+  for(size_t i = 0; i<numDof; i++)
   {
     qjS[i] = qj_t[i];
     qjDotS[i] = qjDot_t[i];
 
   //  mexPrintf("qj : %2.2f, qjDot : %2.2f \n",qjS[i],qjDotS[i]);
   }
-  for(int i=0;i<6;i++)
+  for(size_t i=0; i<6; i++)
   {
     vbS[i] = vb_t[i];
     //mexPrintf("vbS ; %2.2f",vbS[i]);
@@ -162,7 +162,7 @@ double * ModelState::qj()
 }
 void ModelState::qj(double *qj_t)
 {
-  for (int i = 0;i<numDof ; i++)
+  for (size_t i = 0;i<numDof ; i++)
   {
     qj_t[i] = qjS[i];
   }
@@ -174,7 +174,7 @@ double * ModelState::qjDot()
 }
 void ModelState::qjDot(double *qjDot_t)
 {
-  for (int i = 0;i<numDof ; i++)
+  for (size_t i = 0; i<numDof; i++)
   {
     qjDot_t[i] = qjDotS[i];
   }
@@ -209,7 +209,8 @@ void ModelState::g(double *gT)
     gT[i] = gS[i];
   }
 }
-int ModelState::dof()
+
+size_t ModelState::dof()
 {
   return(numDof);
 }
@@ -358,8 +359,9 @@ wbi::Frame ModelState::getReferenceToWorldFrameRotoTrans(void)
 
 wbi::Frame ModelState::getRootWorldRotoTranslation(void)
 {
-
+    return world_H_rootLink;
 }
+
 void ModelState::setRootWorldRotoTranslation(wbi::Frame rootWorldFrame )
 {
   world_H_rootLink = rootWorldFrame;

@@ -37,7 +37,7 @@ class ModelInitialiseURDF : public ModelComponent
 {
 public:
 
-  ~ModelInitialiseURDF();
+  virtual ~ModelInitialiseURDF();
   static ModelInitialiseURDF* getInstance();
 
   /**

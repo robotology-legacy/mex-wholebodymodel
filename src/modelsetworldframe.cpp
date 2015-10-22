@@ -127,6 +127,8 @@ bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray* prhs[])
     //H_baseLink_wrWorld = tempFrame;
     modelState->setRootWorldRotoTranslation(tempFrame);
     //    mexPrintf("Roto translation of world from base frame applied \n");
+
+    return true;
 }
 
 

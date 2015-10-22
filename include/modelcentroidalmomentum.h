@@ -46,7 +46,7 @@ public:
   virtual bool computeFast(int, const mxArray *[]);
 
 //   virtual bool display(int, const mxArray *[]);
-  ~ModelCentroidalMomentum();
+  virtual ~ModelCentroidalMomentum();
 
 private:
   ModelCentroidalMomentum();

@@ -95,7 +95,7 @@ bool ModelUpdateState::allocateReturnSpace(int nlhs, mxArray* plhs[])
 
 bool ModelUpdateState::setState(int nrhs, const mxArray* prhs[])
 {
-    int numDof = modelState->dof();
+    size_t numDof = modelState->dof();
 
     if(mxGetM(prhs[1])!=numDof || mxGetN(prhs[1])!=1 || mxGetM(prhs[2])!=numDof ||mxGetN(prhs[2])!=1 || mxGetM(prhs[3])!=6 || mxGetN(prhs[3])!=1)
     {

@@ -34,7 +34,6 @@ ModelComponent::ModelComponent(const unsigned int args, const unsigned int altAr
 {
   modelState = ModelState::getInstance();
   robotModel =  modelState->robotModel();
-  int numDof = robotModel->getDoFs();
 
   //int robot_base_frame_link;
   //robotModel->getLinkId ("root", ROBOT_BASE_FRAME_LINK);

@@ -38,7 +38,8 @@ class ModelForwardKinematics : public ModelComponent
 {
 public:
 
-  ~ModelForwardKinematics();
+  virtual ~ModelForwardKinematics();
+  
   static ModelForwardKinematics * getInstance();
 
   /**

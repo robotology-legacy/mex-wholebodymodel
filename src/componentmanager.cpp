@@ -140,18 +140,18 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Requested component not found. Please request a valid component");
   }
   activeComponent = search->second;
-  if(nlhs!=activeComponent->numReturns())
+  if(nlhs!=(int)activeComponent->numReturns())
   {
     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Error in number of returned parameters in requested component, check docs");
   }
-  if(nrhs != (1+activeComponent->numArguments()) && nrhs != (1+activeComponent->numAltArguments()))
+  if(nrhs != (int)(1+activeComponent->numArguments()) && nrhs != (int)(1+activeComponent->numAltArguments()))
   {
      mexPrintf("Requested component uses  uses %d arguments and returns %d items",activeComponent->numArguments(),activeComponent->numReturns());
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Error in number of arguments, check docs");
   }
   activeComponent->allocateReturnSpace(nlhs,plhs);
 
-  if(nrhs == (1+activeComponent->numAltArguments()))
+  if(nrhs == (int)(1+activeComponent->numAltArguments()))
   {
     activeComponent->computeFast(nrhs,prhs);
     returnVal = true;

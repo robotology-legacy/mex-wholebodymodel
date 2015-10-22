@@ -49,7 +49,7 @@ public:
   virtual bool computeFast(int, const mxArray *[]);
   virtual bool allocateReturnSpace(int, mxArray *[]);
 
-  ~ModelJacobian();
+  virtual ~ModelJacobian();
 private:
   ModelJacobian();
   static ModelJacobian* modelJacobian;

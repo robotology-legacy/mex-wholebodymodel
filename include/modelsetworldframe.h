@@ -45,7 +45,7 @@ public:
   virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
 
-  ~ModelSetWorldFrame();
+  virtual ~ModelSetWorldFrame();
 private:
   ModelSetWorldFrame();
   static ModelSetWorldFrame *modelSetWorldFrame;

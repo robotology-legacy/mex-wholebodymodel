@@ -32,13 +32,13 @@ public:
    * and set the instance pointer to NULL.
    */
   static void deleteInstance();
-  
+
   virtual bool allocateReturnSpace(int, mxArray*[]);
   virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
 
 //   virtual bool display(int, const mxArray *[]);
-  ~ModelGeneralisedBiasForces();
+  virtual ~ModelGeneralisedBiasForces();
 
 private:
   ModelGeneralisedBiasForces();

@@ -36,8 +36,7 @@ namespace mexWBIComponent
 class ModelInitialise : public ModelComponent
 {
 public:
-
-  ~ModelInitialise();
+  virtual ~ModelInitialise();
   static ModelInitialise* getInstance();
 
   /**
@@ -45,7 +44,7 @@ public:
    * and set the instance pointer to NULL.
    */
   static void deleteInstance();
-  
+
   //virtual bool display(int, const mxArray *[]);
   virtual bool allocateReturnSpace(int, mxArray *[]);
   virtual bool compute(int, const mxArray *[]);

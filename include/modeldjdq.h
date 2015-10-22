@@ -39,7 +39,7 @@ public:
   virtual bool computeFast(int, const mxArray *[]);
 
     //virtual bool display(int, const mxArray *[]);
-  ~ModelDjDq();
+  virtual ~ModelDjDq();
 
 private:
   ModelDjDq(void);

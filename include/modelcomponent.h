@@ -46,8 +46,7 @@ public:
   const unsigned int numArguments();
   const unsigned int numAltArguments();
 
-
-  ~ModelComponent();
+  virtual ~ModelComponent();
 
 protected:
 
@@ -57,8 +56,8 @@ protected:
   ModelComponent(const unsigned int, const unsigned int, const unsigned int);
 
   const unsigned int numArgs;
-  const unsigned int numAltArgs;
   const unsigned int numRets;
+  const unsigned int numAltArgs;
   wbi::iWholeBodyModel *robotModel;
 
   Eigen::Matrix4d H_w2b;

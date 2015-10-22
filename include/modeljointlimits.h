@@ -32,7 +32,7 @@ class ModelJointLimits : public ModelComponent
 {
 public:
 
-  ~ModelJointLimits();
+  virtual ~ModelJointLimits();
   static ModelJointLimits* getInstance();
 
   /**

@@ -49,8 +49,7 @@ public:
   virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
 
-
-  ~ModelGetState();
+  virtual ~ModelGetState();
 private:
   ModelGetState();
   static ModelGetState *modelGetState;

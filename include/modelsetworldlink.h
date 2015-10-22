@@ -46,7 +46,7 @@ public:
   virtual bool computeFast(int, const mxArray *[]);
   //virtual bool display(int, const mxArray *[]) = 0;
 
-  ~ModelSetWorldLink();
+  virtual ~ModelSetWorldLink();
 private:
   ModelSetWorldLink();
   static ModelSetWorldLink *modelSetWorldLink;

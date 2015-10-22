@@ -45,8 +45,7 @@ public:
   virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
 
-
-  ~ModelUpdateState();
+  virtual ~ModelUpdateState();
 private:
   ModelUpdateState();
   static ModelUpdateState *modelUpdateState;

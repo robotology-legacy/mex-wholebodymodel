@@ -42,7 +42,7 @@ public:
   virtual bool computeFast(int, const mxArray *[]);
   virtual bool allocateReturnSpace(int, mxArray *[]);
 
-  ~ModelMassMatrix();
+  virtual ~ModelMassMatrix();
 private:
  // ModelJointLimits(int = 0, mxArray * = NULL );
   ModelMassMatrix();

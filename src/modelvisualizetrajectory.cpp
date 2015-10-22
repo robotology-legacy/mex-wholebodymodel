@@ -100,8 +100,6 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray* prhs
   double quatVal[4];
   double roll,pitch,yaw;
   double iniTime, finTime,delayTime;
-  int ip = 0;
-  //double qj
 
   wbi::Rotation baseRot;
 
@@ -120,7 +118,8 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray* prhs
     }
 
     baseRot = wbi::Rotation::quaternion(quatVal[0],quatVal[1],quatVal[2],quatVal[3]);
-    baseRot.eulerZYX(roll,pitch,yaw);
+
+    baseRot.getEulerZYX(roll,pitch,yaw);
 
     // 3orientations and 3 positions
     floatingBaseData.addDouble(yaw);
@@ -159,8 +158,8 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray* prhs
       rightArmData.addDouble(qj[ti+i*numTSteps] );
     }
 
-        //padding to make the rest of arms render (minor issue with icubGui non controlled DoF in a port)
-    for(ip =0;i<11;i++)
+    //padding to make the rest of arms render (minor issue with icubGui non controlled DoF in a port)
+    for(size_t j =0; j<11; j++)
     {
      // leftArmData.addDouble(qj[ti*modelState->dof()+i]);
       leftArmData.addDouble(0.0);

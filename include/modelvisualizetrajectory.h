@@ -52,7 +52,7 @@ public:
   virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
 
-  ~ModelVisualizeTrajectory();
+  virtual ~ModelVisualizeTrajectory();
 private:
   ModelVisualizeTrajectory();
   static ModelVisualizeTrajectory *modelVisualizeTrajectory;

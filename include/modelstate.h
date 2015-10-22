@@ -36,7 +36,7 @@ namespace mexWBIComponent
 class ModelState
 {
 public:
-   ~ModelState();
+   virtual ~ModelState();
    static ModelState * getInstance(std::string = "icubGazeboSim");
 
   /**
@@ -70,7 +70,7 @@ public:
    void vb(double *);
 
    void g(double *);
-   int dof();
+   size_t dof();
 
    /**
     * Load a robot model from a yarpWholeBodyInterface
@@ -100,7 +100,7 @@ private:
    //wbi::Frame world_H_root;
    wbi::Frame world_H_reference;
 
-  int numDof;
+  size_t numDof;
   std::string currentRobotName;
   std::string robot_reference_frame_link_name;
 

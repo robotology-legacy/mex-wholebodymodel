@@ -104,6 +104,7 @@ bool ModelSetWorldLink::compute(int nrhs, const mxArray* prhs[])
 
 //    changeWorldFrame(refLinkName,tempFrame);
 //    mexPrintf("Robot base link changed to %s\n",refLinkName.c_str());
+   return true;
 }
 bool ModelSetWorldLink::computeFast(int nrhs, const mxArray* prhs[])
 {
@@ -132,6 +133,8 @@ bool ModelSetWorldLink::computeFast(int nrhs, const mxArray* prhs[])
    //H_baseLink_wrWorld = tempFrame;
    modelState->setReferenceToWorldFrameRotoTrans(tempFrame);
 //    mexPrintf("Roto translation of world from base frame applied \n");
+
+   return true;
 }
 
 

@@ -116,7 +116,7 @@ bool ModelMassMatrix::computeFast(int nrhs, const mxArray* prhs[])
 
 bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
 {
-  int numDof = modelState->dof();
+  size_t numDof = modelState->dof();
 
   if(mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1)
   {
@@ -142,7 +142,7 @@ bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
 
 #ifdef DEBUG
   mexPrintf("qj received \n");
-  for(int i = 0; i< numDof;i++)
+  for(size_t i = 0; i< numDof;i++)
   {
     mexPrintf(" %f",qj[i]);
   }
