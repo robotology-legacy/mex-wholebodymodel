@@ -39,36 +39,48 @@ public:
    ~ModelState();
    static ModelState * getInstance(std::string = "icubGazeboSim");
    bool setState(double *,double*,double*);
-   
+
    //void setBaseFrameLink(int);
    void setReferenceFrameLink(std::string);
    void setReferenceToWorldFrameRotoTrans(wbi::Frame);
    void setRootWorldRotoTranslation(wbi::Frame);
    void setGravity(double *g_temp);
-   
+
    std::string getReferenceFrameLinkName();
    int getReferenceFrameLink(void);
    wbi::Frame getReferenceToWorldFrameRotoTrans(void);
    wbi::Frame getRootWorldRotoTranslation(void);
    wbi::Frame computeRootWorldRotoTranslation(double* q_temp);
-   
+
    double * qj();
    double * qjDot();
    double * vb();
-   
+
    double *g();
-   
+
    void qj(double *);
    void qjDot(double *);
    void vb(double *);
-   
+
    void g(double *);
-//    wbi::Frame rootRotoTrans();
    int dof();
+
+   /**
+    * Load a robot model from a yarpWholeBodyInterface
+    * configuration, specifyng the YARP_ROBOT_NAME
+    */
    void robotModel(std::string);
+
+   /**
+    * Load a robot model from a URDF file path.
+    * Using this function, all the dofs of the URDF
+    * are automatically added to the interface.
+    */
+   void robotModelFromURDF(std::string urdfFileName);
+
    wbi::iWholeBodyModel * robotModel(void);
    std::string robotName(void);
-   
+
 private:
   ModelState(std::string);
   static ModelState * modelState;
@@ -80,15 +92,15 @@ private:
   //wbi::Frame H_referenceLink_wrWorld;
    //wbi::Frame world_H_root;
    wbi::Frame world_H_reference;
-  
+
   int numDof;
   std::string currentRobotName;
   std::string robot_reference_frame_link_name;
-  
+
   static wbi::iWholeBodyModel *robotWBIModel;
-  
+
   bool fixedLinkComputation;
-  
+
   Eigen::Matrix4d H_w2b;
   //wbi::Frame H_base_wrfLink,
   //wbi::Frame xB;
@@ -100,7 +112,7 @@ private:
   wbi::Frame rootLink_H_ReferenceLink;
   wbi::Frame referenceLink_H_rootLink;
   double *gS;
-  
+
 };
 }
 

@@ -19,7 +19,7 @@
 
 //global includes
 
-//library includes 
+//library includes
 #include <wbi/iWholeBodyModel.h>
 // #include <wbiIcub/icubWholeBodyModel.h>
 #include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
@@ -29,7 +29,7 @@
 
 using namespace mexWBIComponent;
 
-ModelMassMatrix * ModelMassMatrix::modelMassMatrix; 
+ModelMassMatrix * ModelMassMatrix::modelMassMatrix;
 
 ModelMassMatrix::ModelMassMatrix(): ModelComponent(3,0,1)
 {
@@ -53,14 +53,16 @@ bool ModelMassMatrix::allocateReturnSpace(int nlhs, mxArray* plhs[])
 //   {
 //      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumOutputs","1 output argument required for massmatrix");
 //   }
+  int numDof = modelState->dof();
+
   plhs[0]=mxCreateDoubleMatrix(numDof+6,numDof+6, mxREAL);
-  
+
   massMatrix = mxGetPr(plhs[0]);
   returnVal = true;
   return(returnVal);
 }
 
-ModelMassMatrix * ModelMassMatrix::getInstance() 
+ModelMassMatrix * ModelMassMatrix::getInstance()
 {
   if(modelMassMatrix == NULL)
   {
@@ -89,25 +91,26 @@ bool ModelMassMatrix::computeFast(int nrhs, const mxArray* prhs[])
   robotModel = modelState->robotModel();
   qj = modelState->qj();
   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
-  //xB = modelState->rootRotoTrans();  
-  
+  //xB = modelState->rootRotoTrans();
+
   if(!robotModel->computeMassMatrix(qj,world_H_rootLink,massMatrix))
   {
     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI MassMatrix call");
   }
 
-  
+
 #ifdef DEBUG
   mexPrintf("ModelMassMatrix computed\n");
 #endif
   return(true);
-  
+
 }
 
 
 
 bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
 {
+  int numDof = modelState->dof();
 
   if(mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1)
   {
@@ -118,7 +121,7 @@ bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
   double *R_temp,*p_temp;
   R_temp = (double *)mxGetPr(prhs[1]);
   p_temp = (double *)mxGetPr(prhs[2]);
-  
+
   double tempR[9],tempP[3];
   for(int i = 0;i<9;i++)
   {
@@ -130,17 +133,17 @@ bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
   }
   wbi::Rotation tempRot(tempR);
   wbi::Frame tempFrame(tempRot, tempP);
-   
+
 #ifdef DEBUG
-  mexPrintf("qj received \n"); 
+  mexPrintf("qj received \n");
   for(int i = 0; i< numDof;i++)
   {
     mexPrintf(" %f",qj[i]);
   }
-#endif  
+#endif
   //int LINK_FOOT_WRF;
   world_H_rootLink = tempFrame;//%modelState->computeRootWorldRotoTranslation(qj);
-  
+
   if(massMatrix != NULL)
   {
      if(!robotModel->computeMassMatrix(qj,world_H_rootLink,massMatrix))
@@ -149,7 +152,7 @@ bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
      }
   }
 //   mxFree(q);
-  return(true);  
+  return(true);
 }
 
 

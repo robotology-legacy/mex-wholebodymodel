@@ -1,1 +1,3 @@
 baseLinkFrameTest;
+disp('Papare')
+initialiseTest;
