@@ -55,6 +55,10 @@ bool isRobotNameAFile(const std::string & robotName)
   {
     return false;
   }
+  else
+  {
+      return false;
+  }
 }
 
 ModelState::ModelState(std::string robotName) : robot_reference_frame_link_name("l_sole"), fixedLinkComputation(false) //: qS[ndof],dqS[ndof],dxbS[ndof]
