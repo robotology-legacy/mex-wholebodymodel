@@ -14,6 +14,7 @@ try
     % in this list. To make a test fail, just raise an exception,
     % for example by checking a condition with an assert
     WBMTests
+    disp('test run')
 catch ME
     warning(ME.identifier,ME.message);
     warning('mex-wholebodymodel matlab tests failed. Exiting matlab.');

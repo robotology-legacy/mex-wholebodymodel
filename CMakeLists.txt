@@ -12,7 +12,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # MATLAB and YARP is searched before adding the different modules because they will be used by all of them
 find_package(YARP        REQUIRED)
 find_package(Matlab REQUIRED
-             MX_LIBRARY)
+             MX_LIBRARY
+             MAIN_PROGRAM)
 
 if(NOT Matlab_FOUND)
     message(FATAL_ERROR "Matlab not found")

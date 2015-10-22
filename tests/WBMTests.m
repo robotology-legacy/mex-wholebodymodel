@@ -1,2 +1,3 @@
 baseLinkFrameTest;
-initialiseFromURDFTest;
+disp('Papare')
+initialiseTest;
