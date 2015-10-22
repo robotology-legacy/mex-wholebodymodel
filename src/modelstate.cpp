@@ -44,12 +44,16 @@ bool isRobotNameAFile(const std::string & robotName)
   // call the robotModelFromURDF , otherwise the usual robotModel
   if( robotName.size() < 4 )
   {
-      return false;
+    return false;
   }
 
   if( robotName[robotName.size()-4] == '.' )
   {
-      return true;
+    return true;
+  }
+  else
+  {
+    return false;
   }
 }
 
