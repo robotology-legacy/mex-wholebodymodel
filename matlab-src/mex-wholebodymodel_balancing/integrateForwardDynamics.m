@@ -20,8 +20,8 @@ addpath('./../');
 %% params for balancing controller
 % the user can set this parameters depending on what he wants to do with
 % the robot
- params.demo_left_and_right      =  0;                                      %either 0 or 1; only for two feet on the ground
- params.QP_solver                =  1;                                      %either 0 or 1
+ params.demo_left_and_right      =  1;                                      %either 0 or 1; only for two feet on the ground
+ params.QP_solver                =  0;                                      %either 0 or 1
  
 % balancing on two feet or one foot
  params.feet_on_ground           =  2;                                      %either 1 or 2
@@ -119,7 +119,7 @@ end
 %% integrate forward dynamics
  disp('starting numerical integration');
  
- options = odeset('RelTol',1e-2,'AbsTol',1e-4);
+ options = odeset('RelTol',1e-4,'AbsTol',1e-4);
    
  [t,chi] = ode15s(forwardDynFunc,params.tStart:params.sim_step:params.tEnd,params.chiInit,options);
 
