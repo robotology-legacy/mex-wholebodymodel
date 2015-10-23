@@ -65,7 +65,9 @@ bool ModelJointLimits::allocateReturnSpace(int nlhs, mxArray* plhs[])
 
 ModelJointLimits::~ModelJointLimits()
 {
+#ifdef DEBUG
   mexPrintf("ModelJointLimits destructed\n");
+#endif
 }
 
 ModelJointLimits* ModelJointLimits::getInstance()
