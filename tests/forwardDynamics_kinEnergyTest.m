@@ -39,9 +39,9 @@ v = [dx_b;omega_W;dqj];
 %[~,T_b,~,~] = wholeBodyModel('get-state');
 
 
-R_b = quaternion2dcm(qt_b);
+w_R_b = quaternion2dcm(qt_b);
 
-wbm_setWorldFrame(R_b,x_b,[0 0 0]');
+wbm_setWorldFrame(w_R_b,x_b,[0 0 0]');
 wbm_updateState(qj,dqj,[dx_b;omega_W]);
 
 M = wbm_massMatrix();
@@ -81,7 +81,8 @@ fc = (JcMinvJct)\(JcMinv*(h-[tau+tauDamp;zeros(6,1)])-dJcDq);
 % expressed in the world frame to the obtain angular velocity in body frame omega_b.
 % This is then used in the quaternion derivative computation.
 
-omega_b = R_b'*omega_W;
+b_R_w = w_R_b';
+omega_b = b_R_w*omega_W;
 dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
 
 dx = [dx_b;dqt_b;dqj];
