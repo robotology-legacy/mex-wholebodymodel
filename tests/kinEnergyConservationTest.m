@@ -51,7 +51,6 @@ function [] = kinEnergyConservationTest( params )
     params.constraintLinkNames = {};
 
     %% no control torques: zero input torques
-    gInit = wbm_generalisedBiasForces(Rtemp,Ptemp,params.qjInit,zeros(params.ndof,1),zeros(6,1));
     params.tau = @(t)zeros(params.ndof,1);
 
     %% setup integration
@@ -88,89 +87,90 @@ function [] = kinEnergyConservationTest( params )
     end
 
     if( params.plot )
+        figure
         plot(t,kinEnergy,'b');
         hold on;
         %plot(t,kinEnergy2,'r');
         xlabel('Time t(sec)');
         ylabel(' (J)');
-        title('Kinetic Energy');
+        title(['Kinetic Energy for ',robotDisplayName]);
     end
 
     kinEnergyMaxErrRel = max(abs(kinEnergy-kinEnergy(1)))/kinEnergy(1);
 
     fprintf('Relative error for energy for model %s: %f\n',robotDisplayName,kinEnergyMaxErrRel);
 
-    if( params.exitOnFailure )
+    if( params.raiseErrorOnFail )
         WBMAssertEqual(kinEnergyMaxErrRel,0,'Kinetic energy is not constant',params.relTol);
     end
 
-    % figure;
-    % plot(t,dqj);
-    % xlabel('Time t(sec)');
-    % ylabel('dqj (rad/sec)');
-    % title('Joint velocities ');
-    %
-    % figure;
-    % plot(t,dx_b);
-    % xlabel('Time t(sec)');
-    % ylabel('(m/sec)');
-    % title('Floating Base translation velocities');
-    %
-    %
-    % figure;
-    % plot(t,omega_W);
-    % xlabel('Time t(sec)');
-    % ylabel(' (m/sec)');
-    % title('Floating Base rotational velocities');
-    %
-    % ddx_b = chiDot(:,1:3);
-    % domega_b = chiDot(:,4:6);
-    % ddqj = chiDot(:,7:7+ndof);
-    %
-    % figure;
-    % plot(t,ddqj);
-    % xlabel('Time t(sec)');
-    % ylabel('(rad/sec^2)');
-    % title('Joint accelerations ');
-    %
-    % figure;
-    % plot(t,ddx_b);
-    % xlabel('Time t(sec)');
-    % ylabel('(m/sec^2)');
-    % title(' Floating Base translation acceleration ');
-    %
-    % figure;
-    % plot(t,domega_b);
-    % xlabel('Time t(sec)');
-    % ylabel('(m/sec^2)');
-    % title('Floating Base angular acceleration');
-    %
-    % figure;
-    % plot(t,gOut);
-    % xlabel('Time t(sec)');
-    % ylabel('mixed units');
-    % title('g');
-    %
-    % figure;
-    % plot(t,hOut);
-    % xlabel('Time t(sec)');
-    % ylabel('mixed units');
-    % title('h');
-    %
-    % figure(1);
-
-    % figure;
-    % plot(t,fc);
-    % xlabel('Time t(sec)');
-    % ylabel('mixed units');
-    % title('fc');
-
-    % plot3(x_b(:,1),x_b(:,2),x_b(:,3));hold on;
-    % plot3(x_b(1,1),x_b(1,2),x_b(1,3),'ro');
-    % grid on;
-    % axis square;
-    % xlabel('X(m)');
-    % ylabel('Y(m)');
-    % zlabel('Z(m)');
+%     figure;
+%     plot(t,dqj);
+%     xlabel('Time t(sec)');
+%     ylabel('dqj (rad/sec)');
+%     title('Joint velocities ');
+% 
+%     figure;
+%     plot(t,dx_b);
+%     xlabel('Time t(sec)');
+%     ylabel('(m/sec)');
+%     title('Floating Base translation velocities');
+% 
+% 
+%     figure;
+%     plot(t,omega_W);
+%     xlabel('Time t(sec)');
+%     ylabel(' (m/sec)');
+%     title('Floating Base rotational velocities');
+% 
+%     ddx_b = chiDot(:,1:3);
+%     domega_b = chiDot(:,4:6);
+%     ddqj = chiDot(:,7:7+ndof);
+% 
+%     figure;
+%     plot(t,ddqj);
+%     xlabel('Time t(sec)');
+%     ylabel('(rad/sec^2)');
+%     title('Joint accelerations ');
+% 
+%     figure;
+%     plot(t,ddx_b);
+%     xlabel('Time t(sec)');
+%     ylabel('(m/sec^2)');
+%     title(' Floating Base translation acceleration ');
+% 
+%     figure;
+%     plot(t,domega_b);
+%     xlabel('Time t(sec)');
+%     ylabel('(m/sec^2)');
+%     title('Floating Base angular acceleration');
+% 
+%     figure;
+%     plot(t,gOut);
+%     xlabel('Time t(sec)');
+%     ylabel('mixed units');
+%     title('g');
+% 
+%     figure;
+%     plot(t,hOut);
+%     xlabel('Time t(sec)');
+%     ylabel('mixed units');
+%     title('h');
+% 
+%     figure(1);
+% 
+%     figure;
+%     plot(t,fc);
+%     xlabel('Time t(sec)');
+%     ylabel('mixed units');
+%     title('fc');
+% 
+%     plot3(x_b(:,1),x_b(:,2),x_b(:,3));hold on;
+%     plot3(x_b(1,1),x_b(1,2),x_b(1,3),'ro');
+%     grid on;
+%     axis square;
+%     xlabel('X(m)');
+%     ylabel('Y(m)');
+%     zlabel('Z(m)');
 
 end

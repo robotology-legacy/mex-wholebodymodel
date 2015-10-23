@@ -16,12 +16,9 @@ function [pos,dcm] = frame2posrot(qT)
 % Genova, Dec 2015
 
 pos = qT(1:3);
-qt_b_mod_s = qT(4);
-qt_b_mod_r = qT(5:end);
+quaternion = qT(4:end);
 
 % Assuming q = [q_real; q_vec]
-
-dcm = zeros(3,3);
-dcm = eye(3) + 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
+dcm = quaternion2dcm(quaternion);
 
 end
