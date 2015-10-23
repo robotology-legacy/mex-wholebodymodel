@@ -1,5 +1,7 @@
 function name = whatname(name_group,k)
 
+% This function assigns names to graphs according to robot's joints
+
 %% Torso names
 a1 = strcmp(name_group,'torso');
 

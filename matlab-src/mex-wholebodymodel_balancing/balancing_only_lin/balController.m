@@ -1,4 +1,4 @@
-function  [tau_ol,f_c, cVisualParam] = balController(t,param,controlParam)
+function  [tau_ol, cVisualParam] = balController(t,param,controlParam)
 
 % this is the main function for the balancing controller. it contains the definition of every
 % parameters necessary for the controller and calls the other functions
@@ -13,6 +13,7 @@ LEFT_RIGHT_FOOT_IN_CONTACT  = param.numConstraints;
 DOF           = param.ndof;
 q             = controlParam.qj;
 qDes          = param.qjInit;
+
 v             = controlParam.v;
 
 M             = controlParam.M;
@@ -23,20 +24,13 @@ Jc            = controlParam.Jc;
 dJcDv         = controlParam.dJcDq;
 J_CoM         = controlParam.Jcom;
 
-pos_feet      = controlParam.pos_feet;
-posLeftFoot   = controlParam.lsole;
-posRightFoot  = controlParam.rsole;
-
 xcom          = controlParam.com(1:3);
 xcomDes       = param.com_ini(1:3);
 
-lfoot_ini     = param.lfoot_ini;
-rfoot_ini     = param.rfoot_ini;
 
 %% gains definition
-[gainsPCOM, gainsDCOM, ~ , impedances_ini, dampings, referenceParams, directionOfOscillation, noOscillationTime,...
- forceFrictionCoefficient, numberOfPoints, torsionalFrictionCoefficient,...
- footSize, fZmin, increasingRatesImp, qTildeMax] = gains (DOF,LEFT_RIGHT_FOOT_IN_CONTACT,DEMO_LEFT_AND_RIGHT);
+[gainsPCOM, gainsDCOM, ~, impedances_ini, dampings, referenceParams, directionOfOscillation, noOscillationTime,...
+ ~, ~, ~, ~, ~, increasingRatesImp, qTildeMax] = gains (DOF,LEFT_RIGHT_FOOT_IN_CONTACT,DEMO_LEFT_AND_RIGHT);
 
 %% com trajectory generator
 desired_x_dx_ddx_CoM = generTraj (xcomDes,t,referenceParams,directionOfOscillation,noOscillationTime);
@@ -56,13 +50,13 @@ qMax=0;
 impedances = nonLinImp (qDes,q,qMin,qMax,impedances_ini,increasingRatesImp,qTildeMax);
 
 %% constraints at foot
-[~,~]      = constraints (forceFrictionCoefficient,numberOfPoints,torsionalFrictionCoefficient,footSize,fZmin);
+% [ConstraintsMatrix,bVectorConstraints] = constraints (forceFrictionCoefficient,numberOfPoints,torsionalFrictionCoefficient,footSize,fZmin);
 
 %% balancing with noQpcontroller
-[errorCoM, f_c, tau_ol,f0]   =  controllerFCN (LEFT_RIGHT_FOOT_IN_CONTACT, DOF, ...
-                                            q, qDes, v, M, h, posLeftFoot, posRightFoot, Jc, dJcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
-                                            gainsPCOM, gainsDCOM, impedances, dampings, pos_feet, lfoot_ini, rfoot_ini);
-
+[errorCoM, tau_ol, f0]   =  controllerFCN (LEFT_RIGHT_FOOT_IN_CONTACT, DOF, ...
+                                           q, qDes, v, M, h, Jc, dJcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
+                                           gainsPCOM, gainsDCOM, impedances, dampings);
+  
 %%  parameters for the visualization
 cVisualParam.f0    = f0;
 cVisualParam.e_com = errorCoM;

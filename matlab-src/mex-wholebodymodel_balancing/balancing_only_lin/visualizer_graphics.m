@@ -84,7 +84,7 @@ end
 
 end
 
-%%
+%% Torques and CoM
 for k=1:25
 
 figure(8)

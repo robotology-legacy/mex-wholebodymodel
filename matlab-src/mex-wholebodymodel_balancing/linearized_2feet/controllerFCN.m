@@ -1,7 +1,7 @@
 function [tauModel, Sigma, NA, fHdotDesC1C2, errorCoM, f0, tau2]   =  ...
           controllerFCN (LEFT_RIGHT_FOOT_IN_CONTACT, DOF, USE_QP_SOLVER, ConstraintsMatrix, bVectorConstraints,...
           q, qDes, v, M, h, H, posLeftFoot, posRightFoot, footSize, Jc, JcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
-          gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, pos_feet, lfoot_ini, rfoot_ini, xcom0, qDes0)
+          gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, qDes0, xcom0)
 
 % this is the function that computes the desired contact forces and torques
 % at joints. There's also the possibility to use QP program to calculate f0 
@@ -18,12 +18,12 @@ constraints     = LEFT_RIGHT_FOOT_IN_CONTACT;
 %reg             = 0.01;
 
 %% others variables
-gravAcc          = 9.81;
+gravAcc         = 9.81;
 
- m               = M(1,1);
- Mb              = M(1:6,1:6);
- Mbj             = M(1:6,7:end);
-%Mj              = M(7:end,7:end);
+ m              = M(1,1);
+ Mb             = M(1:6,1:6);
+ Mbj            = M(1:6,7:end);
+%Mj             = M(7:end,7:end);
 
 St              = [ zeros(6,ROBOT_DOF);
                     eye(ROBOT_DOF,ROBOT_DOF)];
@@ -62,7 +62,7 @@ if     constraints == 1
 elseif constraints == 2
 
     A      = [AL, AR];
-   
+    
     pinvA  = pinv( A, PINV_TOL);
     
 end
@@ -107,27 +107,7 @@ qTilde           =  q-qDes;
 Sigma            = -(PInv_JcMinvSt*JcMinvJct + NL*JBar);
 SigmaNA          =  Sigma*NA;
 
-%% adding a correction term in the costraint equation
-% this is necessary to reduce the numerical errors in the costraint
-% equation. 
- k_corr_pos = 5;
- k_corr_vel = 2*sqrt(k_corr_pos);
- 
- if     constraints == 1
-     
- pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6))];
- 
- elseif constraints == 2
-     
- pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6));...
-                   (pos_rightFoot-rfoot_ini(1:3));(pos_feet(10:12))];
-               
- end
- 
- tauModel   = PInv_JcMinvSt*(JcMinv*h - JcDv -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet_delta) + ... 
-              NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(impedances)*qTilde - diag(dampings)*qD);
-
-%tauModel   = PInv_JcMinvSt*(JcMinv*h - JcDv) + NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(impedances)*qTilde - diag(dampings)*qD);
+tauModel   = PInv_JcMinvSt*(JcMinv*h - JcDv) + NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(impedances)*qTilde - diag(dampings)*qD);
 
 %% QP solver
 CL               = ConstraintsMatrix; 
@@ -205,12 +185,12 @@ if     constraints == 1
 
 elseif constraints == 2 && USE_QP_SOLVER == 0 
 
-f0                    = -pinv(SigmaNA, PINV_TOL)*(tauModel+Sigma*f_HDot);
+  f0                  = -pinv(SigmaNA, PINV_TOL)*(tauModel+Sigma*f_HDot);
 
 end
 
-%f                         = f_HDot + NA*f0;
-errorCoM                   = xcom - desired_x_dx_ddx_CoM(:,1);
+%f                    = f_HDot + NA*f0;
+errorCoM              = xcom - desired_x_dx_ddx_CoM(:,1);
 
 %% Calculation of tau for the comparison between linear and nonlinear system
 xDDcomStar0       =  - gainsPCOM*(xcom  - xcom0)...
@@ -226,22 +206,15 @@ tauModel0         = PInv_JcMinvSt*(JcMinv*h) + ...
 f02               = -pinv(SigmaNA, PINV_TOL)*(tauModel0+Sigma*pinvA*(HDotDes0 - grav));                
                 
                 
-tau_non_lin       = tauModel0 + Sigma*(pinvA*(HDotDes0 - grav)+NA*f02);
-% tau_non_lin        =NL*(- diag(dampings)*(qD));
+tau_non_lin       = tauModel0 + Sigma*(pinvA*(HDotDes0 - grav) + NA*f02);
+
 load('KS')
 load('KD')
 load('tau_reg')
-
-% + KS*(q-qDes0);% +
 
 tau_lin           = tau_reg + KS*(q-qDes0) + KD*qD;
 
 tau2              = [tau_non_lin tau_lin];
 
+end
 
-
-                
-                
-                
-                
-                

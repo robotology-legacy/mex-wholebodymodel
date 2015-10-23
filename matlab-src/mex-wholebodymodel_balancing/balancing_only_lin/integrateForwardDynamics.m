@@ -60,7 +60,6 @@ addpath('./../../');
  params.omega_bInit = zeros(3,1);
   
 %% Fixing the world reference frame to the ground, not to the left foot 
- 
  wbm_updateState(params.qjInit,params.dqjInit,zeros(6,1));
  
  [qj,T_b,dqj,vb] = wbm_getState();
@@ -70,32 +69,32 @@ addpath('./../../');
  
 % the vector of variables is redefined to integrate also the position of the feet to
 % correct numerical errors
-%  params.chiInit = [T_b;params.qjInit;...
-%                    params.dx_bInit;params.omega_bInit;params.dqjInit];
+% params.chiInit = [T_b;params.qjInit;...
+%                   params.dx_bInit;params.omega_bInit;params.dqjInit];
 
 if     params.feet_on_ground == 2
     
    params.chiInit = [T_b;params.qjInit;...
-                    params.dx_bInit;params.omega_bInit;params.dqjInit; zeros(12,1)];   
+                    params.dx_bInit; params.omega_bInit; params.dqjInit; zeros(12,1)];   
     
 elseif params.feet_on_ground == 1
   
    params.chiInit = [T_b;params.qjInit;...
-                    params.dx_bInit;params.omega_bInit;params.dqjInit; zeros(6,1)];
+                    params.dx_bInit; params.omega_bInit; params.dqjInit; zeros(6,1)];
     
 end
 
 %% contact constraints         
- if     params.feet_on_ground == 2
+if     params.feet_on_ground == 2
      
  params.constraintLinkNames      = {'l_sole','r_sole'}; 
 
- elseif params.feet_on_ground == 1
+elseif params.feet_on_ground == 1
      
 % this is for only for the left foot on the ground
  params.constraintLinkNames      = {'l_sole'}; 
 
- end
+end
 
  params.numConstraints           = length(params.constraintLinkNames);
    
@@ -110,16 +109,18 @@ end
  params.rfoot_ini = wbm_forwardKinematics('r_sole');
  
 %% setup integration
+ params.tStart   = 0;
+ params.tEnd     = 15;   
+ params.sim_step = 0.01;
+ 
+ params.wait     = waitbar(0,'Integration in process...');
+
  forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,params);
     
- params.tStart   = 0;
- params.tEnd     = 10;   
- params.sim_step = 0.01;
-
 %% integrate forward dynamics
  disp('starting numerical integration');
  
- options = odeset('RelTol',1e-6,'AbsTol',1e-6);
+ options = odeset('RelTol',1e-5,'AbsTol',1e-5);
    
  [t,chi] = ode15s(forwardDynFunc,params.tStart:params.sim_step:params.tEnd,params.chiInit,options);
 

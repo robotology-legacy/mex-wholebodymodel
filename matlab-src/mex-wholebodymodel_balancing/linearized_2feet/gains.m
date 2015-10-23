@@ -49,8 +49,8 @@ if LEFT_RIGHT_FOOT_IN_CONTACT == 2
                          
     if (DEMO_LEFT_AND_RIGHT == 1)
         
-        directionOfOscillation = [1;1;1];
-        referenceParams        = [0.00025 0.2];     %referenceParams(1) = amplitude of ascillations in meters
+        directionOfOscillation = [0;1;0];
+        referenceParams        = [0.0015 0.35];     %referenceParams(1) = amplitude of ascillations in meters
     
     end
     
@@ -59,7 +59,7 @@ end
 %% PARAMETERS FOR ONLY ONE FOOT ON THE GROUND
 if  LEFT_RIGHT_FOOT_IN_CONTACT == 1
     
-    gainsPCOM                 = diag([50 50 50]);
+    gainsPCOM                 = diag([50  50 50]);
     gainsDCOM                 = diag([  1    1   1]);
 
     gainMomentum              = 1 ;
@@ -98,7 +98,6 @@ if  LEFT_RIGHT_FOOT_IN_CONTACT == 1
         referenceParams        = [0.00025 0.2];     %referenceParams(1) = amplitude of ascillations in meters
     
     end
-                           
 
 end
 

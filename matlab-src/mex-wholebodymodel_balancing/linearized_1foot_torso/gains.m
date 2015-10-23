@@ -91,7 +91,7 @@ if  LEFT_RIGHT_FOOT_IN_CONTACT == 1
       impRightLeg         = [ 20   20  20  10  10  10
                                0    0   0   0   0   0];
                            
-                           
+                                                      
      if (DEMO_LEFT_AND_RIGHT == 1)
         
         directionOfOscillation = [1;1;1];

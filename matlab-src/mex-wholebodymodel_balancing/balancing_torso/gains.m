@@ -15,7 +15,7 @@ qTildeMax                         = 20*pi/180;
 %% PARAMETERS FOR TWO FEET ON THE GROUND
 if LEFT_RIGHT_FOOT_IN_CONTACT == 2
     
-    gainsPCOM                 = diag([ 1 1 1]);
+    gainsPCOM                 = diag([ 50   50  50]);
     gainsDCOM                 = 2*sqrt(gainsPCOM);
 
     gainMomentum              = 1;

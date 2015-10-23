@@ -1,7 +1,7 @@
-function [tauModel, Sigma, NA, fHdotDesC1C2, errorCoM, f0,f_g,Sigmaf]   =  ...
+function [tauModel, Sigma, NA, fHdotDesC1C2, errorCoM, f0]   =  ...
           controllerFCN (LEFT_RIGHT_FOOT_IN_CONTACT, DOF, USE_QP_SOLVER, ConstraintsMatrix, bVectorConstraints,...
           q, qDes, v, M, h, H, posLeftFoot, posRightFoot, footSize, Jc, JcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
-          gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, pos_feet, lfoot_ini, rfoot_ini, deltaphi)
+          gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, deltaphi)
 
 % this is the function that computes the desired contact forces and torques
 % at joints. There's also the possibility to use QP program to calculate f0 
@@ -18,12 +18,12 @@ constraints     = LEFT_RIGHT_FOOT_IN_CONTACT;
 %reg             = 0.01;
 
 %% others variables
-gravAcc          = 9.81;
+gravAcc         = 9.81;
 
- m               = M(1,1);
- Mb              = M(1:6,1:6);
- Mbj             = M(1:6,7:end);
-%Mj              = M(7:end,7:end);
+ m              = M(1,1);
+ Mb             = M(1:6,1:6);
+ Mbj            = M(1:6,7:end);
+%Mj             = M(7:end,7:end);
 
 St              = [ zeros(6,ROBOT_DOF);
                     eye(ROBOT_DOF,ROBOT_DOF)];
@@ -41,7 +41,7 @@ rotMatRightFoot = Rf(posRightFoot(4:7));
 xDcom           = J_CoM(1:3,:)*v;
 qD              = v(7:end);
 
-xDDcomStar      = 0*desired_x_dx_ddx_CoM(:,3) - gainsPCOM*(xcom  - desired_x_dx_ddx_CoM(:,1))...
+xDDcomStar      = desired_x_dx_ddx_CoM(:,3) - gainsPCOM*(xcom  - desired_x_dx_ddx_CoM(:,1))...
                   - gainsDCOM*(xDcom - desired_x_dx_ddx_CoM(:,2));
 
 Pr              = pos_rightFoot - xcom;   % Application point of the contact force on the right foot w.r.t. CoM
@@ -62,7 +62,7 @@ if     constraints == 1
 elseif constraints == 2
 
     A      = [AL, AR];
-   
+    
     pinvA  = pinv( A, PINV_TOL);
     
 end
@@ -76,7 +76,7 @@ JcMinvJct       = JcMinv*transpose(Jc);
 %PInv_JcMinvSt  = JcMinvSt'/(JcMinvSt*JcMinvSt' + reg*eye(size(JcMinvSt,1)));
 
 %% CoM controller and desired contact forces
-gainOrient      = 0;
+gainOrient      = 1;
 
 HDotDes_w       = -gainMomentum*H(4:end)-gainOrient*deltaphi;
 
@@ -85,8 +85,8 @@ HDotDes         = [  m*xDDcomStar;
                       
 NL              = eye(ROBOT_DOF) - PInv_JcMinvSt*JcMinvSt;
 
-f_HDot          = pinvA*(HDotDes);
-f_g             = -pinvA*grav;
+f_HDot          = pinvA*(HDotDes - grav);
+
 %% corrections for only one foot on the ground
 NA               =  zeros(6);
 
@@ -97,8 +97,7 @@ fHdotDesC1C2     =  f_HDot;
 elseif constraints == 2
     
 NA               =  eye(12,12)-pinvA*A;
-
-NA = zeros(12);
+    
 fHdotDesC1C2     =  f_HDot;
    
 end
@@ -107,34 +106,10 @@ end
 JBar             =  transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));   % multiplier of f in tau0
 qTilde           =  q-qDes;
 
-kk               =  0.05*diag(impedances);
-
 Sigma            = -(PInv_JcMinvSt*JcMinvJct + NL*JBar);
-
-Sigmaf            = -(kk*PInv_JcMinvSt*JcMinvJct + NL*JBar);
 SigmaNA          =  Sigma*NA;
 
-%% adding a correction term in the costraint equation
-% this is necessary to reduce the numerical errors in the costraint
-% equation. 
- k_corr_pos = 5;
- k_corr_vel = 2*sqrt(k_corr_pos);
- 
- if     constraints == 1
-     
- pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6))];
-  
- elseif constraints == 2
-     
- pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6));...
-                   (pos_rightFoot-rfoot_ini(1:3));(pos_feet(10:12))];
-               
- end
- 
- tauModel   = PInv_JcMinvSt*(JcMinv*h - JcDv -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet_delta) + ... 
-              NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(impedances)*qTilde - diag(dampings)*qD);
-
-%tauModel   = PInv_JcMinvSt*(JcMinv*h - JcDv) + NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(impedances)*qTilde - diag(dampings)*qD);
+tauModel   = PInv_JcMinvSt*(JcMinv*h - JcDv) + NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(impedances)*qTilde - diag(dampings)*qD);
 
 %% QP solver
 CL               = ConstraintsMatrix; 
@@ -212,10 +187,12 @@ if     constraints == 1
 
 elseif constraints == 2 && USE_QP_SOLVER == 0 
 
-f0                    = -pinv(SigmaNA, PINV_TOL)*(tauModel+Sigma*f_HDot);
+  f0                  = -pinv(SigmaNA, PINV_TOL)*(tauModel+Sigma*f_HDot);
 
 end
 
-%f                         = f_HDot + NA*f0;
-errorCoM                   = xcom - desired_x_dx_ddx_CoM(:,1);
+%f                    = f_HDot + NA*f0;
+errorCoM              = xcom - desired_x_dx_ddx_CoM(:,1);
+
+
 

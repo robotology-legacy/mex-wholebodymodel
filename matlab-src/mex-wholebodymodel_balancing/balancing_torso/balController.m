@@ -1,4 +1,4 @@
-function  [tau,fc, cVisualParam] = balController(t,param,controlParam)
+function  [tau, cVisualParam] = balController(t,param,controlParam)
 
 % this is the main function for the balancing controller. it contains the definition of every
 % parameters necessary for the controller and calls the other functions
@@ -13,6 +13,7 @@ LEFT_RIGHT_FOOT_IN_CONTACT  = param.numConstraints;
 DOF           = param.ndof;
 q             = controlParam.qj;
 qDes          = param.qjInit;
+
 v             = controlParam.v;
 
 M             = controlParam.M;
@@ -23,19 +24,14 @@ Jc            = controlParam.Jc;
 dJcDv         = controlParam.dJcDq;
 J_CoM         = controlParam.Jcom;
 
-pos_feet      = controlParam.pos_feet;
 posLeftFoot   = controlParam.lsole;
 posRightFoot  = controlParam.rsole;
 
 xcom          = controlParam.com(1:3);
 xcomDes       = param.com_ini(1:3);
 
-lfoot_ini     = param.lfoot_ini;
-rfoot_ini     = param.rfoot_ini;
-
 phi           = controlParam.phi;
 phi0          = param.phi0;
-
 deltaphi      = (phi-phi0).';
 
 %% gains definition
@@ -64,15 +60,14 @@ impedances = nonLinImp (qDes,q,qMin,qMax,impedances_ini,increasingRatesImp,qTild
 [ConstraintsMatrix,bVectorConstraints] = constraints (forceFrictionCoefficient,numberOfPoints,torsionalFrictionCoefficient,footSize,fZmin);
 
 %% balancing with noQpcontroller
-[tauModel,Sigma,NA,fHdotDesC1C2,errorCoM,f0,fg,Sigmaf]   =  ...
+[tauModel,Sigma,NA,fHdotDesC1C2,errorCoM,f0]   =  ...
  controllerFCN   (LEFT_RIGHT_FOOT_IN_CONTACT,DOF,USE_QP_SOLVER,ConstraintsMatrix,bVectorConstraints,...
                   q,qDes,v, M, h, H, posLeftFoot, posRightFoot,footSize, Jc, dJcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
-                  gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, pos_feet, lfoot_ini, rfoot_ini, deltaphi);      
+                  gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, deltaphi);     
   
 %% calculating tau and fc
-fc  = fHdotDesC1C2 + NA*f0;
-
-tau = tauModel + Sigma*fg +Sigmaf*fHdotDesC1C2;
+fc_des  = fHdotDesC1C2 + NA*f0;
+tau     = tauModel + Sigma*fc_des;
 
 %%  parameters for the visualization
 cVisualParam.f0    = f0;

@@ -36,11 +36,11 @@ PINV_TOL    = 1e-10;
 inv_rot     = eye(3)/rot;
 
 %Feet Jacobian
-link_name  = {'l_sole', 'r_sole'};
-n_constr   = 12;
-num_constr = 2;
+link_name   = {'l_sole', 'r_sole'};
+n_constr    = 12;
+num_constr  = 2;
 
-Jc        = zeros(n_constr,n_tot);
+Jc          = zeros(n_constr,n_tot);
 
 for ii=1:num_constr
     
@@ -105,11 +105,11 @@ f1    = -f12*grav -NA*pinvSigmaNA*(pinvL*Jc*g_bar*e3 + NL*D*M*g_bar*e3);
 F     =  pinvL*Jc*Minv + NL*D; 
 f22   =  NA*pinvSigmaNA;
 
-P     = Jc*g_bar*e3 - Jc*Minv*Jct*f1;
-P0    = D*(M*g_bar*e3 - Jct*f1);
+P     =  Jc*g_bar*e3 - Jc*Minv*Jct*f1;
+P0    =  D*(M*g_bar*e3 - Jct*f1);
 
-R1    = F*Jct*f12; 
-R2    = (eye(n_joints) + F*Jct*f22)*NL; 
+R1    =  F*Jct*f12; 
+R2    =  (eye(n_joints) + F*Jct*f22)*NL; 
 
 % Torques at equilibrium
 tau_reg = pinvL*P + NL*P0;
@@ -153,39 +153,11 @@ T          = [T_tilde         zeros(n_base,n_joints);
               zeros(n_joints,n_base), eye(n_joints)];
           
 % vb conversion in dqj
-Jc_b    = Jc(1:n_base, 1:n_base);
-Jc_q    = Jc(1:n_base, n_base+1:end);
+Jc_b       =  Jc(1:n_base, 1:n_base);
+Jc_q       =  Jc(1:n_base, n_base+1:end);
 
-conv_vb = -(eye(n_base)/Jc_b)*Jc_q;
+conv_vb    = -(eye(n_base)/Jc_b)*Jc_q;
 
-Jc2_b       =  Jc(n_base+1:12,1:n_base);
-Jc2_qr_leg  =  Jc(n_base+1:12,26:31);
-
-% global conv_r_leg
-% conv_r_leg  = -(eye(n_base)/Jc2_qr_leg)*Jc2_b*conv_vb;
-% 
-% 
-% % conv_tot  = -eye(12)/Jc_tot*Jc_qtilde;
-% % conv_qjll = conv_tot(7:end,:);
-% % conv_vb   = conv_tot(1:6,:);
-% % % 
-  add = eye(25);
-% %  add(20:end,20:end)=zeros(6);
-%  add(20:end,14:19)=conv_r_leg(:,14:19);
-
-%  add(14:19,20:end)=inv(conv_r_leg(:,14:19));
- 
-%  add(14:19,20:end)=conv_r_leg.';
-% 
-% Jc_tot    =  Jc(1:12,[1:6 19:25]);
-% Jc_qtilde =  Jc(1:12,7:end);
-% 
-% conv_tot  = -eye(12)/Jc_tot*Jc_qtilde;
-% conv_qjll = conv_tot(7:end,:);
-% % conv_vb   = conv_tot(1:6,:);
-% 
-% add = add + [zeros(19,25); conv_qjll];
-          
 % CoM jacobian
 Jcom       = wbm_jacobian(inv_rot,pos,qjDes,'com');
 
@@ -258,7 +230,7 @@ total_Jcom  = Jcom_a_linb*(eye(n_base)/T_tilde)*conv_vb + Jcom_a_linq;
 dqHdot      = [-m*Kp*total_Jcom; zeros(3,n_joints)];
     
 %total stiffness
-KS = dtau_ng -R1*dqHdot -R2*Kimp*add;
+KS = dtau_ng -R1*dqHdot -R2*Kimp;
 save('KS','KS')
 
 %% Others derivatives with respect of velocity
@@ -272,33 +244,7 @@ Hw_der   = Jwb*conv_vb + Jwqj;
 dqDHdot  = [-m*Kd*xD_der; -Kg*Hw_der];
 
 %total damping
-% KD = -0*R1*dqDHdot -R2*Kder*add;
-KD = -R1*dqDHdot -R2*Kder*add;
-
- dMatr_vett     = zeros(n_joints);
- Matr_dvett     = zeros(n_joints);
- 
- Matr           = R2*Kder;
- der_vett       = zeros(1,n_joints);
- 
-% for ii = 1:25
-%     
-%     ei= zeros(25,1);
-%     ei(ii)=1;
-%     eit =ei.';
-%     
-%    for j = 1:n_joints 
-%        
-%    der_vett(j)     =     eit*der_Kder(j);
-%    
-%    end
-% 
-%    Matr_dvett     =  Matr_dvett + Matr(:,ii)*der_vett;
-%    
-% end
-%    
-% KD = -Matr_dvett;
-
+KD = -R1*dqDHdot -R2*Kder;
 save('KD','KD')
 
 %% Positive definite verify 

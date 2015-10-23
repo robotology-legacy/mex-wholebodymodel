@@ -20,7 +20,7 @@ for tt=1:length(t)
 [a,c] = forwardDynamics(t(tt), chi(tt,:).', params);
 
 tau_t     = c.tau;
-tau_lint  = c.tau2;
+tau_lint  = c.tau_lin;
 
 tau     = [tau tau_t];
 tau_lin = [tau_lin tau_lint];

@@ -1,7 +1,7 @@
-function [errorCoM, f_c, tau_ol,f0]   =  ...
+function [errorCoM, tau_ol,f0]   =  ...
           controllerFCN (LEFT_RIGHT_FOOT_IN_CONTACT, DOF, ...
-          q, qDes, v, M, h, posLeftFoot, posRightFoot, Jc, JcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
-          gainsPCOM, gainsDCOM, impedances, dampings, pos_feet, lfoot_ini, rfoot_ini)
+          q, qDes, v, M, h, Jc, JcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
+          gainsPCOM, gainsDCOM, impedances, dampings)
 
 % this is the function that computes the desired contact forces and torques
 % at joints. There's also the possibility to use QP program to calculate f0 
@@ -12,15 +12,12 @@ constraints     = LEFT_RIGHT_FOOT_IN_CONTACT;
  PINV_TOL        = 1e-10;
 %reg             = 0.01;
 
-pos_leftFoot    = posLeftFoot(1:3);
-pos_rightFoot   = posRightFoot(1:3);
-
 %% others variables
 gravAcc          = 9.81;
 
- m               = M(1,1);
- n_joints        = DOF;
- n_base          = 6;
+m               = M(1,1);
+n_joints        = DOF;
+n_base          = 6;
 
 S     = [zeros(n_joints,n_base) eye(n_joints)];
 St    = S.';
@@ -36,7 +33,7 @@ grav            = [ zeros(2,1);
                
 xDcom           = J_CoM(1:3,:)*v;
 qD              = v(7:end);
-qTilde          =  q-qDes;
+qTilde          = q-qDes;
 
 xDDcomStar      = desired_x_dx_ddx_CoM(:,3) - gainsPCOM*(xcom  - desired_x_dx_ddx_CoM(:,1))...
                   - gainsDCOM*(xDcom - desired_x_dx_ddx_CoM(:,2));
@@ -82,13 +79,11 @@ elseif constraints == 2
 end
 
 HDotDes         = m*xDDcomStar;
-                      
 NL              = eye(ROBOT_DOF) - PInv_JcMinvSt*JcMinvSt;
-
 f_HDot          = pinvA*(HDotDes - grav);
 
 %% corrections for only one foot on the ground
-NA               =  zeros(3);
+NA              =  zeros(3);
 
 if     constraints == 1
      
@@ -102,23 +97,6 @@ fl_ini     =  f_HDot;
    
 end
 
-%% adding a correction term in the costraint equation
-% this is necessary to reduce the numerical errors in the costraint
-% equation. 
-k_corr_pos = 5;
-k_corr_vel = 2*sqrt(k_corr_pos);
- 
-if     constraints == 1
-     
-pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6))];
- 
-elseif constraints == 2
-     
-pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6));...
-                  (pos_rightFoot-rfoot_ini(1:3));(pos_feet(10:12))];
-               
-end
-
 %% construction of torques
 Gamma       = -PInv_JcMinvSt*(JcMinv*Jcmt);
 NL_tilde    =  [Gamma NL];
@@ -127,12 +105,12 @@ pinvNL_t2   =  pinv(NL_tilde2, PINV_TOL);
 
 if     constraints == 1
 
-f0                    =  zeros(3,1);
+f0          =  zeros(3,1);
 
 elseif constraints == 2
     
 G           = -PInv_JcMinvSt*JcMinv*Jcft;
-tau_f0      =  PInv_JcMinvSt*(JcMinv*h -JcDv -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet_delta) -PInv_JcMinvSt*(JcMinv*Jcft*fl_ini);
+tau_f0      =  PInv_JcMinvSt*(JcMinv*h -JcDv) -PInv_JcMinvSt*(JcMinv*Jcft*fl_ini);
 post_f0     =  D*(h-Jcft*fl_ini) -diag(impedances)*qTilde -diag(dampings)*qD;
 R           = -D*Jcmt*NA;
 H           =  G + NL_tilde*pinvNL_t2*(R-G);
@@ -144,7 +122,7 @@ end
 
 fl         =  fl_ini + NA*f0;
 
-tau_base   =  PInv_JcMinvSt*(JcMinv*h -JcDv -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet) -PInv_JcMinvSt*(JcMinv*Jcft*fl);
+tau_base   =  PInv_JcMinvSt*(JcMinv*h -JcDv) -PInv_JcMinvSt*(JcMinv*Jcft*fl);
 
 post       =  D*(h-Jcft*fl) -diag(impedances)*qTilde -diag(dampings)*qD;
 
@@ -153,21 +131,7 @@ tau0_tilde =  pinvNL_t2*(post-tau_base);
 %% Definition of torques and contact forces
 
  tau_ol    = tau_base + NL_tilde*tau0_tilde;
-
- if     constraints == 1
-     
- m_c    = tau0_tilde(1:3);
- f_c    = [fl; m_c];
- 
- elseif constraints == 2
-     
- m_c    = tau0_tilde(1:6);
- f_c    = [fl(1:3); m_c(1:3); fl(4:6); m_c(4:6)];
- 
- end
  
  errorCoM  = xcom - desired_x_dx_ddx_CoM(:,1);
  
  end
- 
- 
