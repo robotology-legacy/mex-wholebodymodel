@@ -13,7 +13,7 @@ params.raiseErrorOnFail = true;
 params.relTol = 1e-3;
 
 % params duration of simulation (in seconds)
-params.simulationLengthInSecs = 150;
+params.simulationLengthInSecs = 1;
 
 % models
 
