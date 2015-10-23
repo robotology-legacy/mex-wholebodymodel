@@ -35,26 +35,13 @@ dqj = chi(ndof+14:2*ndof+13,:);
 v = [dx_b;omega_W;dqj];
 
 %% MexWholeBodyModel calls
-
-
-wbm_updateState(qj,dqj,[dx_b;omega_W]);
-
 %reconstructing rotation of root to world from the quaternion
 %[~,T_b,~,~] = wholeBodyModel('get-state');
 
-%righting quaternion ordering to [real;imaginary]^T since get-state
-%returns the opposite ordering
-%qt_b_mod = [T_b(7);T_b(4:6)];
-%qt_b_mod_s = T_b(7);
-%qt_b_mod_r = T_b(4:6);
 
-qt_b_mod_s = qt_b(1);
-qt_b_mod_r = qt_b(2:end);
-R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
-
+R_b = quaternion2dcm(qt_b);
 
 wbm_setWorldFrame(R_b,x_b,[0 0 0]');
-
 wbm_updateState(qj,dqj,[dx_b;omega_W]);
 
 M = wbm_massMatrix();
@@ -90,11 +77,11 @@ tauDamp = -param.dampingCoeff*dqj;
 
 fc = (JcMinvJct)\(JcMinv*(h-[tau+tauDamp;zeros(6,1)])-dJcDq);
 
-% need to apply root-to-world rotation to the spatial angular velocity omega_W to
-% obtain angular velocity in body frame omega_b. This is then used in the
-% quaternion derivative computation.
+% need to apply the inverse of the {}^w R_b (R_b) to the angular velocity omega_W
+% expressed in the world frame to the obtain angular velocity in body frame omega_b.
+% This is then used in the quaternion derivative computation.
 
-omega_b = R_b*omega_W;% R_b*omega_W;
+omega_b = R_b*omega_W;
 dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
 
 dx = [dx_b;dqt_b;dqj];
