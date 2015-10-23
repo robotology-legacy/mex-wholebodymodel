@@ -1,13 +1,13 @@
 function [pos,dcm] = frame2posrot(qT)
 %FRAME2POSROT Converts the frame returned from standing pose wholeBodyModel into
 %individual positions and the DCM rotation matrix
-%   Arguments : 
-%   Normal Mode :  
+%   Arguments :
+%   Normal Mode :
 %               qT - (7 X 1) frame returned by whole body model
 %               get-state (3 post followed by quaternion with real first)
-%   Returns :   
-%               x - position x 
-%               y - position y     
+%   Returns :
+%               x - position x
+%               y - position y
 %               z - position z
 %               dcm - Discrete Cosine Matrix (Rotation matrix 3 X 3)
 %

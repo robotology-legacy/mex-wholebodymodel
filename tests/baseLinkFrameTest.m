@@ -42,13 +42,12 @@ fprintf('Prior rotation \n');
 disp(rot);
 fprintf('Prior rotation check (R^T*R)\n');
 disp(rot'*rot);
-fprintf('Prior frame \n');
-disp(T_b');
-fprintf('Prior quaternion norm \n');
-disp(norm(T_b(4:end)));
+%fprintf('Prior frame \n');
+%disp(T_b');
+%fprintf('Prior quaternion norm \n');
+%disp(norm(T_b(4:end)));
 
-fprintf('Converting to a set world frame... \n');
-
+% fprintf('Converting to a set world frame... \n');
 wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
 
 [qj,T_b_Got,dqj,vb] = wbm_getState();
@@ -58,13 +57,13 @@ fprintf('Post convertion rotation \n');
 disp(rotGot);
 WBMAssertEqual(posGot,pos);
 WBMAssertEqual(rotGot,rot);
-fprintf('Post conversion rotation check (R^T*R)\n');
-disp(rotGot'*rotGot);
+% fprintf('Post conversion rotation check (R^T*R)\n');
+% disp(rotGot'*rotGot);
 WBMAssertEqual(rotGot'*rotGot,eye(3,3));
-fprintf('Post conversion frame \n');
-disp(T_b_Got');
+% fprintf('Post conversion frame \n');
+% disp(T_b_Got');
 WBMAssertEqual(T_b_Got,T_b);
-fprintf('Post conversion quaternion norm \n');
-disp(norm(T_b_Got(4:end)));
+% fprintf('Post conversion quaternion norm \n');
+% disp(norm(T_b_Got(4:end)));
 WBMAssertEqual(norm(T_b_Got(4:end)),1);
 
