@@ -81,7 +81,7 @@ fc = (JcMinvJct)\(JcMinv*(h-[tau+tauDamp;zeros(6,1)])-dJcDq);
 % expressed in the world frame to the obtain angular velocity in body frame omega_b.
 % This is then used in the quaternion derivative computation.
 
-omega_b = R_b*omega_W;
+omega_b = R_b'*omega_W;
 dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
 
 dx = [dx_b;dqt_b;dqj];
