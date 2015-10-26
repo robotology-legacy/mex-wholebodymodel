@@ -27,44 +27,39 @@
 
 #include <wbi/wbiUtil.h>
 
-// #include <boost/concept_check.hpp>
 #include <Eigen/Core>
-// #include<wbiIcub/icubWholeBodyModel.h>
 
 #include "modelstate.h"
 
 namespace mexWBIComponent{
-  
+
 class ModelComponent{
 public:
-  
   static ModelComponent* getInstance();
-  
+
   virtual bool allocateReturnSpace(int, mxArray*[]) = 0;
   virtual bool compute(int, const mxArray *[]) = 0;
   virtual bool computeFast(int, const mxArray *[]) = 0;
   //virtual bool display(int, const mxArray *[]) = 0;
-  
+
   const unsigned int numReturns();
   const unsigned int numArguments();
   const unsigned int numAltArguments();
-  
-   
-  ~ModelComponent();
-  
+
+  virtual ~ModelComponent();
+
 protected:
-  
- // bool setState(double * , double * , double *, wbi::Frame);  
+
+ // bool setState(double * , double * , double *, wbi::Frame);
 //   bool changeWorldFrame(std::string,wbi::Frame);
 //   wbi::Frame computeRootWorldRotoTranslation(double *);
-  ModelComponent(const unsigned int, const unsigned int, const unsigned int);  
-  int numDof;
-  
+  ModelComponent(const unsigned int, const unsigned int, const unsigned int);
+
   const unsigned int numArgs;
-  const unsigned int numAltArgs;
   const unsigned int numRets;
+  const unsigned int numAltArgs;
   wbi::iWholeBodyModel *robotModel;
-  
+
   Eigen::Matrix4d H_w2b;
   //wbi::Frame H_base_wrfLink,
   //wbi::Frame xB;
@@ -75,10 +70,10 @@ protected:
   wbi::Frame world_H_rootLink;
 //   wbi::Frame rootLink_H_ReferenceLink;
 //   wbi::Frame referenceLink_H_rootLink;
-  
+
   //ROBOT_BASE_FRAME_LINK;
   ModelState *modelState;
-  
+
 };
 
 

@@ -103,11 +103,11 @@ controlParam.dJcDq   = dJcDq;
 
 if param.feet_on_ground == 1
     
-controlParam.pos_feet = chi(64:69,:);
+pos_feet = chi(64:69,:);
 
 elseif param.feet_on_ground == 2
 
-controlParam.pos_feet = chi(64:75,:);
+pos_feet = chi(64:75,:);
 
 end
 
@@ -117,13 +117,47 @@ controlParam.com     = wbm_forwardKinematics(R_binv,x_b,qj,'com');
 controlParam.Jcom    = wbm_jacobian(R_binv,x_b,qj,'com');
 
 %% control torque and contact forces calculated using the balancing controller
-[tau, fc, cVisualParam] = balController(t,param,controlParam);
+[tau, cVisualParam] = balController(t,param,controlParam);
   
 %% Contact forces computation
+M_inv = eye(ndof+6)/M;
+Jct   = Jc.';
+St    =  [ zeros(6,ndof);
+           eye(ndof,ndof)];
+
+JcMinvJct = Jc*M_inv*Jct;
+JcMinv    = Jc*M_inv;
+JcMinvSt  = Jc*M_inv*St;
+
+% adding a correction term in the costraint equation
+% this is necessary to reduce the numerical errors in the costraint
+% equation. 
+ k_corr_pos = 5;
+ k_corr_vel = 2*sqrt(k_corr_pos);
+ 
+ lfoot_ini     = param.lfoot_ini;
+ rfoot_ini     = param.rfoot_ini;
+ 
+ pos_leftFoot   = controlParam.lsole(1:3);
+ pos_rightFoot  = controlParam.rsole(1:3);
+ 
+ if     param.numConstraints == 1
+     
+ pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6))];
+ 
+ elseif param.numConstraints == 2
+     
+ pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6));...
+                   (pos_rightFoot-rfoot_ini(1:3));(pos_feet(10:12))];
+               
+ end
+
+fc    = (eye(6*param.numConstraints)/JcMinvJct)*(JcMinv*h -JcMinvSt*tau -dJcDq  -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet_delta);
+
+%%
 % need to apply root-to-world rotation to the spatial angular velocity omega_W to
 % obtain angular velocity in body frame omega_b. This is then used in the
 % quaternion derivative computation.
-
 omega_b = R_binv*omega_W;                               
 dqt_b   = quaternionDerivative(omega_b, qt_b);       
 

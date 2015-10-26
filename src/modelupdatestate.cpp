@@ -39,7 +39,7 @@ ModelUpdateState::ModelUpdateState() : ModelComponent(3,3,0)
 #ifdef DEBUG
   mexPrintf("ModelUpdateState constructed \n");
 #endif
-  
+
 }
 
 ModelUpdateState * ModelUpdateState::getInstance()
@@ -48,14 +48,20 @@ ModelUpdateState * ModelUpdateState::getInstance()
   {
     modelUpdateState = new ModelUpdateState;
   }
-  
+
   return(modelUpdateState);
 }
 
+void ModelUpdateState::deleteInstance()
+{
+  deleteObject(&modelUpdateState);
+}
 
 ModelUpdateState::~ModelUpdateState()
 {
-
+#ifdef DEBUG
+  mexPrintf("ModelUpdateState destructed\n");
+#endif
 }
 
 bool ModelUpdateState::compute(int nrhs, const mxArray *prhs[])
@@ -81,7 +87,7 @@ bool ModelUpdateState::computeFast(int nrhs, const mxArray *prhs[])
 
 bool ModelUpdateState::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
-  
+
 #ifdef DEBUG
   mexPrintf("Trying to allocate memory in ModelUpdateState (nothing to do really)\n");
 #endif
@@ -91,6 +97,8 @@ bool ModelUpdateState::allocateReturnSpace(int nlhs, mxArray* plhs[])
 
 bool ModelUpdateState::setState(int nrhs, const mxArray* prhs[])
 {
+    size_t numDof = modelState->dof();
+
     if(mxGetM(prhs[1])!=numDof || mxGetN(prhs[1])!=1 || mxGetM(prhs[2])!=numDof ||mxGetN(prhs[2])!=1 || mxGetM(prhs[3])!=6 || mxGetN(prhs[3])!=1)
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions / inputs");
@@ -102,15 +110,13 @@ bool ModelUpdateState::setState(int nrhs, const mxArray* prhs[])
      double *q_temp,*dq_temp,*dxb_temp;
       q_temp = (double *)mxGetPr(prhs[1]);
       dq_temp = (double *)mxGetPr(prhs[2]);
-      dxb_temp = (double *)mxGetPr(prhs[3]);        
-     
+      dxb_temp = (double *)mxGetPr(prhs[3]);
+
       modelState->setState(q_temp,dq_temp,dxb_temp);
-            
+
 #ifdef DEBUG
       mexPrintf("Updated state : (q,dq)\n");
 
-      int numDof = modelState->dof();
-      
       mexPrintf("Updated State\n");
 #endif
   return(true);

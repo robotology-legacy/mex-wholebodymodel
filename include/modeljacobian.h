@@ -33,22 +33,29 @@ namespace mexWBIComponent{
 class ModelJacobian : public ModelComponent
 {
 public:
-  
-  
+
+
   static ModelJacobian* getInstance();
+
+  /**
+   * Delete the (static) instance of this component,
+   * and set the instance pointer to NULL.
+   */
+  static void deleteInstance();
+
 //   virtual const int numReturns();
 //   virtual bool display(int, const mxArray *[]);
-  virtual bool compute(int, const mxArray *[]);  
+  virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
   virtual bool allocateReturnSpace(int, mxArray *[]);
 
-  ~ModelJacobian();  
+  virtual ~ModelJacobian();
 private:
   ModelJacobian();
-  static ModelJacobian* modelJacobian; 
-  
+  static ModelJacobian* modelJacobian;
+
   bool processArguments(int, const mxArray *[]);
-  
+
 //<<<<<< HEAD
   double *j_colMajor;
   double *j_rowMajor;//[6*(6+MEX_WBMODEL_MAX_NUM_JOINTS)];
@@ -58,7 +65,7 @@ private:
 // >>>>>>> 2079d9e9aecaad2016bf292be94bc8c6b2688f1a
   double *qj;
   char * refLink;
-  
+
 };
 }
 #endif // MODELJACOBIAN_H

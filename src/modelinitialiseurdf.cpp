@@ -19,44 +19,46 @@
  *
  */
 
-#include "modelinitialise.h"
+#include "modelinitialiseurdf.h"
 
 using namespace mexWBIComponent;
 
-ModelInitialise * ModelInitialise::modelInitialise;
+ModelInitialiseURDF * ModelInitialiseURDF::modelInitialiseURDF;
 
-ModelInitialise::ModelInitialise() : ModelComponent(1,0,0)
+ModelInitialiseURDF::ModelInitialiseURDF() : ModelComponent(1,0,0)
 {
 
 }
 
-ModelInitialise::~ModelInitialise()
+ModelInitialiseURDF::~ModelInitialiseURDF()
 {
-
+#ifdef DEBUG
+  mexPrintf("ModelInitialiseURDF destructed");
+#endif
 }
 
-bool ModelInitialise::allocateReturnSpace(int, mxArray*[])
+bool ModelInitialiseURDF::allocateReturnSpace(int, mxArray*[])
 {
   // nothing to do really
   return(true);
 }
 
-ModelInitialise* ModelInitialise::getInstance()
+ModelInitialiseURDF* ModelInitialiseURDF::getInstance()
 {
-  if(modelInitialise == NULL)
+  if(modelInitialiseURDF == NULL)
   {
-    modelInitialise = new ModelInitialise();
+    modelInitialiseURDF = new ModelInitialiseURDF();
   }
-  return(modelInitialise);
+  return(modelInitialiseURDF);
 }
 
-void ModelInitialise::deleteInstance()
+void ModelInitialiseURDF::deleteInstance()
 {
-  deleteObject(&modelInitialise);
+  deleteObject(&modelInitialiseURDF);
 }
 
 
-bool ModelInitialise::compute(int nrhs, const mxArray* prhs[])
+bool ModelInitialiseURDF::compute(int nrhs, const mxArray* prhs[])
 {
 
   if(!mxIsChar(prhs[1]))
@@ -70,7 +72,7 @@ bool ModelInitialise::compute(int nrhs, const mxArray* prhs[])
 
   if(rName.compare(modelState->robotName())!=0)
   {
-    modelState->robotModel(rName);
+    modelState->robotModelFromURDF(rName);
   }
 
   mexPrintf("Robot name %s and World Reference Frame set about %s \n",(modelState->robotName()).c_str(),(modelState->getReferenceFrameLinkName()).c_str());
@@ -78,7 +80,7 @@ bool ModelInitialise::compute(int nrhs, const mxArray* prhs[])
 
 }
 
-bool ModelInitialise::computeFast(int nrhs, const mxArray* prhs[])
+bool ModelInitialiseURDF::computeFast(int nrhs, const mxArray* prhs[])
 {
   // nothing to do really
   return(true);

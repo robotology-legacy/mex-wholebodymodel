@@ -19,21 +19,26 @@
  *
  */
 
-#ifndef MODELSETWORLDLINK_H
-#define MODELSETWORLDLINK_H
+#ifndef MODELINITIALISEURDF_H
+#define MODELINITIALISEURDF_H
 
-// global includes
+// Global Includes
 
-// library includes
+// Library Includes
+#include <wbi/iWholeBodyModel.h>
 
-// local includes
-# include "modelcomponent.h"
+// Local Includes
+#include "modelcomponent.h"
 
-namespace mexWBIComponent{
-class ModelSetWorldLink : public ModelComponent
+namespace mexWBIComponent
+{
+
+class ModelInitialiseURDF : public ModelComponent
 {
 public:
-  static ModelSetWorldLink* getInstance();
+
+  virtual ~ModelInitialiseURDF();
+  static ModelInitialiseURDF* getInstance();
 
   /**
    * Delete the (static) instance of this component,
@@ -41,17 +46,17 @@ public:
    */
   static void deleteInstance();
 
-  virtual bool allocateReturnSpace(int, mxArray*[]);
+  //virtual bool display(int, const mxArray *[]);
+  virtual bool allocateReturnSpace(int, mxArray *[]);
   virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
-  //virtual bool display(int, const mxArray *[]) = 0;
 
-  virtual ~ModelSetWorldLink();
+
+
 private:
-  ModelSetWorldLink();
-  static ModelSetWorldLink *modelSetWorldLink;
-
+  ModelInitialiseURDF();
+  static ModelInitialiseURDF* modelInitialiseURDF;
 };
-}
 
-#endif // MODELSETWORLDLINK_H
+}
+#endif // MODELINITIALISEURDF_H

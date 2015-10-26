@@ -2,21 +2,21 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  *  Authors: Naveen Kuppuswamy
  *  email: naveen.kuppuswamy@iit.it
- * 
+ *
  *  The development of this software was supported by the FP7 EU projects
  *  CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
  *  http://www.codyco.eu
- * 
+ *
  *  Permission is granted to copy, distribute, and/or modify this program
  *  under the terms of the GNU General Public License, version 2 or any
  *  later version published by the Free Software Foundation.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  *  Public License for more details
- *  
- * 
+ *
+ *
  */
 
 // global includes
@@ -54,6 +54,12 @@ ModelGetState* ModelGetState::getInstance()
   return(modelGetState);
 }
 
+void ModelGetState::deleteInstance()
+{
+  deleteObject(&modelGetState);
+}
+
+
 
 bool ModelGetState::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
@@ -66,25 +72,28 @@ bool ModelGetState::allocateReturnSpace(int nlhs, mxArray* plhs[])
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumOutputs","4 output arguments required for ModelGetState");
   }
-  
+
 //   if(mxGetM(plhs[0]) != numDof || mxGetN(plhs[0]) != 1 || mxGetM(plhs[1]) != 7 || mxGetN(plhs[1]) != 1 )
 //   {
 //      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
 //   }
 
+  int numDof = modelState->dof();
+
+
     //p[0] =  mxCreateNumericMatrix(numDof, 1, mxDOUBLE_CLASS, mxREAL);//
   plhs[0]=mxCreateDoubleMatrix(numDof,1, mxREAL); //qj
   plhs[1]=mxCreateDoubleMatrix(7,1, mxREAL); //wTb
   plhs[2]=mxCreateDoubleMatrix(numDof,1, mxREAL); //qjDot
-  plhs[3]=mxCreateDoubleMatrix(6,1, mxREAL); //vb 
-  
-  returnVal = true;  
-  
+  plhs[3]=mxCreateDoubleMatrix(6,1, mxREAL); //vb
+
+  returnVal = true;
+
   qj = mxGetPr(plhs[0]);
   wTb = mxGetPr(plhs[1]);
   qjDot = mxGetPr(plhs[2]);
   vb = mxGetPr(plhs[3]);
-  
+
   returnVal = true;
   return(returnVal);
 }
@@ -92,12 +101,12 @@ bool ModelGetState::allocateReturnSpace(int nlhs, mxArray* plhs[])
 bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
 {
   int i;
-  
+
 #ifdef DEBUG
   mexPrintf("ModelGetState performing Compute");
 #endif
   //double *qjTemp;//qjTemp[numDof];
- 
+
   //qj = modelState->qj();
   modelState->qj(qj);
 //  qjDot = modelState->qjDot();
@@ -105,23 +114,18 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
   //rootRotoTrans = modelState->rootRotoTrans();
   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
 //   modelState->computeRootWorldRotoTranslation(qj);
-  
+
 #ifdef DEBUG
 
   mexPrintf("Inside getState\nRootWorldRotoTrans\n");
-  
+
   mexPrintf("world_H_root\n");
   mexPrintf((world_H_rootLink.R.toString()).c_str());
   mexPrintf(" = \n");
-  
+
   mexPrintf("world_H_ReferenceLink\n");
   mexPrintf(( (modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str());
-  
-  mexPrintf("\n X \n");
-  
-  mexPrintf("referenceLink_H_RootLink\n");
-  mexPrintf((referenceLink_H_rootLink.R.toString()).c_str());
-  
+
   mexPrintf("\n\n");
 
 #endif
@@ -132,10 +136,10 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
       std::stringstream ssR;
     ssR<<"Quat : ["<<rootQuaternion[0]<<","<<rootQuaternion[1]<<","<<rootQuaternion[2]<<","<<rootQuaternion[3]<<"]\n";
     std::string sR = ssR.str();
-    
+
     mexPrintf(sR.c_str());
 #endif
-    
+
     for (i = 0; i<3 ; i++)
   {
     wTb[i] = world_H_rootLink.p[i];
@@ -144,7 +148,7 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
   {
     wTb[3+i] = rootQuaternion[i];
   }
-  
+
  // qjDot = modelState->qjDot();
  // vb = modelState->vb();
   modelState->qjDot(qjDot);
@@ -155,54 +159,49 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
     mexPrintf("ModelGetState qj[%d] : %2.2f, qjDot[%d] : %2.2f\n",i,qj[i],i,qjDot[i]);
   }
   */
-  
+
   return true;
 }
 
 bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
 {
   int i;
-  
+
 #ifdef DEBUG
   mexPrintf("ModelGetState performing Compute");
 #endif
-  
+
   //qj = modelState->qj();
   modelState->qj(qj);
   //rootRotoTrans = computeRootWorldRotoTranslation(qj);
-  
+
  // world_H_rootLink = computeRootWorldRotoTranslation(qj);
 
   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
 #ifdef DEBUG
   mexPrintf("Inside getState\nRootWorldRotoTrans\n");
-  
+
   mexPrintf("world_H_root\n");
   mexPrintf((world_H_rootLink.R.toString()).c_str());
   mexPrintf(" = \n");
-  
+
   mexPrintf("world_H_ReferenceLink\n");
   mexPrintf(( (modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str());
-  
-  mexPrintf("\n X \n");
-  
-  mexPrintf("referenceLink_H_RootLink\n");
-  mexPrintf((referenceLink_H_rootLink.R.toString()).c_str());
-  
+
   mexPrintf("\n\n");
-  //rootQuaternion = 
+  //rootQuaternion =
 #endif
 
   (modelState->getRootWorldRotoTranslation()).R.getQuaternion(rootQuaternion[1], rootQuaternion[2], rootQuaternion[3], rootQuaternion[0]);
 #ifdef DEBUG
   //wbi::Rotation::getQuaternion(rootRotoTrans.R);
-  
+
       std::stringstream ssR;
     ssR<<"Quat : ["<<rootQuaternion[0]<<","<<rootQuaternion[1]<<","<<rootQuaternion[2]<<","<<rootQuaternion[3]<<"]\n";
     std::string sR = ssR.str();
     mexPrintf(sR.c_str());
 #endif
-    
+
   for (i = 0; i<3 ; i++)
   {
     wTb[i] = world_H_rootLink.p[i];
@@ -211,14 +210,14 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
   {
     wTb[3+i] = rootQuaternion[i];
   }
-  
+
   //qjDot = modelState->qjDot();
   //vb = modelState->vb();
 
   modelState->qjDot(qjDot);
   modelState->vb(vb);
   /*
-  
+
   for(int i = 0 ; i< numDof; i++)
   {
     mexPrintf("ModelGetState qj[%d] : %2.2f, qjDot[%d] : %2.2f\n",i,qj[i],i,qjDot[i]);

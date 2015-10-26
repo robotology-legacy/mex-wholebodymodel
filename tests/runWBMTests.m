@@ -15,7 +15,7 @@ try
     % for example by checking a condition with an assert
     WBMTests
 catch ME
-    warning(ME.identifier,ME.message);
+    disp(getReport(ME,'extended'));
     warning('mex-wholebodymodel matlab tests failed. Exiting matlab.');
     exit(1)
 end

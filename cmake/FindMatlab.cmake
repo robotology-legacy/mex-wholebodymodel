@@ -55,7 +55,7 @@
 # returning an exit code can be used as well (0 indicating a success).
 #
 # Module Input Variables
-# ----------------------
+# ^^^^^^^^^^^^^^^^^^^^^^
 #
 # Users or projects may set the following variables to configure the module
 # behaviour:
@@ -69,10 +69,10 @@
 #   versions.
 #
 # Variables defined by the module
-# -------------------------------
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # Result variables
-# ^^^^^^^^^^^^^^^^
+# """"""""""""""""
 #
 # ``Matlab_FOUND``
 #   ``TRUE`` if the Matlab installation is found, ``FALSE``
@@ -100,7 +100,7 @@
 #   Available only if the component ``MEX_COMPILER`` is asked
 #
 # Cached variables
-# ^^^^^^^^^^^^^^^^
+# """"""""""""""""
 #
 # ``Matlab_MEX_EXTENSION``
 #   the extension of the mex files for the current platform (given by Matlab).
@@ -109,7 +109,7 @@
 #   is changed by the user, the result variables are recomputed.
 #
 # Provided macros
-# ---------------
+# ^^^^^^^^^^^^^^^
 #
 # :command:`matlab_get_version_from_release_name`
 #   returns the version from the release name
@@ -117,7 +117,7 @@
 #   returns the release name from the Matlab version
 #
 # Provided functions
-# ------------------
+# ^^^^^^^^^^^^^^^^^^
 #
 # :command:`matlab_add_mex`
 #   adds a target compiling a MEX file.
@@ -134,11 +134,12 @@
 #   returns the suffix to be used for the mex files
 #   (platform/architecture dependant)
 # :command:`matlab_get_version_from_matlab_run`
-#   returns the version of Matlab, given the full directory of the Matlab program.
+#   returns the version of Matlab, given the full directory of the Matlab
+#   program.
 #
 #
 # Known issues
-# ------------
+# ^^^^^^^^^^^^
 #
 # **Symbol clash in a MEX target**
 #   By default, every symbols inside a MEX
@@ -165,7 +166,7 @@
 #
 #
 # Reference
-# --------------
+# ^^^^^^^^^
 #
 # .. variable:: Matlab_ROOT_DIR
 #
@@ -228,6 +229,7 @@ if(NOT MATLAB_ADDITIONAL_VERSIONS)
 endif()
 
 set(MATLAB_VERSIONS_MAPPING
+  "R2015b=8.6"
   "R2015a=8.5"
   "R2014b=8.4"
   "R2014a=8.3"
@@ -918,7 +920,7 @@ function(matlab_add_mex )
       PROPERTIES
         CXX_VISIBILITY_PRESET "hidden"
         C_VISIBILITY_PRESET "hidden"
-        VISIBILITY_INLINES_HIDDEN "hidden"
+        VISIBILITY_INLINES_HIDDEN ON
     )
 
     #  get_target_property(
@@ -1064,7 +1066,7 @@ if(Matlab_ROOT_DIR)
     endif()
   else()
     # NOTFOUND indicates the code below to search for the version automatically
-    if(NOT DEFINED Matlab_VERSION_STRING_INTERNAL)
+    if("${Matlab_VERSION_STRING_INTERNAL}" STREQUAL "")
       list(APPEND _matlab_possible_roots "NOTFOUND" ${Matlab_ROOT_DIR}) # empty version
     else()
       list(APPEND _matlab_possible_roots ${Matlab_VERSION_STRING_INTERNAL} ${Matlab_ROOT_DIR}) # cached version
@@ -1159,8 +1161,8 @@ if(_numbers_of_matlab_roots EQUAL 0)
 
     # get the directory (the command below has to be run twice)
     # this will be the matlab root
-    get_filename_component(_matlab_current_location "${_matlab_current_location}" PATH)
-    get_filename_component(_matlab_current_location "${_matlab_current_location}" PATH) # Matlab should be in bin
+    get_filename_component(_matlab_current_location "${_matlab_current_location}" DIRECTORY)
+    get_filename_component(_matlab_current_location "${_matlab_current_location}" DIRECTORY) # Matlab should be in bin
 
     list(APPEND _matlab_possible_roots "NOTFOUND" ${_matlab_current_location})
 

@@ -29,20 +29,25 @@ namespace mexWBIComponent{
 class ModelMassMatrix : public ModelComponent
 {
 public:
-  
+
   static ModelMassMatrix* getInstance();
-//   virtual bool display(int, const mxArray *[]);
-  
-  virtual bool compute(int, const mxArray *[]);  
+
+  /**
+   * Delete the (static) instance of this component,
+   * and set the instance pointer to NULL.
+   */
+  static void deleteInstance();
+
+  virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
   virtual bool allocateReturnSpace(int, mxArray *[]);
 
-  ~ModelMassMatrix();  
+  virtual ~ModelMassMatrix();
 private:
  // ModelJointLimits(int = 0, mxArray * = NULL );
   ModelMassMatrix();
-  static ModelMassMatrix* modelMassMatrix; 
-  
+  static ModelMassMatrix* modelMassMatrix;
+
   bool processArguments(int, const mxArray *[]);
   double *massMatrix;
   double *qj;

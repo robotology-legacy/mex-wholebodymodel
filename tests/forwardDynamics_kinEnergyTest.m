@@ -1,7 +1,7 @@
-function [ dchi ] = forwardDynamics_zeroExternalForces( t,chi,param )
+function [ dchi , h , g,fc, kinEnergy ] = forwardDynamics_zeroExternalForces( t,chi,param )
 %FORWARDDYNAMICS Forward dynamics of the wholeBodyModel
 %
-%   This is the forward dynamics of the model loaded in the 
+%   This is the forward dynamics of the model loaded in the
 %   wholeBodyInterface from the URDF description. The dynamic model is
 %   described as an explicit ordinary differential equation of the form:
 %
@@ -23,7 +23,7 @@ function [ dchi ] = forwardDynamics_zeroExternalForces( t,chi,param )
 %% extraction of state
 ndof = param.ndof;
 
-%x_b = chi(1:3,:);
+x_b = chi(1:3,:);
 qt_b = chi(4:7,:);
 qj = chi(8:ndof+7,:);
 %x = [x_b;qt_b;qj];
@@ -32,16 +32,27 @@ dx_b = chi(ndof+8:ndof+10,:);
 omega_W = chi(ndof+11:ndof+13,:);
 dqj = chi(ndof+14:2*ndof+13,:);
 
-%dx = [dqj;dx_b;omega_b];
-%v = dx;
-%chi = [x;dx];
+v = [dx_b;omega_W;dqj];
 
 %% MexWholeBodyModel calls
+%reconstructing rotation of root to world from the quaternion
+%[~,T_b,~,~] = wholeBodyModel('get-state');
+
+
+w_R_b = quaternion2dcm(qt_b);
+
+wbm_setWorldFrame(w_R_b,x_b,[0 0 0]');
 wbm_updateState(qj,dqj,[dx_b;omega_W]);
+
 M = wbm_massMatrix();
 h = wbm_generalisedBiasForces();
-g = wbm_modelGeneralisedForces(qj,zeros(25,1),zeros(6,1)); 
-h = h-g;
+
+%M = wbm_massMatrix(qj);
+%h = wbm_generalisedBiasForces(qj,dqj,[dx_b;omega_W]);
+
+g = zeros(size(h));
+
+%h = zeros(size(h));
 %H = wbm_centroidalMomentum();
 
 %% Building up contraints jacobian and djdq
@@ -60,35 +71,24 @@ tau = param.tau(t);
 
 %% Contact forces computation
 JcMinv = Jc/M;
-JcMinvJct = JcMinv * Jc';   
+JcMinvJct = JcMinv * Jc';
 
-tauDamp = -param.dampingCoeff*qj;
-  
+tauDamp = -param.dampingCoeff*dqj;
+
 fc = (JcMinvJct)\(JcMinv*(h-[tau+tauDamp;zeros(6,1)])-dJcDq);
 
-% need to apply root-to-world rotation to the spatial angular velocity omega_W to
-% obtain angular velocity in body frame omega_b. This is then used in the
-% quaternion derivative computation.
-[~,T_b,~,~] = wholeBodyModel('get-state');
+% need to apply the inverse of the {}^w R_b (R_b) to the angular velocity omega_W
+% expressed in the world frame to the obtain angular velocity in body frame omega_b.
+% This is then used in the quaternion derivative computation.
 
-%righting quaternion ordering to [real;imaginary]^T since get-state
-%returns the opposite ordering
-%qt_b_mod = [T_b(7);T_b(4:6)];
-qt_b_mod_s = T_b(7);
-qt_b_mod_r = T_b(4:6);
-
-%reconstructing rotation of root to world from the quaternion
-R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
-
-omega_b = R_b*omega_W;
-
+b_R_w = w_R_b';
+omega_b = b_R_w*omega_W;
 dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
 
-%dx = [dqj;dx_b;dqt_b];
 dx = [dx_b;dqt_b;dqj];
 dv = M\(Jc'*fc + [tau+tauDamp; zeros(6,1)]-h);
-
-dchi = [dx;dv];  
-
+dchi = [dx;dv];
+kinEnergy = 0.5*v'*M*v;
+%dchi = zeros(size(dchi));
 end
 

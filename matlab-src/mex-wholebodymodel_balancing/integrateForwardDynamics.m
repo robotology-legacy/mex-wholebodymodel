@@ -14,7 +14,6 @@ addpath('./../worker_functions');
 addpath('./../');
 
 %% initialise mexWholeBodyModel
- setenv('YARP_ROBOT_NAME','icubGazeboSim')
  wbm_modelInitialise('icubGazeboSim');
  wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[0,0,-9.81]');
 
@@ -25,7 +24,7 @@ addpath('./../');
  params.QP_solver                =  0;                                      %either 0 or 1
  
 % balancing on two feet or one foot
- params.feet_on_ground           =  1;                                      %either 1 or 2
+ params.feet_on_ground           =  2;                                      %either 1 or 2
 
 % for the visualization of torques, forces and other user-defined graphics 
  vis_graphics                    =  1;                                      %either 0 or 1
@@ -35,7 +34,7 @@ addpath('./../');
  params.ndof         = 25;
 
 % initial conditions                  
- params.leftArmInit  = [ 0   10  0.0  44.9   0.0]';          
+ params.leftArmInit  = [ -19.7   29.7  0.0  44.9   0.0]';          
  params.rightArmInit = [ -19.7   29.7  0.0  44.9   0.0]';         
  
  if     params.feet_on_ground == 2
@@ -114,13 +113,13 @@ end
  forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,params);
     
  params.tStart   = 0;
- params.tEnd     = 4;   
+ params.tEnd     = 20;   
  params.sim_step = 0.01;
 
 %% integrate forward dynamics
  disp('starting numerical integration');
  
- options = odeset('RelTol',1e-2,'AbsTol',1e-4);
+ options = odeset('RelTol',1e-4,'AbsTol',1e-4);
    
  [t,chi] = ode15s(forwardDynFunc,params.tStart:params.sim_step:params.tEnd,params.chiInit,options);
 

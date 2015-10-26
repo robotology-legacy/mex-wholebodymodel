@@ -28,19 +28,24 @@ class ModelDjDq : public ModelComponent
 {
 public:
    static ModelDjDq* getInstance(void);
-  
+  /**
+   * Delete the (static) instance of this component,
+   * and set the instance pointer to NULL.
+   */
+  static void deleteInstance();
+
   virtual bool allocateReturnSpace(int, mxArray*[]);
   virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
-    
+
     //virtual bool display(int, const mxArray *[]);
-  ~ModelDjDq();
-  
+  virtual ~ModelDjDq();
+
 private:
   ModelDjDq(void);
   static ModelDjDq *modelDjDq;
   bool processArguments(int, const mxArray *[]);
-  
+
   double *qj;
   double *qjDot;
   double *vb;

@@ -45,13 +45,19 @@ ComponentManager* ComponentManager::getInstance(std::string robotName)
   return(componentManager);
 }
 
+void ComponentManager::deleteInstance()
+{
+  deleteObject(&componentManager);
+}
+
+
 
 ComponentManager::ComponentManager(std::string robotName)
 {
 #ifdef DEBUG
    mexPrintf("ComponentManager constructed \n");
 #endif
-   initialise(robotName); 
+   initialise(robotName);
    componentList["joint-limits"] = modelJointLimits;
    componentList["mass-matrix"] = modelMassMatrix;
    componentList["generalised-forces"] = modelGeneralisedBiasForces;
@@ -60,6 +66,7 @@ ComponentManager::ComponentManager(std::string robotName)
    componentList["update-state"] = modelUpdateState;
    componentList["get-state"] = modelGetState;
    componentList["model-initialise"] = modelInitialise;
+   componentList["model-initialise-urdf"] = modelInitialiseURDF;
    componentList["forward-kinematics"] = modelForwardKinematics;
    componentList["visualize-trajectory"] = modelVisualizeTrajectory;
    componentList["centroidal-momentum"] = modelCentroidalMomentum;
@@ -67,34 +74,38 @@ ComponentManager::ComponentManager(std::string robotName)
    componentList["set-world-link"] = modelSetWorldLink;
 }
 
-ComponentManager::~ComponentManager()
+void ComponentManager::cleanup()
 {
-  
-
 #ifdef DEBUG
-  mexPrintf("icub WholeBodyModel destructed \n");
-  mexPrintf("ComponentManager destructed \n");
+  mexPrintf("ComponentManager destructed\n");
 #endif
 
-  delete(modelJointLimits); 
-  delete(modelMassMatrix);
-  delete(modelUpdateState);
-  delete(modelGetState);
-  delete(modelGeneralisedBiasForces);
-  delete(modelDjDq);
-  delete(modelJacobian);
-  delete(modelForwardKinematics);
-  delete(modelInitialise);
-  delete(modelState);
-  delete(modelVisualizeTrajectory);
-  delete(modelCentroidalMomentum);
-  delete(modelSetWorldFrame);
-  delete(modelSetWorldLink);
+  ModelJointLimits::deleteInstance();
+  ModelMassMatrix::deleteInstance();
+  ModelUpdateState::deleteInstance();
+  ModelGetState::deleteInstance();
+  ModelGeneralisedBiasForces::deleteInstance();
+  ModelDjDq::deleteInstance();
+  ModelJacobian::deleteInstance();
+  ModelForwardKinematics::deleteInstance();
+  ModelInitialise::deleteInstance();
+  ModelInitialiseURDF::deleteInstance();
+  ModelVisualizeTrajectory::deleteInstance();
+  ModelCentroidalMomentum::deleteInstance();
+  ModelSetWorldFrame::deleteInstance();
+  ModelSetWorldLink::deleteInstance();
+  ModelState::deleteInstance();
 }
+
+ComponentManager::~ComponentManager(void)
+{
+    cleanup();
+}
+
 
 void ComponentManager::initialise(std::string robotName)
 {
-  
+
   modelState = ModelState::getInstance(robotName);
   modelUpdateState = ModelUpdateState::getInstance();
   modelGetState = ModelGetState::getInstance();
@@ -105,6 +116,7 @@ void ComponentManager::initialise(std::string robotName)
   modelJacobian = ModelJacobian::getInstance();
   modelForwardKinematics = ModelForwardKinematics::getInstance();
   modelInitialise = ModelInitialise::getInstance();
+  modelInitialiseURDF = ModelInitialiseURDF::getInstance();
   modelVisualizeTrajectory = ModelVisualizeTrajectory::getInstance();
   modelCentroidalMomentum = ModelCentroidalMomentum::getInstance();
   modelSetWorldFrame = ModelSetWorldFrame::getInstance();
@@ -117,16 +129,16 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
   bool returnVal = false;
   ModelComponent *activeComponent;
   char* str;
-  
+
 #ifdef DEBUG
    mexPrintf("Trying to parseMexArguments\n");
 #endif
-   
+
      str=mxArrayToString(prhs[0]);
 
 #ifdef DEBUG
      mexPrintf("Searching for the component '%s', of size  %d\n",str,sizeof(str));
-#endif 
+#endif
 
   std::map<std::string,ModelComponent*>::iterator search = componentList.find(str);
   if(search == componentList.end())
@@ -134,27 +146,27 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Requested component not found. Please request a valid component");
   }
   activeComponent = search->second;
-  if(nlhs!=activeComponent->numReturns())
+  if(nlhs!=(int)activeComponent->numReturns())
   {
     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Error in number of returned parameters in requested component, check docs");
-  }        
-  if(nrhs != (1+activeComponent->numArguments()) && nrhs != (1+activeComponent->numAltArguments()))
+  }
+  if(nrhs != (int)(1+activeComponent->numArguments()) && nrhs != (int)(1+activeComponent->numAltArguments()))
   {
      mexPrintf("Requested component uses  uses %d arguments and returns %d items",activeComponent->numArguments(),activeComponent->numReturns());
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Error in number of arguments, check docs");
   }
-  activeComponent->allocateReturnSpace(nlhs,plhs);	
-    
-  if(nrhs == (1+activeComponent->numAltArguments()))
+  activeComponent->allocateReturnSpace(nlhs,plhs);
+
+  if(nrhs == (int)(1+activeComponent->numAltArguments()))
   {
     activeComponent->computeFast(nrhs,prhs);
     returnVal = true;
   }
   else
-  {	
+  {
     activeComponent->compute( nrhs, prhs);
     returnVal = true;
   }
 
-    return(returnVal);
+  return(returnVal);
 }

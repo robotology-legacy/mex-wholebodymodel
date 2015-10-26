@@ -37,6 +37,7 @@
 #include "modeldjdq.h"
 #include "modeljacobian.h"
 #include "modelinitialise.h"
+#include "modelinitialiseurdf.h"
 #include "modelforwardkinematics.h"
 #include "modelvisualizetrajectory.h"
 #include "modelcentroidalmomentum.h"
@@ -48,17 +49,25 @@ namespace mexWBIComponent
 class ComponentManager
 {
 public:
-  
+
   static ComponentManager *getInstance(std::string robotName = "icub");
+
+  /**
+   * Delete the (static) instance of this component,
+   * and set the instance pointer to NULL.
+   */
+  static void deleteInstance();
+
   bool processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]);
+  void cleanup();
    ~ComponentManager(void);
-   
+
   //int getDofs();
 private:
   ComponentManager(std::string);
   static ComponentManager *componentManager;
   void initialise(std::string);
-  
+
   ModelState *modelState;
   ModelComponent *currentComponent;
   ModelJointLimits *modelJointLimits;
@@ -69,14 +78,15 @@ private:
   ModelDjDq *modelDjDq;
   ModelJacobian *modelJacobian;
   ModelInitialise *modelInitialise;
+  ModelInitialiseURDF *modelInitialiseURDF;
   ModelForwardKinematics *modelForwardKinematics;
   ModelVisualizeTrajectory *modelVisualizeTrajectory;
   ModelCentroidalMomentum *modelCentroidalMomentum;
   ModelSetWorldFrame *modelSetWorldFrame;
   ModelSetWorldLink *modelSetWorldLink;
-  
+
   int numDof;
-  
+
   //static wbi::iWholeBodyModel *robotModel;
   std::map <std::string, ModelComponent*> componentList;
 };

@@ -29,7 +29,7 @@
 #include "modeljacobian.h"
 using namespace mexWBIComponent;
 
-ModelJacobian * ModelJacobian::modelJacobian; 
+ModelJacobian * ModelJacobian::modelJacobian;
 
 ModelJacobian::ModelJacobian(): ModelComponent(4,1,1)
 {
@@ -53,7 +53,8 @@ bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray* plhs[])
 #ifdef DEBUG
   mexPrintf("Trying to allocateReturnSpace in ModelJacobian\n");
 #endif
-  
+  int numDof = modelState->dof();
+
   bool returnVal = false;
 
   plhs[0]=mxCreateDoubleMatrix(6,numDof+6, mxREAL);
@@ -67,7 +68,7 @@ bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray* plhs[])
   return(returnVal);
 }
 
-ModelJacobian * ModelJacobian::getInstance() 
+ModelJacobian * ModelJacobian::getInstance()
 {
   if(modelJacobian == NULL)
   {
@@ -75,6 +76,12 @@ ModelJacobian * ModelJacobian::getInstance()
   }
   return(modelJacobian);
 }
+
+void ModelJacobian::deleteInstance()
+{
+  deleteObject(&modelJacobian);
+}
+
 
 bool ModelJacobian::compute(int nrhs, const mxArray * prhs[])
 {
@@ -93,19 +100,21 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
 #ifdef DEBUG
   mexPrintf("Trying to fastCompute ModelJacobian \n");
 #endif
-  
+
   if(!mxIsChar(prhs[1]))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
   }
-    
+
+  int numDof = modelState->dof();
+
   qj = modelState->qj();
   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
   refLink = mxArrayToString(prhs[1]);
   robotModel = modelState->robotModel();
   int refLinkID;
   std::string com("com");
-  
+
   if(com.compare(refLink)==0)
   {
     refLinkID = -1;
@@ -115,7 +124,7 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
     //robotModel->getLinkId (refLink, refLinkID);
     robotModel->getFrameList().idToIndex(refLink, refLinkID);
   }
-  
+
     modelState = ModelState::getInstance();
 
   if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j_rowMajor)))
@@ -139,20 +148,21 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
 
 bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
 {
-  
+  size_t numDof = modelState->dof();
+
   if(mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || !mxIsChar(prhs[4]))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
   }
   robotModel = modelState->robotModel();
-    
+
   qj = mxGetPr(prhs[3]);
   refLink = mxArrayToString(prhs[4]);
-  
+
   double *R_temp,*p_temp;
   R_temp = (double *)mxGetPr(prhs[1]);
   p_temp = (double *)mxGetPr(prhs[2]);
-  
+
   double tempR[9],tempP[3];
   for(int i = 0;i<9;i++)
   {
@@ -164,23 +174,23 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
   }
   wbi::Rotation tempRot(tempR);
   wbi::Frame tempFrame(tempRot, tempP);
-  
+
 #ifdef DEBUG
   mexPrintf("qj received \n");
 
-  for(int i = 0; i< numDof;i++)
+  for(size_t i = 0; i< numDof;i++)
   {
     mexPrintf(" %f",qj[i]);
   }
-#endif  
-  
+#endif
+
   world_H_rootLink = tempFrame;//modelState->computeRootWorldRotoTranslation(qj);
-  
+
   if(j_rowMajor != NULL && j_colMajor != NULL)
   {
     int refLinkID;
     std::string com("com");
-  
+
     if(com.compare(refLink)==0)
     {
       refLinkID = -1;
@@ -195,7 +205,7 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
     }
   }
   int columnMajCtr = 0;
-  for (int i = 0; i<(numDof+6); i++)
+  for (size_t i = 0; i<(numDof+6); i++)
   {
       for (int j = 0;j<6;j++)
       {
@@ -204,5 +214,5 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
       }
   }
 
-  return(true);  
+  return(true);
 }
