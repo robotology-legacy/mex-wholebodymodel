@@ -35,7 +35,6 @@ namespace mexWBIComponent{
 
 class ModelComponent{
 public:
-
   static ModelComponent* getInstance();
 
   virtual bool allocateReturnSpace(int, mxArray*[]) = 0;
@@ -47,8 +46,7 @@ public:
   const unsigned int numArguments();
   const unsigned int numAltArguments();
 
-
-  ~ModelComponent();
+  virtual ~ModelComponent();
 
 protected:
 
@@ -58,8 +56,8 @@ protected:
   ModelComponent(const unsigned int, const unsigned int, const unsigned int);
 
   const unsigned int numArgs;
-  const unsigned int numAltArgs;
   const unsigned int numRets;
+  const unsigned int numAltArgs;
   wbi::iWholeBodyModel *robotModel;
 
   Eigen::Matrix4d H_w2b;

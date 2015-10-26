@@ -24,7 +24,7 @@
 #include <mex.h>
 
 using namespace mexWBIComponent;
-ModelJointLimits* ModelJointLimits::modelJointLimits = NULL;
+ModelJointLimits* ModelJointLimits::modelJointLimits = 0;
 //const int ModelJointLimits::numReturnArguments = 2;
 
 
@@ -65,20 +65,25 @@ bool ModelJointLimits::allocateReturnSpace(int nlhs, mxArray* plhs[])
 
 ModelJointLimits::~ModelJointLimits()
 {
-//   std::cout<<"in child desctructor jointLimits \n";
-  mexPrintf("ModelJointLimits destructed \n");
-  //delete(jointLimits);
+#ifdef DEBUG
+  mexPrintf("ModelJointLimits destructed\n");
+#endif
 }
 
 ModelJointLimits* ModelJointLimits::getInstance()
 {
   if(modelJointLimits == NULL)
   {
-
     modelJointLimits  = new ModelJointLimits;
   }
   return(modelJointLimits);
 }
+
+void ModelJointLimits::deleteInstance()
+{
+  deleteObject(&modelJointLimits);
+}
+
 /*
  * REIMPLEMENT IN FUTURE
 bool ModelJointLimits::display(int nrhs, const mxArray *prhs[])

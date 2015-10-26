@@ -40,7 +40,14 @@ ModelForwardKinematics::ModelForwardKinematics() : ModelComponent(4,1,1)
 
 ModelForwardKinematics::~ModelForwardKinematics()
 {
+#ifdef DEBUG
+  mexPrintf("ModelForwardKinematics destructed\n");
+#endif
+}
 
+void ModelForwardKinematics::deleteInstance()
+{
+  deleteObject(&modelForwardKinematics);
 }
 
 bool ModelForwardKinematics::allocateReturnSpace(int nlhs, mxArray* plhs[])
@@ -69,7 +76,7 @@ bool ModelForwardKinematics::compute(int nrhs, const mxArray* prhs[])
 
 bool ModelForwardKinematics::processArguments(int nrhs, const mxArray* prhs[])
 {
-  int numDof = modelState->dof();
+  size_t numDof = modelState->dof();
   if(mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1  || mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || !mxIsChar(prhs[4]))
   {
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
@@ -95,7 +102,7 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray* prhs[])
 #ifdef DEBUG
   mexPrintf("qj received \n");
 
-  for(int i = 0; i< numDof;i++)
+  for(size_t i = 0; i< numDof;i++)
   {
     mexPrintf(" %f",qj[i]);
   }

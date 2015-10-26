@@ -54,6 +54,12 @@ ModelGetState* ModelGetState::getInstance()
   return(modelGetState);
 }
 
+void ModelGetState::deleteInstance()
+{
+  deleteObject(&modelGetState);
+}
+
+
 
 bool ModelGetState::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
@@ -120,11 +126,6 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
   mexPrintf("world_H_ReferenceLink\n");
   mexPrintf(( (modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str());
 
-  mexPrintf("\n X \n");
-
-  mexPrintf("referenceLink_H_RootLink\n");
-  mexPrintf((referenceLink_H_rootLink.R.toString()).c_str());
-
   mexPrintf("\n\n");
 
 #endif
@@ -186,11 +187,6 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
 
   mexPrintf("world_H_ReferenceLink\n");
   mexPrintf(( (modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str());
-
-  mexPrintf("\n X \n");
-
-  mexPrintf("referenceLink_H_RootLink\n");
-  mexPrintf((referenceLink_H_rootLink.R.toString()).c_str());
 
   mexPrintf("\n\n");
   //rootQuaternion =

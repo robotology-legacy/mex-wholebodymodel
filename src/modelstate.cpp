@@ -40,14 +40,14 @@ wbi::iWholeBodyModel * ModelState::robotWBIModel = NULL;
 bool isRobotNameAFile(const std::string & robotName)
 {
   // Ugly hack: check the last four char of robotName :
-  // if it ends in .xxx (where xxx is is an classical extention)
+  // if it ends in .xxx or .xxxx (where xxx or xxxx is is an classical extention)
   // call the robotModelFromURDF , otherwise the usual robotModel
-  if( robotName.size() < 4 )
+  if( robotName.size() < 5 )
   {
     return false;
   }
 
-  if( robotName[robotName.size()-4] == '.' )
+  if( robotName[robotName.size()-4] == '.' || robotName[robotName.size()-5] == '.')
   {
     return true;
   }
@@ -59,8 +59,6 @@ bool isRobotNameAFile(const std::string & robotName)
 
 ModelState::ModelState(std::string robotName) : robot_reference_frame_link_name("l_sole"), fixedLinkComputation(false) //: qS[ndof],dqS[ndof],dxbS[ndof]
 {
-  yarp::os::Network::init();
-
   if( isRobotNameAFile(robotName) )
   {
     robotModelFromURDF(robotName);
@@ -81,26 +79,49 @@ ModelState::ModelState(std::string robotName) : robot_reference_frame_link_name(
   qjS = (double*)malloc(sizeof(double) * (numDof));
   qjDotS = (double*)malloc(sizeof(double) * (numDof));
 
-  gS = new double(3);
   gS[0] = 0; gS[1] = 0; gS[2] = -9.81;
 
 }
 
 ModelState::~ModelState()
 {
+#ifdef DEBUG
+  mexPrintf("ModelState destructor called\n");
+#endif
 
-  if(qjDotS != NULL){
+  if(qjDotS != 0)
+  {
       free(qjDotS);
-          qjDotS = 0;
+      qjDotS = 0;
   }
 
-  if(qjS != NULL){
+#ifdef DEBUG
+  mexPrintf("free(qjDotS) called\n");
+#endif
+
+  if(qjS != NULL)
+  {
       free(qjS);
-          qjS = 0;
+      qjS = 0;
   }
-  yarp::os::Network::fini();
-  delete(robotWBIModel);
-  mexPrintf("ModelState destructed\n");
+
+#ifdef DEBUG
+  mexPrintf("free(qjS) called\n");
+#endif
+
+#ifdef DEBUG
+  mexPrintf("free(gS) called\n");
+#endif
+
+  if(robotWBIModel != 0)
+  {
+    delete robotWBIModel;
+    robotWBIModel = 0;
+  }
+
+#ifdef DEBUG
+  mexPrintf("ModelState destructor returning\n");
+#endif
 }
 
 ModelState *  ModelState::getInstance(std::string robotName)
@@ -112,6 +133,10 @@ ModelState *  ModelState::getInstance(std::string robotName)
   return(modelState);
 }
 
+void ModelState::deleteInstance()
+{
+  deleteObject(&modelState);
+}
 
 bool ModelState::setState(double *qj_t,double *qjDot_t,double *vb_t)
 {
@@ -119,14 +144,14 @@ bool ModelState::setState(double *qj_t,double *qjDot_t,double *vb_t)
   mexPrintf("Trying to update state\n");
 #endif
 
-  for(int i = 0;i<numDof;i++)
+  for(size_t i = 0; i<numDof; i++)
   {
     qjS[i] = qj_t[i];
     qjDotS[i] = qjDot_t[i];
 
   //  mexPrintf("qj : %2.2f, qjDot : %2.2f \n",qjS[i],qjDotS[i]);
   }
-  for(int i=0;i<6;i++)
+  for(size_t i=0; i<6; i++)
   {
     vbS[i] = vb_t[i];
     //mexPrintf("vbS ; %2.2f",vbS[i]);
@@ -155,7 +180,7 @@ double * ModelState::qj()
 }
 void ModelState::qj(double *qj_t)
 {
-  for (int i = 0;i<numDof ; i++)
+  for (size_t i = 0;i<numDof ; i++)
   {
     qj_t[i] = qjS[i];
   }
@@ -167,7 +192,7 @@ double * ModelState::qjDot()
 }
 void ModelState::qjDot(double *qjDot_t)
 {
-  for (int i = 0;i<numDof ; i++)
+  for (size_t i = 0; i<numDof; i++)
   {
     qjDot_t[i] = qjDotS[i];
   }
@@ -202,7 +227,8 @@ void ModelState::g(double *gT)
     gT[i] = gS[i];
   }
 }
-int ModelState::dof()
+
+size_t ModelState::dof()
 {
   return(numDof);
 }
@@ -238,8 +264,10 @@ void  ModelState::robotModel(std::string robotName)
 
   std::string wbiConfFile = rf.findFile("yarpWholeBodyInterface.ini");
   yarpWbiOptions.fromConfigFile(wbiConfFile);
-  //Overwrite the robot parameter that could be present in wbi_conf_file
-  yarpWbiOptions.put("robot",robotName);
+
+  // Never get the limits from getLimitsFromControlBoard
+  // When using mex-wholebodymodel
+  yarpWbiOptions.unput("getLimitsFromControlBoard");
 
 
   robotWBIModel = new yarpWbi::yarpWholeBodyModel(localName.c_str(), yarpWbiOptions);
@@ -349,8 +377,9 @@ wbi::Frame ModelState::getReferenceToWorldFrameRotoTrans(void)
 
 wbi::Frame ModelState::getRootWorldRotoTranslation(void)
 {
-
+    return world_H_rootLink;
 }
+
 void ModelState::setRootWorldRotoTranslation(wbi::Frame rootWorldFrame )
 {
   world_H_rootLink = rootWorldFrame;

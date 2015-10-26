@@ -30,14 +30,23 @@
 //local includes
 #include "mexwholebodymodelsettings.h"
 
+#include <mex.h>
+
 
 namespace mexWBIComponent
 {
 class ModelState
 {
 public:
-   ~ModelState();
+   virtual ~ModelState();
    static ModelState * getInstance(std::string = "icubGazeboSim");
+
+  /**
+   * Delete the (static) instance of this component,
+   * and set the instance pointer to NULL.
+   */
+   static void deleteInstance();
+
    bool setState(double *,double*,double*);
 
    //void setBaseFrameLink(int);
@@ -63,7 +72,7 @@ public:
    void vb(double *);
 
    void g(double *);
-   int dof();
+   size_t dof();
 
    /**
     * Load a robot model from a yarpWholeBodyInterface
@@ -85,7 +94,7 @@ private:
   ModelState(std::string);
   static ModelState * modelState;
   //double *qS, *dqS, *dxbS;
-  double vbS[6],*qjS,*qjDotS;//;qjS[MEX_WBMODEL_MAX_NUM_JOINTS],qjDotS[MEX_WBMODEL_MAX_NUM_JOINTS],vbS[6];
+  double vbS[6],*qjS,*qjDotS, gS[3];//;qjS[MEX_WBMODEL_MAX_NUM_JOINTS],qjDotS[MEX_WBMODEL_MAX_NUM_JOINTS],vbS[6];
 //   wbi::Frame rootS;
   int robot_reference_frame_link;
   //wbi::Frame H_rootLink_wrWorld;
@@ -93,7 +102,7 @@ private:
    //wbi::Frame world_H_root;
    wbi::Frame world_H_reference;
 
-  int numDof;
+  size_t numDof;
   std::string currentRobotName;
   std::string robot_reference_frame_link_name;
 
@@ -111,9 +120,23 @@ private:
   wbi::Frame world_H_rootLink;
   wbi::Frame rootLink_H_ReferenceLink;
   wbi::Frame referenceLink_H_rootLink;
-  double *gS;
 
 };
+
+/**
+ * Helper function to delete instances
+ *
+ * @param pp pointer to the pointer to delete and set to 0
+ */
+template <class T> void deleteObject(T** pp)
+{
+    if( *pp != 0 )
+    {
+        delete *pp;
+        *pp = 0;
+    }
+}
+
 }
 
 #endif // MODELSTATE_H

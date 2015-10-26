@@ -48,8 +48,6 @@ ModelGeneralisedBiasForces::ModelGeneralisedBiasForces() : ModelComponent(5,0,1)
 
 ModelGeneralisedBiasForces::~ModelGeneralisedBiasForces()
 {
-  //delete(h);
-  delete(g);
 }
 
 ModelGeneralisedBiasForces * ModelGeneralisedBiasForces::getInstance()
@@ -60,6 +58,13 @@ ModelGeneralisedBiasForces * ModelGeneralisedBiasForces::getInstance()
   }
   return(modelGeneralisedBiasForces);
 }
+
+void ModelGeneralisedBiasForces::deleteInstance()
+{
+  deleteObject(&modelGeneralisedBiasForces);
+}
+
+
 
 bool ModelGeneralisedBiasForces::allocateReturnSpace(int nlhs, mxArray* plhs[])
 {
@@ -124,7 +129,7 @@ bool ModelGeneralisedBiasForces::display(int nrhs, const mxArray* prhs[])
 // }
 bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[])
 {
-  int numDof = modelState->dof();
+  size_t numDof = modelState->dof();
 
   if(mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||  mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || mxGetM(prhs[4]) != numDof || mxGetN(prhs[4]) != 1 || mxGetM(prhs[5]) != 6 || mxGetN(prhs[5]) != 1)
   {
@@ -153,7 +158,7 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
 #ifdef DEBUG
   mexPrintf("qj received \n");
 
-  for(int i = 0; i< numDof;i++)
+  for(size_t i = 0; i< numDof;i++)
   {
     mexPrintf(" %f",qj[i]);
   }
@@ -171,5 +176,7 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
 
 
   }
+
+  return true;
 }
 

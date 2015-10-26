@@ -32,7 +32,9 @@ ModelInitialiseURDF::ModelInitialiseURDF() : ModelComponent(1,0,0)
 
 ModelInitialiseURDF::~ModelInitialiseURDF()
 {
-
+#ifdef DEBUG
+  mexPrintf("ModelInitialiseURDF destructed");
+#endif
 }
 
 bool ModelInitialiseURDF::allocateReturnSpace(int, mxArray*[])
@@ -49,6 +51,12 @@ ModelInitialiseURDF* ModelInitialiseURDF::getInstance()
   }
   return(modelInitialiseURDF);
 }
+
+void ModelInitialiseURDF::deleteInstance()
+{
+  deleteObject(&modelInitialiseURDF);
+}
+
 
 bool ModelInitialiseURDF::compute(int nrhs, const mxArray* prhs[])
 {

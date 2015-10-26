@@ -33,19 +33,24 @@ class ModelUpdateState : public ModelComponent
 {
 public:
   static ModelUpdateState* getInstance();
-  
+
+  /**
+   * Delete the (static) instance of this component,
+   * and set the instance pointer to NULL.
+   */
+  static void deleteInstance();
+
   virtual bool allocateReturnSpace(int, mxArray*[]);
 //   virtual bool display(int, const mxArray *[]);
   virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
-  
-  
-  ~ModelUpdateState();
+
+  virtual ~ModelUpdateState();
 private:
   ModelUpdateState();
   static ModelUpdateState *modelUpdateState;
 //   const int numReturnArguments;
-    
+
   bool setState(int, const mxArray *[]);
 //   wbi::Frame updateBaseFrame(double *);
   Eigen::Matrix4d H_w2b;

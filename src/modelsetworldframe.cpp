@@ -30,7 +30,7 @@
 
 using namespace mexWBIComponent;
 
-ModelSetWorldFrame *ModelSetWorldFrame::modelSetWorldFrame;
+ModelSetWorldFrame *ModelSetWorldFrame::modelSetWorldFrame = 0;
 
 ModelSetWorldFrame::ModelSetWorldFrame(): ModelComponent(3,2,0)
 {
@@ -54,6 +54,12 @@ ModelSetWorldFrame* ModelSetWorldFrame::getInstance()
     }
     return(modelSetWorldFrame);
 }
+
+void ModelSetWorldFrame::deleteInstance()
+{
+  deleteObject(&modelSetWorldFrame);
+}
+
 
 bool ModelSetWorldFrame::allocateReturnSpace(int a, mxArray* m[])
 {
@@ -120,7 +126,9 @@ bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray* prhs[])
     //H_baseLink_wrWorld = temp;
     //H_baseLink_wrWorld = tempFrame;
     modelState->setRootWorldRotoTranslation(tempFrame);
-    //    mexPrintf("Roto translation of world from base frame applied \n"); 
+    //    mexPrintf("Roto translation of world from base frame applied \n");
+
+    return true;
 }
 
 
