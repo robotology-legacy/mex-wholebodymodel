@@ -73,7 +73,7 @@ com0     = wbm_forwardKinematics(rot_inv0,pos0,qj0,'com');
 xcom0    = com0(1:3);
 
 space = 500;
-toll  = 95*pi/180;
+toll  = 5*pi/180;
 
 q2  = zeros(n_joints,space);
 dq2 = q2;
@@ -169,26 +169,26 @@ lin_dyn  = -Kp*(xcom-xcom0) -Kd*xDcom;
 HDotDes = [  m*lin_dyn;
            -Kg*H(4:end)];
 %%
-bb = A*inv(Jc*Minv*Jct)*(Jc*Minv*St)*Kimp*pinv(Jc*Minv*St, toll_lambda)*(Jc*Minv*Jct)*pinvA
- 
-eig_B = eig(bb)
-flag  = 0;
-
-for i = 1:length(eig_B)
-   
-    if eig_B(i) <= 0 
-	flag = 1;
-    end
-    
-end
-
-if flag == 1
-    
-	disp('not positive definite')
-	else
-	disp('positive definite')
-    
-end
+% bb = A*inv(Jc*Minv*Jct)*(Jc*Minv*St)*Kimp*pinv(Jc*Minv*St, toll_lambda)*(Jc*Minv*Jct)*pinvA
+%  
+% eig_B = eig(bb)
+% flag  = 0;
+% 
+% for i = 1:length(eig_B)
+%    
+%     if eig_B(i) <= 0 
+% 	flag = 1;
+%     end
+%     
+% end
+% 
+% if flag == 1
+%     
+% 	disp('not positive definite')
+% 	else
+% 	disp('positive definite')
+%     
+% end
 
 %% nonlinear torques
 f     = pinvA*(HDotDes-grav);
@@ -206,7 +206,7 @@ wbm_updateState(qj0,zeros(n_joints,1),zeros(n_base,1));
 end
 
 %% graphics of linearization with respect of qj
-% graphics(q2*180/pi,tau_q,tau_q_lin,qj0*180/pi,tau_reg);
+graphics(q2*180/pi,tau_q,tau_q_lin,qj0*180/pi,tau_reg);
 
 %% velocity
 %definition of vb

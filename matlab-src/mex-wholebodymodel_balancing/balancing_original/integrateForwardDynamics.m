@@ -21,7 +21,7 @@ addpath('./../../');
 % the user can set this parameters depending on what he wants to do with
 % the robot
  params.demo_left_and_right      =  1;                                      %either 0 or 1; only for two feet on the ground
- params.QP_solver                =  1;                                      %either 0 or 1
+ params.QP_solver                =  0;                                      %either 0 or 1
  
 % balancing on two feet or one foot
  params.feet_on_ground           =  2;                                      %either 1 or 2
@@ -110,7 +110,7 @@ end
  
 %% setup integration
  params.tStart   = 0;
- params.tEnd     = 10;   
+ params.tEnd     = 75;   
  params.sim_step = 0.01;
  
  params.wait     = waitbar(0,'Integration in process...');
@@ -120,7 +120,7 @@ end
 %% integrate forward dynamics
  disp('starting numerical integration');
  
- options = odeset('RelTol',1e-5,'AbsTol',1e-5);
+ options = odeset('RelTol',1e-8,'AbsTol',1e-8);
    
  [t,chi] = ode15s(forwardDynFunc,params.tStart:params.sim_step:params.tEnd,params.chiInit,options);
 

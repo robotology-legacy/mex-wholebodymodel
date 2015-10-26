@@ -55,7 +55,8 @@ while(temp<10)
     visualizeForwardDynamics([x_b,qt_b,qj],t,params);
     temp = 10;    
     pause;
-    
+  
+
 end
 
 %% plot base link positions
@@ -73,10 +74,14 @@ end
     ylabel('Y(m)');
     zlabel('Z(m)');
     
+        print -depsc root
+    
     figure(3);
     plot(t,x_b(:,1),t,x_b(:,2),'r',t,x_b(:,3),'k');
     hold on
     grid on;
     title('positions of the root link')
+    
+
 
 end

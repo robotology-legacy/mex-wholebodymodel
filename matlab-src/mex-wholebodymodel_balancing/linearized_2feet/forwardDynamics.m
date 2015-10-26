@@ -25,7 +25,7 @@ function [ dchi, visual_param ] = forwardDynamics( t,chi,param )
 
 %   disp(t);
 
-waitbar(t/param.tEnd,param.wait)
+% waitbar(t/param.tEnd,param.wait)
  
 %% extraction of state
 ndof = param.ndof;

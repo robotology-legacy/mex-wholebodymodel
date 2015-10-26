@@ -472,5 +472,6 @@ while ii<n+1 % the visualization instance
 end
 %disp('------------');
 
+    print -depsc Demo
 end
 

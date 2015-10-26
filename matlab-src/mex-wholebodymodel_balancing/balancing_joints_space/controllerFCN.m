@@ -194,42 +194,26 @@ errorCoM              = xcom - desired_x_dx_ddx_CoM(:,1);
 
 %% Joints space controller
 Jct = Jc.';
+Jc_tot = -(eye(6)/Jc(1:6,1:6))*Jc(1:6,7:end);
 
-0 = Jc(1:6,:)*v;
-0 = Jc(7:end,:)*v;
-dx
+Jc_rf    = (Jc(7:end,1:6)*Jc_tot + Jc(7:end,7:end));
+% J_CoM_rf = (J_CoM(1:3,1:6)*Jc_tot + J_CoM(1:3,7:end));
+J_CoM_rf = (J_CoM(1:6,1:6)*Jc_tot + J_CoM(1:6,7:end));
 
-inv_base =  (eye(6)/Jc(1:6,1:6));
-J_qj     = -J_CoM(1:3,1:6)*inv_base*Jc(1:6,7:end) + J_CoM(1:3,7:end);
+Jt_bar = [Jc_rf ; J_CoM_rf ];
 
-Jc2      = -Jc(7:end,1:6)*inv_base*Jc(1:6,7:end) + Jc(7:end,7:end);
+Kcorr     =  10;
 
-% dxtot = [desired_x_dx_ddx_CoM(:,2); zeros(6,1)];
+xTilde    =  xdes_real - desired_x_dx_ddx_CoM(:,1);
+corr_term = -Kcorr*xTilde;
 
-xdes_real = xcom;
-kcorr = 5;
-xtilde = xdes_real - desired_x_dx_ddx_CoM(:,1);
+vett   = [zeros(6,1); (desired_x_dx_ddx_CoM(:,2)+corr_term); zeros(3,1)];
 
-dxtot = [desired_x_dx_ddx_CoM(:,2)-kcorr*xtilde; zeros(6,1)];
+dqj_des = pinv(Jt_bar, PINV_TOL)*vett;
 
-J_tot = [J_qj ;Jc2];
 
-dqj_des = pinv(J_tot, PINV_TOL)*dxtot;
-
-%  inv_base   =  (eye(12)/Jc(1:12,[(1:6) (26:31)]));
-%  J_total    = -J_CoM(1:6,[(1:6), (26:31)])*inv_base*Jc(1:12,7:25) + J_CoM(1:6,7:25);
-% %J_total    =  J_CoM(1:3,7:end);
-% 
-%  dqj_des_min   =  pinv(J_total,PINV_TOL)*[desired_x_dx_ddx_CoM(:,2);zeros(3,1)];
-%  
-%  dq_base    = - inv_base*Jc(1:12,7:25)*dqj_des_min;
-%  
-%  dqj_right  = dq_base(7:end);
-%  
-%  dqj_des    = [dqj_des_min; dqj_right];
-%  
- qTilde2 = q - qDes2;
- qD2     = v(7:end) - dqj_des;
+ qTilde2 = q - qDes;
+ qD2     = v(7:end);% - dqj_des;
 %  
 %  beq = [desired_x_dx_ddx_CoM(:,2);zeros(3,1)];
 %  Aeq = J_total;
