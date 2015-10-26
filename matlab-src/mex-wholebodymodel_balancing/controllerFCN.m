@@ -125,8 +125,17 @@ SigmaNA          =  Sigma*NA;
  end
  
  tauModel   = PInv_JcMinvSt*(JcMinv*h - JcDv -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet_delta) + ... 
-              NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(impedances)*qTilde - diag(dampings)*qD);
-
+             NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(impedances)*qTilde - diag(dampings)*qD);
+%disp(PInv_JcMinvSt*(JcMinv*h - JcDv -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet_delta));
+% taucontrol=diag(impedances)*qTilde
+ maxtau=1;
+ tauModel=min(maxtau,max(-maxtau,tauModel));
+%  tauModel   = PInv_JcMinvSt*(JcMinv*h - JcDv -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet_delta) + ... 
+%               NL*(h(7:end) - Mbj'/Mb*h(1:6) - taucontrol - diag(dampings)*qD);
+          
+          
+tauModel(19)=0;
+tauModel(20)=0;
 %tauModel   = PInv_JcMinvSt*(JcMinv*h - JcDv) + NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(impedances)*qTilde - diag(dampings)*qD);
 
 %% QP solver
@@ -210,5 +219,5 @@ f0                    = -pinv(SigmaNA, PINV_TOL)*(tauModel+Sigma*f_HDot);
 end
 
 %f                         = f_HDot + NA*f0;
-errorCoM                   = xcom - desired_x_dx_ddx_CoM(:,1);
+errorCoM                   = [xcom - desired_x_dx_ddx_CoM(:,1);xcom];
 

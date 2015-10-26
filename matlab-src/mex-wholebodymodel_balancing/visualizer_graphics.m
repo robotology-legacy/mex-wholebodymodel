@@ -90,6 +90,14 @@ grid on
 plot(t,ecom(k,:))
 title('CoM error')
 
+for k=4:6
+
+figure(10)
+hold all
+grid on
+plot(t,ecom(k,:))
+title('CoM')
+
 end
 
 figure(9)

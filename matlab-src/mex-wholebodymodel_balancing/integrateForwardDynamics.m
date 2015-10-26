@@ -25,7 +25,7 @@ addpath('./../');
  params.QP_solver                =  0;                                      %either 0 or 1
  
 % balancing on two feet or one foot
- params.feet_on_ground           =  2;                                      %either 1 or 2
+ params.feet_on_ground           =  1;                                      %either 1 or 2
 
 % for the visualization of torques, forces and other user-defined graphics 
  vis_graphics                    =  1;                                      %either 0 or 1

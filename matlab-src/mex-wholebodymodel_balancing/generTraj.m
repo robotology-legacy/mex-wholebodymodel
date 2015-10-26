@@ -17,6 +17,7 @@ end
 
  xcomDes    =  xCom0 + 0*A*[0;sin(2*pi*f*t);-1+cos(2*pi*f*t)];
 %xcomDes(1) =  xcomDes(1) + 0.01;
+ %xcomDes    =  [0.0132 -0.0712 0.5]'-min(1,t/4)*[0 -0.06 0]';
  
  xDcomDes   =  0*2*pi*f*A*[0;cos(2*pi*f*t);-sin(2*pi*f*t)];
  
