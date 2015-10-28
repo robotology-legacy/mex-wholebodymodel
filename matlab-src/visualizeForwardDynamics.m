@@ -23,8 +23,11 @@ vis_speed = 1;    % this variable is set to change the visualization speed,
                   % to make its speed close to the real time in case 
                   % the simulation time step is changed.
                   
-wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
-    wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
+%wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
+
+[rot,pos] = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
+wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
+wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
 
 
     
