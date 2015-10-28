@@ -4,7 +4,7 @@ close all;
 %% initialise mexWholeBodyModel
 wbm_modelInitialise('icubGazeboSim');
 
-wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
+%wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
 
 %% setup params
 params.ndof = 25;
@@ -34,12 +34,18 @@ params.dx_bInit = zeros(3,1);
 params.omega_bInit = zeros(3,1);
 params.dampingCoeff = 0.00;
 
-wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
+[rot,pos] = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
+% fprintf('Converting to a set world frame... \n');
+wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
+
 [qj,T_b,dqj,vb] = wbm_getState();
 
-[pos,rot] = frame2posrot(T_b);
+%[pos,rot] = frame2posrot(T_b);
 fprintf('Prior rotation \n');
 disp(rot);
+%fprintf('Prior position \n');
+%disp(pos);
+
 fprintf('Prior rotation check (R^T*R)\n');
 disp(rot'*rot);
 %fprintf('Prior frame \n');
@@ -47,14 +53,20 @@ disp(rot'*rot);
 %fprintf('Prior quaternion norm \n');
 %disp(norm(T_b(4:end)));
 
-% fprintf('Converting to a set world frame... \n');
-wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
+
+
+wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
+
 
 [qj,T_b_Got,dqj,vb] = wbm_getState();
 
 [posGot,rotGot] = frame2posrot(T_b_Got);
 fprintf('Post convertion rotation \n');
 disp(rotGot);
+%fprintf('Post position \n');
+%disp(posGot);
+
+
 WBMAssertEqual(posGot,pos);
 WBMAssertEqual(rotGot,rot);
 % fprintf('Post conversion rotation check (R^T*R)\n');

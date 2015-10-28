@@ -68,14 +68,10 @@ bool ModelInitialiseURDF::compute(int nrhs, const mxArray* prhs[])
 
   std::string rName = mxArrayToString(prhs[1]);
 
-  //mexPrintf("Existing Robot name %s and ModelStates robot name %s \n",rName.c_str(),(modelState->robotName()).c_str());
-
   if(rName.compare(modelState->robotName())!=0)
   {
     modelState->robotModelFromURDF(rName);
   }
-
-//   mexPrintf("Robot name set as %s and World Reference Frame set about %s \n",(modelState->robotName()).c_str(),(modelState->getReferenceFrameLinkName()).c_str());
   mexPrintf("Robot name set as %s\n",(modelState->robotName()).c_str());
 
   return(true);

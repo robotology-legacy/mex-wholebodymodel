@@ -25,8 +25,6 @@
 
 using namespace mexWBIComponent;
 ModelJointLimits* ModelJointLimits::modelJointLimits = 0;
-//const int ModelJointLimits::numReturnArguments = 2;
-
 
 
 ModelJointLimits::ModelJointLimits() : ModelComponent(0,0,2)
@@ -34,8 +32,6 @@ ModelJointLimits::ModelJointLimits() : ModelComponent(0,0,2)
 #ifdef DEBUG
   mexPrintf("ModelJointLimits constructed \n");
 #endif
-
- // ModelComponent::robotModel = m;
 
 }
 
@@ -52,7 +48,6 @@ bool ModelJointLimits::allocateReturnSpace(int nlhs, mxArray* plhs[])
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","2 output arguments required for joint limits");
   }
 
-    //p[0] =  mxCreateNumericMatrix(numDof, 1, mxDOUBLE_CLASS, mxREAL);//
   plhs[0]=mxCreateDoubleMatrix(numDof,1, mxREAL);
   plhs[1]=mxCreateDoubleMatrix(numDof,1, mxREAL);
   returnVal = true;
@@ -84,25 +79,6 @@ void ModelJointLimits::deleteInstance()
   deleteObject(&modelJointLimits);
 }
 
-/*
- * REIMPLEMENT IN FUTURE
-bool ModelJointLimits::display(int nrhs, const mxArray *prhs[])
-{
-  mexPrintf("Trying to display ModelJointLimits\n");
-  double temp1[numDof],temp2[numDof];
-  robotModel->getJointLimits(temp1,temp2);
-
-  for(int i = 0; i<numDof; i++)
-  {
-      //std::cout<<" Joint :"<<i<<", MinLimit"<<minJointLimits[i]<<", MaxLimit"<<maxJointLimits[i]<<std::endl;
-      mexPrintf(" Joint : %d, MinLimit : %f, MaxLimit : %f \n",i,temp1[i],temp2[i]);
-
-      jointLowerLimit[i] = temp1[i];
-      jointUpperLimit[i] = temp2[i];
-  }
-
-  return(true);
-}*/
 
 bool ModelJointLimits::compute(int nrhs, const mxArray *prhs[])
 {

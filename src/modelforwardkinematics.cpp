@@ -108,7 +108,7 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray* prhs[])
   }
 #endif
 
-  world_H_rootLink = tempFrame;//modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = tempFrame;
 
   if(xT != NULL)
   {
@@ -175,10 +175,7 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray* prhs[])
   }
   robotModel = modelState->robotModel();
   qj = modelState->qj();
-  //xB = modelState->rootRotoTrans();
-//   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
   world_H_rootLink = modelState->getRootWorldRotoTranslation();
- // mexPrintf("BaseFrame : [%2.2f,%2.2f,%2.2f]\n",world_H_rootLink.p[0],world_H_rootLink.p[1],world_H_rootLink.p[2]);
   refLink = mxArrayToString(prhs[1]);
   int refLinkID;
 
@@ -190,27 +187,11 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray* prhs[])
   }
   else
   {
-//     robotModel->getLinkId (refLink, refLinkID);
     if(!robotModel->getFrameList().idToIndex(refLink, refLinkID))
     {
-     // mexPrintf(sprintf("Requested %s ",refLink));
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","forwardKinematics call Link ID does not exist");
     }
-/*
-std::string temp2= refLink;
 
-	std::stringstream ss;
-	ss<<refLinkID;
-   temp2.append(" ID : ");
-   temp2.append(ss.str());
-
-
-   mexPrintf(temp2.c_str()); */
-    /*
-    mexPrintf("~~~~~ID List: \n");
-      std::string temp = robotModel->getFrameList().toString();
-      mexPrintf(temp.c_str());
-      mexPrintf("~~~~EndID List \n");*/
   }
 
   double xTemp[7];
@@ -242,16 +223,6 @@ std::string temp2= refLink;
     xT[4] = quatTemp[1];
     xT[5] = quatTemp[2];
     xT[6] = quatTemp[3];
-//   wbi::Frame xTF(xTemp);
-//     xT[0] = xTF.p[0];
-//     xT[1] = xTF.p[1];
-//     xT[2] = xTF.p[2];
-//     double quatTemp[4];
-//     xTF.R.getQuaternion(quatTemp);
-//     xT[3] = quatTemp[0];
-//     xT[4] = quatTemp[1];
-//     xT[5] = quatTemp[2];
-//     xT[6] = quatTemp[3];
 #ifdef DEBUG
   mexPrintf("ModelJacobian fastComputed\n");
 #endif

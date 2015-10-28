@@ -97,11 +97,10 @@ bool ModelGeneralisedBiasForces::computeFast(int nrhs, const mxArray* prhs[])
 
     qj = modelState->qj();
     qjDot = modelState->qjDot();
-    //xB = modelState->rootRotoTrans();
+
     g = modelState->g();
 
 
-//     world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
     world_H_rootLink = modelState->getRootWorldRotoTranslation();
     vb = modelState->vb();
 
@@ -113,21 +112,6 @@ bool ModelGeneralisedBiasForces::computeFast(int nrhs, const mxArray* prhs[])
 }
 
 
-/*
-bool ModelGeneralisedBiasForces::display(int nrhs, const mxArray* prhs[])
-{
-  mexPrintf("Trying to display generalised bias forces, h:\n");
-
-  double tempH[modelState->dof()+6];
-  robotModel->computeGeneralizedBiasForces(modelState->q(),modelState->baseFrame(),modelState->dq(),modelState->dxb(),g,tempH);
-  */
-
-//   for (int i = 0;i<modelState->dof()+6;i++)
-//   {
-//     mexPrintf("%f ",tempH[i]);
-//   }
-//   return(true);
-// }
 bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[])
 {
   size_t numDof = modelState->dof();
@@ -165,7 +149,7 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
   }
 #endif
 
-  world_H_rootLink = tempFrame;//%modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = tempFrame;
   g = modelState->g();
 
   if(h != NULL)

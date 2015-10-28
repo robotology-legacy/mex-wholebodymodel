@@ -22,7 +22,6 @@
 
 // library includes
 #include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
-//#include<wbiIcub/icubWholeBodyModel.h>
 
 // local includes
 #include "modelstate.h"
@@ -35,13 +34,6 @@ ModelComponent::ModelComponent(const unsigned int args, const unsigned int altAr
   modelState = ModelState::getInstance();
   robotModel =  modelState->robotModel();
 
-  //int robot_base_frame_link;
-  //robotModel->getLinkId ("root", ROBOT_BASE_FRAME_LINK);
-  //robotModel->getFrameList().idToIndex("l_sole",robot_base_frame_link);
-  //robotModel->getFrameList().wbiIdToNumericId("l_sole",robot_base_frame_link);
-  //robotModel->getLinkId ("l_sole", robot_base_frame_link);
-//   std::string startingFrame = "";
-//   modelState->setReferenceFrameLink(startingFrame);
 }
 
 
@@ -67,14 +59,4 @@ const unsigned int ModelComponent::numAltArguments()
 {
   return(numAltArgs);
 }
-/*
-bool ModelComponent::changeWorldFrame(std::string referenceLinkName, wbi::Frame F)
-{
-  //int refLinkID;
 
-  modelState->setReferenceFrameLink(referenceLinkName);
-  mexPrintf("Reference Frame Link ID set to : %s\n",(modelState->getReferenceFrameLinkName()).c_str());
-
-  modelState->setReferenceToWorldFrameRotoTrans(F);
-  return(true);
-}*/

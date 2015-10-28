@@ -104,12 +104,9 @@ bool ModelDjDq::computeFast(int nrhs, const mxArray* prhs[])
   qj = modelState->qj();
   qjDot = modelState->qjDot();
   vb = modelState->vb();
-//   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
   world_H_rootLink = modelState->getRootWorldRotoTranslation();
-  //xB = modelState->rootRotoTrans();
   refLink = mxArrayToString(prhs[1]);
   int refLinkID;
-  //robotModel->getLinkId (refLink, refLinkID);
   std::string com("com");
 
   if(com.compare(refLink)==0)
@@ -118,7 +115,6 @@ bool ModelDjDq::computeFast(int nrhs, const mxArray* prhs[])
   }
   else
   {
-    //robotModel->getLinkId (refLink, refLinkID);
     robotModel->getFrameList().idToIndex(refLink,refLinkID);
   }
 
@@ -130,18 +126,8 @@ bool ModelDjDq::computeFast(int nrhs, const mxArray* prhs[])
   return(true);
 }
 
-/*
-bool ModelDjDq::display(int nrhs, const mxArray* prhs[])
-{
-  mexPrintf("Trying to display ModelDjDq:\n");
-  return(true);
-}*/
 bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
 {
-//   if(nrhs<5)
-//   {
-//      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Atleast 5 input arguments required for modelDjDq");
-//   }
 
   size_t numDof = modelState->dof();
 
@@ -180,12 +166,11 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
   }
 #endif
 
-  world_H_rootLink = tempFrame;//modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = tempFrame;
 
   if(Djdq != NULL)
   {
     int refLinkID;
-    //robotModel->getLinkId(refLink,refLinkID);
     std::string com("com");
 
     if(com.compare(refLink)==0)
@@ -194,7 +179,6 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray* prhs[])
     }
     else
     {
-      //robotModel->getLinkId (refLink, refLinkID);
       robotModel->getFrameList().idToIndex(refLink,refLinkID);
     }
     if(!robotModel->computeDJdq(qj,world_H_rootLink,qjDot,vb,refLinkID,Djdq))
