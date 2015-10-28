@@ -98,7 +98,8 @@ bool ModelMassMatrix::computeFast(int nrhs, const mxArray* prhs[])
 #endif
   robotModel = modelState->robotModel();
   qj = modelState->qj();
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+//   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->getRootWorldRotoTranslation();
   //xB = modelState->rootRotoTrans();
 
   if(!robotModel->computeMassMatrix(qj,world_H_rootLink,massMatrix))

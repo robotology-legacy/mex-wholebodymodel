@@ -104,7 +104,8 @@ bool ModelDjDq::computeFast(int nrhs, const mxArray* prhs[])
   qj = modelState->qj();
   qjDot = modelState->qjDot();
   vb = modelState->vb();
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+//   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->getRootWorldRotoTranslation();
   //xB = modelState->rootRotoTrans();
   refLink = mxArrayToString(prhs[1]);
   int refLinkID;

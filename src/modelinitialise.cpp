@@ -73,7 +73,8 @@ bool ModelInitialise::compute(int nrhs, const mxArray* prhs[])
     modelState->robotModel(rName);
   }
 
-  mexPrintf("Robot name %s and World Reference Frame set about %s \n",(modelState->robotName()).c_str(),(modelState->getReferenceFrameLinkName()).c_str());
+//   mexPrintf("Robot name %s and World Reference Frame set about %s \n",(modelState->robotName()).c_str(),(modelState->getReferenceFrameLinkName()).c_str());
+  mexPrintf("Robot name set as % \n",(modelState->robotName()).c_str());
   return(true);
 
 }

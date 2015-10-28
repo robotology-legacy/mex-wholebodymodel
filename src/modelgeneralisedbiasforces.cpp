@@ -101,7 +101,8 @@ bool ModelGeneralisedBiasForces::computeFast(int nrhs, const mxArray* prhs[])
     g = modelState->g();
 
 
-    world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+//     world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+    world_H_rootLink = modelState->getRootWorldRotoTranslation();
     vb = modelState->vb();
 
     if(!robotModel->computeGeneralizedBiasForces(qj,world_H_rootLink,qjDot,vb,g,h))

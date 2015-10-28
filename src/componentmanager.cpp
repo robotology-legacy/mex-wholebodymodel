@@ -28,7 +28,21 @@
 
 //local includes
 #include "componentmanager.h"
-
+#include "modelcomponent.h"
+#include "modeljointlimits.h"
+#include "modelmassmatrix.h"
+#include "modelupdatestate.h"
+#include "modelgetstate.h"
+#include "modelgeneralisedbiasforces.h"
+#include "modelstate.h"
+#include "modeldjdq.h"
+#include "modeljacobian.h"
+#include "modelinitialise.h"
+#include "modelinitialiseurdf.h"
+#include "modelforwardkinematics.h"
+#include "modelvisualizetrajectory.h"
+#include "modelcentroidalmomentum.h"
+#include "modelsetworldframe.h"
 
 using namespace mexWBIComponent;
 
@@ -71,7 +85,7 @@ ComponentManager::ComponentManager(std::string robotName)
    componentList["visualize-trajectory"] = modelVisualizeTrajectory;
    componentList["centroidal-momentum"] = modelCentroidalMomentum;
    componentList["set-world-frame"] = modelSetWorldFrame;
-   componentList["set-world-link"] = modelSetWorldLink;
+//    componentList["set-world-link"] = modelSetWorldLink;
 }
 
 void ComponentManager::cleanup()
@@ -93,7 +107,7 @@ void ComponentManager::cleanup()
   ModelVisualizeTrajectory::deleteInstance();
   ModelCentroidalMomentum::deleteInstance();
   ModelSetWorldFrame::deleteInstance();
-  ModelSetWorldLink::deleteInstance();
+//   ModelSetWorldLink::deleteInstance();
   ModelState::deleteInstance();
 }
 
@@ -120,7 +134,7 @@ void ComponentManager::initialise(std::string robotName)
   modelVisualizeTrajectory = ModelVisualizeTrajectory::getInstance();
   modelCentroidalMomentum = ModelCentroidalMomentum::getInstance();
   modelSetWorldFrame = ModelSetWorldFrame::getInstance();
-  modelSetWorldLink= ModelSetWorldLink::getInstance();
+//   modelSetWorldLink= ModelSetWorldLink::getInstance();
 }
 
 

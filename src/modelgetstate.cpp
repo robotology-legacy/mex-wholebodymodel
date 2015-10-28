@@ -112,7 +112,8 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
 //  qjDot = modelState->qjDot();
 //  vb = modelState->vb();
   //rootRotoTrans = modelState->rootRotoTrans();
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+//   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->getRootWorldRotoTranslation();
 //   modelState->computeRootWorldRotoTranslation(qj);
 
 #ifdef DEBUG
@@ -177,7 +178,8 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
 
  // world_H_rootLink = computeRootWorldRotoTranslation(qj);
 
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+//  world_H_rootLink = modelState->computeRootWorldRotoTranslation();
+  world_H_rootLink = modelState->getRootWorldRotoTranslation();
 #ifdef DEBUG
   mexPrintf("Inside getState\nRootWorldRotoTrans\n");
 

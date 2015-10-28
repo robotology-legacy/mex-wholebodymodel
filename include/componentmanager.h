@@ -26,23 +26,25 @@
 // external headers
 #include <mex.h>
 
-// local includes
-#include "modelcomponent.h"
-#include "modeljointlimits.h"
-#include "modelmassmatrix.h"
-#include "modelupdatestate.h"
-#include "modelgetstate.h"
-#include "modelgeneralisedbiasforces.h"
-#include "modelstate.h"
-#include "modeldjdq.h"
-#include "modeljacobian.h"
-#include "modelinitialise.h"
-#include "modelinitialiseurdf.h"
-#include "modelforwardkinematics.h"
-#include "modelvisualizetrajectory.h"
-#include "modelcentroidalmomentum.h"
-#include "modelsetworldframe.h"
-#include "modelsetworldlink.h"
+// forward declarations
+namespace mexWBIComponent{
+  class ModelState;
+  class ModelComponent;
+  class ModelJointLimits;
+  class ModelUpdateState;
+  class ModelGetState;
+  class ModelGeneralisedBiasForces;
+  class ModelDjDq;
+  class ModelJacobian;
+  class ModelInitialiseURDF;
+  class ModelForwardKinematics;
+  class ModelVisualizeTrajectory;
+  class ModelCentroidalMomentum;
+  class ModelMassMatrix;
+  class ModelSetWorldFrame;
+  class ModelInitialise;
+}
+// #include "modelsetworldlink.h"
 
 namespace mexWBIComponent
 {
@@ -83,7 +85,6 @@ private:
   ModelVisualizeTrajectory *modelVisualizeTrajectory;
   ModelCentroidalMomentum *modelCentroidalMomentum;
   ModelSetWorldFrame *modelSetWorldFrame;
-  ModelSetWorldLink *modelSetWorldLink;
 
   int numDof;
 

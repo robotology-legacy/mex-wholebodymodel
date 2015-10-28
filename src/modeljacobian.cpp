@@ -109,7 +109,8 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
   int numDof = modelState->dof();
 
   qj = modelState->qj();
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+//   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->getRootWorldRotoTranslation();
   refLink = mxArrayToString(prhs[1]);
   robotModel = modelState->robotModel();
   int refLinkID;

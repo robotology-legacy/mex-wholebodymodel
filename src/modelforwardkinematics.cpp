@@ -176,7 +176,8 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray* prhs[])
   robotModel = modelState->robotModel();
   qj = modelState->qj();
   //xB = modelState->rootRotoTrans();
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+//   world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->getRootWorldRotoTranslation();
  // mexPrintf("BaseFrame : [%2.2f,%2.2f,%2.2f]\n",world_H_rootLink.p[0],world_H_rootLink.p[1],world_H_rootLink.p[2]);
   refLink = mxArrayToString(prhs[1]);
   int refLinkID;

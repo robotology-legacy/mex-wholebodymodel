@@ -40,8 +40,8 @@ ModelComponent::ModelComponent(const unsigned int args, const unsigned int altAr
   //robotModel->getFrameList().idToIndex("l_sole",robot_base_frame_link);
   //robotModel->getFrameList().wbiIdToNumericId("l_sole",robot_base_frame_link);
   //robotModel->getLinkId ("l_sole", robot_base_frame_link);
-  std::string startingFrame = "l_sole";
-  modelState->setReferenceFrameLink(startingFrame);
+//   std::string startingFrame = "";
+//   modelState->setReferenceFrameLink(startingFrame);
 }
 
 
