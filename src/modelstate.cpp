@@ -328,3 +328,8 @@ wbi::Frame ModelState::getRootWorldRotoTranslation(void)
     return world_H_rootLink;
 }
 
+void ModelState::setRootWorldRotoTranslation(wbi::Frame rootWorldFrame )
+{
+   world_H_rootLink = rootWorldFrame;
+
+}

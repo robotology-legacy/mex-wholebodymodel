@@ -8,8 +8,7 @@ wbm_modelInitialise('icubGazeboSim');
 
 
 %wbm_setWorldLink('codyco_balancing_world',eye(3),[0 0 0]',[-9.81,0,0]');
-wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
-
+%wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
 
 %if(exist('storedTestTrajectory.mat','file')==0)
     %wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[-9.81, 0 , 0]');
@@ -35,6 +34,10 @@ wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
     params.dx_bInit = zeros(3,1);
     params.omega_bInit = zeros(3,1);
     params.dampingCoeff = 0.00;%0.75;
+    
+    [rot,pos] = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
+    % fprintf('Converting to a set world frame... \n');
+    wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
 
     wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
     [qj,T_bInit,dqj,vb] = wbm_getState();
