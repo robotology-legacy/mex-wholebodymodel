@@ -17,8 +17,6 @@ name = whatname('l_arm',k);
 title(name)
 legend('Linear','NonLinear','qj0')
 
-print -depsc t11
-
 figure(10)
 subplot(3,2,k)
 plot(t(k+3+5,:),tau_lin(k+3+5,:),'r')
@@ -32,8 +30,6 @@ ylabel('Nm')
 name = whatname('r_arm',k);
 title(name)
 legend('Linear','NonLinear','qj0')
-
-print -depsc t22
 
 end
 
@@ -53,8 +49,6 @@ name = whatname('l_leg',k);
 title(name)
 legend('Linear','NonLinear','qj0')
 
-print -depsc t33
-
 figure(12)
 subplot(3,2,k)
 plot(t(k+13+6,:),tau_lin(k+13+6,:),'r')
@@ -68,8 +62,6 @@ ylabel('Nm')
 name = whatname('r_leg',k);
 title(name)
 legend('Linear','NonLinear','qj0')
-
-print -depsc t44
 
 end
 
@@ -88,8 +80,5 @@ ylabel('Nm')
 name = whatname('torso',k);
 title(name)  
 legend('Linear','NonLinear','qj0')
-
-print -depsc t55
-
 
 end

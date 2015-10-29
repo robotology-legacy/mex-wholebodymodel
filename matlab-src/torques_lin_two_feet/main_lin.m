@@ -33,7 +33,7 @@ wbm_updateState(qjDes, zeros(n_joints,1), zeros(n_base,1));
 
 %% Variables definition
 PINV_TOL    = 1e-10;
-inv_rot     = eye(3)/rot;
+rot_t       = rot.';
 
 %Feet Jacobian
 link_name   = {'l_sole', 'r_sole'};
@@ -44,17 +44,17 @@ Jc          = zeros(n_constr,n_tot);
 
 for ii=1:num_constr
     
-   Jc(6*(ii-1)+1:6*ii,:) = wbm_jacobian(inv_rot,pos,qjDes,link_name{ii});
+   Jc(6*(ii-1)+1:6*ii,:) = wbm_jacobian(rot_t,pos,qjDes,link_name{ii});
 
 end
 
 %Mass matrix
-M = wbm_massMatrix(inv_rot,pos,qjDes);
+M = wbm_massMatrix(rot_t,pos,qjDes);
 
 %Matrix A at CoM
-x_lsole = wbm_forwardKinematics(inv_rot,pos,qjDes,'l_sole');
-x_rsole = wbm_forwardKinematics(inv_rot,pos,qjDes,'r_sole');
-com     = wbm_forwardKinematics(inv_rot,pos,qjDes,'com');
+x_lsole = wbm_forwardKinematics(rot_t,pos,qjDes,'l_sole');
+x_rsole = wbm_forwardKinematics(rot_t,pos,qjDes,'r_sole');
+com     = wbm_forwardKinematics(rot_t,pos,qjDes,'com');
 
 pos_leftFoot    = x_lsole(1:3);
 pos_rightFoot   = x_rsole(1:3);
@@ -159,7 +159,7 @@ Jc_q       =  Jc(1:n_base, n_base+1:end);
 conv_vb    = -(eye(n_base)/Jc_b)*Jc_q;
 
 % CoM jacobian
-Jcom       = wbm_jacobian(inv_rot,pos,qjDes,'com');
+Jcom       = wbm_jacobian(rot_t,pos,qjDes,'com');
 
 % Hw jacobian
 Jwb        = zeros(3,n_base);
@@ -170,7 +170,7 @@ for ii = 1:n_joints
     dot_qj     = zeros(n_joints,1);
     dot_qj(ii) = 1;
     
-    H = wbm_centroidalMomentum(inv_rot,pos,qjDes,dot_qj,zeros(n_base,1));
+    H = wbm_centroidalMomentum(rot_t,pos,qjDes,dot_qj,zeros(n_base,1));
      
     Jwqj(:,ii) = H(4:6);
     
@@ -181,7 +181,7 @@ for ii = 1:6
     vb     = zeros(n_base,1);
     vb(ii) = 1;
     
-    H = wbm_centroidalMomentum(inv_rot,pos,qjDes,zeros(n_joints,1),vb);
+    H = wbm_centroidalMomentum(rot_t,pos,qjDes,zeros(n_joints,1),vb);
     
     Jwb(:,ii) = H(4:6);
     

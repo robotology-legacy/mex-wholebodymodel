@@ -109,13 +109,13 @@ if     param.feet_on_ground == 1
     
 pos_feet = chi(64:69,:);
 
-controlParam.qDes2 = chi(70:end,:);
+controlParam.qDes = chi(70:end,:);
 
 elseif param.feet_on_ground == 2
 
 pos_feet = chi(64:75,:);
 
-controlParam.qDes2 = chi(76:end,:);
+controlParam.qDes = chi(76:end,:);
 
 end
 
@@ -124,23 +124,10 @@ controlParam.rsole   = wbm_forwardKinematics(R_binv,x_b,qj,'r_sole');
 controlParam.com     = wbm_forwardKinematics(R_binv,x_b,qj,'com');
 controlParam.Jcom    = wbm_jacobian(R_binv,x_b,qj,'com');
 
- controlParam.xdes_real = wbm_forwardKinematics(R_binv,x_b,controlParam.qDes2,'com');
- controlParam.xdes_real = controlParam.xdes_real(1:3);
+controlParam.xdes_real = wbm_forwardKinematics(R_binv,x_b,controlParam.qDes,'com');
+controlParam.xdes_real = controlParam.xdes_real(1:3);
 
-%% control torque and contact forces calculated using the balancing controller
-[tau, cVisualParam] = balController(t,param,controlParam);
 
-%% calculation of the real contact forces
-Jct            = Jc.';
-St             = [zeros(6,ndof); eye(ndof)];
-M_inv          = eye(ndof+6)/M;
-JcMinvSt       = Jc*M_inv*St;
-JcMinv         = Jc*M_inv;
-inv_JcMinvJct  = eye(6*param.feet_on_ground)/(Jc*M_inv*Jct);
-
-% adding a correction term in the costraints equation.
-% this is necessary to reduce the numerical errors in the costraints
-% equation. 
 pos_leftFoot    = controlParam.lsole(1:3);
 pos_rightFoot   = controlParam.rsole(1:3);
 
@@ -160,8 +147,33 @@ k_corr_vel = 2*sqrt(k_corr_pos);
                    (pos_rightFoot-rfoot_ini(1:3));(pos_feet(10:12))];
                
  end
+ 
+controlParam.pos_feet  = pos_feet_delta;
+controlParam.dJcom     = wbm_djdq(R_binv,x_b,qj,dqj,[dx_b;omega_W],'com');
+
+%% control torque and contact forces calculated using the balancing controller
+[tau, cVisualParam] = balController(t,param,controlParam);
+
+%% calculation of the real contact forces
+Jct            = Jc.';
+St             = [zeros(6,ndof); eye(ndof)];
+M_inv          = eye(ndof+6)/M;
+JcMinvSt       = Jc*M_inv*St;
+JcMinv         = Jc*M_inv;
+inv_JcMinvJct  = eye(6*param.feet_on_ground)/(Jc*M_inv*Jct);
 
 f_c            = inv_JcMinvJct*(JcMinv*h -JcMinvSt*tau -dJcDq -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet_delta);
+
+CoP(1) = -f_c(5)/f_c(3);
+CoP(2) =  f_c(4)/f_c(3);
+
+if  param.feet_on_ground == 2
+CoP(3) = -f_c(11)/f_c(9);
+CoP(4) =  f_c(10)/f_c(9);
+
+end
+
+CoP=CoP.';
 
 %% dchi computation
 % need to apply root-to-world rotation to the spatial angular velocity omega_W to
@@ -188,9 +200,11 @@ dv      = M\(Jc'*f_c + [zeros(6,1); tau]-h);
   visual_param.pos_feet  = [controlParam.lsole ; controlParam.rsole];
   visual_param.fc        = f_c;
   visual_param.tau       = tau;
-  visual_param.qj        = qj;
+  visual_param.qj        = controlParam.qDes;
   visual_param.error_com = cVisualParam.e_com;
   visual_param.f0        = cVisualParam.f0;
+  visual_param.CoP       = CoP;
+  
 
 end
 

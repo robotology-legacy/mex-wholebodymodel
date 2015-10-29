@@ -1,23 +1,18 @@
 function [T_bar,angles] = parametrization(rot)
 
-% X-Y-Z parametrization 
-C2 = rot(3,3); 
-S2 = sqrt(1-C2.^2);
+%Z-Y-X rotation
+phi   =  atan2(rot(3,2), rot(3,3));
+theta = -asin(rot(3,1));
+psi   =  atan2(rot(2,1),rot(1,1));
 
-C1 = -rot(2,3)/S2;
-C3 =  rot(3,2)/S2;
+angles = [phi theta psi];
 
-S1 = rot(1,3)/S2;
-S3 = rot(3,1)/S2;
+%Matrix which links the angular velocity with the derivative of euler
+%angles
 
-t1    =  atan2(S1,C1);
-t2    =  atan2(S2,C2);
-t3    =  atan2(S3,C3);
-
-angles =[t1 t2 t3];
-
-T_bar = [sin(t2)*sin(t3)  cos(t3)    0;
-         sin(t2)*cos(t3) -sin(t3)    0;
-              cos(t2)       0        1];     
+T_bar = [1     0           -sin(theta);
+         0  cos(phi)   sin(phi)*cos(theta) ;
+         0 -sin(phi)   cos(phi)*cos(theta)];
+     
     
 end

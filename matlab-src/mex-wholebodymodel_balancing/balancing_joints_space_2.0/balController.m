@@ -1,4 +1,4 @@
-function  [tau_c, cVisualParam] = balController(t,param,controlParam)
+function  [tau_js, cVisualParam] = balController(t,param,controlParam)
 
 % this is the main function for the balancing controller. it contains the definition of every
 % parameters necessary for the controller and calls the other functions
@@ -12,8 +12,7 @@ LEFT_RIGHT_FOOT_IN_CONTACT  = param.numConstraints;
 %% initial variables
 DOF           = param.ndof;
 q             = controlParam.qj;
-
-qDes          = param.qjInit + 0.5*pi/180*sin(2*pi*0.35*t);
+qDes          = param.qjInit;
 
 v             = controlParam.v;
 
@@ -31,8 +30,6 @@ posRightFoot  = controlParam.rsole;
 xcom          = controlParam.com(1:3);
 xcomDes       = param.com_ini(1:3);
 
-gen           = controlParam.gen;
-xdes_real     = controlParam.xdes_real;
 
 %% gains definition
 [gainsPCOM, gainsDCOM, gainMomentum, impedances_ini, dampings, referenceParams, directionOfOscillation, noOscillationTime,...
@@ -41,6 +38,14 @@ xdes_real     = controlParam.xdes_real;
 
 %% com trajectory generator
 desired_x_dx_ddx_CoM = generTraj (xcomDes,t,referenceParams,directionOfOscillation,noOscillationTime);
+
+[dq_inv,ddq_inv,d_kin_total,traj_obt,delta] = inverse_kin(desired_x_dx_ddx_CoM,param);
+
+cVisualParam.d_kin_total = d_kin_total;
+q_inv = param.d_kin_total(8:end);   
+
+traj_des = [desired_x_dx_ddx_CoM(:,1); desired_x_dx_ddx_CoM(:,2); desired_x_dx_ddx_CoM(:,3)];
+traj     = [traj_des; traj_obt];
 
 %% stability test
 % this creates a perturbation on the desired position of center of mass
@@ -60,15 +65,11 @@ impedances = nonLinImp (qDes,q,qMin,qMax,impedances_ini,increasingRatesImp,qTild
 [ConstraintsMatrix,bVectorConstraints] = constraints (forceFrictionCoefficient,numberOfPoints,torsionalFrictionCoefficient,footSize,fZmin);
 
 %% balancing with noQpcontroller
-qDes2                 = controlParam.qDes;
-
-[tauModel, Sigma, NA, fHdotDesC1C2,...                
-          errorCoM, f0, tau_c, dqj_des]   = controllerFCN (LEFT_RIGHT_FOOT_IN_CONTACT, DOF, USE_QP_SOLVER, ConstraintsMatrix, bVectorConstraints,...
-                                            q, qDes, v, M, h, H, posLeftFoot, posRightFoot, footSize, Jc, dJcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
-                                            gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, gen, qDes2, xdes_real, controlParam);
-                                        
-cVisualParam.dqj_des  = dqj_des;                                        
-      
+[tauModel,Sigma,NA,fHdotDesC1C2,errorCoM,f0, tau_js]   =  ...
+ controllerFCN   (LEFT_RIGHT_FOOT_IN_CONTACT,DOF,USE_QP_SOLVER,ConstraintsMatrix,bVectorConstraints,...
+                  q,qDes,v, M, h, H, posLeftFoot, posRightFoot,footSize, Jc, dJcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
+                  gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, dq_inv, ddq_inv, q_inv);      
+  
 %% calculating tau and fc
 fc_des  = fHdotDesC1C2 + NA*f0;
 tau     = tauModel + Sigma*fc_des;
@@ -76,5 +77,7 @@ tau     = tauModel + Sigma*fc_des;
 %%  parameters for the visualization
 cVisualParam.f0    = f0;
 cVisualParam.e_com = errorCoM;
+cVisualParam.traj  = traj;
+cVisualParam.delta = delta;
 
 end

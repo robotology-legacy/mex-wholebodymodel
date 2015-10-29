@@ -55,12 +55,13 @@ while(temp<10)
     visualizeForwardDynamics([x_b,qt_b,qj],t,params);
     temp = 10;    
     pause;
-    
+  
 end
 
 %% plot base link positions
     figure(2);
-    plot3(x_b(:,1),x_b(:,2),x_b(:,3));
+%   plot3(x_b(1000:end,1),x_b(1000:end,2),x_b(1000:end,3));
+    plot3(x_b(1:end,1),x_b(1:end,2),x_b(1:end,3));
     hold on
     plot3(x_b(1,1),x_b(1,2),x_b(1,3),'ro');
     grid on;
@@ -71,9 +72,8 @@ end
     
     xlabel('X(m)');
     ylabel('Y(m)');
-    zlabel('Z(m)'); 
-
-    
+    zlabel('Z(m)');
+        
     figure(3);
     plot(t,x_b(:,1),t,x_b(:,2),'r',t,x_b(:,3),'k');
     hold on

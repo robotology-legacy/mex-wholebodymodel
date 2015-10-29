@@ -40,8 +40,6 @@ grid on
 plot(t,pos(k,:))
 title('left foot position')
 
-print -depsc Feet_pos1
-
 figure(5)
 hold all
 grid on
@@ -72,14 +70,11 @@ grid on
 plot(t,fc(k,:))
 title('contact forces')
 
-print -depsc Fc
-
 figure(7)
 hold all
 grid on
 plot(t,f0(k,:))
 title('f0')
-print -depsc F0
 
 end
 
@@ -94,8 +89,6 @@ grid on
 plot(t,tau(k,:))
 title('torques at joints')
 
-print -depsc torques
-
 end
 
 for k=1:3
@@ -106,8 +99,6 @@ grid on
 plot(t,ecom(k,:))
 title('CoM error')
 
-print -depsc com
-
 end
 
 figure(10)
@@ -115,8 +106,6 @@ hold on
 grid on
 plot(t,norm_tau)
 title('norm of joints torques')
-
-print -depsc normt
 
 %% Joints positions
 for k=1:5
@@ -132,8 +121,6 @@ ylabel('rad')
 name = whatname('l_arm',k);
 title(name)
 
-print -depsc q1t
-
 figure(12)
 subplot(3,2,k)
 plot(t,qj(k+3+5,:))
@@ -144,8 +131,6 @@ ylabel('rad')
 
 name = whatname('r_arm',k);
 title(name)
-
-print -depsc q2t
 
 end
 
@@ -162,8 +147,6 @@ ylabel('rad')
 name = whatname('l_leg',k);
 title(name)
 
-print -depsc q3t
-
 figure(14)
 subplot(3,2,k)
 plot(t,qj(k+13+6,:))
@@ -175,7 +158,6 @@ ylabel('rad')
 name = whatname('r_leg',k);
 title(name)
 
-print -depsc q4t
 end
 
 for k=1:3
@@ -190,8 +172,6 @@ ylabel('rad')
 
 name = whatname('torso',k);
 title(name)  
-
-print -depsc q5t
 
 end
 

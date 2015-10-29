@@ -1,8 +1,5 @@
-function [K1_new,K2_new] = kronecher_prod(C,R1,R2,S1,S2,lparam)
+function [K1_new,K2_new] = kronecher_prod(C,R1,R2,S1,S2)
 
-
- m=lparam.m;
- 
  R1_tilde1 = R1;
  R2_tilde1 = R2(1:3,:);
      

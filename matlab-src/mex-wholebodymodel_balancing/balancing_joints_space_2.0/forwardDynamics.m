@@ -46,9 +46,9 @@ v       = [dx_b; omega_W; dqj];
 qT         = [x_b; qt_b];
 [~,R_b]    = frame2posrot(qT);
  
-wbm_setWorldFrame(R_b,x_b,[0 0 -9.81]');
-
-wbm_updateState(qj,dqj,[dx_b;omega_W]);
+% wbm_setWorldFrame(R_b,x_b,[0 0 -9.81]');
+% 
+% wbm_updateState(qj,dqj,[dx_b;omega_W]);
 
 %% MexWholeBodyModel calls
 % warning: there's an issue with the optimized mode: for now, it won't be
@@ -57,11 +57,11 @@ wbm_updateState(qj,dqj,[dx_b;omega_W]);
 % h = wbm_generalisedBiasForces();
 % H = wbm_centroidalMomentum();
 
-R_binv = eye(3)/R_b;
+R_btr = eye(3)/R_b;
 
-M      = wbm_massMatrix(R_binv,x_b,qj); 
-h      = wbm_generalisedBiasForces(R_binv,x_b,qj,dqj,[dx_b;omega_W]);
-H      = wbm_centroidalMomentum(R_binv,x_b,qj,dqj,[dx_b;omega_W]);
+M      = wbm_massMatrix(R_btr,x_b,qj); 
+h      = wbm_generalisedBiasForces(R_btr,x_b,qj,dqj,[dx_b;omega_W]);
+H      = wbm_centroidalMomentum(R_btr,x_b,qj,dqj,[dx_b;omega_W]);
 
 %% Building up contraints jacobian and djdq
 Jc    = zeros(6*param.numConstraints,6+ndof);
@@ -69,8 +69,8 @@ dJcDq = zeros(6*param.numConstraints,1);
 
 for i=1:param.numConstraints
     
-    Jc(6*(i-1)+1:6*i,:)    = wbm_jacobian(R_binv,x_b,qj,param.constraintLinkNames{i});
-    dJcDq(6*(i-1)+1:6*i,:) = wbm_djdq(R_binv,x_b,qj,dqj,[dx_b;omega_W],param.constraintLinkNames{i});
+    Jc(6*(i-1)+1:6*i,:)    = wbm_jacobian(R_btr,x_b,qj,param.constraintLinkNames{i});
+    dJcDq(6*(i-1)+1:6*i,:) = wbm_djdq(R_btr,x_b,qj,dqj,[dx_b;omega_W],param.constraintLinkNames{i});
     
 end
 
@@ -90,7 +90,7 @@ else
  
  disp('joint limits reached at time')    
  disp(t)
- error('joint limits reached '); 
+%error('joint limits reached '); 
 
 end
 
@@ -103,10 +103,20 @@ controlParam.v       = v;
 controlParam.Jc      = Jc;
 controlParam.dJcDq   = dJcDq;
 
-controlParam.lsole   = wbm_forwardKinematics(R_binv,x_b,qj,'l_sole');
-controlParam.rsole   = wbm_forwardKinematics(R_binv,x_b,qj,'r_sole');
-controlParam.com     = wbm_forwardKinematics(R_binv,x_b,qj,'com');
-controlParam.Jcom    = wbm_jacobian(R_binv,x_b,qj,'com');
+if     param.feet_on_ground == 1
+    
+param.d_kin_total = chi(64:end,:);
+
+elseif param.feet_on_ground == 2
+
+param.d_kin_total = chi(64:end,:);
+
+end
+
+controlParam.lsole   = wbm_forwardKinematics(R_btr,x_b,qj,'l_sole');
+controlParam.rsole   = wbm_forwardKinematics(R_btr,x_b,qj,'r_sole');
+controlParam.com     = wbm_forwardKinematics(R_btr,x_b,qj,'com');
+controlParam.Jcom    = wbm_jacobian(R_btr,x_b,qj,'com');
 
 % adding a correction term in the costraints equation.
 % this is necessary to reduce the numerical errors in the costraints
@@ -157,11 +167,22 @@ inv_JcMinvJct  = eye(6*param.feet_on_ground)/(Jc*M_inv*Jct);
 
 f_c            = inv_JcMinvJct*(JcMinv*h -JcMinvSt*tau -dJcDq -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet_delta);
 
+CoP(1) = -f_c(5)/f_c(3);
+CoP(2) =  f_c(4)/f_c(3);
+
+if  param.feet_on_ground == 2
+CoP(3) = -f_c(11)/f_c(9);
+CoP(4) =  f_c(10)/f_c(9);
+
+end
+
+CoP=CoP.';
+
 %% dchi computation
 % need to apply root-to-world rotation to the spatial angular velocity omega_W to
 % obtain angular velocity in body frame omega_b. This is then used in the
 % quaternion derivative computation.
-omega_b = R_binv*omega_W;                               
+omega_b = R_btr*omega_W;                               
 dqt_b   = quaternionDerivative(omega_b, qt_b);       
 
 dx      = [dx_b;dqt_b;dqj];
@@ -170,7 +191,8 @@ dv      = M\(Jc'*f_c + [zeros(6,1); tau]-h);
 
 % the vector of variables to be integrated is redefined to add the feet
 % position and orientation
-dchi   = [dx;dv];  
+% dchi   = [dx;dv];  
+  dchi   = [dx; dv; cVisualParam.d_kin_total];
 
 %kinEnergy = 0.5*v'*M*v;
 %dchi      = zeros(size(dchi));
@@ -180,13 +202,13 @@ dchi   = [dx;dv];
 % function
   visual_param.pos_feet  = [controlParam.lsole ; controlParam.rsole];
   visual_param.fc        = f_c;
-  
-  visual_param.tau          = cVisualParam.tau2(:,1);
-  visual_param.tau_lin      = cVisualParam.tau2(:,2);
-  
+  visual_param.tau       = tau;
   visual_param.qj        = qj;
   visual_param.error_com = cVisualParam.e_com;
   visual_param.f0        = cVisualParam.f0;
+  visual_param.traj      = cVisualParam.traj;
+  visual_param.delta     = cVisualParam.delta;
+  visual_param.CoP       = CoP;
 
 end
 

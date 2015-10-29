@@ -33,14 +33,14 @@ wbm_updateState(qjDes,zeros(n_joints,1),zeros(n_base,1));
 [pos,rot]   = frame2posrot(T_b);
 
 %% Steady-state torques definition
-rot_inv = eye(3)/rot;
+rot_tr  = rot.';
 
 %Feet Jacobian
-Jc      = wbm_jacobian(rot_inv, pos, qjDes, 'l_sole');
+Jc      = wbm_jacobian(rot_tr, pos, qjDes, 'l_sole');
 %Mass matrix
-M       = wbm_massMatrix(rot_inv, pos, qjDes);
+M       = wbm_massMatrix(rot_tr, pos, qjDes);
 %Matrix A at CoM
-com     = wbm_forwardKinematics(rot_inv, pos, qjDes, 'com');
+com     = wbm_forwardKinematics(rot_tr, pos, qjDes, 'com');
 xcom    = com(1:3);
 A       = eye(3);
 
@@ -127,7 +127,7 @@ Kd   = gainsDCOM;
 Kg   = gainMomentum*eye(3);
 
 %% Floating base transformations
-[T_bar, ~] = parametrization(rot_inv);
+[T_bar, ~] = parametrization(rot_tr);
 
 T_tilde    = [  eye(3)  zeros(3);
               zeros(3)   T_bar ];
@@ -136,7 +136,7 @@ T          = [    T_tilde            zeros(n_base,n_joints);
               zeros(n_joints,n_base)         eye(n_joints)];
 
 %CoM Jacobian 
-Jcom       = wbm_jacobian(rot_inv, pos, qjDes, 'com');
+Jcom       = wbm_jacobian(rot_tr, pos, qjDes, 'com');
 
 Jcom_lin   = Jcom(1:3,:);
 Jcom_lin_b = Jcom_lin(:,1:n_base);
@@ -151,7 +151,7 @@ for ii = 1:n_base
 vb     = zeros(n_base,1);
 vb(ii) = 1;
 
-H = wbm_centroidalMomentum(rot_inv, pos, qjDes, zeros(n_joints,1), vb);
+H = wbm_centroidalMomentum(rot_tr, pos, qjDes, zeros(n_joints,1), vb);
 
 Jwb(:,ii) = H(4:end);
 
@@ -162,7 +162,7 @@ for ii = 1:n_joints
 dqj     = zeros(n_joints,1);
 dqj(ii) = 1;
 
-H = wbm_centroidalMomentum(rot_inv, pos, qjDes, dqj, zeros(n_base,1));
+H = wbm_centroidalMomentum(rot_tr, pos, qjDes, dqj, zeros(n_base,1));
 
 Jwq(:,ii) = H(4:end);
 
@@ -273,7 +273,7 @@ R12  =  total_Jcom;
 S11  = -NL_tot;
 S12  =  eye(n_joints);
 
-[Kp_n, Kimp_n] = kronecher_prod(desired_KS,R11,R12,S11,S12,lparam);
+[Kp_n, Kimp_n] = kronecher_prod(desired_KS,R11,R12,S11,S12);
 
 KS_new = dtau_ng -R1*(-m*Kp_n*total_Jcom) -NL_tot*Kimp_n;
 
@@ -286,7 +286,7 @@ R22 =  xD_der;
 S21 = -NL_tot;
 S22 =  eye(n_joints);
 
-[Kd_n, Kder_n] = kronecher_prod(desired_KD,R21,R22,S21,S22,lparam);
+[Kd_n, Kder_n] = kronecher_prod(desired_KD,R21,R22,S21,S22);
 
 KD_new = -R1*(-m*Kd_n*xD_der) -NL_tot*Kder_n;
 

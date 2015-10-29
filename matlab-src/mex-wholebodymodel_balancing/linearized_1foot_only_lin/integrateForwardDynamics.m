@@ -66,23 +66,9 @@ addpath('./../../');
  [pos,rot]       = frame2posrot(T_b);
    
  wbm_setWorldFrame(rot,pos,[0,0,-9.81]')
- 
-% the vector of variables is redefined to integrate also the position of the feet to
-% correct numerical errors
-% params.chiInit = [T_b;params.qjInit;...
-%                   params.dx_bInit;params.omega_bInit;params.dqjInit];
 
-if     params.feet_on_ground == 2
-    
-   params.chiInit = [T_b;params.qjInit;...
-                    params.dx_bInit; params.omega_bInit; params.dqjInit; zeros(12,1)];   
-    
-elseif params.feet_on_ground == 1
-  
-   params.chiInit = [T_b;params.qjInit;...
-                    params.dx_bInit; params.omega_bInit; params.dqjInit; zeros(6,1)];
-    
-end
+ params.chiInit = [T_b;params.qjInit;...
+                  params.dx_bInit;params.omega_bInit;params.dqjInit];
 
 %% contact constraints         
 if     params.feet_on_ground == 2

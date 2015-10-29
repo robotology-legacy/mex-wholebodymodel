@@ -110,7 +110,7 @@ end
  
 %% setup integration
  params.tStart   = 0;
- params.tEnd     = 30;   
+ params.tEnd     = 10;   
  params.sim_step = 0.01;
  
  params.wait     = waitbar(0,'Integration in process...');

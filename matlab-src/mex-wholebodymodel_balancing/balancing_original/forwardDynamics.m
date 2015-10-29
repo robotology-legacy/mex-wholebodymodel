@@ -57,11 +57,11 @@ wbm_updateState(qj,dqj,[dx_b;omega_W]);
 % h = wbm_generalisedBiasForces();
 % H = wbm_centroidalMomentum();
 
-R_binv = eye(3)/R_b;
+R_b_inv  = eye(3)/R_b;
 
-M      = wbm_massMatrix(R_binv,x_b,qj); 
-h      = wbm_generalisedBiasForces(R_binv,x_b,qj,dqj,[dx_b;omega_W]);
-H      = wbm_centroidalMomentum(R_binv,x_b,qj,dqj,[dx_b;omega_W]);
+M      = wbm_massMatrix(R_b_inv,x_b,qj); 
+h      = wbm_generalisedBiasForces(R_b_inv,x_b,qj,dqj,[dx_b;omega_W]);
+H      = wbm_centroidalMomentum(R_b_inv,x_b,qj,dqj,[dx_b;omega_W]);
 
 %% Building up contraints jacobian and djdq
 Jc    = zeros(6*param.numConstraints,6+ndof);
@@ -69,8 +69,8 @@ dJcDq = zeros(6*param.numConstraints,1);
 
 for i=1:param.numConstraints
     
-    Jc(6*(i-1)+1:6*i,:)    = wbm_jacobian(R_binv,x_b,qj,param.constraintLinkNames{i});
-    dJcDq(6*(i-1)+1:6*i,:) = wbm_djdq(R_binv,x_b,qj,dqj,[dx_b;omega_W],param.constraintLinkNames{i});
+    Jc(6*(i-1)+1:6*i,:)    = wbm_jacobian(R_b_inv,x_b,qj,param.constraintLinkNames{i});
+    dJcDq(6*(i-1)+1:6*i,:) = wbm_djdq(R_b_inv,x_b,qj,dqj,[dx_b;omega_W],param.constraintLinkNames{i});
     
 end
 
@@ -103,20 +103,46 @@ controlParam.v       = v;
 controlParam.Jc      = Jc;
 controlParam.dJcDq   = dJcDq;
 
-if     param.feet_on_ground == 1
-    
-pos_feet = chi(64:69,:);
+controlParam.lsole   = wbm_forwardKinematics(R_b_inv,x_b,qj,'l_sole');
+controlParam.rsole   = wbm_forwardKinematics(R_b_inv,x_b,qj,'r_sole');
+controlParam.com     = wbm_forwardKinematics(R_b_inv,x_b,qj,'com');
+controlParam.Jcom    = wbm_jacobian(R_b_inv,x_b,qj,'com');
 
-elseif param.feet_on_ground == 2
+% adding a correction term in the costraints equation.
+% this is necessary to reduce the numerical errors in the costraints
+% equation. 
+[x_lf,R_b_lf]    = frame2posrot(controlParam.lsole);
+[~,phi_lf]       = parametrization(R_b_lf);
+[x_rf,R_b_rf]    = frame2posrot(controlParam.rsole);
+[~,phi_rf]       = parametrization(R_b_rf);
 
-pos_feet = chi(64:75,:);
+pos_leftFoot     = [x_lf; phi_lf.'];
+pos_rightFoot    = [x_rf; phi_rf.'];
 
-end
+lfoot_ini        = param.lfoot_ini;
+rfoot_ini        = param.rfoot_ini;
 
-controlParam.lsole   = wbm_forwardKinematics(R_binv,x_b,qj,'l_sole');
-controlParam.rsole   = wbm_forwardKinematics(R_binv,x_b,qj,'r_sole');
-controlParam.com     = wbm_forwardKinematics(R_binv,x_b,qj,'com');
-controlParam.Jcom    = wbm_jacobian(R_binv,x_b,qj,'com');
+[xi_lf,R_bi_lf]    = frame2posrot(lfoot_ini);
+[~,phii_lf]        = parametrization(R_bi_lf);
+[xi_rf,R_bi_rf]    = frame2posrot(rfoot_ini);
+[~,phii_rf]        = parametrization(R_bi_rf);
+
+lfoot_ini_t     = [xi_lf; phii_lf.'];
+rfoot_ini_t     = [xi_rf; phii_rf.'];
+
+k_corr_pos = 5;
+k_corr_vel = 2*sqrt(k_corr_pos);
+  
+ if      param.feet_on_ground == 1
+     
+ pos_feet_delta = pos_leftFoot-lfoot_ini_t;
+ 
+ elseif  param.feet_on_ground == 2
+     
+ pos_feet_delta = [(pos_leftFoot-lfoot_ini_t);...
+                   (pos_rightFoot-rfoot_ini_t)];
+               
+ end
 
 %% control torque and contact forces calculated using the balancing controller
 [tau, cVisualParam] = balController(t,param,controlParam);
@@ -129,36 +155,13 @@ JcMinvSt       = Jc*M_inv*St;
 JcMinv         = Jc*M_inv;
 inv_JcMinvJct  = eye(6*param.feet_on_ground)/(Jc*M_inv*Jct);
 
-% adding a correction term in the costraints equation.
-% this is necessary to reduce the numerical errors in the costraints
-% equation. 
-pos_leftFoot    = controlParam.lsole(1:3);
-pos_rightFoot   = controlParam.rsole(1:3);
-
-lfoot_ini       = param.lfoot_ini;
-rfoot_ini       = param.rfoot_ini;
-
-k_corr_pos = 5;
-k_corr_vel = 2*sqrt(k_corr_pos);
-  
- if      param.feet_on_ground == 1
-     
- pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6))];
- 
- elseif  param.feet_on_ground == 2
-     
- pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6));...
-                   (pos_rightFoot-rfoot_ini(1:3));(pos_feet(10:12))];
-               
- end
-
 f_c            = inv_JcMinvJct*(JcMinv*h -JcMinvSt*tau -dJcDq -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet_delta);
 
 %% dchi computation
 % need to apply root-to-world rotation to the spatial angular velocity omega_W to
 % obtain angular velocity in body frame omega_b. This is then used in the
 % quaternion derivative computation.
-omega_b = R_binv*omega_W;                               
+omega_b = R_b_inv*omega_W;                               
 dqt_b   = quaternionDerivative(omega_b, qt_b);       
 
 dx      = [dx_b;dqt_b;dqj];
@@ -167,8 +170,7 @@ dv      = M\(Jc'*f_c + [zeros(6,1); tau]-h);
 
 % the vector of variables to be integrated is redefined to add the feet
 % position and orientation
-% dchi   = [dx;dv];  
-  dchi   = [dx;dv;Jc*v];
+  dchi   = [dx;dv];  
 
 %kinEnergy = 0.5*v'*M*v;
 %dchi      = zeros(size(dchi));

@@ -65,10 +65,14 @@ addpath('./../../');
  [qj,T_b,dqj,vb] = wbm_getState();
  [pos,rot]       = frame2posrot(T_b);
    
- wbm_setWorldFrame(rot,pos,[0,0,-9.81]')
+%  wbm_setWorldFrame(rot,pos,[0,0,-9.81]')
  
- params.chiInit = [T_b;params.qjInit;...
-                  params.dx_bInit;params.omega_bInit;params.dqjInit];
+% the vector of variables is redefined to integrate also the position of the feet to
+% correct numerical errors
+% params.chiInit = [T_b;params.qjInit;...
+%                   params.dx_bInit;params.omega_bInit;params.dqjInit];
+
+params.chiInit = [T_b; params.qjInit; params.dx_bInit; params.omega_bInit; params.dqjInit; T_b; params.qjInit];   
 
 %% contact constraints         
 if     params.feet_on_ground == 2
@@ -106,7 +110,7 @@ end
 %% integrate forward dynamics
  disp('starting numerical integration');
  
- options = odeset('RelTol',1e-4,'AbsTol',1e-4);
+ options = odeset('RelTol',1e-9,'AbsTol',1e-9);
    
  [t,chi] = ode15s(forwardDynFunc,params.tStart:params.sim_step:params.tEnd,params.chiInit,options);
 

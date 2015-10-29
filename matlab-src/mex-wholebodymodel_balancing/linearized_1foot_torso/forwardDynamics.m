@@ -103,20 +103,46 @@ controlParam.v       = v;
 controlParam.Jc      = Jc;
 controlParam.dJcDq   = dJcDq;
 
-if     param.feet_on_ground == 1
-    
-pos_feet = chi(64:69,:);
-
-elseif param.feet_on_ground == 2
-
-pos_feet = chi(64:75,:);
-
-end
-
 controlParam.lsole   = wbm_forwardKinematics(R_binv,x_b,qj,'l_sole');
 controlParam.rsole   = wbm_forwardKinematics(R_binv,x_b,qj,'r_sole');
 controlParam.com     = wbm_forwardKinematics(R_binv,x_b,qj,'com');
 controlParam.Jcom    = wbm_jacobian(R_binv,x_b,qj,'com');
+
+% adding a correction term in the costraints equation.
+% this is necessary to reduce the numerical errors in the costraints
+% equation. 
+[x_lf,R_b_lf]    = frame2posrot(controlParam.lsole);
+[~,phi_lf]       = parametrization(R_b_lf);
+[x_rf,R_b_rf]    = frame2posrot(controlParam.rsole);
+[~,phi_rf]       = parametrization(R_b_rf);
+
+pos_leftFoot     = [x_lf; phi_lf.'];
+pos_rightFoot    = [x_rf; phi_rf.'];
+
+lfoot_ini        = param.lfoot_ini;
+rfoot_ini        = param.rfoot_ini;
+
+[xi_lf,R_bi_lf]    = frame2posrot(lfoot_ini);
+[~,phii_lf]        = parametrization(R_bi_lf);
+[xi_rf,R_bi_rf]    = frame2posrot(rfoot_ini);
+[~,phii_rf]        = parametrization(R_bi_rf);
+
+lfoot_ini_t     = [xi_lf; phii_lf.'];
+rfoot_ini_t     = [xi_rf; phii_rf.'];
+
+k_corr_pos = 5;
+k_corr_vel = 2*sqrt(k_corr_pos);
+  
+ if      param.feet_on_ground == 1
+     
+ pos_feet_delta = pos_leftFoot-lfoot_ini_t;
+ 
+ elseif  param.feet_on_ground == 2
+     
+ pos_feet_delta = [(pos_leftFoot-lfoot_ini_t);...
+                   (pos_rightFoot-rfoot_ini_t)];
+               
+ end
 
 %torso orientation
  qt_torso              = wbm_forwardKinematics(R_binv,x_b,qj,'torso');
@@ -136,29 +162,6 @@ JcMinvSt       = Jc*M_inv*St;
 JcMinv         = Jc*M_inv;
 inv_JcMinvJct  = eye(6*param.feet_on_ground)/(Jc*M_inv*Jct);
 
-% adding a correction term in the costraints equation.
-% this is necessary to reduce the numerical errors in the costraints
-% equation. 
-pos_leftFoot    = controlParam.lsole(1:3);
-pos_rightFoot   = controlParam.rsole(1:3);
-
-lfoot_ini       = param.lfoot_ini;
-rfoot_ini       = param.rfoot_ini;
-
-k_corr_pos = 5;
-k_corr_vel = 2*sqrt(k_corr_pos);
-  
- if      param.feet_on_ground == 1
-     
- pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6))];
- 
- elseif  param.feet_on_ground == 2
-     
- pos_feet_delta = [(pos_leftFoot-lfoot_ini(1:3)); (pos_feet(4:6));...
-                   (pos_rightFoot-rfoot_ini(1:3));(pos_feet(10:12))];
-               
- end
-
 f_c            = inv_JcMinvJct*(JcMinv*h -JcMinvSt*tau -dJcDq -k_corr_vel.*Jc*v -k_corr_pos.*pos_feet_delta);
 
 %% dchi computation
@@ -174,8 +177,7 @@ dv      = M\(Jc'*f_c + [zeros(6,1); tau]-h);
 
 % the vector of variables to be integrated is redefined to add the feet
 % position and orientation
-% dchi   = [dx;dv];  
-  dchi   = [dx;dv;Jc*v];
+dchi   = [dx;dv];  
 
 %kinEnergy = 0.5*v'*M*v;
 %dchi      = zeros(size(dchi));

@@ -14,7 +14,7 @@ wbm_updateState(qj2, zeros(n_joints,1), zeros(n_base,1));
 [~, T_b2, ~, ~] = wbm_getState();
 [pos2, rot2]    = frame2posrot(T_b2);
 
-tau_delta2 = add_delta(eye(3)/rot2, pos2, qj2, lparam);
+tau_delta2 = add_delta(rot2.', pos2, qj2, lparam);
 
 wbm_updateState(qjDes, zeros(n_joints,1), zeros(n_base,1));
 
@@ -27,7 +27,7 @@ wbm_updateState(qj3, zeros(n_joints,1), zeros(n_base,1));
 [~, T_b3, ~, ~] = wbm_getState();
 [pos3, rot3]    = frame2posrot(T_b3);
 
-tau_delta3 = add_delta(eye(3)/rot3, pos3, qj3, lparam);
+tau_delta3 = add_delta(rot3.', pos3, qj3, lparam);
 
 wbm_updateState(qjDes, zeros(n_joints,1), zeros(n_base,1));
 

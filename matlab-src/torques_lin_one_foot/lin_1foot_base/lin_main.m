@@ -32,17 +32,17 @@ wbm_updateState(qjDes,zeros(n_joints,1),zeros(n_base,1));
 [pos,rot]   = frame2posrot(T_b);
 
 %% Steady-state torques definition
-rot_inv = eye(3)/rot;
+rot_tr = rot.';
 
 %Feet Jacobian
-Jc  = wbm_jacobian(rot_inv, pos, qjDes, 'l_sole');
+Jc  = wbm_jacobian(rot_tr, pos, qjDes, 'l_sole');
 
 %Mass matrix
-M   = wbm_massMatrix(rot_inv, pos, qjDes);
+M   = wbm_massMatrix(rot_tr, pos, qjDes);
 
 %Matrix A at CoM
-x_lsole = wbm_forwardKinematics(rot_inv, pos, qjDes, 'l_sole');
-com     = wbm_forwardKinematics(rot_inv, pos, qjDes, 'com');
+x_lsole = wbm_forwardKinematics(rot_tr, pos, qjDes, 'l_sole');
+com     = wbm_forwardKinematics(rot_tr, pos, qjDes, 'com');
 
 pos_leftFoot = x_lsole(1:3);
 xcom         = com(1:3);
@@ -120,7 +120,7 @@ Kd   = gainsDCOM;
 Kg   = gainMomentum*eye(3);
 
 %% Floating base transformations
-[T_bar, ~] = parametrization(rot_inv);
+[T_bar, ~] = parametrization(rot_tr);
 
 T_tilde    = [  eye(3)  zeros(3);
               zeros(3)   T_bar ];
@@ -129,7 +129,7 @@ T          = [    T_tilde            zeros(n_base,n_joints);
               zeros(n_joints,n_base)         eye(n_joints)];
 
 %CoM Jacobian 
-Jcom       = wbm_jacobian(rot_inv, pos, qjDes, 'com');
+Jcom       = wbm_jacobian(rot_tr, pos, qjDes, 'com');
 
 Jcom_lin   = Jcom(1:3,:);
 Jcom_lin_b = Jcom_lin(:,1:n_base);
@@ -144,7 +144,7 @@ for ii = 1:n_base
 vb     = zeros(n_base,1);
 vb(ii) = 1;
 
-H = wbm_centroidalMomentum(rot_inv, pos, qjDes, zeros(n_joints,1), vb);
+H = wbm_centroidalMomentum(rot_tr, pos, qjDes, zeros(n_joints,1), vb);
 
 Jwb(:,ii) = H(4:end);
 
@@ -155,7 +155,7 @@ for ii = 1:n_joints
 dqj     = zeros(n_joints,1);
 dqj(ii) = 1;
 
-H = wbm_centroidalMomentum(rot_inv, pos, qjDes, dqj, zeros(n_base,1));
+H = wbm_centroidalMomentum(rot_tr, pos, qjDes, dqj, zeros(n_base,1));
 
 Jwq(:,ii) = H(4:end);
 
@@ -259,7 +259,7 @@ end
 
 %% Gains tuning using kronecher product
 % stiffness matrix
-desired_KS = -0*dtau_ng -0*eye(n_joints);
+desired_KS = -dtau_ng -25*eye(n_joints);
 
 R11  = -R1*[-m*eye(3); zeros(3)];
 R12  =  total_Jcom;
@@ -269,7 +269,7 @@ S12  =  eye(n_joints);
 
 [Kp_n, ~, Kimp_n] = kronecher_prod(desired_KS,R11,R12,S11,S12,lparam,'position');
 
-KS_new = 0*dtau_ng -R1*[-m*Kp_n*total_Jcom; zeros(3,n_joints)] -NL*Kimp_n;
+KS_new = dtau_ng -R1*[-m*Kp_n*total_Jcom; zeros(3,n_joints)] -NL*Kimp_n;
 
 % damping matrix
 desired_KD = -5*eye(n_joints);

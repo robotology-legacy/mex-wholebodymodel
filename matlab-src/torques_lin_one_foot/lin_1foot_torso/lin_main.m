@@ -32,17 +32,17 @@ wbm_updateState(qjDes,zeros(n_joints,1),zeros(n_base,1));
 [pos,rot]   = frame2posrot(T_b);
 
 %% Steady-state torques definition
-rot_inv = eye(3)/rot;
+rot_tr = rot.';
 
 %Feet Jacobian
-Jc  = wbm_jacobian(rot_inv, pos, qjDes, 'l_sole');
+Jc  = wbm_jacobian(rot_tr, pos, qjDes, 'l_sole');
 
 %Mass matrix
-M   = wbm_massMatrix(rot_inv, pos, qjDes);
+M   = wbm_massMatrix(rot_tr, pos, qjDes);
 
 %Matrix A at CoM
-x_lsole = wbm_forwardKinematics(rot_inv, pos, qjDes, 'l_sole');
-com     = wbm_forwardKinematics(rot_inv, pos, qjDes, 'com');
+x_lsole = wbm_forwardKinematics(rot_tr, pos, qjDes, 'l_sole');
+com     = wbm_forwardKinematics(rot_tr, pos, qjDes, 'com');
 
 pos_leftFoot = x_lsole(1:3);
 xcom         = com(1:3);
@@ -81,7 +81,7 @@ Lambda    = Jc*Minv*St;
 %pinvL     = pinv(Lambda, toll);
  pinvL     = Lambda.'/(Lambda*Lambda.' + toll*eye(size(Lambda,1)));
 
-NL        = eye(n_joints) - pinvL*Lambda;
+NL         = eye(n_joints) - pinvL*Lambda;
 
 %% Final terms
 P  = Jc*g_bar*e3 + Jc*Minv*Jct*pinvA*grav;
@@ -120,17 +120,8 @@ Kd   = gainsDCOM;
 Kg   = gainMomentum*eye(3);
 Kg2  = 15*eye(3);
 
-% load('gains_tun')
-% 
-% Kg2  = gains_tun.Kg2_n;
-% Kimp = gains_tun.Kimp_n;
-% Kder = gains_tun.Kder_n;
-% Kp   = gains_tun.Kp_n;
-% Kd   = gains_tun.Kd_n;
-% Kg   = gains_tun.Kg_n;
-
 %% Floating base transformations
-[T_bar, ~] = parametrization(rot_inv);
+[T_bar, ~] = parametrization(rot_tr);
 
 T_tilde    = [  eye(3)  zeros(3);
               zeros(3)   T_bar ];
@@ -139,14 +130,14 @@ T          = [    T_tilde            zeros(n_base,n_joints);
               zeros(n_joints,n_base)         eye(n_joints)];
 
 %CoM Jacobian 
-Jcom       = wbm_jacobian(rot_inv, pos, qjDes, 'com');
+Jcom       = wbm_jacobian(rot_tr, pos, qjDes, 'com');
 
 Jcom_lin   = Jcom(1:3,:);
 Jcom_lin_b = Jcom_lin(:,1:n_base);
 Jcom_lin_q = Jcom_lin(:,n_base+1:end);
 
 % torso Jacobian
-Jt         = wbm_jacobian(rot_inv, pos, qjDes, 'torso');
+Jt         = wbm_jacobian(rot_tr, pos, qjDes, 'torso');
 
 %Jw for angular momentum
 Jwb = zeros(3,n_base);
@@ -157,7 +148,7 @@ for ii = 1:n_base
 vb     = zeros(n_base,1);
 vb(ii) = 1;
 
-H = wbm_centroidalMomentum(rot_inv, pos, qjDes, zeros(n_joints,1), vb);
+H = wbm_centroidalMomentum(rot_tr, pos, qjDes, zeros(n_joints,1), vb);
 
 Jwb(:,ii) = H(4:end);
 
@@ -168,7 +159,7 @@ for ii = 1:n_joints
 dqj     = zeros(n_joints,1);
 dqj(ii) = 1;
 
-H = wbm_centroidalMomentum(rot_inv, pos, qjDes, dqj, zeros(n_base,1));
+H = wbm_centroidalMomentum(rot_tr, pos, qjDes, dqj, zeros(n_base,1));
 
 Jwq(:,ii) = H(4:end);
 

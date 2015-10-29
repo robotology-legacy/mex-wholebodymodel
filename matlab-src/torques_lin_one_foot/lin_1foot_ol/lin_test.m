@@ -67,9 +67,9 @@ Kd = gainsDCOM;
 Kg = gainMomentum*eye(3);
 
 %% Position and velocity variation form steady state
-rot_inv0 = eye(3)/rot0;
+rot_tr0  = rot0.';
 
-com0     = wbm_forwardKinematics(rot_inv0,pos0,qj0,'com');
+com0     = wbm_forwardKinematics(rot_tr0,pos0,qj0,'com');
 xcom0    = com0(1:3);
 
 space = 500;
@@ -105,26 +105,26 @@ wbm_updateState(qj,zeros(n_joints,1),zeros(n_base,1));
 [pos,rot]       = frame2posrot(T_b);
      
 %% Base variables
-rot_inv = eye(3)/rot;
+rot_tr = rot.';
 
 %Jacobian at feet    
-Jc = wbm_jacobian(rot_inv,pos,qj,'l_sole');
+Jc = wbm_jacobian(rot_tr,pos,qj,'l_sole');
 
 %Mass matrix
-M  = wbm_massMatrix(rot_inv,pos,qj);
+M  = wbm_massMatrix(rot_tr,pos,qj);
 
 %JcDv
-JcDv = wbm_djdq(rot_inv,pos,qj,dqj0,vb0,'l_sole');
+JcDv = wbm_djdq(rot_tr,pos,qj,dqj0,vb0,'l_sole');
 
 %Generalised bias forces
-h    = wbm_generalisedBiasForces(rot_inv,pos,qj,dqj0,vb0);
+h    = wbm_generalisedBiasForces(rot_tr,pos,qj,dqj0,vb0);
 
 %Centroidal momentum
-H    = wbm_centroidalMomentum(rot_inv,pos,qj,dqj0,vb0);
+H    = wbm_centroidalMomentum(rot_tr,pos,qj,dqj0,vb0);
 
 %Matrix A at CoM
-x_lsole = wbm_forwardKinematics(rot_inv,pos,qj,'l_sole');
-com     = wbm_forwardKinematics(rot_inv,pos,qj,'com');
+x_lsole = wbm_forwardKinematics(rot_tr,pos,qj,'l_sole');
+com     = wbm_forwardKinematics(rot_tr,pos,qj,'com');
 
 pos_leftFoot    = x_lsole(1:3);
 xcom            = com(1:3);
@@ -150,7 +150,7 @@ pinvL  = pinv(Lambda, toll_lambda);
 
 NL     = eye(n_joints) - pinvL*Lambda;
  
-Jcom           = wbm_jacobian(rot_inv,pos,qj,'com');
+Jcom           = wbm_jacobian(rot_tr,pos,qj,'com');
 
 Jcom_lin       = Jcom(1:3,:);
 
@@ -205,7 +205,6 @@ tau0_tilde = pinvNLt2*(post-tau_f);
 
 tau_q(:,kk) = tau_f + NL_tilde*tau0_tilde;
 
-
 %% linear torques
 tau_q_lin(:,kk) = tau_reg +KS*(qj-qj0) +KD*(dqj0);
 
@@ -216,7 +215,7 @@ wbm_updateState(qj0,zeros(n_joints,1),zeros(n_base,1));
 end
 
 %% graphics of linearization with respect of qj
-% graphics(q2*180/pi,tau_q,tau_q_lin,qj0*180/pi,tau_reg);
+graphics(q2*180/pi,tau_q,tau_q_lin,qj0*180/pi,tau_reg);
 
 %% velocity
 %definition of vb
@@ -225,8 +224,8 @@ wbm_updateState(qj0,zeros(n_joints,1),zeros(n_base,1));
 [~,T_b,~,~]     = wbm_getState();
 [pos,rot]       = frame2posrot(T_b);
 
-rot_inv   = eye(3)/rot;
-Jc        = wbm_jacobian(rot_inv,pos,qj0,'l_sole');
+rot_tr    = rot.';
+Jc        = wbm_jacobian(rot_tr,pos,qj0,'l_sole');
 Jc_base   = Jc(:,1:n_base);
 Jc_qj     = Jc(:,n_base+1:end);
 
@@ -251,29 +250,29 @@ wbm_updateState(qj,dqj,vb);
 [pos,rot]       = frame2posrot(T_b);
      
 %% Base variables
-rot_inv = eye(3)/rot;
+rot_tr = rot.';
 
 %Jacobian at feet    
-Jc = wbm_jacobian(rot_inv,pos,qj,'l_sole');
+Jc = wbm_jacobian(rot_tr,pos,qj,'l_sole');
 
 %Mass matrix
-M  = wbm_massMatrix(rot_inv,pos,qj);
+M  = wbm_massMatrix(rot_tr,pos,qj);
 
 %JcDv
-JcDv = wbm_djdq(rot_inv,pos,qj,dqj,vb,'l_sole');
+JcDv = wbm_djdq(rot_tr,pos,qj,dqj,vb,'l_sole');
 
 %gen. bias forces
-h    = wbm_generalisedBiasForces(rot_inv,pos,qj,dqj,vb);
+h    = wbm_generalisedBiasForces(rot_tr,pos,qj,dqj,vb);
 
 %centroidal momentum
-H    = wbm_centroidalMomentum(rot_inv,pos,qj,dqj,vb);
+H    = wbm_centroidalMomentum(rot_tr,pos,qj,dqj,vb);
 
 %Matrix A at CoM
 % x_lsole = wbm_forwardKinematics(rot_inv,pos,qj,'l_sole');
 % com     = wbm_forwardKinematics(rot_inv,pos,qj,'com');
 
 % pos_leftFoot    = x_lsole(1:3);
-xcom            = com(1:3);
+  xcom            = com(1:3);
   
 % Pl              = pos_leftFoot  - xcom;
 
@@ -299,7 +298,7 @@ pinvL  = pinv(Lambda, toll_lambda);
 
 NL     = eye(n_joints) - pinvL*Lambda;
  
-Jcom           = wbm_jacobian(rot_inv,pos,qj,'com');
+Jcom           = wbm_jacobian(rot_tr,pos,qj,'com');
 
 Jcom_lin       = Jcom(1:3,:);
 
@@ -323,7 +322,7 @@ fl               = pinvA*(HDotDes-grav);
  Mb              = M(1:6,1:6);
  Mbj             = M(1:6,7:end);
  qTilde          = qj-qj0;
- qD              = dqj0;
+ qD              = dqj;
 
 %%
 Jcf = Jc([1 2 3],:);
@@ -340,7 +339,7 @@ JcMinvJct       = JcMinv*transpose(Jc);
  
 tau_b  =  PInv_JcMinvSt*(JcMinv*h - JcDv);
 tau_fl = -PInv_JcMinvSt*(JcMinv*Jcft*fl);
-tau_f = tau_b+tau_fl;
+tau_f  = tau_b+tau_fl;
 Gamma  = -PInv_JcMinvSt*(JcMinv*Jcmt);
 
 NL_tilde = [Gamma NL];
@@ -352,7 +351,7 @@ pinvNLt2  = pinv(NL_tilde2,toll_lambda);
 
 tau0_tilde = pinvNLt2*(post-tau_f);
 
-tau_q(:,kk) = tau_f + NL_tilde*tau0_tilde;
+tau_dq(:,kk) = tau_f + NL_tilde*tau0_tilde;
 
 
 %% linear torques
@@ -365,5 +364,5 @@ wbm_updateState(qj0,zeros(n_joints,1),zeros(n_base,1));
 end
 
 %% graphics of linearization with respect of dqj
-graphics(dq2*180/pi,tau_dq,tau_dq_lin,dqj0*180/pi,tau_reg);
+% graphics(dq2*180/pi,tau_dq,tau_dq_lin,dqj0*180/pi,tau_reg);
 

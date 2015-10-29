@@ -68,20 +68,20 @@ Kg   = gainMomentum*eye(3);
 Kg2  = 15*eye(3);
 
 %% Position and velocity variation form steady state
-rot_inv0 = eye(3)/rot0;
+rot_tr0 = rot0.';
 
-com0     = wbm_forwardKinematics(rot_inv0,pos0,qj0,'com');
+com0     = wbm_forwardKinematics(rot_tr0,pos0,qj0,'com');
 xcom0    = com0(1:3);
 
 %torso orientation
-qt_torso         = wbm_forwardKinematics(rot_inv0,pos0,qj0,'torso');
+qt_torso         = wbm_forwardKinematics(rot_tr0,pos0,qj0,'torso');
 [~,rot_t]        = frame2posrot(qt_torso);
  
 [~,phi0]         = parametrization(rot_t);
 phi0             = phi0.';
  
 space = 500;
-toll  = 3.5*pi/180;
+toll  = 2.5*pi/180;
 
 q2  = zeros(n_joints,space);
 dq2 = q2;
@@ -113,26 +113,26 @@ wbm_updateState(qj,zeros(n_joints,1),zeros(n_base,1));
 [pos,rot]       = frame2posrot(T_b);
      
 %% Base variables
-rot_inv = eye(3)/rot;
+rot_tr = rot.';
 
 %Jacobian at feet    
-Jc = wbm_jacobian(rot_inv,pos,qj,'l_sole');
+Jc = wbm_jacobian(rot_tr,pos,qj,'l_sole');
 
 %Mass matrix
-M  = wbm_massMatrix(rot_inv,pos,qj);
+M  = wbm_massMatrix(rot_tr,pos,qj);
 
 %JcDv
-JcDv = wbm_djdq(rot_inv,pos,qj,dqj0,vb0,'l_sole');
+JcDv = wbm_djdq(rot_tr,pos,qj,dqj0,vb0,'l_sole');
 
 %Generalised bias forces
-h    = wbm_generalisedBiasForces(rot_inv,pos,qj,dqj0,vb0);
+h    = wbm_generalisedBiasForces(rot_tr,pos,qj,dqj0,vb0);
 
 %Centroidal momentum
-H    = wbm_centroidalMomentum(rot_inv,pos,qj,dqj0,vb0);
+H    = wbm_centroidalMomentum(rot_tr,pos,qj,dqj0,vb0);
 
 %Matrix A at CoM
-x_lsole = wbm_forwardKinematics(rot_inv,pos,qj,'l_sole');
-com     = wbm_forwardKinematics(rot_inv,pos,qj,'com');
+x_lsole = wbm_forwardKinematics(rot_tr,pos,qj,'l_sole');
+com     = wbm_forwardKinematics(rot_tr,pos,qj,'com');
 
 pos_leftFoot    = x_lsole(1:3);
 xcom            = com(1:3);
@@ -159,7 +159,7 @@ pinvL  = pinv(Lambda, toll_lambda);
 
 NL     = eye(n_joints) - pinvL*Lambda;
  
-Jcom           = wbm_jacobian(rot_inv,pos,qj,'com');
+Jcom           = wbm_jacobian(rot_tr,pos,qj,'com');
 
 Jcom_lin       = Jcom(1:3,:);
 
@@ -175,7 +175,7 @@ xDcom    = (Jcom_lin_base*conv_vb + Jcom_lin_qj)*dqj0;
 lin_dyn  = -Kp*(xcom-xcom0) -Kd*xDcom;
 
 %torso orientation
-qt_torso         = wbm_forwardKinematics(rot_inv,pos,qj,'torso');
+qt_torso         = wbm_forwardKinematics(rot_tr,pos,qj,'torso');
 [~,rot_t]        = frame2posrot(qt_torso);
  
 [~,phi]         = parametrization(rot_t);
@@ -209,8 +209,8 @@ wbm_updateState(qj0,zeros(n_joints,1),zeros(n_base,1));
 [~,T_b,~,~]     = wbm_getState();
 [pos,rot]       = frame2posrot(T_b);
 
-rot_inv   = eye(3)/rot;
-Jc        = wbm_jacobian(rot_inv,pos,qj0,'l_sole');
+rot_tr    = rot.';
+Jc        = wbm_jacobian(rot_tr,pos,qj0,'l_sole');
 Jc_base   = Jc(:,1:n_base);
 Jc_qj     = Jc(:,n_base+1:end);
 
@@ -235,26 +235,26 @@ wbm_updateState(qj,dqj,vb);
 [pos,rot]       = frame2posrot(T_b);
      
 %% Base variables
-rot_inv = eye(3)/rot;
+rot_tr = rot.';
 
 %Jacobian at feet    
-Jc = wbm_jacobian(rot_inv,pos,qj,'l_sole');
+Jc = wbm_jacobian(rot_tr,pos,qj,'l_sole');
 
 %Mass matrix
-M  = wbm_massMatrix(rot_inv,pos,qj);
+M  = wbm_massMatrix(rot_tr,pos,qj);
 
 %JcDv
-JcDv = wbm_djdq(rot_inv,pos,qj,dqj,vb,'l_sole');
+JcDv = wbm_djdq(rot_tr,pos,qj,dqj,vb,'l_sole');
 
 %gen. bias forces
-h    = wbm_generalisedBiasForces(rot_inv,pos,qj,dqj,vb);
+h    = wbm_generalisedBiasForces(rot_tr,pos,qj,dqj,vb);
 
 %centroidal momentum
-H    = wbm_centroidalMomentum(rot_inv,pos,qj,dqj,vb);
+H    = wbm_centroidalMomentum(rot_tr,pos,qj,dqj,vb);
 
 %Matrix A at CoM
-x_lsole = wbm_forwardKinematics(rot_inv,pos,qj,'l_sole');
-com     = wbm_forwardKinematics(rot_inv,pos,qj,'com');
+x_lsole = wbm_forwardKinematics(rot_tr,pos,qj,'l_sole');
+com     = wbm_forwardKinematics(rot_tr,pos,qj,'com');
 
 pos_leftFoot    = x_lsole(1:3);
 xcom            = com(1:3);
@@ -281,7 +281,7 @@ pinvL  = pinv(Lambda, toll_lambda);
 
 NL     = eye(n_joints) - pinvL*Lambda;
  
-Jcom           = wbm_jacobian(rot_inv,pos,qj,'com');
+Jcom           = wbm_jacobian(rot_tr,pos,qj,'com');
 
 Jcom_lin       = Jcom(1:3,:);
 
@@ -297,7 +297,7 @@ xDcom    = (Jcom_lin_base*conv_vb + Jcom_lin_qj)*dqj;
 lin_dyn  = -Kp*(xcom-xcom0) -Kd*xDcom;
 
 %torso orientation
-qt_torso         = wbm_forwardKinematics(rot_inv,pos,qj,'torso');
+qt_torso         = wbm_forwardKinematics(rot_tr,pos,qj,'torso');
 [~,rot_t]        = frame2posrot(qt_torso);
  
 [~,phi]          = parametrization(rot_t);

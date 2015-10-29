@@ -74,8 +74,6 @@ end
     ylabel('Y(m)');
     zlabel('Z(m)');
     
-        print -depsc root
-    
     figure(3);
     plot(t,x_b(:,1),t,x_b(:,2),'r',t,x_b(:,3),'k');
     hold on

@@ -125,6 +125,7 @@ ylabel('rad')
 name = whatname('l_arm',k);
 title(name)
 
+
 figure(12)
 subplot(3,2,k)
 plot(t,qj(k+3+5,:))
@@ -135,6 +136,7 @@ ylabel('rad')
 
 name = whatname('r_arm',k);
 title(name)
+
 
 end
 
@@ -151,6 +153,7 @@ ylabel('rad')
 name = whatname('l_leg',k);
 title(name)
 
+
 figure(14)
 subplot(3,2,k)
 plot(t,qj(k+13+6,:))
@@ -161,6 +164,8 @@ ylabel('rad')
 
 name = whatname('r_leg',k);
 title(name)
+
+
 
 end
 
@@ -177,6 +182,7 @@ ylabel('rad')
 name = whatname('torso',k);
 title(name)  
 
+  
 end
 
 end

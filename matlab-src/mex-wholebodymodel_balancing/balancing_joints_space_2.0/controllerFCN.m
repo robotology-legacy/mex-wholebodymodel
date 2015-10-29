@@ -1,7 +1,7 @@
-function [tauModel, Sigma, NA, fHdotDesC1C2, errorCoM, f0, tau_c, dqDes]   =  ...
+function [tauModel, Sigma, NA, fHdotDesC1C2, errorCoM, f0, tau_js]   =  ...
           controllerFCN (LEFT_RIGHT_FOOT_IN_CONTACT, DOF, USE_QP_SOLVER, ConstraintsMatrix, bVectorConstraints,...
           q, qDes, v, M, h, H, posLeftFoot, posRightFoot, footSize, Jc, JcDv, xcom, J_CoM, desired_x_dx_ddx_CoM,...
-          gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, gen, qDes2, xdes_real,controlParam)
+          gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings, dq_inv, ddq_inv, q_inv)
 
 % this is the function that computes the desired contact forces and torques
 % at joints. There's also the possibility to use QP program to calculate f0 
@@ -23,7 +23,8 @@ gravAcc         = 9.81;
  m              = M(1,1);
  Mb             = M(1:6,1:6);
  Mbj            = M(1:6,7:end);
-Mj             = M(7:end,7:end);
+ Mj             = M(7:end,7:end);
+ Mjb            = Mbj.';
 
 St              = [ zeros(6,ROBOT_DOF);
                     eye(ROBOT_DOF,ROBOT_DOF)];
@@ -192,29 +193,31 @@ end
 %f                    = f_HDot + NA*f0;
 errorCoM              = xcom - desired_x_dx_ddx_CoM(:,1);
 
-%% Joints space controller
+%% joints space controller 
+qTilde2  = q  - q_inv;
+dqTilde2 = qD - dq_inv;
 Jct = Jc.';
-[ddqDes, dqDes] = inversekin (controlParam,desired_x_dx_ddx_CoM);
 
-qD2 = qD-dqDes;
-qTilde2 = q-qDes2;
+h_new = (eye(31) - Jct*(eye(6*constraints)/(JcMinvJct))*JcMinv)*h;
+v_new = Jct*(eye(6*constraints)/(JcMinvJct))*JcDv;
 
+B     = (eye(31) - Jct*(eye(6*constraints)/(JcMinvJct))*JcMinv)*St;
 
- h_new = (eye(31) -Jct*(eye(6*constraints)/(JcMinvJct))*JcMinv)*h;
- v_new = Jct*(eye(12)/(JcMinvJct))*JcDv;
- 
- B       = (eye(31) -Jct*(eye(6*constraints)/(JcMinvJct))*JcMinv)*St;
-%  gen_new = (eye(31) -Jct*(eye(6*constraints)/(JcMinvJct))*JcMinv)*gen; 
- 
- Bj    = B(7:end,:);
- Bbj   = B(1:6,:);
- 
- Mjb   = M(7:end,1:6);
- 
- B_bar = Bj -Mjb*(eye(6)/Mb)*Bbj;
- 
-  Mbar  = Mj -Mjb*(eye(6)/Mb)*Mbj;
- 
-tau_c  =  pinv(B_bar,PINV_TOL)*((h_new(7:end)+v_new(7:end)-Mjb*(eye(6)/Mb)*(h_new(1:6)+v_new(1:6)))+ (-diag(impedances)*qTilde2 -diag(dampings)*qD2));
-%tau_c  =  pinv(B_bar,PINV_TOL)*(gen_new(7:end)-Mjb*(eye(6)/Mb)*(gen_new(1:6))+(-diag(impedances)*qTilde2 -diag(dampings)*qD2));
+Bbj   = B(1:6,:);
+Bj    = B(7:end,:);
 
+B_bar = Bj - Mjb*(eye(6)/Mb)*Bbj;
+M_bar = Mj - Mjb*(eye(6)/Mb)*Mbj;
+
+h_bar = h_new(7:end) -Mjb*(eye(6)/Mb)*h_new(1:6);
+v_bar = v_new(7:end) -Mjb*(eye(6)/Mb)*v_new(1:6);
+
+if     constraints == 1
+
+tau_js = eye(25)/B_bar*(h_bar+v_bar +M_bar*(ddq_inv -diag(impedances)*qTilde2 -diag(dampings)*dqTilde2));
+
+elseif constraints == 2 
+
+tau_js = pinv(B_bar,PINV_TOL)*(h_bar + v_bar + M_bar*(ddq_inv -diag(impedances)*qTilde2 -diag(dampings)*dqTilde2));
+
+end

@@ -8,50 +8,14 @@ a1 = strcmp(name,'position');
  
  A2 = kron(S2.',S1);
  
- for kk = 1:sqrt(size(A2,1))
-     
-     ei=zeros(sqrt(size(A2,1)),1);
-     ei(kk) =1;
-     
- Ei=ei*ei.';
- E(:,kk)=Ei(:);
+ reg = 1e-5;
  
- end
- 
- 
- reg = 1e-15;
- A_kron = (E.')*[A1 A2];
- matrix = [A1 A2 -E];
- pinvm = pinv(matrix, reg);
- null = eye(size(pinvm,1))-pinvm*matrix;
- size(null)
- sum(sum(abs(null)))
- nulldiag = null(size([A1 A2],2)+1:end);
-
- delta2 = 1*ones(size(null,2),1);
-%  size(delta2)
- 
- vett2 = null;
- size(vett2)
-sum(sum(abs( vett2(:,635:end))))
- 
-
-size(E)
-coso=[[A1 A2]*vett2(1:634,:)*delta2-E*vett2(635:end,:)*delta2]
-sum(sum(abs(coso)))
-
+ A_kron = [A1 A2];
 
  pinvA_kron  = pinv(A_kron,reg); 
  
-%  cvett = C(:);
-%  cvett = -15*ones(25,1);
-cvett = A_kron(:,3);
-
-%  vett = pinvA_kron*cvett;
-vett =vett2(1:634,:)*delta2;
-lambda = sum(sum(abs(vett2(635:end,:))))
-
-polipalle
+ cvett = C(:);
+ vett  = pinvA_kron*cvett;
 
 Kg_new     = zeros(3);     
 Kp_new     = zeros(3);
@@ -85,16 +49,6 @@ K2_new = Kg_new;
 K3_new = Kimp_new;
 
  end
- 
-%  aa = [A1 A2];
-%  bb=[aa E*cvett];
-%  [s,v,d]=svd(bb);
-%  [ss,vv,dd]=svd(aa);
-%  
-%  [diag(v) diag(vv)]
-%  
- [ eig(R1*K1_new*R2 + S1*K3_new*S2) lambda] 
-% R1*K1_new*R2 + S1*K3_new*S2
 
 %% 
 a2 = strcmp(name,'velocity');
