@@ -85,7 +85,6 @@ ComponentManager::ComponentManager(std::string robotName)
    componentList["visualize-trajectory"] = modelVisualizeTrajectory;
    componentList["centroidal-momentum"] = modelCentroidalMomentum;
    componentList["set-world-frame"] = modelSetWorldFrame;
-//    componentList["set-world-link"] = modelSetWorldLink;
 }
 
 void ComponentManager::cleanup()
@@ -107,7 +106,6 @@ void ComponentManager::cleanup()
   ModelVisualizeTrajectory::deleteInstance();
   ModelCentroidalMomentum::deleteInstance();
   ModelSetWorldFrame::deleteInstance();
-//   ModelSetWorldLink::deleteInstance();
   ModelState::deleteInstance();
 }
 
@@ -134,7 +132,6 @@ void ComponentManager::initialise(std::string robotName)
   modelVisualizeTrajectory = ModelVisualizeTrajectory::getInstance();
   modelCentroidalMomentum = ModelCentroidalMomentum::getInstance();
   modelSetWorldFrame = ModelSetWorldFrame::getInstance();
-//   modelSetWorldLink= ModelSetWorldLink::getInstance();
 }
 
 

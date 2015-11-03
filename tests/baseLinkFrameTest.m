@@ -4,7 +4,6 @@ close all;
 %% initialise mexWholeBodyModel
 wbm_modelInitialise('icubGazeboSim');
 
-%wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[ 0,0,-9.81]');
 
 %% setup params
 params.ndof = 25;
@@ -40,19 +39,12 @@ wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
 
 [qj,T_b,dqj,vb] = wbm_getState();
 
-%[pos,rot] = frame2posrot(T_b);
 fprintf('Prior rotation \n');
 disp(rot);
-%fprintf('Prior position \n');
-%disp(pos);
+
 
 fprintf('Prior rotation check (R^T*R)\n');
 disp(rot'*rot);
-%fprintf('Prior frame \n');
-%disp(T_b');
-%fprintf('Prior quaternion norm \n');
-%disp(norm(T_b(4:end)));
-
 
 
 wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));

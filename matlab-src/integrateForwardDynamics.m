@@ -35,11 +35,12 @@ wbm_modelInitialise('icubGazeboSim');
     params.omega_bInit = zeros(3,1);
     params.dampingCoeff = 0.00;%0.75;
     
+    wbm_setWorldFrame(eye(3),zeros(3,1),[ 0,0,-9.81]');
+    wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
     [rot,pos] = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
     % fprintf('Converting to a set world frame... \n');
     wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
-
-    wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
+    
     [qj,T_bInit,dqj,vb] = wbm_getState();
 
     qt_b_mod_s = T_bInit(4);

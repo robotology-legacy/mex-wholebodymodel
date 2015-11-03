@@ -1,6 +1,8 @@
 function [ world_R_base,world_p_base ] = wbm_getWorldFrameFromFixedLink( varargin )
-%WBM_GETWORLDFRAMEFROMFIXEDLINK returns the floating base position for a
-%given reference link name and joint configuration
+%WBM_GETWORLDFRAMEFROMFIXEDLINK returns the floating base position wrt to a
+%world frame that is intentionally set at a specified link frame. The
+%returned floating base position and rotation is obtained from  forward kinematics 
+%wrt the specified link frame
 %
 %   Arguments :
 %       Optimised Mode : link_name - string matching URDF name of the link (frame)
@@ -13,21 +15,36 @@ function [ world_R_base,world_p_base ] = wbm_getWorldFrameFromFixedLink( varargi
 % Genova, Dec 2014
 
     switch(nargin)
-        case 1 
-            qT = wbm_forwardKinematics(varargin{1});
-            p = zeros(3,1);
-            [base_p_reference,base_R_reference] = frame2posrot(qT);
-            world_p_base = -base_p_reference;
-            world_R_base = base_R_reference';
+        case 1
+            [world_R_base, world_p_base]= computeNewWorldToBase(varargin{1});                
         case 2 
-            qT = wbm_forwardKinematics(eye(3),zeros(3,1),varargin{2},varargin{1});
-            p = zeros(3,1);
-            [base_p_reference,base_R_reference] = frame2posrot(qT);
-            world_p_base = -base_p_reference;
-            world_R_base = base_R_reference';
+            [world_R_base, world_p_base]= computeNewWorldToBase(varargin{1},varargin{2});
         otherwise
             disp('getWorldFrameFromFixedLink : Incorrect number of arguments, check docs');
     end
             
 end
 
+
+function [world_R_base, world_p_base] = computeNewWorldToBase(varargin)
+    
+    [~,oldWorld_qH_base,~,~]  = wbm_getState();
+    [oldWorld_p_base,oldWorld_R_base] = frame2posrot(oldWorld_qH_base);
+    oldWorld_H_base = [oldWorld_R_base oldWorld_p_base; zeros(1,3) 1];
+
+    
+    if(nargin == 1)
+        [base_qH_referenceLink] = wbm_forwardKinematics(varargin{1});
+    else
+        [base_qH_referenceLink] = wbm_forwardKinematics(oldWorld_R_base,oldWorld_p_base,varargin{2},varargin{1});
+    end
+
+    [base_p_referenceLink,base_R_referenceLink] = frame2posrot(base_qH_referenceLink);
+            
+     base_H_referenceLink = [base_R_referenceLink base_p_referenceLink; zeros(1,3) 1];
+     oldWorld_H_referenceLink = oldWorld_H_base * base_H_referenceLink;
+     newWorld_H_base = oldWorld_H_referenceLink \ oldWorld_H_base;
+            
+     world_p_base = newWorld_H_base(1:3,4);
+     world_R_base = newWorld_H_base(1:3,1:3);
+end

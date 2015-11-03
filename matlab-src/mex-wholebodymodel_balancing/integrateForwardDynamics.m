@@ -114,7 +114,7 @@ end
  forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,params);
     
  params.tStart   = 0;
- params.tEnd     = 20;   
+ params.tEnd     = 0.05;   
  params.sim_step = 0.01;
 
 %% integrate forward dynamics
