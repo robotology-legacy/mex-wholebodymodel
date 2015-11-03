@@ -13,7 +13,7 @@ params.raiseErrorOnFail = true;
 params.relTol = 1e-3;
 
 % params duration of simulation (in seconds)
-params.simulationLengthInSecs = 1;
+params.simulationLengthInSecs = 10;
 
 % models
 
@@ -24,6 +24,16 @@ kinEnergyConservationTest(params);
 
 % check iCub from local urdf model
 params.urdfFilePath = 'icub.urdf';
+params.isURDF = true;
+kinEnergyConservationTest(params);
+
+% check iCub V2.5 no battery from local urdf model
+params.urdfFilePath = 'iCubV2.5_nobattery.urdf';
+params.isURDF = true;
+kinEnergyConservationTest(params);
+
+% check iCub V2.5 no battery from local urdf model
+params.urdfFilePath = 'iCubV2.5.urdf';
 params.isURDF = true;
 kinEnergyConservationTest(params);
 
