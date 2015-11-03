@@ -34,15 +34,14 @@ function [world_R_base, world_p_base] = computeNewWorldToBase(varargin)
 
     
     if(nargin == 1)
-        [base_qH_referenceLink] = wbm_forwardKinematics(varargin{1});
+        [oldWorld_qH_referenceLink] = wbm_forwardKinematics(varargin{1});
     else
-        [base_qH_referenceLink] = wbm_forwardKinematics(oldWorld_R_base,oldWorld_p_base,varargin{2},varargin{1});
+        [oldWorld_qH_referenceLink] = wbm_forwardKinematics(oldWorld_R_base,oldWorld_p_base,varargin{2},varargin{1});
     end
 
-    [base_p_referenceLink,base_R_referenceLink] = frame2posrot(base_qH_referenceLink);
-            
-     base_H_referenceLink = [base_R_referenceLink base_p_referenceLink; zeros(1,3) 1];
-     oldWorld_H_referenceLink = oldWorld_H_base * base_H_referenceLink;
+     [oldWorld_p_referenceLink,oldWorld_R_referenceLink] = frame2posrot(oldWorld_qH_referenceLink);
+                
+     oldWorld_H_referenceLink = [oldWorld_R_referenceLink oldWorld_p_referenceLink; zeros(1,3) 1];
      newWorld_H_base = oldWorld_H_referenceLink \ oldWorld_H_base;
             
      world_p_base = newWorld_H_base(1:3,4);
