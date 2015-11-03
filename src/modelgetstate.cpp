@@ -73,15 +73,9 @@ bool ModelGetState::allocateReturnSpace(int nlhs, mxArray* plhs[])
      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumOutputs","4 output arguments required for ModelGetState");
   }
 
-//   if(mxGetM(plhs[0]) != numDof || mxGetN(plhs[0]) != 1 || mxGetM(plhs[1]) != 7 || mxGetN(plhs[1]) != 1 )
-//   {
-//      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
-//   }
-
   int numDof = modelState->dof();
 
 
-    //p[0] =  mxCreateNumericMatrix(numDof, 1, mxDOUBLE_CLASS, mxREAL);//
   plhs[0]=mxCreateDoubleMatrix(numDof,1, mxREAL); //qj
   plhs[1]=mxCreateDoubleMatrix(7,1, mxREAL); //wTb
   plhs[2]=mxCreateDoubleMatrix(numDof,1, mxREAL); //qjDot
@@ -105,15 +99,9 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
 #ifdef DEBUG
   mexPrintf("ModelGetState performing Compute");
 #endif
-  //double *qjTemp;//qjTemp[numDof];
-
-  //qj = modelState->qj();
   modelState->qj(qj);
-//  qjDot = modelState->qjDot();
-//  vb = modelState->vb();
-  //rootRotoTrans = modelState->rootRotoTrans();
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
-//   modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->getRootWorldRotoTranslation();
+
 
 #ifdef DEBUG
 
@@ -149,16 +137,9 @@ bool ModelGetState::compute(int nrhs, const mxArray* prhs[])
     wTb[3+i] = rootQuaternion[i];
   }
 
- // qjDot = modelState->qjDot();
- // vb = modelState->vb();
   modelState->qjDot(qjDot);
   modelState->vb(vb);
-  /*
-  for(int i = 0 ; i< numDof; i++)
-  {
-    mexPrintf("ModelGetState qj[%d] : %2.2f, qjDot[%d] : %2.2f\n",i,qj[i],i,qjDot[i]);
-  }
-  */
+
 
   return true;
 }
@@ -171,13 +152,8 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
   mexPrintf("ModelGetState performing Compute");
 #endif
 
-  //qj = modelState->qj();
   modelState->qj(qj);
-  //rootRotoTrans = computeRootWorldRotoTranslation(qj);
-
- // world_H_rootLink = computeRootWorldRotoTranslation(qj);
-
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = modelState->getRootWorldRotoTranslation();
 #ifdef DEBUG
   mexPrintf("Inside getState\nRootWorldRotoTrans\n");
 
@@ -194,8 +170,7 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
 
   (modelState->getRootWorldRotoTranslation()).R.getQuaternion(rootQuaternion[1], rootQuaternion[2], rootQuaternion[3], rootQuaternion[0]);
 #ifdef DEBUG
-  //wbi::Rotation::getQuaternion(rootRotoTrans.R);
-
+ 
       std::stringstream ssR;
     ssR<<"Quat : ["<<rootQuaternion[0]<<","<<rootQuaternion[1]<<","<<rootQuaternion[2]<<","<<rootQuaternion[3]<<"]\n";
     std::string sR = ssR.str();

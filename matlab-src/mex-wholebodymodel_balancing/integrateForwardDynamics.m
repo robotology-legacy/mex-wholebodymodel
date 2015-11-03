@@ -9,14 +9,13 @@ clc
 % Don't forget to set the path properly depending on where are the folders in
 % your computer
 addpath('./../whole_body_model_functions/');
-addpath('./../../../../build/');
+addpath('./../../../build/');
 addpath('./../worker_functions');
 addpath('./../');
 
 %% initialise mexWholeBodyModel
  wbm_modelInitialise('icubGazeboSim');
- wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[0,0,-9.81]');
-
+ 
 %% params for balancing controller
 % the user can set this parameters depending on what he wants to do with
 % the robot
@@ -59,14 +58,16 @@ addpath('./../');
  params.dx_bInit    = zeros(3,1);
  params.omega_bInit = zeros(3,1);
   
-%% fixing the world reference frame to the ground, not to the left foot 
+%% fixing the world reference frame to the ground, (first obtaining from left foot )
  
- wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
+[rot,pos] = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
+wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
+
+ %wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
  
  [qj,T_b,dqj,vb] = wbm_getState();
- [pos,rot]       = frame2posrot(T_b);
-   
- wbm_setWorldFrame(rot,pos,[0,0,-9.81]')
+ %[pos,rot]       = frame2posrot(T_b);
+ %wbm_setWorldFrame(rot,pos,[0,0,-9.81]')
  
 % the vector of variables is redefined to integrate also the position of the feet to
 % correct numerical errors
@@ -113,7 +114,7 @@ end
  forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,params);
     
  params.tStart   = 0;
- params.tEnd     = 20;   
+ params.tEnd     = 0.05;   
  params.sim_step = 0.01;
 
 %% integrate forward dynamics

@@ -34,7 +34,6 @@ ModelSetWorldFrame *ModelSetWorldFrame::modelSetWorldFrame = 0;
 
 ModelSetWorldFrame::ModelSetWorldFrame(): ModelComponent(3,2,0)
 {
-    //numDof = robotModel->getDoFs();
 #ifdef DEBUG
     mexPrintf("ModelSetWorldFrame constructed \n");
 #endif

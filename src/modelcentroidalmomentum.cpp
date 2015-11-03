@@ -88,7 +88,7 @@ bool ModelCentroidalMomentum::computeFast(int nrhs, const mxArray* prhs[])
 
     qj = modelState->qj();
     qjDot = modelState->qjDot();
-    world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);//modelState->//rootRotoTrans();
+    world_H_rootLink = modelState->getRootWorldRotoTranslation();
     vb = modelState->vb();
 
     if(!robotModel->computeCentroidalMomentum(qj,world_H_rootLink,qjDot,vb,h))
@@ -133,7 +133,7 @@ bool ModelCentroidalMomentum::processArguments(int nrhs, const mxArray* prhs[])
     mexPrintf(" %f",qj[i]);
   }
 #endif
-  world_H_rootLink = tempFrame;//modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = tempFrame;
 
   if(h != NULL)
   {

@@ -49,17 +49,10 @@ public:
 
    bool setState(double *,double*,double*);
 
-   //void setBaseFrameLink(int);
-   void setReferenceFrameLink(std::string);
-   void setReferenceToWorldFrameRotoTrans(wbi::Frame);
    void setRootWorldRotoTranslation(wbi::Frame);
    void setGravity(double *g_temp);
 
-   std::string getReferenceFrameLinkName();
-   int getReferenceFrameLink(void);
-   wbi::Frame getReferenceToWorldFrameRotoTrans(void);
    wbi::Frame getRootWorldRotoTranslation(void);
-   wbi::Frame computeRootWorldRotoTranslation(double* q_temp);
 
    double * qj();
    double * qjDot();
@@ -93,33 +86,16 @@ public:
 private:
   ModelState(std::string);
   static ModelState * modelState;
-  //double *qS, *dqS, *dxbS;
-  double vbS[6],*qjS,*qjDotS, gS[3];//;qjS[MEX_WBMODEL_MAX_NUM_JOINTS],qjDotS[MEX_WBMODEL_MAX_NUM_JOINTS],vbS[6];
-//   wbi::Frame rootS;
-  int robot_reference_frame_link;
-  //wbi::Frame H_rootLink_wrWorld;
-  //wbi::Frame H_referenceLink_wrWorld;
-   //wbi::Frame world_H_root;
-   wbi::Frame world_H_reference;
+  double vbS[6],*qjS,*qjDotS, gS[3];
 
   size_t numDof;
   std::string currentRobotName;
-  std::string robot_reference_frame_link_name;
 
   static wbi::iWholeBodyModel *robotWBIModel;
 
-  bool fixedLinkComputation;
-
   Eigen::Matrix4d H_w2b;
-  //wbi::Frame H_base_wrfLink,
-  //wbi::Frame xB;
 
-//   int robot_base_frame_link;
-//   wbi::Frame H_rootLink_wrWorld;
-//   wbi::Frame H_baseLink_wrWorld;
   wbi::Frame world_H_rootLink;
-  wbi::Frame rootLink_H_ReferenceLink;
-  wbi::Frame referenceLink_H_rootLink;
 
 };
 

@@ -51,10 +51,7 @@ bool ModelMassMatrix::allocateReturnSpace(int nlhs, mxArray* plhs[])
   mexPrintf("Trying to allocateReturnSpace in ModelMassMatrix\n");
 #endif
   bool returnVal = false;
-//   if(nlhs!=1)
-//   {
-//      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumOutputs","1 output argument required for massmatrix");
-//   }
+
   int numDof = modelState->dof();
 
   plhs[0]=mxCreateDoubleMatrix(numDof+6,numDof+6, mxREAL);
@@ -98,8 +95,7 @@ bool ModelMassMatrix::computeFast(int nrhs, const mxArray* prhs[])
 #endif
   robotModel = modelState->robotModel();
   qj = modelState->qj();
-  world_H_rootLink = modelState->computeRootWorldRotoTranslation(qj);
-  //xB = modelState->rootRotoTrans();
+  world_H_rootLink = modelState->getRootWorldRotoTranslation();
 
   if(!robotModel->computeMassMatrix(qj,world_H_rootLink,massMatrix))
   {
@@ -149,8 +145,7 @@ bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
     mexPrintf(" %f",qj[i]);
   }
 #endif
-  //int LINK_FOOT_WRF;
-  world_H_rootLink = tempFrame;//%modelState->computeRootWorldRotoTranslation(qj);
+  world_H_rootLink = tempFrame;
 
   if(massMatrix != NULL)
   {
@@ -159,7 +154,6 @@ bool ModelMassMatrix::processArguments(int nrhs, const mxArray * prhs[])
 	mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the WBI MassMatrix call");
      }
   }
-//   mxFree(q);
   return(true);
 }
 

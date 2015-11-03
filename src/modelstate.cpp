@@ -57,7 +57,7 @@ bool isRobotNameAFile(const std::string & robotName)
   }
 }
 
-ModelState::ModelState(std::string robotName) : robot_reference_frame_link_name("l_sole"), fixedLinkComputation(false) //: qS[ndof],dqS[ndof],dxbS[ndof]
+ModelState::ModelState(std::string robotName) 
 {
   if( isRobotNameAFile(robotName) )
   {
@@ -69,11 +69,6 @@ ModelState::ModelState(std::string robotName) : robot_reference_frame_link_name(
   }
 
   numDof = robotWBIModel->getDoFs();
-
-  if( fixedLinkComputation )
-  {
-    this->setReferenceFrameLink(this->robot_reference_frame_link_name);
-  }
 
 
   qjS = (double*)malloc(sizeof(double) * (numDof));
@@ -149,22 +144,14 @@ bool ModelState::setState(double *qj_t,double *qjDot_t,double *vb_t)
     qjS[i] = qj_t[i];
     qjDotS[i] = qjDot_t[i];
 
-  //  mexPrintf("qj : %2.2f, qjDot : %2.2f \n",qjS[i],qjDotS[i]);
   }
   for(size_t i=0; i<6; i++)
   {
     vbS[i] = vb_t[i];
-    //mexPrintf("vbS ; %2.2f",vbS[i]);
   }
-  //rootS = F;
   return(true);
 }
-//    setState(double *,double*,double*,wbi:Frame);
-//
-//    double * q();
-//    double * dq();
-//    double * dxb();
-//    wbi::Frame baseFrame();
+
 void ModelState::setGravity(double *g_temp)
 {
   for(int i=0;i<3;i++)
@@ -175,7 +162,6 @@ void ModelState::setGravity(double *g_temp)
 
 double * ModelState::qj()
 {
-//   return(qS);
   return(&qjS[0]);
 }
 void ModelState::qj(double *qj_t)
@@ -187,7 +173,6 @@ void ModelState::qj(double *qj_t)
 }
 double * ModelState::qjDot()
 {
-//   return(dqS);
   return(&qjDotS[0]);
 }
 void ModelState::qjDot(double *qjDot_t)
@@ -201,7 +186,6 @@ void ModelState::qjDot(double *qjDot_t)
 
 double * ModelState::vb()
 {
-//   return(dxbS);
   return(&vbS[0]);
 }
 void ModelState::vb(double *vb_t)
@@ -211,11 +195,6 @@ void ModelState::vb(double *vb_t)
     vb_t[i] = vbS[i];
   }
 }
-// wbi::Frame ModelState::rootRotoTrans()
-// {
-//   return(rootS);
-// }
-
 double * ModelState::g(void)
 {
   return(&gS[0]);
@@ -342,38 +321,7 @@ std::string ModelState::robotName(void)
   return(currentRobotName);
 }
 
-void ModelState::setReferenceFrameLink(std::string desLink)
-{
-  robot_reference_frame_link_name = desLink;
 
-  std::string com("com");
-  if(com.compare(desLink)==0)
-  {
-    robot_reference_frame_link = wbi::iWholeBodyModel::COM_LINK_ID;
-  }
-  else
-  {
-    robotWBIModel->getFrameList().idToIndex(desLink.c_str(),robot_reference_frame_link);
-  }
-  fixedLinkComputation = true;
-}
-
-void ModelState::setReferenceToWorldFrameRotoTrans(wbi::Frame trans)
-{
-  world_H_reference = trans;
-}
-int ModelState::getReferenceFrameLink(void)
-{
-  return(robot_reference_frame_link);
-}
-std::string ModelState::getReferenceFrameLinkName(void)
-{
-  return(robot_reference_frame_link_name);
-}
-wbi::Frame ModelState::getReferenceToWorldFrameRotoTrans(void)
-{
-  return(world_H_reference);
-}
 
 wbi::Frame ModelState::getRootWorldRotoTranslation(void)
 {
@@ -382,20 +330,6 @@ wbi::Frame ModelState::getRootWorldRotoTranslation(void)
 
 void ModelState::setRootWorldRotoTranslation(wbi::Frame rootWorldFrame )
 {
-  world_H_rootLink = rootWorldFrame;
-  fixedLinkComputation = false;
-}
+   world_H_rootLink = rootWorldFrame;
 
-wbi::Frame ModelState::computeRootWorldRotoTranslation(double* q_temp)
-{
-
-  if(fixedLinkComputation)
-  {
-    ModelState::robotWBIModel->computeH(q_temp,wbi::Frame::identity(),robot_reference_frame_link, rootLink_H_ReferenceLink);
-    rootLink_H_ReferenceLink.setToInverse().get4x4Matrix (H_w2b.data());
-    // H_rootLink
-    referenceLink_H_rootLink.set4x4Matrix (H_w2b.data());
-    world_H_rootLink = world_H_reference*referenceLink_H_rootLink ;
-  }
-  return(world_H_rootLink);
 }
