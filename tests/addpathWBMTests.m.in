@@ -9,6 +9,3 @@ addpath('${CMAKE_CURRENT_SOURCE_DIR}/../mex-wholebodymodel/matlab/utilities');
 
 % Add the test script in the source directory
 addpath('${CMAKE_CURRENT_SOURCE_DIR}')
-
-% Add the models directory
-addpath('${CMAKE_CURRENT_SOURCE_DIR}/models')
