@@ -21,3 +21,7 @@ slprj/
 
 # Matlab figures
 *.fig 
+
+# OS X Finder files
+.DS_Store
+
