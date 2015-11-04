@@ -26,11 +26,13 @@ JcMinv          = Jc/M;
 JcMinvJct       = JcMinv*transpose(Jc);
 
 %% joints space controller 
-g_new   =  (-Jct*(JcMinvJct\JcMinv))*g;
-CNu_new =  (-Jct*(JcMinvJct\JcMinv))*CNu;
+Lambda  =  (JcMinvJct\JcMinv);
+
+g_new   =  (-Jct*Lambda)*g;
+CNu_new =  (-Jct*Lambda)*CNu;
 v_new   =    Jct*(JcMinvJct\JcDv);
 
-B       = (eye(31) - Jct*(JcMinvJct\JcMinv))*S;
+B       = (eye(31) - Jct*Lambda)*S;
 
 B_bar   = B(7:end,:);
 

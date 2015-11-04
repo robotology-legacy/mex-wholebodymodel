@@ -8,9 +8,9 @@ clc
 %% Setup path
 % set the path properly depending on where are the
 % required folders in your computer
-addpath('./../../whole_body_model_functions/');
-addpath('./../../../../../build/');
-addpath('./../../worker_functions');
+addpath('./../whole_body_model_functions/');
+addpath('./../../../../build/');
+addpath('./../worker_functions');
 
 %% Initialise the mexWholeBodyModel
 wbm_modelInitialise('icubGazeboSim');
@@ -25,7 +25,7 @@ wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[0,0,-9.81]');
  params.feet_on_ground           =  2;                                      %either 1 or 2
 
 % visualize inverse kinematic graphics
- vis_ikin_graphics               =  0;                                      %either 0 or 1
+ vis_ikin_graphics               =  1;                                      %either 0 or 1
  
 % visualize state integration graphics
  vis_graphics                    =  1;                                      %either 0 or 1
@@ -165,7 +165,7 @@ params.chiInit    = [T_b; params.qjInit; params.dx_bInit; params.omega_bInit; pa
 
 %% Final and initial integration time
 params.tStart          = 0;
-params.tEnd            = 1;
+params.tEnd            = 10;
  
 %% Inverse kinematics integrator
 % step for inverse kinematics integrator
