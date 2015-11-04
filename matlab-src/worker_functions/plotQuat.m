@@ -47,7 +47,7 @@ for ii=1:n
     
     
     
-%     set(ori3,'xdata',[x(ii) x(ii)+rx(ii)],'ydata',[y(ii) y(ii)+ry(ii)],'zdata',[z(ii) z(ii)+rz(ii)]);
+%   set(ori3,'xdata',[x(ii) x(ii)+rx(ii)],'ydata',[y(ii) y(ii)+ry(ii)],'zdata',[z(ii) z(ii)+rz(ii)]);
     title(num2str(ii));
     
     pause(0.0005);
