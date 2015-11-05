@@ -32,8 +32,8 @@ classdef WBM < WBMBasic
             newObj = copy@WBMBasic(obj);
         end
                 
-        function [xTb_init, chi_init, g_init] = getInitConditions(obj)
-            % g_init??? notwendig?
+        function [xTb_init, chi_init] = getODEinitConditions(obj)
+            
         end
         
         forwardDynamics(obj, t, ctrlTrqs, chi)
@@ -41,6 +41,14 @@ classdef WBM < WBMBasic
         forwardDynamicsZeroExtForces(obj, t, chi)
         
         visualizeForwardDynamics(obj, t, chi)
+        
+        function wbm_state = getStateParams(obj, chi)
+            
+        end
+        
+        function chi = getStateVector(obj, wbm_state)
+            
+        end
 
         function wbm_config = getWBMConfig(obj)
             wbm_config = obj.wb_config;
@@ -79,7 +87,7 @@ classdef WBM < WBMBasic
     
     methods(Access = private)
         function initConfig(obj, robot_config)
-            % check robot_config is an instance of a class that
+            % check if robot_config is an instance of a class that
             % is derived from the class "wbmBasicRobotConfig" ...
             if ~isa(robot_config, 'wbmBasicRobotConfig')
                 error('WBM::initWBM: %s', obj.wb_strDataTypeErr);
@@ -91,10 +99,6 @@ classdef WBM < WBMBasic
             obj.wb_config.cstrLinkNames = robot_config.cstrLinkNames;
             obj.wb_config.dampCoeff = robot_config.dampCoeff;
             obj.wb_config.initState = robot_config.initState;
-            
-            % convert all angle-values of the joint positions
-            % from degrees to radians ... 
-            %obj.wb_config.initState.q_j = obj.wb_config.initState.q_j * (pi/180.0);
         end
                         
     end

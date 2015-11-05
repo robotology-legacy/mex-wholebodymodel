@@ -112,17 +112,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
         end
         
         function [xTb, q_j, v_b, dq_j] = getState(varargin)
-        %function wbm_state = getState(varargin)
-            % get the raw-data ...
             [q_j, xTb, dq_j, v_b] = wholeBodyModel('get-state');
-           
-            %wbm_state = wbmState;
-            %wbm_state.q_j = q_j;
-            %wbm_state.dq_j = dq_j;
-            %wbm_state.x_b = xTb(1:3);
-            %wbm_state.qt_b = xTb(4:7);
-            %wbm_state.dx_b = v_b(1:3);
-            %wbm_state.omega_b = v_b(4:6);
         end
                 
         function M = massMatrix(obj, R_rootlnk_wf, p_rootlnk_wf, q_j)            

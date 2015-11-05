@@ -1,4 +1,4 @@
-classdef wbmState
+classdef wbmStateParams
     properties
         % postions and orientations:
         x_b      = zeros(3,1);
