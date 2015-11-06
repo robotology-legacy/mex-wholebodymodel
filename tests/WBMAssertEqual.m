@@ -11,7 +11,7 @@ function [ ] = WBMAssertEqual( val1, val2, errorMsg, tol  )
     end
     if( norm(val1-val2) > tol )
         disp([ 'WBM Tests: ' errorMsg])
-        disp([ 'mismatch between ' num2str(val1) ' and ' num2str(val2)])
+        disp([ 'mismatch between ' mat2str(val1) ' and ' mat2str(val2)])
         assert(norm(val1-val2) <= tol)
     end
 end
