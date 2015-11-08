@@ -1,5 +1,5 @@
-function [T, dT] = centroidalTransf(xcom,x_b,dxcom,dx_b,M)
-% centroidalTransf
+function [T, dT] = centroidalTransformationT_TDot(xcom,x_b,dxcom,dx_b,M)
+% centroidalTransformationT_TDot
 % converts the normal floating base frame of reference to 
 % the centroidal frame of reference
 %% T calculation
@@ -27,8 +27,7 @@ dX      = [zeros(3),Sf(dr)';
 dMb     = [zeros(3),Sf(mdr)';
            Sf(mdr),zeros(3)];
 
-invMb   =  eye(6)/Mb;
-inv_dMb = -invMb*dMb*invMb;
+inv_dMb = -Mb\dMb/Mb;
 
 dJs     = dX*(Mb\Mbj) + X*inv_dMb*Mbj;
  

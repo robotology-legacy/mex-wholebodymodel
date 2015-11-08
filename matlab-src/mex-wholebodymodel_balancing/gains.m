@@ -96,7 +96,7 @@ end
 %% other calculations
   impedances          = [impTorso(1,:),impArms(1,:),impArms(1,:),impLeftLeg(1,:),impRightLeg(1,:)];
    
-  dampings            = 0.25*ones(1,DOF);
+  dampings            = 0.5*ones(1,DOF);
 
   increasingRatesImp  = [impTorso(2,:),impArms(2,:),impArms(2,:),impLeftLeg(2,:),impRightLeg(2,:)];
 

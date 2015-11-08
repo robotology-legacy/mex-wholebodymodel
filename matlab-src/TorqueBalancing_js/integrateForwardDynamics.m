@@ -8,13 +8,13 @@ clc
 %% Setup path
 % set the path properly depending on where are the
 % required folders in your computer
-addpath('./../whole_body_model_functions/');
+addpath('./../../mex-wholebodymodel/matlab/utilities');
+addpath('./../../mex-wholebodymodel/matlab/wrappers');
 addpath('./../../../../build/');
-addpath('./../worker_functions');
+addpath('./../');
 
 %% Initialise the mexWholeBodyModel
 wbm_modelInitialise('icubGazeboSim');
-wbm_setWorldLink('l_sole',eye(3),[0 0 0]',[0,0,-9.81]');
 
 %% Setup demos and visualizer
 % the user can set this parameters depending on what he wants to do with
@@ -84,10 +84,15 @@ end
  params.omega_bInit = zeros(3,1);
   
 %% Fixing the world reference frame to the ground, not to the left foot 
- wbm_updateState(params.qjInit, params.dqjInit, [params.dx_bInit; params.omega_bInit]);
- 
- [~,T_b,~,~] = wbm_getState();
- [pos,rot]   = frame2posrot(T_b);  
+% update the state with the initial conditions
+wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit]);
+
+% fixing the world reference frame w.r.t. the left foot position
+[rot,pos]   = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
+
+wbm_setWorldFrame(rot,pos,[0 0 -9.81]')
+
+[~,T_b,~,~] = wbm_getState();
  
 %% Contact constraints         
 if     params.feet_on_ground == 2
@@ -161,7 +166,8 @@ v_i             = pinvJc_i*vett_feet + NJ*v_i0;
 params.ikin_init  = [T_b; params.qjInit; v_i];
 
 % initial condition for state integration 
-params.chiInit    = [T_b; params.qjInit; params.dx_bInit; params.omega_bInit; params.dqjInit]; 
+%params.chiInit    = [T_b; params.qjInit; params.dx_bInit; params.omega_bInit; params.dqjInit]; 
+params.chiInit     = [T_b; params.qjInit; v_i]; 
 
 %% Final and initial integration time
 params.tStart          = 0;
@@ -190,7 +196,7 @@ end
 %% Setup state integration
 % ode tolerances
  params.sim_step = 0.01;
- options         = odeset('RelTol',1e-5,'AbsTol',1e-5);
+ options         = odeset('RelTol',1e-4,'AbsTol',1e-4);
  params.wait     = waitbar(0,'State integration in process...');
 
 % function that will be integrated

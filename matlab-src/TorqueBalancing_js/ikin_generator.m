@@ -15,7 +15,7 @@ qt_b         = integr_terms(1:7);
 q_inv        = integr_terms(8:7+ndof);
 
 [x_b_des,Rb_des] = frame2posrot(qt_b);
-R_btr_des        = Rb_des.';
+R_btr_des        = Rb_des';
 
 %% Jacobian at feet and CoM 
 for ii=1:param.numConstraints

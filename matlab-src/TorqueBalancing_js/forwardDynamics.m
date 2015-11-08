@@ -45,7 +45,6 @@ R_b_tr  = R_b.';
 M       = wbm_massMatrix(R_b_tr,x_b,qj); 
 h       = wbm_generalisedBiasForces(R_b_tr,x_b,qj,dqj,[dx_b;omega_W]);
 g       = wbm_generalisedBiasForces(R_b_tr,x_b,qj,zeros(25,1),zeros(6,1));
-CNu     = h-g;
 
 %% building up constraints jacobian and djdq
 Jc    = zeros(6*param.numConstraints,6+ndof);
@@ -69,10 +68,10 @@ dcom    = Jcom*v;
 dxcom   = dcom(1:3);
 
 % transformation matrix for centroidal
-[T, dT] = centroidalTransf(xcom, x_b, dxcom, dx_b, M);
+[T, dT] = centroidalTransformationT_TDot(xcom,x_b,dxcom,dx_b,M);
 
 % conversion of parameters to the new frame of reference
-[Mc,CNu_c, gc, Jc_c, dJcdv_c, vc] = centroidalConversion(M, CNu, g, Jc, dJcdv, v, T, dT);
+[Mc,CNu_c, gc, Jc_c, dJcdv_c, vc] = fromFloatingToCentroidalDynamics(M, h, g, Jc, dJcdv, v, T, dT);
 
 %% saturation check
 limits = param.limits;
@@ -89,7 +88,7 @@ else
  
  disp('joint limits reached at time')    
  disp(t)
-%error('joint limits reached '); 
+ error('joint limits reached '); 
 
 end
 

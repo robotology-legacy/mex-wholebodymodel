@@ -33,6 +33,8 @@ ddqj      = dqj;
 q_total   = zeros(dim_q,dim_t);
 
 q_total(:,1)     = y0;
+qj(:,1)          = y0(8:7+ndof);
+dqj(:,1)         = y0(14+ndof:end);
 ddqj(:,1)        = ddy0;
 
 if params.numConstraints == 2
