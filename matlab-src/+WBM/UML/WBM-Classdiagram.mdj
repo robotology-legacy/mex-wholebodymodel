@@ -1067,7 +1067,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "-compNewWorldToBase(urdf_link_name: string): vector",
+											"text": "-computeNewWorld2Base(urdf_link_name: string): vector",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5
 										},
@@ -1095,7 +1095,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "-compNewWorldToBase(urdf_link_name: string, q_j: vector): vector",
+											"text": "-computeNewWorld2Base(urdf_link_name: string, q_j: vector): vector",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5
 										}
@@ -1607,7 +1607,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+forwardDynamics(t: integer, ctrlTrqs: vector, chi: vector): vector",
+											"text": "+forwardDynamics(t: integer, ctrlTrqs: vector, stvChi: vector): vector",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5
 										},
@@ -1635,7 +1635,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+forwardDynamicsZeroExtForces(t: integer, ctrlTrqs: vector, chi: vector): vector",
+											"text": "+forwardDynamicsZeroExtForces(t: integer, ctrlTrqs: vector, stvChi: vector): vector <deprecated>",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5
 										},
@@ -1691,7 +1691,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+getStateParams(chi: vector): wbmStateParams",
+											"text": "+getStateParams(stvChi: vector): wbmStateParams",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5
 										},
@@ -1719,7 +1719,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+getStateVector(wbm_state: wbmStateParams): vector",
+											"text": "+getStateVector(wbm_stParams: wbmStateParams): vector",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5
 										},
@@ -8850,7 +8850,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyxdTB0bDk8U="
 							},
-							"name": "compNewWorldToBase",
+							"name": "computeNewWorld2Base",
 							"visibility": "private",
 							"isStatic": false,
 							"isLeaf": false,
@@ -8897,7 +8897,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyxdTB0bDk8U="
 							},
-							"name": "compNewWorldToBase",
+							"name": "computeNewWorld2Base",
 							"visibility": "private",
 							"isStatic": false,
 							"isLeaf": false,
@@ -9477,7 +9477,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFPyz/iw0fBbqM="
 									},
-									"name": "chi",
+									"name": "stvChi",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -9544,7 +9544,7 @@
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "vector",
+									"type": "vector <deprecated>",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -9556,7 +9556,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFPy0DOfEfPVLs="
 									},
-									"name": "chi",
+									"name": "stvChi",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -9652,7 +9652,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFQTVwM+KwluNc="
 									},
-									"name": "chi",
+									"name": "stvChi",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -9701,7 +9701,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFQSKpt1fkRa00="
 									},
-									"name": "wbm_state",
+									"name": "wbm_stParams",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,

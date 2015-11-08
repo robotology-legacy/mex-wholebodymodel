@@ -1,10 +1,10 @@
 classdef WBM < WBMBasic
     properties(Access = private)
-        wb_config@wbmBasicRobotConfig
+        wbm_config@wbmBasicRobotConfig
     end
     
     properties(Access = private, Constant)
-       wb_strWrongMatDimErr = 'Wrong matrix dimension!';
+       wbm_strWrongMatDimErr = 'Wrong matrix dimension!';
     end
     
     methods(Access = public)
@@ -20,38 +20,46 @@ classdef WBM < WBMBasic
             obj = obj@WBMBasic(args{:});
             
             if ~exist('robot_config', 'var')
-                error('WBM::WBM: %s', obj.wb_strWrongArgErr);
+                error('WBM::WBM: %s', obj.wbm_strWrongArgErr);
             end
  
             initConfig(robot_config);
-            setState(obj.wb_config.initState.q_j, obj.wb_config.initState.dq_j, ...
-                     obj.wb_config.initState.dx_b, obj.wb_config.initState.omega_b);            
+            setState(obj.wbm_config.initState.q_j, obj.wbm_config.initState.dq_j, ...
+                     obj.wbm_config.initState.dx_b, obj.wbm_config.initState.omega_b);            
         end
         
         function newObj = copy(obj)
             newObj = copy@WBMBasic(obj);
         end
                 
-        function [xTb_init, chi_init] = getODEinitConditions(obj)
+        %function [xTb_init, chi_init] = getODEinitConditions(obj) % deprecated
+        %    
+        %end
+        
+        function T_b = getFrameRototranslation(obj)
+            [T_b,~,~,~] = getState();
+        end
+        
+        function updateWorldFrame(obj, q_j, dq_j, v_b, g_wf, urdf_link_name)
             
         end
         
         forwardDynamics(obj, t, ctrlTrqs, chi)
         
-        forwardDynamicsZeroExtForces(obj, t, chi)
+        %forwardDynamicsZeroExtForces(obj, t, chi) % deprecated
         
         visualizeForwardDynamics(obj, t, chi)
         
-        function wbm_state = getStateParams(obj, chi)
+        function wbm_stParams = getStateParams(obj, stvChi)
             
         end
         
-        function chi = getStateVector(obj, wbm_state)
+        function chi = getStateVector(obj, wbm_stParams)
             
         end
 
         function wbm_config = getWBMConfig(obj)
-            wbm_config = obj.wb_config;
+            wbm_config = obj.wbm_config;
         end
         
         function dispWBMConfig(obj, precision)
@@ -59,15 +67,15 @@ classdef WBM < WBMBasic
                 precision = 2;
             end
                         
-            cellLnkNames = [num2cell(1:obj.wb_config.nCstrs); obj.wb_config.cstrLinkNames];
+            cellLnkNames = [num2cell(1:obj.wbm_config.nCstrs); obj.wbm_config.cstrLinkNames];
             strLnkNamesLst = sprintf('  %d  %s\n', cellLnkNames{:});
             
-            cellInitSt{1} = sprintf('  q_j:      %s\n', mat2str(obj.wb_config.initState.q_j, precision));
-            cellInitSt{2} = sprintf('  dq_j:     %s\n', mat2str(obj.wb_config.initState.dq_j, precision));
-            cellInitSt{3} = sprintf('  x_b:      %s\n', mat2str(obj.wb_config.initState.x_b, precision));
-            cellInitSt{4} = sprintf('  qt_b:     %s\n', mat2str(obj.wb_config.initState.qt_b, precision));
-            cellInitSt{5} = sprintf('  dx_b:     %s\n', mat2str(obj.wb_config.initState.dx_b, precision));
-            cellInitSt{6} = sprintf('  omega_b:  %s\n', mat2str(obj.wb_config.initState.omega_b, precision));
+            cellInitSt{1} = sprintf('  q_j:      %s\n', mat2str(obj.wbm_config.initState.q_j, precision));
+            cellInitSt{2} = sprintf('  dq_j:     %s\n', mat2str(obj.wbm_config.initState.dq_j, precision));
+            cellInitSt{3} = sprintf('  x_b:      %s\n', mat2str(obj.wbm_config.initState.x_b, precision));
+            cellInitSt{4} = sprintf('  qt_b:     %s\n', mat2str(obj.wbm_config.initState.qt_b, precision));
+            cellInitSt{5} = sprintf('  dx_b:     %s\n', mat2str(obj.wbm_config.initState.dx_b, precision));
+            cellInitSt{6} = sprintf('  omega_b:  %s\n', mat2str(obj.wbm_config.initState.omega_b, precision));
             strInitState = strcat(cellInitSt{1}, cellInitSt{2}, cellInitSt{3}, ...
                                   cellInitSt{4}, cellInitSt{5}, cellInitSt{6});
                               
@@ -77,8 +85,8 @@ classdef WBM < WBMBasic
                                  ' Constraint link names:\n\n%s\n' ...
                                  ' damping coefficient: %f\n\n' ...
                                  ' initial state:\n\n%s\n'], ...
-                                obj.wb_config.ndof, obj.wb_config.nCstrs, ...
-                                strLnkNamesLst, obj.wb_config.dampCoeff, ...
+                                obj.wbm_config.ndof, obj.wbm_config.nCstrs, ...
+                                strLnkNamesLst, obj.wbm_config.dampCoeff, ...
                                 strInitState);
            disp(strConfig);
         end
@@ -90,15 +98,15 @@ classdef WBM < WBMBasic
             % check if robot_config is an instance of a class that
             % is derived from the class "wbmBasicRobotConfig" ...
             if ~isa(robot_config, 'wbmBasicRobotConfig')
-                error('WBM::initWBM: %s', obj.wb_strDataTypeErr);
+                error('WBM::initWBM: %s', obj.wbm_strDataTypeErr);
             end
             
-            obj.wb_config = wbmBasicRobotConfig;
-            obj.wb_config.ndof = robot_config.ndof;
-            obj.wb_config.nCstrs = robot_config.nCstrs;
-            obj.wb_config.cstrLinkNames = robot_config.cstrLinkNames;
-            obj.wb_config.dampCoeff = robot_config.dampCoeff;
-            obj.wb_config.initState = robot_config.initState;
+            obj.wbm_config = wbmBasicRobotConfig;
+            obj.wbm_config.ndof = robot_config.ndof;
+            obj.wbm_config.nCstrs = robot_config.nCstrs;
+            obj.wbm_config.cstrLinkNames = robot_config.cstrLinkNames;
+            obj.wbm_config.dampCoeff = robot_config.dampCoeff;
+            obj.wbm_config.initState = robot_config.initState;
         end
                         
     end

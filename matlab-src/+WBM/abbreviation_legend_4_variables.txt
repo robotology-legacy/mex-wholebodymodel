@@ -1,0 +1,18 @@
+Legend of abbreviations which are used for the variable names: 
+
+    wbm   ... whole body model
+    str   ... string
+    lnk   ... link
+    wf    ... world frame
+    j     ... joint
+    b     ... base
+    fb    ... floating base  or  frame base
+    w2b   ... world to base
+    ow    ... old world
+    nw    ... new world
+    trqs  ... torques
+    st    ... state
+    stv   ... state vector
+    ctrl  ... control
+    ref   ... reference
+
