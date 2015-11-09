@@ -109,10 +109,10 @@ end
  params.numConstraints           = length(params.constraintLinkNames);
    
 %% Feet initial position and orientation and CoM initial position                               
- params.lfoot_ini = wbm_forwardKinematics(rot', pos, params.qjInit,'l_sole');
- params.rfoot_ini = wbm_forwardKinematics(rot', pos, params.qjInit,'r_sole');
+ params.lfoot_ini = wbm_forwardKinematics(rot, pos, params.qjInit,'l_sole');
+ params.rfoot_ini = wbm_forwardKinematics(rot, pos, params.qjInit,'r_sole');
  
- params.com_ini   = wbm_forwardKinematics(rot', pos, params.qjInit,'com');
+ params.com_ini   = wbm_forwardKinematics(rot, pos, params.qjInit,'com');
  
 %% Joints limits
  load('jointLimits.mat')
@@ -141,11 +141,11 @@ PINV_TOL    = 1e-8;
 %% Jacobian at feet and CoM 
 for ii=1:params.numConstraints
     
-    Jc_i(6*(ii-1)+1:6*ii,:) = wbm_jacobian(rot',pos, params.qjInit, params.constraintLinkNames{ii});
+    Jc_i(6*(ii-1)+1:6*ii,:) = wbm_jacobian(rot,pos, params.qjInit, params.constraintLinkNames{ii});
 
 end
 
-Jcom_i_tot  =  wbm_jacobian(rot',pos ,params.qjInit,'com');
+Jcom_i_tot  =  wbm_jacobian(rot,pos ,params.qjInit,'com');
 Jcom_i      =  Jcom_i_tot(1:3,:);
 
 %% Desired state velocity

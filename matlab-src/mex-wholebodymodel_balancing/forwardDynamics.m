@@ -44,11 +44,9 @@ qT         = [x_b; qt_b];
 %% mexWholeBodyModel calls
 % warning: there's an issue with the wbm optimized mode: for now, it won't be
 % used
-R_b_tr = R_b';
-
-M      = wbm_massMatrix(R_b_tr,x_b,qj); 
-h      = wbm_generalisedBiasForces(R_b_tr,x_b,qj,dqj,[dx_b;omega_W]);
-H      = wbm_centroidalMomentum(R_b_tr,x_b,qj,dqj,[dx_b;omega_W]);
+M      = wbm_massMatrix(R_b,x_b,qj); 
+h      = wbm_generalisedBiasForces(R_b,x_b,qj,dqj,[dx_b;omega_W]);
+H      = wbm_centroidalMomentum(R_b,x_b,qj,dqj,[dx_b;omega_W]);
 
 %% building up contraints jacobian and djdq
 Jc    = zeros(6*param.numConstraints,6+ndof);
@@ -56,8 +54,8 @@ dJcDq = zeros(6*param.numConstraints,1);
 
 for i=1:param.numConstraints
     
-    Jc(6*(i-1)+1:6*i,:)    = wbm_jacobian(R_b_tr,x_b,qj,param.constraintLinkNames{i});
-    dJcDq(6*(i-1)+1:6*i,:) = wbm_djdq(R_b_tr,x_b,qj,dqj,[dx_b;omega_W],param.constraintLinkNames{i});
+    Jc(6*(i-1)+1:6*i,:)    = wbm_jacobian(R_b,x_b,qj,param.constraintLinkNames{i});
+    dJcDq(6*(i-1)+1:6*i,:) = wbm_djdq(R_b,x_b,qj,dqj,[dx_b;omega_W],param.constraintLinkNames{i});
     
 end
 
@@ -89,10 +87,10 @@ controlParam.v       = v;
 controlParam.Jc      = Jc;
 controlParam.dJcDq   = dJcDq;
 
-controlParam.lsole   = wbm_forwardKinematics(R_b_tr,x_b,qj,'l_sole');
-controlParam.rsole   = wbm_forwardKinematics(R_b_tr,x_b,qj,'r_sole');
-controlParam.com     = wbm_forwardKinematics(R_b_tr,x_b,qj,'com');
-controlParam.Jcom    = wbm_jacobian(R_b_tr,x_b,qj,'com');
+controlParam.lsole   = wbm_forwardKinematics(R_b,x_b,qj,'l_sole');
+controlParam.rsole   = wbm_forwardKinematics(R_b,x_b,qj,'r_sole');
+controlParam.com     = wbm_forwardKinematics(R_b,x_b,qj,'com');
+controlParam.Jcom    = wbm_jacobian(R_b,x_b,qj,'com');
 
 % adding a correction term in the costraints equation.
 % this is necessary to reduce the numerical integration errors 
@@ -160,7 +158,7 @@ fc    = (eye(6*param.numConstraints)/JcMinvJct)*(JcMinv*h -JcMinvSt*tau -dJcDq  
 % need to apply root-to-world rotation to the spatial angular velocity omega_W to
 % obtain angular velocity in body frame omega_b. This is then used in the
 % quaternion derivative computation.
-omega_b = R_b_tr*omega_W;                               
+omega_b = (R_b')*omega_W;                               
 dqt_b   = quaternionDerivative(omega_b, qt_b);       
 
 dx      = [dx_b;dqt_b;dqj];

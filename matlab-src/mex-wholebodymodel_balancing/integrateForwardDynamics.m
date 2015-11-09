@@ -91,10 +91,10 @@ wbm_setWorldFrame(rot,pos,[0 0 -9.81]')
  
  limits           = [jl1 jl2];
  params.limits    = limits;
- params.com_ini   = wbm_forwardKinematics(rot',pos,params.qjInit,'com');
+ params.com_ini   = wbm_forwardKinematics(rot,pos,params.qjInit,'com');
  
- params.lfoot_ini = wbm_forwardKinematics(rot',pos,params.qjInit,'l_sole');
- params.rfoot_ini = wbm_forwardKinematics(rot',pos,params.qjInit,'r_sole');
+ params.lfoot_ini = wbm_forwardKinematics(rot,pos,params.qjInit,'l_sole');
+ params.rfoot_ini = wbm_forwardKinematics(rot,pos,params.qjInit,'r_sole');
  
 %% setup integration
  params.tStart   = 0;
