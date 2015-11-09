@@ -27,6 +27,7 @@ dX      = [zeros(3),Sf(dr)';
 dMb     = [zeros(3),Sf(mdr)';
            Sf(mdr),zeros(3)];
 
+%dMb^{-1} = - Mb^{-1} dMb Mb^{-1}
 inv_dMb = -Mb\dMb/Mb;
 
 dJs     = dX*(Mb\Mbj) + X*inv_dMb*Mbj;
