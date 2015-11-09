@@ -84,6 +84,7 @@ public:
    std::string robotName(void);
 
 private:
+    
   ModelState(std::string);
   static ModelState * modelState;
   double vbS[6],*qjS,*qjDotS, gS[3];

@@ -14,8 +14,8 @@ constraints     = LEFT_RIGHT_FOOT_IN_CONTACT;
 
 %% tolerances for pseudoinverse and QP
  PINV_TOL        = 1e-10;
- regHessiansQP   = 1e-3;
-%reg             = 0.01;
+ regHessiansQP   = 1e-5;
+%reg             = 0.0001;
 
 %% others variables
 gravAcc          = 9.81;

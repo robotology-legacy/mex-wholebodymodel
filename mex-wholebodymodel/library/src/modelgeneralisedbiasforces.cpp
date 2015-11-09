@@ -125,14 +125,12 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
   p_temp = (double *)mxGetPr(prhs[2]);
 
   double tempR[9],tempP[3];
-  for(int i = 0;i<9;i++)
+  for(int i = 0;i<3;i++)
   {
-    tempR[i] = R_temp[i];
-    if(i<3)
-     {
-       tempP[i] = p_temp[i];
-     }
+     tempP[i] = p_temp[i];
   }
+  
+  reorderMatrixElements(R_temp, tempR);
   wbi::Rotation tempRot(tempR);
   wbi::Frame tempFrame(tempRot, tempP);
   robotModel = modelState->robotModel();

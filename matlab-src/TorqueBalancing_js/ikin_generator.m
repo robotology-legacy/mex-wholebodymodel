@@ -15,25 +15,24 @@ qt_b         = integr_terms(1:7);
 q_inv        = integr_terms(8:7+ndof);
 
 [x_b_des,Rb_des] = frame2posrot(qt_b);
-R_btr_des        = Rb_des.';
 
 %% Jacobian at feet and CoM 
 for ii=1:param.numConstraints
     
-    Jc_i(6*(ii-1)+1:6*ii,:)    = wbm_jacobian(R_btr_des,x_b_des,q_inv,param.constraintLinkNames{ii});
+    Jc_i(6*(ii-1)+1:6*ii,:)    = wbm_jacobian(Rb_des,x_b_des,q_inv,param.constraintLinkNames{ii});
 
 end
 
-Jcom_i_tot  =  wbm_jacobian(R_btr_des,x_b_des,q_inv,'com');
+Jcom_i_tot  =  wbm_jacobian(Rb_des,x_b_des,q_inv,'com');
 Jcom_i      =  Jcom_i_tot(1:3,:);
 
 %% CoM position
-real_des_com_tot     = wbm_forwardKinematics(R_btr_des,x_b_des,q_inv,'com');
+real_des_com_tot     = wbm_forwardKinematics(Rb_des,x_b_des,q_inv,'com');
 real_des_xcom        = real_des_com_tot(1:3);
 
 %% Feet position and orientation
-lsole   = wbm_forwardKinematics(R_btr_des,x_b_des,q_inv,'l_sole');
-rsole   = wbm_forwardKinematics(R_btr_des,x_b_des,q_inv,'r_sole');
+lsole   = wbm_forwardKinematics(Rb_des,x_b_des,q_inv,'l_sole');
+rsole   = wbm_forwardKinematics(Rb_des,x_b_des,q_inv,'r_sole');
 
 [x_lf,R_b_lf]    = frame2posrot(lsole);
 [T_lf,phi_lf]    = parametrization(R_b_lf);
@@ -86,16 +85,16 @@ v_i         = integr_terms(8+ndof:end);
 dq_inv      = v_i(7:end);
 
 v_ib        = v_i(1:6);                               
-dqt_b       = quaternionDerivative(R_btr_des*v_ib(4:end), qt_b(4:end));
+dqt_b       = quaternionDerivative((Rb_des')*v_ib(4:end), qt_b(4:end));
  
 %% Jacobian time derivative
 for ii=1:param.numConstraints
     
-    dJcdv(6*(ii-1)+1:6*ii,:) = wbm_djdq(R_btr_des,x_b_des,q_inv,dq_inv,v_ib,param.constraintLinkNames{ii});
+    dJcdv(6*(ii-1)+1:6*ii,:) = wbm_djdq(Rb_des,x_b_des,q_inv,dq_inv,v_ib,param.constraintLinkNames{ii});
 
 end
 
-dJcomdv_tot =  wbm_djdq(R_btr_des,x_b_des,q_inv,dq_inv,v_ib,'com');
+dJcomdv_tot =  wbm_djdq(Rb_des,x_b_des,q_inv,dq_inv,v_ib,'com');
 dJcomdv     =  dJcomdv_tot(1:3);
 
 %% Feet and CoM corrections of velocities
