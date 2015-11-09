@@ -1,18 +1,34 @@
 Legend of abbreviations which are used for the variable names: 
 
-    wbm   ... whole body model
-    str   ... string
-    lnk   ... link
-    wf    ... world frame
-    j     ... joint
-    b     ... base
-    fb    ... floating base  or  frame base
-    w2b   ... world to base
-    ow    ... old world
-    nw    ... new world
-    trqs  ... torques
-    st    ... state
-    stv   ... state vector
-    ctrl  ... control
-    ref   ... reference
+    wbm     ... whole body model
+	arr     ... array
+    str     ... string
+	fix     ... fixed
+    lnk     ... link
+    rlnk    ... root link
+	r       ... root
+    j       ... joint
+    b       ... base
+	g       ... gravity acceleration (vector)
+	w       ... world
+	wf      ... world frame
+    fb      ... floating base OR frame base
+    ow      ... old world
+    nw      ... new world
+    trqs    ... torques
+    st      ... state
+    stv     ... state vector
+    ctrl    ... control
+    ref     ... reference
+	params  ... parameters
+	config  ... configuration
+	pos     ... position
+	p       ... position OR translation (vector)
+	R       ... rotation (matrix)
+	T       ... transformation (matrix)
+	H       ... homogenous transformation (matrix)
+	wf_T_b  ... transformation FROM the 'base' TO the 'world frame'
+	quat, q ... quaternion
+	q_j     ... joint angle(s)	
+	
 

@@ -6,7 +6,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
     properties(Access = private, Constant)
         wbm_strWrongArgErr = 'Wrong number of input arguments!';
         wbm_strDataTypeErr = 'Wrong data type!';
-        wbm_strVecSizeErr  = 'Wrong vector size!';
+        %wbm_strVecSizeErr  = 'Wrong vector size!';
         wbm_strFrmCtrlErr  = 'Unknown control parameter!';
         wbm_strFileErr     = 'File does not exist on given path!';
         %wbm_strPathErr     = 'This is not a path!';
@@ -14,17 +14,12 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
     
     methods(Access = public)
         % Constructor:
-        function obj = WBMBasic(wbm_params, init_wf_ctrl)
-            if ~exist('wbm_params', 'var')
+        function obj = WBMBasic(model_params)
+            if ~exist('model_params', 'var')
                 error('WBMBasic::WBMBasic: %s', obj.wb_strWrongArgErr);
             end
-                        
-            if ~exist('init_wf_ctrl', 'var')
-                % % set the world frame to the current root link as default ... (wrong)
-                % default: set the world frame to a chosen reference link ... 
-                init_wf_ctrl = 'wfRootLnk';
-            end
-            initWBM(wbm_params, init_wf_ctrl);
+            
+            initWBM(model_params);
         end
         
         % Copy-function:
@@ -62,28 +57,28 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
         
         function initModelURDF(obj, urdf_file_name)
             if ~exists('urdf_file_name', 'var')
-                error('WBMBasic::setWorldLink: %s', obj.wbm_strWrongArgErr);
+                error('WBMBasic::initModelURDF: %s', obj.wbm_strWrongArgErr);
             end
             if ~exists('urdf_file_name', 'file')
-                error('WBMBasic::setWorldLink: %s', obj.wbm_strFileErr);
+                error('WBMBasic::initModelURDF: %s', obj.wbm_strFileErr);
             end
             
             wholeBodyModel('model-initialise-urdf', urdf_file_name);
         end
         
-        function setWorldFrame(obj, R_rootlnk_wf, p_rootlnk_wf, g_wf)
+        function setWorldFrame(obj, wf_R_rootLnk, wf_p_rootLnk, g_wf)
             if (nargin ~= 3)
                 error('WBMBasic::setWorldFrame: %s', obj.wbm_strWrongArgErr);
             end
-            obj.wbm_params.R_rootlnk_wf = R_rootlnk_wf;
-            obj.wbm_params.p_rootlnk_wf = p_rootlnk_wf;
+            obj.wbm_params.wf_R_rootLnk = wf_R_rootLnk;
+            obj.wbm_params.wf_p_rootLnk = wf_p_rootLnk;
             obj.wbm_params.g_wf = g_wf;
 
             % reshape the matrix into an 1-column array ...
-            R_rlnk_wf_arr = reshape(obj.wbm_params.R_rootlnk_wf, [], 1);
+            wf_R_rlnk_arr = reshape(obj.wbm_params.wf_R_rootLnk, [], 1);
             
-            wholeBodyModel('set-world-frame', R_rlnk_wf_arr, ...
-                           obj.wbm_params.p_rootlnk_w, obj.wbm_params.g_wf);
+            wholeBodyModel('set-world-frame', wf_R_rlnk_arr, ...
+                           obj.wbm_params.wf_p_rootLnk, obj.wbm_params.g_wf);
         end
         
         % function setWorldLink(obj, urdf_link_name, R_reflnk_wf, p_reflnk_wf, g_wf) % deprecated
@@ -113,18 +108,18 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
         %     end
         % end
         
-        function [p_w2b, R_w2b] = getWorldFrameFromFixedLink(obj, urdf_link_name, q_j)
+        function [w_p_b, w_R_b] = getWorldFrameFromFixedLink(obj, urdf_link_name, q_j)
             switch nargin
                 case 2
-                    [p_w2b, R_w2b]= computeNewWorld2Base(urdf_link_name, q_j);
+                    [w_p_b, w_R_b]= computeNewWorld2Base(urdf_link_name, q_j);
                 case 1
-                    [p_w2b, R_w2b]= computeNewWorld2Base(urdf_link_name);
+                    [w_p_b, w_R_b]= computeNewWorld2Base(urdf_link_name);
                 otherwise
                     error('WBMBasic::getWorldFrameFromFixedLink: %s', obj.wbm_strWrongArgErr);
             end            
         end
         
-        function setState(obj, q_j, dq_j, v_b)            
+        function setState(obj, q_j, dq_j, v_b)
             if (nargin ~= 3)
                 error('WBMBasic::setState: %s', obj.wbm_strWrongArgErr);
             end
@@ -140,12 +135,12 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             [q_j, T_b, dq_j, v_b] = wholeBodyModel('get-state');
         end
                 
-        function M = massMatrix(obj, R_rootlnk_wf, p_rootlnk_wf, q_j)            
+        function M = massMatrix(obj, wf_R_rootLnk, wf_p_rootLnk, q_j)            
             switch nargin
                 case 3
                     % Normal mode:
-                    R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
-                    M = wholeBodyModel('mass-matrix', R_rlnk_wf_arr, p_rootlnk_wf, q_j);
+                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
+                    M = wholeBodyModel('mass-matrix', wf_R_rlnk_arr, wf_p_rootLnk, q_j);
                 case 0
                     % Optimized mode:
                     M = wholeBodyModel('mass-matrix');
@@ -158,11 +153,11 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             [jl_lower, jl_upper] = wholeBodyModel('joint-limits');
         end
         
-        function J = jacobian(obj, urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j)
+        function J = jacobian(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j)
             switch nargin
                 case 4
-                    R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
-                    J = wholeBodyModel('jacobian', R_rlnk_wf_arr, p_rootlnk_wf, q_j, urdf_link_name);                    
+                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
+                    J = wholeBodyModel('jacobian', wf_R_rlnk_arr, wf_p_rootLnk, q_j, urdf_link_name);                    
                 case 1
                     J = wholeBodyModel('jacobian', urdf_link_name);
                 otherwise
@@ -170,11 +165,11 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end
         end
         
-        function djdq = dJdq(obj, urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_b)
+        function djdq = dJdq(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             switch nargin
                 case 6
-                    R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
-                    djdq = wholeBodyModel('djdq', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_b, urdf_link_name);
+                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
+                    djdq = wholeBodyModel('djdq', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b, urdf_link_name);
                 case 1
                     djdq = wholeBodyModel('djdq', urdf_link_name);
                 otherwise
@@ -182,11 +177,11 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end
         end
         
-        function H = centrodialMomentum(obj, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_b)
+        function H = centrodialMomentum(obj, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             switch nargin
                 case 5
-                    R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
-                    H = wholeBodyModel('centroidal-momentum', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_b);
+                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
+                    H = wholeBodyModel('centroidal-momentum', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b);
                 case 0 
                     H = wholeBodyModel('centroidal-momentum');
                 otherwise
@@ -194,11 +189,11 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end
         end
         
-        function p = forwardKinematics(obj, urdf_link_name, R_rootlnk_wf, p_rootlnk_wf, q_j)
+        function p = forwardKinematics(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j)
             switch nargin
                 case 4
-                    R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
-                    p = wholeBodyModel('forward-kinematics', R_rlnk_wf_arr, p_rootlnk_wf, q_j, urdf_link_name);
+                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
+                    p = wholeBodyModel('forward-kinematics', wf_R_rlnk_arr, wf_p_rootLnk, q_j, urdf_link_name);
                 case 1
                     p = wholeBodyModel('forward-kinematics', urdf_link_name);
                 otherwise
@@ -206,15 +201,15 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end            
         end
         
-        function C_qv = genBiasForces(obj, R_rootlnk_wf, p_rootlnk_wf, q_j, dq_j, v_b)
+        function C_qv = generalBiasForces(obj, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             switch nargin
                 case 5
-                    R_rlnk_wf_arr = reshape(R_rootlnk_wf, [], 1);
-                    C_qv = wholeBodyModel('generalised-forces', R_rlnk_wf_arr, p_rootlnk_wf, q_j, dq_j, v_b);
+                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
+                    C_qv = wholeBodyModel('generalised-forces', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b);
                 case 0
                     C_qv = wholeBodyModel('generalised-forces');
                 otherwise
-                    error('WBMBasic::genBiasForces: %s', obj.wbm_strWrongArgErr);
+                    error('WBMBasic::generalBiasForces: %s', obj.wbm_strWrongArgErr);
             end
         end       
   
@@ -231,23 +226,25 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
                                  ' URDF ref. link name: %s\n\n' ...
                                  ' R (root link to world frame):\n\n  %s\n\n' ...
                                  ' p (root link to world frame):\n\n  %s\n\n' ...
-                                 ' R (ref. link to world frame):\n\n  %s\n\n' ...
-                                 ' p (ref. link to world frame):\n\n  %s\n\n' ...
                                  ' g (world frame):\n\n %s\n\n'], ...
                                 obj.wbm_params.urdfRobotName, obj.wbm_params.urdfLinkName, ...
-                                mat2str(obj.wbm_params.R_rootlnk_wf, precision), ...
-                                mat2str(obj.wbm_params.p_rootlnk_wf, precision), ...
-                                mat2str(obj.wbm_params.R_reflnk_wf, precision), ...
-                                mat2str(obj.wbm_params.p_reflnk_wf, precision), ...
+                                mat2str(obj.wbm_params.wf_R_rootLnk, precision), ...
+                                mat2str(obj.wbm_params.wf_p_rootLnk, precision), ...
                                 mat2str(obj.wbm_params.g_wf, precision));
+
+                                 %' R (ref. link to world frame):\n\n  %s\n\n' ...
+                                 %' p (ref. link to world frame):\n\n  %s\n\n' ...
+                                 
+                                %mat2str(obj.wbm_params.wf_R_refLnk, precision), ...
+                                %mat2str(obj.wbm_params.wf_p_refLnk, precision), ...
            disp(strParams);
         end
 
     end
     
     methods(Access = private)
-        function initWBM(obj, wbm_params, init_wf_ctrl)
-            if ~isa(wbm_params, 'wbmBasicModelParams')
+        function initWBM(obj, model_params)
+            if ~isa(model_params, 'wbmBasicModelParams')
                 error('WBMBasic::initWBM: %s', obj.wbm_strDataTypeErr);
             end
             
@@ -255,63 +252,48 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             %
             obj.wbm_params = wbmBasicModelParams;
             
-            % initialize the mex-wholeBodyModel of a floating base robot
-            % by using the Unified Robot Description Format (URDF):
-            if isempty(wbm_params.urdfRobotName)
+            % Initialize the mex-wholeBodyModel for a floating base robot,
+            % using Unified Robot Description Format (URDF):
+            if isempty(model_params.urdfRobot)
                 % Optimized mode:
-                initModel();
+                initModel(); % use default robot
             else
                 % Normal mode:
-                initModel(wbm_params.urdfRobotName);
-            end
-            
-            % set the world frame (WF) to a given rototranslation from a
-            % chosen link:
-            switch init_wf_ctrl
-                case 'wfRefLnk'
-                    % use a reference link of the robot ...
-                    if isempty(wbm_params.urdfRefLinkName)
-                        % Optimized mode:
-                        setWorldLink(wbm_params.R_reflnk_wf, wbm_params.p_reflnk_wf);                
-                    else
-                        % Normal mode:
-                        setWorldLink(wbm_params.urdfRefLinkName, wbm_params.R_reflnk_wf, ...
-                                     wbm_params.p_reflnk_wf, wbm_params.g_wf);
-                    end            
-                case 'wfRootLnk'
-                    % use the current root link for the WF ...
-                    setWorldFrame(wbm_params.R_rootlnk_wf, wbm_params.p_rootlnk_wf, ...
-                                  wbm_params.g_wf);
-                otherwise
-                    error('WBMBasic::initWBM: %s', obj.wbm_strFrmCtrlErr);
-            end
+                if exists(model_params.urdfRobot, 'file')
+                    % use directly a specific URDF-file for the robot ...
+                    initModelURDF(model_params.urdfRobot);
+                else
+                    % set the robot-name which is supported by the WBI ...
+                    initModel(model_params.urdfRobot);
+                end
+            end            
         end
         
-        function [p_nw2b, R_nw2b] = computeNewWorld2Base(urdf_link_name, q_j)
-            % get the transformation values from the old world to the base ...
-            [qH_ow2b,~,~,~] = getState();
-            [p_ow2b, R_ow2b] = frame2posRotm(qH_ow2b);
+        function [nw_p_b, nw_R_b] = computeNewWorld2Base(urdf_link_name, q_j)
+            % get the transformation values from the base to the old world ...
+            [ow_qH_b,~,~,~] = getState();
+            [ow_p_b, ow_R_b] = frame2posRotm(ow_qH_b);
             % create the homogenous transformation matrix H
-            % (from old world to base) ...
-            H_ow2b = [R_ow2b p_ow2b; zeros(1,3) 1];
+            % (from base to olw world) ...
+            ow_H_b = [ow_R_b ow_p_b; zeros(1,3) 1];
             
-            % get the transformation values from the old world to the
-            % reference link:
+            % get the transformation values from the reference link to the
+            % old world:
             if (nargin == 1)
-                [qH_ow2refLnk] = forwardKinematics(urdf_link_name);
+                [ow_qH_refLnk] = forwardKinematics(urdf_link_name);
             else
-                [qH_ow2refLnk] = forwardKinematics(urdf_link_name, R_ow2b, p_ow2b, q_j);
+                [ow_qH_refLnk] = forwardKinematics(urdf_link_name, ow_R_b, ow_p_b, q_j);
             end
-            [p_ow2refLnk, R_ow2refLnk] = frame2posRotm(qH_ow2refLnk);
+            [ow_p_refLnk, ow_R_refLnk] = frame2posRotm(ow_qH_refLnk);
             
-            % compute the hom. transformation matrix H from the new world
-            % to the base:
-            H_ow2refLnk = [R_ow2refLnk p_ow2refLnk; zeros(1,3) 1];
-            H_nw2b = H_ow2refLnk \ H_ow2b;
+            % compute the hom. transformation matrix H from the base to
+            % the new world:
+            ow_H_refLnk = [ow_R_refLnk ow_p_refLnk; zeros(1,3) 1];
+            nw_H_b = ow_H_refLnk \ ow_H_b;
             
             % extract the translation and the rotation values ...
-            p_nw2b = H_nw2b(1:3,4);
-            R_nw2b = H_nw2b(1:3,1:3);
+            nw_p_b = nw_H_b(1:3,4);
+            nw_R_b = nw_H_b(1:3,1:3);
         end
 
     end

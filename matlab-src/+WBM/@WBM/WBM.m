@@ -9,8 +9,8 @@ classdef WBM < WBMBasic
     
     methods(Access = public)
         % Constructor:
-        function obj = WBM(wbm_params, robot_config, init_wf_ctrl)
-            args{1} = wbm_params;
+        function obj = WBM(model_params, robot_config, init_wf_ctrl)
+            args{1} = model_params;
             if exist('init_wf_ctrl', 'var')
                 % set the given WF control value, else it will be used
                 % inernally the default value ...
@@ -25,7 +25,16 @@ classdef WBM < WBMBasic
  
             initConfig(robot_config);
             setState(obj.wbm_config.initState.q_j, obj.wbm_config.initState.dq_j, ...
-                     obj.wbm_config.initState.dx_b, obj.wbm_config.initState.omega_b);            
+                     obj.wbm_config.initState.dx_b, obj.wbm_config.initState.omega_b);
+                 
+                 
+            % set the world frame (WF) at a given roto-tranlsation from a
+            % chosen reference link (fixed link):
+%             switch init_wf_ctrl
+%                 case 'wf2FixLnk'
+%                     setWorldFrame2FixedLink(q_j, dq_j, v_b, g_wf, urdf_link_name);
+%                 case '' 
+%             end
         end
         
         function newObj = copy(obj)
@@ -36,26 +45,41 @@ classdef WBM < WBMBasic
         %    
         %end
         
-        function T_b = getFrameRototranslation(obj)
+        function T_b = getWorldFrameRototranslation(varargin)
             [T_b,~,~,~] = getState();
         end
         
-        function updateWorldFrame(obj, q_j, dq_j, v_b, g_wf, urdf_link_name)
+        function setWorldFrame2FixedLink(obj, q_j, dq_j, v_b, g_wf, urdf_link_name)
+            if (nargin ~= 5)
+                error('WBM::updateWorldFrame: %s', obj.wbm_strWrongArgErr);
+            end
             
+            setState(q_j, dq_j, v_b);
+            [p_w2b, R_w2b] = getWorldFrameFromFixedLink(urdf_link_name, q_j);
+            setWorldFrame(R_w2b, p_w2b, g_wf);    
         end
         
         forwardDynamics(obj, t, ctrlTrqs, chi)
         
-        %forwardDynamicsZeroExtForces(obj, t, chi) % deprecated
-        
         visualizeForwardDynamics(obj, t, chi)
         
-        function wbm_stParams = getStateParams(obj, stvChi)
+        function stParams = getStateParams(obj, stvChi)
+            stParams = wbmStateParams;
+            ndof = obj.wbm_config.ndof;
             
+            % get positions and orientation ...
+            stParams.x_b  = stvChi(1:3,:);
+            stParams.qt_b = stvChi(4:7,:);
+            stParams.q_j  = stvChi(8:ndof+7,:);
+            % the velocities ...
+            stParams.dx_b    = stvChi(ndof+8:ndof+10,:);
+            stParams.omega_b = stvChi(ndof+11:ndof+13,:);           
+            stParams.dq_j    = stvChi(ndof+14:2*ndof+13,:);
         end
         
-        function chi = getStateVector(obj, wbm_stParams)
-            
+        function stvChi = getStateVector(obj, stParams)
+            stvChi = [stParams.x_b; stParams.qt_b; stParams.q_j; ...
+                      stParams.dx_b; stParams.omega_b; stParams.dq_j];
         end
 
         function wbm_config = getWBMConfig(obj)

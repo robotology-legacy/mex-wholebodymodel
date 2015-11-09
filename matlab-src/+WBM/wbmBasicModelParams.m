@@ -1,11 +1,11 @@
 classdef wbmBasicModelParams
     properties
-       urdfRobotName@char
+       urdfRobot@char
        urdfRefLinkName@char
-       R_rootlnk_wf = zeros(3);
-       p_rootlnk_wf = zeros(3,1);
-       R_reflnk_wf  = zeros(3);
-       p_reflnk_wf  = zeros(3,1);
+       wf_R_rootLnk = zeros(3);
+       wf_p_rootLnk = zeros(3,1);
+       %wf_R_refLnk  = zeros(3);
+       %wf_p_refLnk  = zeros(3,1);
        g_wf         = zeros(3,1);
     end
 end
