@@ -84,13 +84,7 @@ bool ModelSetWorldFrame::compute(int nrhs, const mxArray* prhs[])
     {
         tempP[i] = p_temp[i];
     }
-
-    //MATLAB is column-major ordered. wbi::Rotation is instead row-major
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            tempR[i*3 + j] = R_temp[i + 3*j];
-        }
-    }
+    reorderMatrixElements(R_temp, tempR);
 
     wbi::Rotation tempRot(tempR);
     wbi::Frame tempFrame(tempRot, tempP);
@@ -129,6 +123,7 @@ bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray* prhs[])
 
     return true;
 }
+
 
 
 
