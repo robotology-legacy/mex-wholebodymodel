@@ -2,61 +2,46 @@ classdef WBM < WBMBasic
     properties(Access = private)
         wbm_config@wbmBasicRobotConfig
     end
-    
-    properties(Access = private, Constant)
-       wbm_strWrongMatDimErr = 'Wrong matrix dimension!';
-    end
-    
+        
     methods(Access = public)
         % Constructor:
-        function obj = WBM(model_params, robot_config, init_wf_ctrl)
-            args{1} = model_params;
-            if exist('init_wf_ctrl', 'var')
-                % set the given WF control value, else it will be used
-                % inernally the default value ...
-                args{2} = init_wf_ctrl;
-            end
+        function obj = WBM(model_params, robot_config, wf2FixLnk)
             % call the constructor of the superclass ...
-            obj = obj@WBMBasic(args{:});
+            obj = obj@WBMBasic(model_params);
             
             if ~exist('robot_config', 'var')
-                error('WBM::WBM: %s', obj.wbm_strWrongArgErr);
+                error('WBM::WBM: %s', wbmErrorMsg.WRONG_ARG_ERR);
+            end
+            if ~exist('wf2FixLnk', 'var')
+                wf2FixLnk = false; % default value ...
             end
  
             initConfig(robot_config);
-            setState(obj.wbm_config.initState.q_j, obj.wbm_config.initState.dq_j, ...
-                     obj.wbm_config.initState.dx_b, obj.wbm_config.initState.omega_b);
-                 
-                 
-            % set the world frame (WF) at a given roto-tranlsation from a
-            % chosen reference link (fixed link):
-%             switch init_wf_ctrl
-%                 case 'wf2FixLnk'
-%                     setWorldFrame2FixedLink(q_j, dq_j, v_b, g_wf, urdf_link_name);
-%                 case '' 
-%             end
+            if (wf2FixLnk == true)
+                % set the world frame (WF) at a given rototranslation from
+                % a chosen fixed link ...
+                obj.setWorldFrame2FixedLink(obj.wbm_config.initStateParams.q_j, obj.wbm_config.initStateParams.dq_j, ...
+                                            obj.wbm_config.initStateParams.v_b, obj.wbm_config.initStateParams.g_wf, ...
+                                            obj.wbm_config.initStateParams.cstrLinkNames{1});
+            end                             
         end
         
         function newObj = copy(obj)
             newObj = copy@WBMBasic(obj);
         end
-                
-        %function [xTb_init, chi_init] = getODEinitConditions(obj) % deprecated
-        %    
-        %end
         
-        function T_b = getWorldFrameRototranslation(varargin)
-            [T_b,~,~,~] = getState();
+        function T_b = getWorldFrameRototranslation(obj)
+            [T_b,~,~,~] = obj.getState();
         end
         
         function setWorldFrame2FixedLink(obj, q_j, dq_j, v_b, g_wf, urdf_link_name)
             if (nargin ~= 5)
-                error('WBM::updateWorldFrame: %s', obj.wbm_strWrongArgErr);
+                error('WBM::updateWorldFrame: %s', wbmErrorMsg.WRONG_ARG_ERR);
             end
             
-            setState(q_j, dq_j, v_b);
-            [p_w2b, R_w2b] = getWorldFrameFromFixedLink(urdf_link_name, q_j);
-            setWorldFrame(R_w2b, p_w2b, g_wf);    
+            obj.setState(q_j, dq_j, v_b);
+            [p_w2b, R_w2b] = obj.getWorldFrameFromFixedLink(urdf_link_name, q_j);
+            obj.setWorldFrame(R_w2b, p_w2b, g_wf);    
         end
         
         forwardDynamics(obj, t, ctrlTrqs, chi)
@@ -77,7 +62,7 @@ classdef WBM < WBMBasic
             stParams.dq_j    = stvChi(ndof+14:2*ndof+13,:);
         end
         
-        function stvChi = getStateVector(obj, stParams)
+        function stvChi = getStateVector(stParams)
             stvChi = [stParams.x_b; stParams.qt_b; stParams.q_j; ...
                       stParams.dx_b; stParams.omega_b; stParams.dq_j];
         end
@@ -122,7 +107,7 @@ classdef WBM < WBMBasic
             % check if robot_config is an instance of a class that
             % is derived from the class "wbmBasicRobotConfig" ...
             if ~isa(robot_config, 'wbmBasicRobotConfig')
-                error('WBM::initWBM: %s', obj.wbm_strDataTypeErr);
+                error('WBM::initWBM: %s', wbmErrorMsg.WRONG_DATA_TYPE_ERR);
             end
             
             obj.wbm_config = wbmBasicRobotConfig;
