@@ -1,5 +1,5 @@
-
-addpath('./../build');
+addpath('./../../mex-wholebodymodel/matlab/wrappers');
+addpath('./../../build');
 %Running a 10,000 run trial
 totTime = 0;numRuns = 1000;
 
@@ -10,7 +10,7 @@ refLink2 = 'l_gripper';
 fprintf('Starting normal mode trial \n-------------------------- \n');
 
 tic;
-wholeBodyModel('model-initialise','icubGazeboSim');
+wbm_modelInitialise('icubGazeboSim');
 initTime = toc();
 
 fprintf('Initialisation time : %e secs\n',initTime);
@@ -20,15 +20,18 @@ tic;
 for i = 1:numRuns
     
     %Setting State to random values
-    q = rand(25,1);dq = rand(25,1);dxb = rand(6,1);
+    q = rand(25,1);dq = rand(25,1);dxb = rand(6,1);R = eye(3);p = rand(3,1);g = [0;0;9.8];
+    wbm_setWorldFrame(R,p,g);
     
     %Mex-WholeBodyModel Components
-    M = wholeBodyModel('mass-matrix',q);    
-    H = wholeBodyModel('generalised-forces',q,dq,dxb);    
-    DjDq1 = wholeBodyModel('djdq',q,dq,dxb,refLink1);
-    DjDq2 = wholeBodyModel('djdq',q,dq,dxb,refLink2);    
-    J = wholeBodyModel('jacobian',q,refLink1);J = wholeBodyModel('jacobian',q,refLink2);
-    J = wholeBodyModel('jacobian',q,refLink1);J = wholeBodyModel('jacobian',q,refLink2);
+    M = wbm_massMatrix(R,p,q);    
+    H = wbm_generalisedBiasForces(R,p,q,dq,dxb);    
+    H = wbm_generalisedBiasForces(R,p,q,dq,dxb); 
+    H = wbm_generalisedBiasForces(R,p,q,dq,dxb); 
+    DjDq1 = wbm_djdq(R,p,q,dq,dxb,refLink1);
+    DjDq2 = wbm_djdq(R,p,q,dq,dxb,refLink2);    
+    J = wbm_jacobian(R,p,q,refLink1);J = wbm_jacobian(R,p,q,refLink2);
+    J = wbm_jacobian(R,p,q,refLink1);J = wbm_jacobian(R,p,q,refLink2);
 end
 totTime = toc();
 %Benchmarks
@@ -39,9 +42,9 @@ clear all;
 
 fprintf('\n\nStarting optimised mode trial \n-------------------------- \n');
 
-totTime = 0;numRuns = 10000;
+totTime = 0;numRuns = 1000;
 tic;
-wholeBodyModel('model-initialise','icub');
+wbm_modelInitialise('icubGazeboSim');
 initTime = toc();
 fprintf('Initialisation time : %e secs \n Starting Trial...\n ',initTime);
 
@@ -52,19 +55,23 @@ tic;
 for i = 1:numRuns
     
     %Setting State to random values
-    q = rand(25,1);dq = rand(25,1);dxb = rand(6,1);
+    q = rand(25,1);dq = rand(25,1);dxb = rand(6,1); R = eye(3); p =rand(3,1);g = [0;0;9.8];
     
-    wholeBodyModel('update-state',q,dq,dxb);
+    wbm_updateState(q,dq,dxb);
+    wbm_setWorldFrame(R,p,g);
     
     %Mex-WholeBodyModel Components
-    M = wholeBodyModel('mass-matrix');    
-    H = wholeBodyModel('generalised-forces');    
-    DjDq1 = wholeBodyModel('djdq',refLink1);
-    DjDq2 = wholeBodyModel('djdq',refLink2);    
-    J = wholeBodyModel('jacobian',refLink1);J = wholeBodyModel('jacobian',refLink2);
-    J = wholeBodyModel('jacobian',refLink1);J = wholeBodyModel('jacobian',refLink2);
+    M = wbm_massMatrix();    
+    H = wbm_generalisedBiasForces();    
+    H = wbm_generalisedBiasForces();  
+    H = wbm_generalisedBiasForces();  
+    DjDq1 = wbm_djdq(refLink1);
+    DjDq2 = wbm_djdq(refLink2);
+    J = wbm_jacobian(refLink1);J = wbm_jacobian(refLink2);
+    J = wbm_jacobian(refLink1);J = wbm_jacobian(refLink2);
 end
 totTime = toc();
 %Benchmarks
 fprintf('Optimised-Mode Trial Total Time : %f secs\n',totTime);
+
 fprintf('Optimised-Mode Trial Average Time : %e secs \n',totTime/numRuns);
