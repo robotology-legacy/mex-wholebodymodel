@@ -13,8 +13,13 @@ To verify regression in the code when you modify the code, some
 regression tests have been implemented in this repository.
 
 ### Run tests
-To run the tests on this repository, just compile it and from the build directory launch
-the `ctest` command. If you want to print out the verbose output of the tests, launch `ctest -VV`.
+Tests use `ctest` infrastructure.
+To run the tests on this repository, after you compiled the project, just following the following steps:
+
+- Move (`cd`) to the build directory
+- Run the `ctest` command. If your project supports multiples configurations (e.g. Xcode), you also have to specify the configuration with `-C`, thus for example `ctest -C Debug`.
+
+If you want to print out the verbose output of the tests, launch the `ctest` command by adding the `-VV` option.
 
 ### Add new tests
 To add new tests, just write a script that runs your test and raise and exception
