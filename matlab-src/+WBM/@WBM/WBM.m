@@ -10,7 +10,7 @@ classdef WBM < WBMBasic
             obj = obj@WBMBasic(model_params);
             
             if ~exist('robot_config', 'var')
-                error('WBM::WBM: %s', wbmErrorMsg.WRONG_ARG_ERR);
+                error('WBM::WBM: %s', wbmErrorMsg.WRONG_ARG);
             end
             if ~exist('wf2FixLnk', 'var')
                 wf2FixLnk = false; % default value ...
@@ -18,12 +18,15 @@ classdef WBM < WBMBasic
  
             initConfig(robot_config);
             if (wf2FixLnk == true)
+                if isempty(obj.wbm_config.initStateParams.cstrLinkNames)
+                    error('WBM::WBM: %s', wbmErrorMsg.CARRAY_IS_EMPTY);
+                end                    
                 % set the world frame (WF) at a given rototranslation from
-                % a chosen fixed link ...
+                % a chosen fixed link (the first entry of the constraint list):
                 obj.setWorldFrame2FixedLink(obj.wbm_config.initStateParams.q_j, obj.wbm_config.initStateParams.dq_j, ...
                                             obj.wbm_config.initStateParams.v_b, obj.wbm_config.initStateParams.g_wf, ...
                                             obj.wbm_config.initStateParams.cstrLinkNames{1});
-            end                             
+            end        
         end
         
         function newObj = copy(obj)
@@ -36,7 +39,7 @@ classdef WBM < WBMBasic
         
         function setWorldFrame2FixedLink(obj, q_j, dq_j, v_b, g_wf, urdf_link_name)
             if (nargin ~= 5)
-                error('WBM::updateWorldFrame: %s', wbmErrorMsg.WRONG_ARG_ERR);
+                error('WBM::setWorldFrame2FixedLink: %s', wbmErrorMsg.WRONG_ARG);
             end
             
             obj.setState(q_j, dq_j, v_b);
@@ -44,9 +47,9 @@ classdef WBM < WBMBasic
             obj.setWorldFrame(R_w2b, p_w2b, g_wf);    
         end
         
-        forwardDynamics(obj, t, ctrlTrqs, chi)
+        forwardDynamics(obj, t, chi, ctrlTrqs)
         
-        visualizeForwardDynamics(obj, t, chi)
+        visualizeForwardDynamics(obj, t, chi, ctrlTrqs)
         
         function stParams = getStateParams(obj, stvChi)
             stParams = wbmStateParams;
@@ -107,7 +110,7 @@ classdef WBM < WBMBasic
             % check if robot_config is an instance of a class that
             % is derived from the class "wbmBasicRobotConfig" ...
             if ~isa(robot_config, 'wbmBasicRobotConfig')
-                error('WBM::initWBM: %s', wbmErrorMsg.WRONG_DATA_TYPE_ERR);
+                error('WBM::initWBM: %s', wbmErrorMsg.WRONG_DATA_TYPE);
             end
             
             obj.wbm_config = wbmBasicRobotConfig;

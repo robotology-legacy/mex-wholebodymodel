@@ -1,4 +1,7 @@
-function [dchi , h] = forwardDynamics(obj, t, ctrlTrqs, chi)
+function [dchi , h] = forwardDynamics(obj, t, chi, ctrlTrqs)
+    ndof = obj.wbm_config.ndof;
+    nCstrs = obj.wbm_config.nCstrs;
+
     %% extraction of state
     %ndof = param.ndof;
 
@@ -32,13 +35,13 @@ function [dchi , h] = forwardDynamics(obj, t, ctrlTrqs, chi)
     % p_b = T_b(1:3);
 
     %[pos_b, R_b] = frame2posRotm(T_b);
-    [~, R_b] = frame2posRotm(T_b);
+    [~,R_b] = frame2posRotm(T_b);
 
     % M = wbm_massMatrix();
     % h = wbm_generalisedBiasForces();
 
     M = obj.massMatrix();
-    h = obj.genBiasForces();
+    h = obj.generalBiasForces();
 
     % hDash = wbm_generalisedBiasForces(R_b,p_b,qj,dqj,[dx_b;omega_W]);
     % g = wbm_generalisedBiasForces(R_b,p_b,qj,zeros(size(qj)),zeros(6,1));
@@ -54,22 +57,23 @@ function [dchi , h] = forwardDynamics(obj, t, ctrlTrqs, chi)
     %     dJcDq(6*(i-1)+1:6*i,:) = wbm_djdq(param.constraintLinkNames{i});
     % end
 
-    Jc = zeros(6 * obj.wb_config.nCstrs, 6 + obj.wb_config.ndof);
-    dJcDq = zeros(6 * obj.wb_config.nCstrs, 1);
-    for i = 1:obj.wb_config.nCstrs
-        Jc(6*(i-1)+1:6*i,:) = obj.jacobian(obj.wb_config.cstrLinkNames{i});
-        dJcDq(6*(i-1)+1:6*i,:) = obj.dJdq(obj.wb_config.cstrLinkNames{i});
+    Jc = zeros(6*nCstrs,6+ndof);
+    dJcDq = zeros(6*nCstrs,1);
+    for i = 1:nCstrs
+        Jc(6*(i-1)+1:6*i,:) = obj.jacobian(obj.wbm_config.cstrLinkNames{i});
+        dJcDq(6*(i-1)+1:6*i,:) = obj.dJdq(obj.wbm_config.cstrLinkNames{i});
     end
 
     %% control torque
-    tau = param.tau(t);
+    %tau = param.tau(t);
+    tau = ctrlTrqs.tau(t);
 
     %% Contact forces computation
     JcMinv = Jc/M;
     JcMinvJct = JcMinv * Jc'; 
 
     %tauDamp = -param.dampingCoeff*dqj;
-    tauDamp = -obj.wb_config.dampCoeff * chi.dq_j;
+    tauDamp = -obj.wbm_config.dampCoeff * st.dq_j;
 
     %temp = JcMinv*h;
     %temp2 = JcMinvJct\(JcMinv*h);
@@ -85,10 +89,10 @@ function [dchi , h] = forwardDynamics(obj, t, ctrlTrqs, chi)
     % dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
 
     omega_b = R_b * omega_w;
-    dqt_b = obj.quatDerivative(omega_b, chi.qt_b);
+    dqt_b = obj.quatDerivative(omega_b, st.qt_b);
 
     %dx = [dx_b;dqt_b;dqj];
-    dx = [chi.dx_b; dqt_b; chi.dq_j];
+    dx = [st.dx_b; dqt_b; st.dq_j];
     dv = M\(Jc'*f_c + [zeros(6, 1); (tau + tauDamp)] - h);
     dchi = [dx; dv];
     
