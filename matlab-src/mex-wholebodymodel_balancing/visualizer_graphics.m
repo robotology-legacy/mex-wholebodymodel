@@ -12,7 +12,7 @@ for tt=1:length(t)
     
 [~,c] = forwardDynamics(t(tt), chi(tt,:).', params);
 
-pos_t   = c.pos_feet(1:3);
+pos_t   = c.pos_feet(1:7);
 fc_t    = c.fc;
 f0_t    = c.f0;
 tau_t   = c.tau;
@@ -37,13 +37,19 @@ grid on
 plot(t,pos(k,:))
 title('left foot position')
 
+figure(5)
+hold all
+grid on
+plot(t,pos(k+4,:))
+title('left foot orientation')
+
 end
 
 if params.feet_on_ground == 1
     
 for k=1:6
 
-figure(5)
+figure(6)
 hold all
 grid on
 plot(t,fc(k,:))
@@ -55,13 +61,13 @@ elseif params.feet_on_ground == 2
 
 for k=1:12
 
-figure(5)
+figure(6)
 hold all
 grid on
 plot(t,fc(k,:))
 title('contact forces')
 
-figure(6)
+figure(7)
 hold all
 grid on
 plot(t,f0(k,:))
@@ -74,7 +80,7 @@ end
 %%
 for k=1:25
 
-figure(7)
+figure(8)
 hold all
 grid on
 plot(t,tau(k,:))
@@ -84,7 +90,7 @@ end
 
 for k=1:3
 
-figure(8)
+figure(9)
 hold all
 grid on
 plot(t,ecom(k,:))
@@ -92,7 +98,7 @@ title('CoM error')
 
 end
 
-figure(9)
+figure(10)
 hold on
 grid on
 plot(t,norm_tau)

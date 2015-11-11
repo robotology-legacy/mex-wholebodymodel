@@ -1,13 +1,6 @@
 function [] = visualizer_demo(t,chi,params)
 
 % This is a program for visualizing the demo of the balancing and the floating base position in space
-
-temp = 1;
-
-while(temp<10)
-
-    figure; 
-    clf;
     
    %initialize GUI
     figure_main = figure('Name', 'iCub Simulator', 'NumberTitle', 'off',...
@@ -52,11 +45,8 @@ while(temp<10)
     qt_b  = chi(:,4:7);
     qj    = chi(:,8:ndof+7);
 
-    visualizeForwardDynamics([x_b,qt_b,qj],t,params);
-    temp = 10;    
+    visualizeForwardDynamics([x_b,qt_b,qj],t,params);    
     pause;
-    
-end
 
 %% plot base link positions
     figure(2);

@@ -15,7 +15,7 @@ function [pos,dcm] = frame2posrot(qT)
 % matlab toolbox source
 % Genova, Dec 2015
 
-pos = qT(1:3);
+pos        = qT(1:3);
 quaternion = qT(4:end);
 
 % Assuming q = [q_real; q_vec]

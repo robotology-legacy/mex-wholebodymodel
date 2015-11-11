@@ -40,12 +40,9 @@ qT         = [x_b; qt_b];
 [~,R_b]    = frame2posrot(qT);
 
 %% parameters definition using wbm_functions
-R_b_tr  = R_b.';
-
-M       = wbm_massMatrix(R_b_tr,x_b,qj); 
-h       = wbm_generalisedBiasForces(R_b_tr,x_b,qj,dqj,[dx_b;omega_W]);
-g       = wbm_generalisedBiasForces(R_b_tr,x_b,qj,zeros(25,1),zeros(6,1));
-CNu     = h-g;
+M       = wbm_massMatrix(R_b,x_b,qj); 
+h       = wbm_generalisedBiasForces(R_b,x_b,qj,dqj,[dx_b;omega_W]);
+g       = wbm_generalisedBiasForces(R_b,x_b,qj,zeros(25,1),zeros(6,1));
 
 %% building up constraints jacobian and djdq
 Jc    = zeros(6*param.numConstraints,6+ndof);
@@ -53,26 +50,26 @@ dJcdv = zeros(6*param.numConstraints,1);
 
 for i=1:param.numConstraints
     
-    Jc(6*(i-1)+1:6*i,:)    = wbm_jacobian(R_b_tr,x_b,qj,param.constraintLinkNames{i});
-    dJcdv(6*(i-1)+1:6*i,:) = wbm_djdq(R_b_tr,x_b,qj,dqj,[dx_b;omega_W],param.constraintLinkNames{i});
+    Jc(6*(i-1)+1:6*i,:)    = wbm_jacobian(R_b,x_b,qj,param.constraintLinkNames{i});
+    dJcdv(6*(i-1)+1:6*i,:) = wbm_djdq(R_b,x_b,qj,dqj,[dx_b;omega_W],param.constraintLinkNames{i});
     
 end
 
 % jacobian at CoM
-Jcom   = wbm_jacobian(R_b_tr,x_b,qj,'com');
+Jcom   = wbm_jacobian(R_b,x_b,qj,'com');
 
 %% centroidal coordinates transformation
 % CoM linear position and velocity
-com     = wbm_forwardKinematics(R_b_tr,x_b,qj,'com');
+com     = wbm_forwardKinematics(R_b,x_b,qj,'com');
 xcom    = com(1:3);
 dcom    = Jcom*v;
 dxcom   = dcom(1:3);
 
 % transformation matrix for centroidal
-[T, dT] = centroidalTransf(xcom, x_b, dxcom, dx_b, M);
+[T, dT] = centroidalTransformationT_TDot(xcom,x_b,dxcom,dx_b,M);
 
 % conversion of parameters to the new frame of reference
-[Mc,CNu_c, gc, Jc_c, dJcdv_c, vc] = centroidalConversion(M, CNu, g, Jc, dJcdv, v, T, dT);
+[Mc,CNu_c, gc, Jc_c, dJcdv_c, vc] = fromFloatingToCentroidalDynamics(M, h, g, Jc, dJcdv, v, T, dT);
 
 %% saturation check
 limits = param.limits;
@@ -89,7 +86,7 @@ else
  
  disp('joint limits reached at time')    
  disp(t)
-%error('joint limits reached '); 
+ error('joint limits reached '); 
 
 end
 
@@ -102,8 +99,8 @@ controlParam.v       = vc;
 controlParam.Jc      = Jc_c;
 controlParam.dJcdv   = dJcdv_c;
 
-lsole                = wbm_forwardKinematics(R_b_tr,x_b,qj,'l_sole');
-rsole                = wbm_forwardKinematics(R_b_tr,x_b,qj,'r_sole');
+lsole                = wbm_forwardKinematics(R_b,x_b,qj,'l_sole');
+rsole                = wbm_forwardKinematics(R_b,x_b,qj,'r_sole');
 controlParam.com     = com;
 
 % adding a correction term in the costraints equation.
@@ -183,7 +180,7 @@ CoP=CoP.';
 % need to apply root-to-world rotation to the spatial angular velocity omega_W to
 % obtain angular velocity in body frame omega_b. This is then used in the
 % quaternion derivative computation.
-omega_b = R_b_tr*omega_W;                               
+omega_b = (R_b')*omega_W;                               
 dqt_b   = quaternionDerivative(omega_b, qt_b);       
 
 dx      = [dx_b;dqt_b;dqj];
