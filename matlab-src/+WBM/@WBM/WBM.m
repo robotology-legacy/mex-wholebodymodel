@@ -20,7 +20,7 @@ classdef WBM < WBMBasic
             if (wf2FixLnk == true)
                 if isempty(obj.wbm_config.initStateParams.cstrLinkNames)
                     error('WBM::WBM: %s', wbmErrorMsg.CARRAY_IS_EMPTY);
-                end                    
+                end
                 % set the world frame (WF) at a given rototranslation from
                 % a chosen fixed link (the first entry of the constraint list):
                 obj.setWorldFrame2FixedLink(obj.wbm_config.initStateParams.q_j, obj.wbm_config.initStateParams.dq_j, ...
@@ -38,13 +38,23 @@ classdef WBM < WBMBasic
         end
         
         function setWorldFrame2FixedLink(obj, q_j, dq_j, v_b, g_wf, urdf_link_name)
-            if (nargin ~= 5)
-                error('WBM::setWorldFrame2FixedLink: %s', wbmErrorMsg.WRONG_ARG);
+            if ~exist('urdf_link_name', 'var')
+                % use the default link ...
+                urdf_link_name = obj.wbm_params.urdfLinkName;
+            else
+                % replace the (old) default link with a new link ...
+                obj.setLinkName(urdf_link_name);
             end
             
-            obj.setState(q_j, dq_j, v_b);
-            [p_w2b, R_w2b] = obj.getWorldFrameFromFixedLink(urdf_link_name, q_j);
-            obj.setWorldFrame(R_w2b, p_w2b, g_wf);    
+            switch nargin
+                case 5
+                case 4            
+                    obj.setState(q_j, dq_j, v_b);
+                    [p_w2b, R_w2b] = obj.getWorldFrameFromFixedLink(urdf_link_name, q_j);
+                    obj.setWorldFrame(R_w2b, p_w2b, g_wf);
+                otherwise
+                    error('WBM::setWorldFrame2FixedLink: %s', wbmErrorMsg.WRONG_ARG);
+            end
         end
         
         forwardDynamics(obj, t, chi, ctrlTrqs)

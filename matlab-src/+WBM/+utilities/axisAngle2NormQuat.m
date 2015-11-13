@@ -6,7 +6,7 @@ function qnorm = axisAngle2NormQuat(axang)
     catch
         % else, for Matlab R2014b and earlier ...
         if (length(axang) ~= 4)
-            error('axisAngle2NormQuat: Wrong vector size!');
+            error('axisAngle2NormQuat: %s', wbmErrMsg.WRONG_VEC_SIZE);
         end
         
         theta = axang(4); % rotation angle in radians

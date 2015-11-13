@@ -2,7 +2,7 @@ function plotQuat(qT)
     % the matrix-dimension must be of m-by-7:
     [m,n] = size(qT);
     if (n ~= 7)
-        error('plotQuat: Wrong matrix dimension!');
+        error('plotQuat: %s', wbmErrMsg.WRONG_MAT_DIM);
     end
     len = m;
 
