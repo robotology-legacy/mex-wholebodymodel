@@ -1,4 +1,4 @@
-classdef wbmBasicRobotConfig
+classdef wbmBaseRobotConfig
     properties
        ndof@int16
        nCstrs@int16

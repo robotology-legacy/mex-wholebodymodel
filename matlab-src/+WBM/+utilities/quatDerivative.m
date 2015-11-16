@@ -1,6 +1,13 @@
-function dq = quatDerivative(q, omega)
+function quatd = quatDerivative(quat, omega)
+    if (length(quat) ~= 4)
+        error('quatDerivative: %s', wbmErrMsg.WRONG_VEC_SIZE);
+    end
+    %if (length(omega) ~= 3)
+    %    error('quatDerivative: %s', wbmErrMsg.WRONG_VEC_SIZE);
+    %end
+
     K = 1;
     omegaCross = [0 -omega'; omega -skew(omega)];
-    dq = 0.5*omegaCross*q + K*(1 - norm(q))*q;
+    quatd = 0.5*omegaCross*quat + K*(1 - norm(quat))*quat;
 end
 

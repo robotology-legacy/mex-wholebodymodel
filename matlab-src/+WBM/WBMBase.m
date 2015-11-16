@@ -1,13 +1,13 @@
-classdef WBMBasic < handle & matlab.mixin.Copyable
+classdef WBMBase < handle & matlab.mixin.Copyable
     properties(Access = private)
-        wbm_params@wbmBasicModelParams
+        wbm_params@wbmBaseModelParams
     end
         
     methods(Access = public)
         % Constructor:
-        function obj = WBMBasic(model_params)
+        function obj = WBMBase(model_params)
             if ~exist('model_params', 'var')
-                error('WBMBasic::WBMBasic: %s', wbmErrorMsg.WRONG_ARG);
+                error('WBMBase::WBMBase: %s', wbmErrorMsg.WRONG_ARG);
             end
             
             initWBM(model_params);
@@ -31,6 +31,11 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
             end            
         end
         
+        % Destructor:
+        function delete(obj)
+            clear obj.wbm_params; % remove from workspace (free-up memory) ...
+        end
+        
         function initModel(obj, urdf_robot_name)
             if ~exist('urdf_robot_name', 'var')
                 % Optimized mode: use as default the URDF of the iCub-Robot
@@ -47,10 +52,10 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
         
         function initModelURDF(obj, urdf_file_name)
             if ~exists('urdf_file_name', 'var')
-                error('WBMBasic::initModelURDF: %s', wbmErrorMsg.WRONG_ARG);
+                error('WBMBase::initModelURDF: %s', wbmErrorMsg.WRONG_ARG);
             end
             if ~exists('urdf_file_name', 'file')
-                error('WBMBasic::initModelURDF: %s', wbmErrorMsg.FILE_NOT_EXIST);
+                error('WBMBase::initModelURDF: %s', wbmErrorMsg.FILE_NOT_EXIST);
             end
             
             obj.wbm_params.urdfRobot = urdf_file_name;
@@ -59,7 +64,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
         
         function setLinkName(obj, new_urdf_link_name)
             if ~exists('new_urdf_link_name', 'var')
-                error('WBMBasic::setLinkName: %s', wbmErrorMsg.WRONG_ARG);
+                error('WBMBase::setLinkName: %s', wbmErrorMsg.WRONG_ARG);
             end
             % update the default link name ...
             obj.wbm_params.urdfLinkName = new_urdf_link_name;
@@ -67,7 +72,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
         
         function setWorldFrame(obj, wf_R_rootLnk, wf_p_rootLnk, g_wf)
             if (nargin ~= 3)
-                error('WBMBasic::setWorldFrame: %s', wbmErrorMsg.WRONG_ARG);
+                error('WBMBase::setWorldFrame: %s', wbmErrorMsg.WRONG_ARG);
             end
             obj.wbm_params.wf_R_rootLnk = wf_R_rootLnk;
             obj.wbm_params.wf_p_rootLnk = wf_p_rootLnk;
@@ -98,17 +103,17 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
                     [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.wbm_params.urdfLinkName);
                 otherwise
                     % should be never reached ...
-                    error('WBMBasic::getWorldFrameFromFixedLink: %s', wbmErrorMsg.WRONG_ARG);
+                    error('WBMBase::getWorldFrameFromFixedLink: %s', wbmErrorMsg.WRONG_ARG);
             end            
         end
         
         function setState(q_j, dq_j, v_b)
             if (nargin ~= 3)
-                error('WBMBasic::setState: %s', wbmErrorMsg.WRONG_ARG);
+                error('WBMBase::setState: %s', wbmErrorMsg.WRONG_ARG);
             end
             %if ( (length(q_j) ~= length(dq_j)) || ...
             %     (length(v_b) ~= 6) )
-            %    error('WBMBasic::setState: %s', wbmErrorMsg.WRONG_VEC_SIZE);
+            %    error('WBMBase::setState: %s', wbmErrorMsg.WRONG_VEC_SIZE);
             %end
             
             wholeBodyModel('update-state', q_j, dq_j, v_b);
@@ -128,7 +133,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
                     % Optimized mode:
                     M = wholeBodyModel('mass-matrix');
                 otherwise
-                    error('WBMBasic::massMatrix: %s', wbmErrorMsg.WRONG_ARG);
+                    error('WBMBase::massMatrix: %s', wbmErrorMsg.WRONG_ARG);
             end
         end       
         
@@ -151,7 +156,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
                 case 0
                     J = wholeBodyModel('jacobian', urdf_link_name);
                 otherwise
-                    error('WBMBasic::jacobian: %s', wbmErrorMsg.WRONG_ARG);
+                    error('WBMBase::jacobian: %s', wbmErrorMsg.WRONG_ARG);
             end
         end
         
@@ -169,7 +174,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
                 case 0
                     djdq = wholeBodyModel('djdq', urdf_link_name);
                 otherwise
-                    error('WBMBasic::dJdq: %s', wbmErrorMsg.WRONG_ARG);
+                    error('WBMBase::dJdq: %s', wbmErrorMsg.WRONG_ARG);
             end
         end
         
@@ -181,7 +186,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
                 case 0 
                     H = wholeBodyModel('centroidal-momentum');
                 otherwise
-                    error('WBMBasic::centrodialMomentum: %s', wbmErrorMsg.WRONG_ARG);
+                    error('WBMBase::centrodialMomentum: %s', wbmErrorMsg.WRONG_ARG);
             end
         end
         
@@ -199,7 +204,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
                 case 0
                     p = wholeBodyModel('forward-kinematics', urdf_link_name);
                 otherwise
-                    error('WBMBasic::forwardKinematics: %s', wbmErrorMsg.WRONG_ARG);                    
+                    error('WBMBase::forwardKinematics: %s', wbmErrorMsg.WRONG_ARG);                    
             end            
         end
         
@@ -211,7 +216,7 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
                 case 0
                     C_qv = wholeBodyModel('generalised-forces');
                 otherwise
-                    error('WBMBasic::generalBiasForces: %s', wbmErrorMsg.WRONG_ARG);
+                    error('WBMBase::generalBiasForces: %s', wbmErrorMsg.WRONG_ARG);
             end
         end       
   
@@ -240,10 +245,10 @@ classdef WBMBasic < handle & matlab.mixin.Copyable
     
     methods(Access = private)
         function initWBM(obj, model_params)
-            if ~isa(model_params, 'wbmBasicModelParams')
-                error('WBMBasic::initWBM: %s', wbmErrorMsg.WRONG_DATA_TYPE);
+            if ~isa(model_params, 'wbmBaseModelParams')
+                error('WBMBase::initWBM: %s', wbmErrorMsg.WRONG_DATA_TYPE);
             end            
-            obj.wbm_params = wbmBasicModelParams;
+            obj.wbm_params = wbmBaseModelParams;
             obj.wbm_params.urdfLinkName = model_params.urdfLinkName;
             
             % Initialize the mex-wholeBodyModel for a floating base robot,

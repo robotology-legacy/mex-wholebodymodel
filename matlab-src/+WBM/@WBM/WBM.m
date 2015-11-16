@@ -1,13 +1,13 @@
-classdef WBM < WBMBasic
+classdef WBM < WBMBase
     properties(Access = private)
-        wbm_config@wbmBasicRobotConfig
+        wbm_config@wbmBaseRobotConfig
     end
         
     methods(Access = public)
         % Constructor:
         function obj = WBM(model_params, robot_config, wf2FixLnk)
             % call the constructor of the superclass ...
-            obj = obj@WBMBasic(model_params);
+            obj = obj@WBMBase(model_params);
             
             if ~exist('robot_config', 'var')
                 error('WBM::WBM: %s', wbmErrorMsg.WRONG_ARG);
@@ -29,8 +29,15 @@ classdef WBM < WBMBasic
             end        
         end
         
+        % Copy-function:
         function newObj = copy(obj)
-            newObj = copy@WBMBasic(obj);
+            newObj = copy@WBMBase(obj);
+        end
+        
+        % Destructor:
+        function delete(obj)
+           delete@WBMBase(obj);
+           clear obj.wbm_config.initStateParams obj.wbm_config;
         end
         
         function T_b = getWorldFrameRototranslation(obj)
@@ -118,12 +125,12 @@ classdef WBM < WBMBasic
     methods(Access = private)
         function initConfig(obj, robot_config)
             % check if robot_config is an instance of a class that
-            % is derived from the class "wbmBasicRobotConfig" ...
-            if ~isa(robot_config, 'wbmBasicRobotConfig')
+            % is derived from the class "wbmBaseRobotConfig" ...
+            if ~isa(robot_config, 'wbmBaseRobotConfig')
                 error('WBM::initWBM: %s', wbmErrorMsg.WRONG_DATA_TYPE);
             end
             
-            obj.wbm_config = wbmBasicRobotConfig;
+            obj.wbm_config = wbmBaseRobotConfig;
             obj.wbm_config.ndof = robot_config.ndof;
             obj.wbm_config.nCstrs = robot_config.nCstrs;
             obj.wbm_config.cstrLinkNames = robot_config.cstrLinkNames;

@@ -1,4 +1,4 @@
-classdef wbmBasicModelParams
+classdef wbmBaseModelParams
     properties
        urdfRobot@char
        urdfLinkName@char
