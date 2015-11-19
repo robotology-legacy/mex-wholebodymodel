@@ -4,7 +4,7 @@ function [pos, rotm] = frame2posRotm(qT)
     end
 
     pos  = qT(1:3);
-    quat = qT(4:end);
-    % compute the orthonormal rotation matrix ...
+    quat = qT(4:7);
+    % compute the orthonormal rotation matrix R ...
     rotm = WBM.utilities.quat2dcm(quat);
 end
