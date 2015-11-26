@@ -1,6 +1,6 @@
-function plotQuat(qT)
+function plotQuat(vqT)
     % the matrix-dimension must be of m-by-7:
-    [m,n] = size(qT);
+    [m,n] = size(vqT);
     if (n ~= 7)
         error('plotQuat: %s', wbmErrMsg.WRONG_MAT_DIM);
     end
@@ -8,14 +8,14 @@ function plotQuat(qT)
 
     figure;
 
-    x = qT(:,1);
-    y = qT(:,2);
-    z = qT(:,3);
+    x = vqT(:,1);
+    y = vqT(:,2);
+    z = vqT(:,3);
 
-    angle = acos(qT(:, 4))*2;
-    rx = qT(:,5)./sqrt(1 - qT(:,4).*qT(:,4));
-    ry = qT(:,6)./sqrt(1 - qT(:,4).*qT(:,4));
-    rz = qT(:,7)./sqrt(1 - qT(:,4).*qT(:,4));
+    angle = acos(vqT(:, 4))*2;
+    rx = vqT(:,5)./sqrt(1 - vqT(:,4).*vqT(:,4));
+    ry = vqT(:,6)./sqrt(1 - vqT(:,4).*vqT(:,4));
+    rz = vqT(:,7)./sqrt(1 - vqT(:,4).*vqT(:,4));
 
     R = vrrotvec2mat([rx(1) ry(1) rz(1) angle(1)]);
 

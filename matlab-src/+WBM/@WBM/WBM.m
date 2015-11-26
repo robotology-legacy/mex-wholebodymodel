@@ -26,7 +26,9 @@ classdef WBM < WBMBase
                 obj.setWorldFrame2FixedLink(obj.wbm_config.initStateParams.q_j, obj.wbm_config.initStateParams.dq_j, ...
                                             obj.wbm_config.initStateParams.v_b, obj.wbm_config.initStateParams.g_wf, ...
                                             obj.wbm_config.initStateParams.cstrLinkNames{1});
-            end        
+            end
+            % get and update the initial rototranslation of the robot base (world frame) ...
+            updateInitRototranslation();      
         end
         
         % Copy-function:
@@ -39,11 +41,7 @@ classdef WBM < WBMBase
            delete@WBMBase(obj);
            clear obj.wbm_config.initStateParams obj.wbm_config;
         end
-        
-        function T_b = getWorldFrameRototranslation(obj)
-            [T_b,~,~,~] = obj.getState();
-        end
-        
+                
         function setWorldFrame2FixedLink(obj, q_j, dq_j, v_b, g_wf, urdf_link_name)
             if ~exist('urdf_link_name', 'var')
                 % use the default link ...
@@ -63,28 +61,86 @@ classdef WBM < WBMBase
                     error('WBM::setWorldFrame2FixedLink: %s', wbmErrorMsg.WRONG_ARG);
             end
         end
+
+        function vqT_b = getBaseRototranslation(obj)
+            [vqT_b,~,~,~] = obj.getState();
+        end
         
         forwardDynamics(obj, t, chi, ctrlTrqs)
         
         visualizeForwardDynamics(obj, t, chi, ctrlTrqs)
+
+        function setupSimulation(sim_config)
+            % check if sim_config is an instance from a derived class of "wbmSimConfig" ...
+            if ~isa(robot_config, 'wbmSimConfig')
+                error('WBM::setupSimulation: %s', wbmErrorMsg.WRONG_DATA_TYPE);
+            end
+
+            figure; clf;
+
+            % init the main figure window for the simulation:
+            sim_config.hFigure_main = figure('Name', sim_config.main_title, 'Position', sim_config.main_pos);
+            set(sim_config.hFigure_main, 'NumberTitle', 'off', 'MenuBar', 'none', 'BackingStore', 'off');
+            % setup the rendering method of the current figure handle:
+            d = opengl('data');
+            if ~d.Software
+                % use the hardware-accelerated OpenGL renderer and not the slow software variant.
+                % Note: the axes DrawMode property is ignored in OpenGL.
+                set(gcf, 'Renderer', 'opengl');
+            else
+                % set the renderer property to "painters" to benefit from the DrawMode ...
+                set(gcf, 'Renderer', 'painters');
+            end
+            % split up the main figure into a 2x2 grid, create and setup the axes for each subplot
+            % in 3D and draw a solid patch on the bottom of the axes:
+            for i = 1:4
+                sim_config.hAxes(i)     = subplot('Position', sim_config.axes_pos(i,1:4));
+                sim_config.plot_objs{i} = plot3(0, 0, 0, '-');
+                %sim_config.plot_objs{i} = plot3(0, 0, 0, '.');
+
+                axis(sim_config.axis_limits);
+                hold on;
+                patch(sim_config.patch_shape(1,1:4), sim_config.patch_shape(2,1:4), ...
+                      sim_config.patch_shape(3,1:4), sim_config.patch_color);
+                set(gca, 'XDir', 'reverse', 'DrawMode', 'fast', ...
+                         'Color', sim_config.axes_colors(1,1:3), ...
+                         'XColor', sim_config.axes_colors(2,1:3), ...
+                         'YColor', sim_config.axes_colors(3,1:3), ...
+                         'ZColor', sim_config.axes_colors(4,1:3));
+                %params.draw_init = 1;
+                rotate3d(gca, 'on');
+
+                figure(sim_config.hFigure_main);
+            end
+            %axes(sim_config.axes(1)); % try to avoid using axes() - slower ...
+            set(sim_config.hFigure_main, 'CurrentAxes', sim_config.hAxes(1)); % much faster ...
+        end
+
+        function plotSimulationResults(@simFunc)
+
+        end
         
         function stParams = getStateParams(obj, stvChi)
             stParams = wbmStateParams;
             ndof = obj.wbm_config.ndof;
             
             % get positions and orientation ...
-            stParams.x_b  = stvChi(1:3,:);
-            stParams.qt_b = stvChi(4:7,:);
-            stParams.q_j  = stvChi(8:ndof+7,:);
+            stParams.x_b  = stvChi(1:3,1);
+            stParams.qt_b = stvChi(4:7,1);
+            stParams.q_j  = stvChi(8:ndof+7,1);
             % the velocities ...
-            stParams.dx_b    = stvChi(ndof+8:ndof+10,:);
-            stParams.omega_b = stvChi(ndof+11:ndof+13,:);           
-            stParams.dq_j    = stvChi(ndof+14:2*ndof+13,:);
+            stParams.dx_b    = stvChi(ndof+8:ndof+10,1);
+            stParams.omega_b = stvChi(ndof+11:ndof+13,1);           
+            stParams.dq_j    = stvChi(ndof+14:2*ndof+13,1);
         end
         
-        function stvChi = getStateVector(stParams)
-            stvChi = [stParams.x_b; stParams.qt_b; stParams.q_j; ...
-                      stParams.dx_b; stParams.omega_b; stParams.dq_j];
+        function stvChi = getStateVector(obj, stParams)
+            if ~exist('stParams', 'var')
+                % use the initial state parameters ... 
+                stParams = obj.wbm_config.initStateParams;
+            end
+            vqT_b   = [stParams.x_b; stParams.qt_b];
+            stvChi = [vqT_b; stParams.q_j; stParams.dx_b; stParams.omega_b; stParams.dq_j];
         end
 
         function wbm_config = getWBMConfig(obj)
@@ -125,7 +181,7 @@ classdef WBM < WBMBase
     methods(Access = private)
         function initConfig(obj, robot_config)
             % check if robot_config is an instance of a class that
-            % is derived from the class "wbmBaseRobotConfig" ...
+            % is derived from "wbmBaseRobotConfig" ...
             if ~isa(robot_config, 'wbmBaseRobotConfig')
                 error('WBM::initWBM: %s', wbmErrorMsg.WRONG_DATA_TYPE);
             end
@@ -136,6 +192,12 @@ classdef WBM < WBMBase
             obj.wbm_config.cstrLinkNames = robot_config.cstrLinkNames;
             obj.wbm_config.dampCoeff = robot_config.dampCoeff;
             obj.wbm_config.initState = robot_config.initState;
+        end
+
+        function updateInitRototranslation(obj)
+            vqT_b_init = obj.getBaseRototranslation();
+            obj.wbm_config.initStateParams.x_b  = vqT_b_init(1:3); % translation/position
+            obj.wbm_config.initStateParams.qt_b = vqT_b_init(4:7); % orientation (quaternion)
         end
                         
     end

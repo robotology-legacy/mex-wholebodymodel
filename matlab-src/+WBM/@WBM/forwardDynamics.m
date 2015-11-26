@@ -46,7 +46,7 @@ function [dchi , h] = forwardDynamics(obj, t, chi, ctrlTrqs)
     % obtain angular velocity in body frame omega_b. This is then used in the
     % quaternion derivative computation:
     omega_b = R_b * omega_w;
-    dqt_b = quatDerivative(omega_b, st.qt_b);
+    dqt_b = quatDerivative(st.qt_b, omega_b);
 
     dx = [st.dx_b; dqt_b; st.dq_j];
     dv = M \ (Jc'*f_c + [zeros(6,1); (tau + tauDamp)] - h);

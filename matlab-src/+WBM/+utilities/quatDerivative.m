@@ -20,10 +20,10 @@ function quatd = quatDerivative(quat, omega)
     Omega_op(2:4,1)   = omega;
     Omega_op(2:4,2:4) = -skew(omega); % (skew-symmetric) cross product matrix
     
-    % This calculation of the quaternion derivative uses in addition a
-    % computational "hack" (K*ε*q), to compute the derivative in the case
-    % that the quaternion is not normalized, s.t. the vector sum = 1.
-    % The factor ε will be 0 if the quaternion is unitary.
+    % This calculation of the quaternion derivative has additionally a
+    % computational "hack" (K*ε*q) to compute the derivative in the case
+    % that the quaternion is not normalized, s.t. the vector sum is still
+    % equal to 1. The factor ε will be 0 if the quaternion is unitary.
     % For further details see:
     %   http://mathworks.com/help/aeroblks/customvariablemass6dofquaternion.html
     %   and https://www.physicsforums.com/threads/quaternion-derivative.706475

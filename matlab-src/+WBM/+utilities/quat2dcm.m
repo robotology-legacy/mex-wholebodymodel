@@ -3,8 +3,8 @@ function dcm = quat2dcm(quat)
         error('quat2dcm: %s', wbmErrMsg.WRONG_VEC_SIZE);
     end
 
-    qt_b_mdl_s = quat(1);   % scalar (real) part
-    qt_b_mdl_r = quat(2:4); % vector (imaginary) part
+    qt_s = quat(1);   % scalar (real) part
+    qt_r = quat(2:4); % vector (imaginary) part
 
     % Calculate the Direction Cosine Matrix (DCM) by applying the
     % Euler-Rodrigues Parameterization for efficent computing of the
@@ -21,5 +21,5 @@ function dcm = quat2dcm(quat)
     %       Further details about the "Rodrigues’ formula" can be found in the book
     %       "A Mathematical Introduction to Robotic Manipulation" by
     %       Murray, Li & Sastry, page 28, formula (2.14).
-    dcm = eye(3) + 2*qt_b_mdl_s*skew(qt_b_mdl_r) + 2*skew(qt_b_mdl_r)^2;
+    dcm = eye(3) + 2*qt_s*skew(qt_r) + 2*skew(qt_r)^2;
 end

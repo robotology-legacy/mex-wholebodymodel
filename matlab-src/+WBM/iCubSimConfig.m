@@ -1,8 +1,8 @@
 classdef iCubSimConfig < wbmSimConfig
     properties
-        main_figure;
         main_title   = 'iCub-Simulator:';
-        axes         = zeros(1,4);
+        hFigure_main
+        hAxes        = zeros(1,4);
         plot_objs    = cell(1,4);
     end
     properties(Constant)
