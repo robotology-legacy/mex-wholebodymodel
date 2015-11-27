@@ -79,7 +79,6 @@ classdef WBMBase < handle & matlab.mixin.Copyable
             obj.wbm_params.g_wf = g_wf;
 
             % reshape the matrix into an 1-column array ...
-            %wf_R_rlnk_arr = reshape(obj.wbm_params.wf_R_rootLnk, [], 1);
             wf_R_rlnk_arr = reshape(obj.wbm_params.wf_R_rootLnk, 9, 1);
             
             wholeBodyModel('set-world-frame', wf_R_rlnk_arr, ...
@@ -128,7 +127,6 @@ classdef WBMBase < handle & matlab.mixin.Copyable
             switch nargin
                 case 3
                     % Normal mode:
-                    %wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
                     M = wholeBodyModel('mass-matrix', wf_R_rlnk_arr, wf_p_rootLnk, q_j);
                 case 0
@@ -152,7 +150,6 @@ classdef WBMBase < handle & matlab.mixin.Copyable
             switch nargin
                 case 4
                 case 3
-                    %wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
                     J = wholeBodyModel('jacobian', wf_R_rlnk_arr, wf_p_rootLnk, q_j, urdf_link_name);
                 case 1
@@ -171,7 +168,6 @@ classdef WBMBase < handle & matlab.mixin.Copyable
             switch nargin
                 case 6
                 case 5
-                    %wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
                     djdq = wholeBodyModel('djdq', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b, urdf_link_name);
                 case 1
@@ -185,7 +181,6 @@ classdef WBMBase < handle & matlab.mixin.Copyable
         function h_c = centroidalMomentum(wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             switch nargin
                 case 5
-                    %wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
                     h_c = wholeBodyModel('centroidal-momentum', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b);
                 case 0 
@@ -203,7 +198,6 @@ classdef WBMBase < handle & matlab.mixin.Copyable
             switch nargin
                 case 4
                 case 3
-                    %wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
                     wf_vqT_rlnk = wholeBodyModel('forward-kinematics', wf_R_rlnk_arr, wf_p_rootLnk, q_j, urdf_link_name);
                 case 1
@@ -217,7 +211,6 @@ classdef WBMBase < handle & matlab.mixin.Copyable
         function C_qv = generalBiasForces(wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             switch nargin
                 case 5
-                    %wf_R_rlnk_arr = reshape(wf_R_rootLnk, [], 1);
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);                    
                     C_qv = wholeBodyModel('generalised-forces', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b);
                 case 0

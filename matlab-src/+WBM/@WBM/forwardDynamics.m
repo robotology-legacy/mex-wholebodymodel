@@ -1,4 +1,4 @@
-function [dchi , h] = forwardDynamics(obj, t, chi, ctrlTrqs)
+function [dchi, h] = forwardDynamics(obj, t, chi, ctrlTrqs)
     ndof = obj.wbm_config.ndof;
     nCstrs = obj.wbm_config.nCstrs;
     dampCoeff = obj.wbm_config.dampCoeff;
@@ -14,9 +14,9 @@ function [dchi , h] = forwardDynamics(obj, t, chi, ctrlTrqs)
     obj.setState(st.q_j, st.dq_j, v_bw);
 
     % reconstruct the rotation of the 'root link' to the 'world'
-    % from the quaternion part of the transformation vector T_b:
-    [T_b,~,~,~] = obj.getState();
-    [~,R_b] = frame2posRotm(T_b);
+    % from the quaternion part of the transformation vector vqT_b:
+    [vqT_b,~,~,~] = obj.getState();
+    [~,R_b] = frame2posRotm(vqT_b);
 
     M = obj.massMatrix();
     h = obj.generalBiasForces();
@@ -26,19 +26,18 @@ function [dchi , h] = forwardDynamics(obj, t, chi, ctrlTrqs)
     Jc = zeros(6*nCstrs,6+ndof);
     dJcDq = zeros(6*nCstrs,1);
     for i = 1:nCstrs
-        Jc(6*i-5:6*i,:) = obj.jacobian(obj.wbm_config.cstrLinkNames{i}); % 6*(i-1)+1 == 6*i-5
+        Jc(6*i-5:6*i,:)    = obj.jacobian(obj.wbm_config.cstrLinkNames{i}); % 6*(i-1)+1 == 6*i-5
         dJcDq(6*i-5:6*i,:) = obj.dJdq(obj.wbm_config.cstrLinkNames{i});
     end
 
-    % get the current control torque ...
+    % get the current control torque vector ...
     tau = ctrlTrqs.tau(t);
 
     % contact force computations:
-    %
     JcMinv = Jc/M;
     JcMinvJct = JcMinv * Jc';
     tauDamp = -dampCoeff * st.dq_j;
-    
+
     % calculate the contact (constraint) force ...
     f_c = JcMinvJct \ (JcMinv * (h - [zeros(6,1); (tau + tauDamp)]) - dJcDq);
 

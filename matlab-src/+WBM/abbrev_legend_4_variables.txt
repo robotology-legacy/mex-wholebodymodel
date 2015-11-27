@@ -11,12 +11,12 @@ Legend of abbreviations and acronyms which are used for the variable names:
 	h_c     ... centroidal momentum (vector)
 	p       ... position OR translation (vector)
 	params  ... parameters
-	pos     ... position
+	pos     ... position(s)
 	q_j     ... joint angle(s)
 	qt, q   ... quaternion
 	quat    ... quaternion
 	r       ... root
-	vqT     ... vector-quaternion transformation (VQS-Transformation) with scale 1 (vector)
+	vqT     ... vector-quaternion transformation [VQS-Transformation without scale S] (vector) (*)
 	w       ... world
 	wf      ... world frame
 	wf_T_b  ... transformation FROM the 'base' TO the 'world frame'
@@ -31,7 +31,13 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ref     ... reference
     rlnk    ... root link OR reference link
     st      ... state
+    stm     ... state matrix
     str     ... string
     stv     ... state vector
     trqs    ... torques
+    vel     ... velocit(y/ies)
     wbm     ... whole body model
+
+
+
+(*) ... Note: without scale factor is the same as if scale S = 1.

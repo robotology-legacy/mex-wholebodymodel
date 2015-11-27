@@ -68,78 +68,116 @@ classdef WBM < WBMBase
         
         forwardDynamics(obj, t, chi, ctrlTrqs)
         
-        visualizeForwardDynamics(obj, t, chi, ctrlTrqs)
+        visualizeForwardDynamics(obj, x_out, tspan, sim_config)
 
-        function setupSimulation(sim_config)
-            % check if sim_config is an instance from a derived class of "wbmSimConfig" ...
-            if ~isa(robot_config, 'wbmSimConfig')
-                error('WBM::setupSimulation: %s', wbmErrorMsg.WRONG_DATA_TYPE);
-            end
+        setupSimulation(sim_config)
 
-            figure; clf;
-
-            % init the main figure window for the simulation:
-            sim_config.hFigure_main = figure('Name', sim_config.main_title, 'Position', sim_config.main_pos);
-            set(sim_config.hFigure_main, 'NumberTitle', 'off', 'MenuBar', 'none', 'BackingStore', 'off');
-            % setup the rendering method of the current figure handle:
-            d = opengl('data');
-            if ~d.Software
-                % use the hardware-accelerated OpenGL renderer and not the slow software variant.
-                % Note: the axes DrawMode property is ignored in OpenGL.
-                set(gcf, 'Renderer', 'opengl');
-            else
-                % set the renderer property to "painters" to benefit from the DrawMode ...
-                set(gcf, 'Renderer', 'painters');
-            end
-            % split up the main figure into a 2x2 grid, create and setup the axes for each subplot
-            % in 3D and draw a solid patch on the bottom of the axes:
-            for i = 1:4
-                sim_config.hAxes(i)     = subplot('Position', sim_config.axes_pos(i,1:4));
-                sim_config.plot_objs{i} = plot3(0, 0, 0, '-');
-                %sim_config.plot_objs{i} = plot3(0, 0, 0, '.');
-
-                axis(sim_config.axis_limits);
-                hold on;
-                patch(sim_config.patch_shape(1,1:4), sim_config.patch_shape(2,1:4), ...
-                      sim_config.patch_shape(3,1:4), sim_config.patch_color);
-                set(gca, 'XDir', 'reverse', 'DrawMode', 'fast', ...
-                         'Color', sim_config.axes_colors(1,1:3), ...
-                         'XColor', sim_config.axes_colors(2,1:3), ...
-                         'YColor', sim_config.axes_colors(3,1:3), ...
-                         'ZColor', sim_config.axes_colors(4,1:3));
-                %params.draw_init = 1;
-                rotate3d(gca, 'on');
-
-                figure(sim_config.hFigure_main);
-            end
-            %axes(sim_config.axes(1)); % try to avoid using axes() - slower ...
-            set(sim_config.hFigure_main, 'CurrentAxes', sim_config.hAxes(1)); % much faster ...
-        end
-
-        function plotSimulationResults(@simFunc)
+        function plotSimulationResults(@simFunc, x_out, tspan, sim_config)
 
         end
         
         function stParams = getStateParams(obj, stvChi)
-            stParams = wbmStateParams;
+            if ~iscolumn(stvChi)
+               error('WBM::getStateParams: %s', wbmErrorMsg.WRONG_VEC_DIM);
+            end
+
             ndof = obj.wbm_config.ndof;
-            
-            % get positions and orientation ...
+            stvSize = obj.wbm_config.stvSize;
+            stParams = obj.initStateParams();
+
+            % get the base/joint positions and the base orientation ...
             stParams.x_b  = stvChi(1:3,1);
             stParams.qt_b = stvChi(4:7,1);
             stParams.q_j  = stvChi(8:ndof+7,1);
-            % the velocities ...
+            % the corresponding velocities ...
             stParams.dx_b    = stvChi(ndof+8:ndof+10,1);
-            stParams.omega_b = stvChi(ndof+11:ndof+13,1);           
-            stParams.dq_j    = stvChi(ndof+14:2*ndof+13,1);
+            stParams.omega_b = stvChi(ndof+11:ndof+13,1);
+            stParams.dq_j    = stvChi(ndof+14:stvSize,1);
+        end
+
+        function stParams = getStateParamsData(obj, chi)
+            ndof = obj.wbm_config.ndof;
+            stvSize = obj.wbm_config.stvSize;
+
+            [m, n] = size(chi);
+            if (n ~= stvSize) 
+                error('WBM::getStateParamsData: %s', wbmErrorMsg.WRONG_MAT_DIM);
+            end
+            stParams = obj.initStateParamsMatrices(m);
+
+            % extract all values ...
+            stParams.x_b  = chi(1:m,1:3);
+            stParams.qt_b = chi(1:m,4:7);
+            stParams.q_j  = chi(1:m,8:ndof+7);
+            
+            stParams.dx_b    = chi(1:m,ndof+8:ndof+10);
+            stParams.omega_b = chi(1:m,ndof+11:ndof+13);           
+            stParams.dq_j    = chi(1:m,ndof+14:stvSize);
+        end
+
+        function stvPos = getStatePositions(obj, stvChi)
+            if ~iscolumn(stvChi)
+               error('WBM::getStatePositions: %s', wbmErrorMsg.WRONG_VEC_DIM);
+            end
+            cutp = obj.wbm_config.ndof + 7;
+
+            % extract the base VQS-Transformation (without S)
+            % and the joint positions ...
+            stvPos = zeros(cutp,1);
+            stvPos = stvChi(1:cutp,1); % [x_b; qt_b; q_j]
+        end
+
+        function stmPos = getStatePositionsData(obj, chi)
+            stvSize = obj.wbm_config.stvSize;
+
+            [m, n] = size(chi);
+            if (n ~= stvSize) 
+                error('WBM::getStatePositionsData: %s', wbmErrorMsg.WRONG_MAT_DIM);
+            end
+
+            stmPos = zeros(m,cutp);
+            stmPos = chi(1:m,1:cutp); % m -by- [x_b, qt_b, q_j]
+        end
+
+        function stvVel = getStateVelocities(obj, stvChi)
+            if ~iscolumn(stvChi)
+               error('WBM::getStateVelocities: %s', wbmErrorMsg.WRONG_VEC_DIM);
+            end
+
+            stvSize = obj.wbm_config.stvSize;
+            cutp = obj.wbm_config.ndof + 8;
+            len = stvSize - cutp;
+
+            % extract the velocites ...
+            stvVel = zeros(len,1);
+            stvVel = stvChi(cutp:stvSize,1); % [dx_b; omega_b; dq_j]
+        end
+
+        function stmVel = getStateVelocitiesData(obj, chi)
+            stvSize = obj.wbm_config.stvSize;
+
+            [m, n] = size(chi);
+            if (n ~= stvSize) 
+                error('WBM::getStateVelocitiesData: %s', wbmErrorMsg.WRONG_MAT_DIM);
+            end
+
+            cutp = obj.wbm_config.ndof + 8;
+            len = stvSize - cutp;
+
+            stmVel = zeros(m,len);
+            stmVel = chi(1:m,cutp:stvSize); % m -by- [dx_b, omega_b, dq_j]
         end
         
         function stvChi = getStateVector(obj, stParams)
             if ~exist('stParams', 'var')
                 % use the initial state parameters ... 
                 stParams = obj.wbm_config.initStateParams;
+            elseif ~iscolumn(stParams.x_b)
+                % the state parameters must be column-vectors ...
+                error('WBM::getStateVector: %s', wbmErrorMsg.WRONG_VEC_DIM); 
             end
-            vqT_b   = [stParams.x_b; stParams.qt_b];
+
+            vqT_b  = [stParams.x_b; stParams.qt_b];
             stvChi = [vqT_b; stParams.q_j; stParams.dx_b; stParams.omega_b; stParams.dq_j];
         end
 
@@ -185,19 +223,48 @@ classdef WBM < WBMBase
             if ~isa(robot_config, 'wbmBaseRobotConfig')
                 error('WBM::initWBM: %s', wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            
+            % the state parameters must be column-vectors ...
+            if ~iscolumn(robot_config.initStateParams.x_b)
+               error('WBM::initWBM: %s', wbmErrorMsg.WRONG_VEC_DIM); 
+            end
+
             obj.wbm_config = wbmBaseRobotConfig;
             obj.wbm_config.ndof = robot_config.ndof;
             obj.wbm_config.nCstrs = robot_config.nCstrs;
             obj.wbm_config.cstrLinkNames = robot_config.cstrLinkNames;
-            obj.wbm_config.dampCoeff = robot_config.dampCoeff;
-            obj.wbm_config.initState = robot_config.initState;
+            obj.wbm_config.dampCoeff = robot_config.dampCoeff;            
+            obj.wbm_config.initStateParams = robot_config.initStateParams;
+            obj.wbm_config.stvSize = 2*obj.wbm_config.ndof + 13;
+        end
+
+        function stParams = initStateParams(obj)
+            stParams = wbmStateParams;
+            % allocate memory for each variable ...
+            stParams.x_b  = zeros(3,1);
+            stParams.qt_b = zeros(4,1);
+            stParams.q_j  = zeros(obj.wbm_config.ndof,1);
+
+            stParams.dx_b    = zeros(3,1);
+            stParams.omega_b = zeros(3,1);
+            stParams.dq_j    = zeros(obj.wbm_config.ndof,1);
+        end
+
+        function stParams = initStateParamsMatrices(obj, m)
+            stParams = wbmStateParams;
+
+            stParams.x_b  = zeros(1:m,3);
+            stParams.qt_b = zeros(1:m,4);
+            stParams.q_j  = zeros(1:m,obj.wbm_config.ndof);
+            
+            stParams.dx_b    = zeros(1:m,3);
+            stParams.omega_b = zeros(1:m,3);
+            stParams.dq_j    = zeros(1:m,obj.wbm_config.ndof);
         end
 
         function updateInitRototranslation(obj)
             vqT_b_init = obj.getBaseRototranslation();
-            obj.wbm_config.initStateParams.x_b  = vqT_b_init(1:3); % translation/position
-            obj.wbm_config.initStateParams.qt_b = vqT_b_init(4:7); % orientation (quaternion)
+            obj.wbm_config.initStateParams.x_b  = vqT_b_init(1:3,1); % translation/position
+            obj.wbm_config.initStateParams.qt_b = vqT_b_init(4:7,1); % orientation (quaternion)
         end
                         
     end
