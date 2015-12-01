@@ -1,4 +1,4 @@
-classdef wbmHumanoidConfig < wbmBasicRobotConfig
+classdef wbmHumanoidConfig < WBM.wbmBaseRobotConfig
     properties
         pos_head
         pos_torso

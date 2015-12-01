@@ -1,44 +1,46 @@
-classdef WBM < WBMBase
+classdef WBM < WBM.WBMBase
     properties(Access = private)
-        wbm_config@wbmBaseRobotConfig
+        wbm_config@WBM.wbmBaseRobotConfig
     end
         
     methods(Access = public)
         % Constructor:
         function obj = WBM(model_params, robot_config, wf2FixLnk)
             % call the constructor of the superclass ...
-            obj = obj@WBMBase(model_params);
+            obj = obj@WBM.WBMBase(model_params);
             
             if ~exist('robot_config', 'var')
-                error('WBM::WBM: %s', wbmErrorMsg.WRONG_ARG);
+                error('WBM::WBM: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             if ~exist('wf2FixLnk', 'var')
                 wf2FixLnk = false; % default value ...
             end
  
-            initConfig(robot_config);
-            if (wf2FixLnk == true)
-                if isempty(obj.wbm_config.initStateParams.cstrLinkNames)
-                    error('WBM::WBM: %s', wbmErrorMsg.CARRAY_IS_EMPTY);
+            obj.initConfig(robot_config);
+            if ~isempty(obj.wbm_config.initStateParams)
+                if wf2FixLnk
+                    if isempty(obj.wbm_config.initStateParams.cstrLinkNames)
+                        error('WBM::WBM: %s', WBM.wbmErrorMsg.CARRAY_IS_EMPTY);
+                    end
+                    % set the world frame (WF) at a given rototranslation from
+                    % a chosen fixed link (the first entry of the constraint list):
+                    obj.setWorldFrame2FixedLink(obj.wbm_config.initStateParams.q_j, obj.wbm_config.initStateParams.dq_j, ...
+                                                obj.wbm_config.initStateParams.v_b, obj.wbm_config.initStateParams.g_wf, ...
+                                                obj.wbm_config.initStateParams.cstrLinkNames{1});
                 end
-                % set the world frame (WF) at a given rototranslation from
-                % a chosen fixed link (the first entry of the constraint list):
-                obj.setWorldFrame2FixedLink(obj.wbm_config.initStateParams.q_j, obj.wbm_config.initStateParams.dq_j, ...
-                                            obj.wbm_config.initStateParams.v_b, obj.wbm_config.initStateParams.g_wf, ...
-                                            obj.wbm_config.initStateParams.cstrLinkNames{1});
+                % get and update the initial rototranslation of the robot base (world frame) ...
+                obj.updateInitRototranslation();
             end
-            % get and update the initial rototranslation of the robot base (world frame) ...
-            updateInitRototranslation();      
         end
         
         % Copy-function:
-        function newObj = copy(obj)
-            newObj = copy@WBMBase(obj);
-        end
+        % function newObj = copy(obj)
+        %     newObj = copy@WBM.WBMBase(obj);
+        % end
         
         % Destructor:
         function delete(obj)
-           delete@WBMBase(obj);
+           delete@WBM.WBMBase(obj);
            clear obj.wbm_config.initStateParams obj.wbm_config;
         end
                 
@@ -52,13 +54,12 @@ classdef WBM < WBMBase
             end
             
             switch nargin
-                case 5
-                case 4            
+                case {4, 5}            
                     obj.setState(q_j, dq_j, v_b);
                     [p_w2b, R_w2b] = obj.getWorldFrameFromFixedLink(urdf_link_name, q_j);
                     obj.setWorldFrame(R_w2b, p_w2b, g_wf);
                 otherwise
-                    error('WBM::setWorldFrame2FixedLink: %s', wbmErrorMsg.WRONG_ARG);
+                    error('WBM::setWorldFrame2FixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
         end
 
@@ -72,13 +73,13 @@ classdef WBM < WBMBase
 
         setupSimulation(sim_config)
 
-        function plotSimulationResults(@simFunc, x_out, tspan, sim_config)
+        % function plotSimulationResults(@simFunc, x_out, tspan, sim_config)
 
-        end
+        % end
         
         function stParams = getStateParams(obj, stvChi)
             if ~iscolumn(stvChi)
-               error('WBM::getStateParams: %s', wbmErrorMsg.WRONG_VEC_DIM);
+               error('WBM::getStateParams: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
             ndof = obj.wbm_config.ndof;
@@ -101,7 +102,7 @@ classdef WBM < WBMBase
 
             [m, n] = size(chi);
             if (n ~= stvSize) 
-                error('WBM::getStateParamsData: %s', wbmErrorMsg.WRONG_MAT_DIM);
+                error('WBM::getStateParamsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
             stParams = obj.initStateParamsMatrices(m);
 
@@ -117,7 +118,7 @@ classdef WBM < WBMBase
 
         function stvPos = getStatePositions(obj, stvChi)
             if ~iscolumn(stvChi)
-               error('WBM::getStatePositions: %s', wbmErrorMsg.WRONG_VEC_DIM);
+               error('WBM::getStatePositions: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
             cutp = obj.wbm_config.ndof + 7;
 
@@ -132,7 +133,7 @@ classdef WBM < WBMBase
 
             [m, n] = size(chi);
             if (n ~= stvSize) 
-                error('WBM::getStatePositionsData: %s', wbmErrorMsg.WRONG_MAT_DIM);
+                error('WBM::getStatePositionsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
             stmPos = zeros(m,cutp);
@@ -141,7 +142,7 @@ classdef WBM < WBMBase
 
         function stvVel = getStateVelocities(obj, stvChi)
             if ~iscolumn(stvChi)
-               error('WBM::getStateVelocities: %s', wbmErrorMsg.WRONG_VEC_DIM);
+               error('WBM::getStateVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
             stvSize = obj.wbm_config.stvSize;
@@ -158,7 +159,7 @@ classdef WBM < WBMBase
 
             [m, n] = size(chi);
             if (n ~= stvSize) 
-                error('WBM::getStateVelocitiesData: %s', wbmErrorMsg.WRONG_MAT_DIM);
+                error('WBM::getStateVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
             cutp = obj.wbm_config.ndof + 8;
@@ -174,7 +175,7 @@ classdef WBM < WBMBase
                 stParams = obj.wbm_config.initStateParams;
             elseif ~iscolumn(stParams.x_b)
                 % the state parameters must be column-vectors ...
-                error('WBM::getStateVector: %s', wbmErrorMsg.WRONG_VEC_DIM); 
+                error('WBM::getStateVector: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM); 
             end
 
             vqT_b  = [stParams.x_b; stParams.qt_b];
@@ -220,15 +221,17 @@ classdef WBM < WBMBase
         function initConfig(obj, robot_config)
             % check if robot_config is an instance of a class that
             % is derived from "wbmBaseRobotConfig" ...
-            if ~isa(robot_config, 'wbmBaseRobotConfig')
-                error('WBM::initWBM: %s', wbmErrorMsg.WRONG_DATA_TYPE);
+            if ~isa(robot_config, 'WBM.wbmBaseRobotConfig')
+                error('WBM::initWBM: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            % the state parameters must be column-vectors ...
-            if ~iscolumn(robot_config.initStateParams.x_b)
-               error('WBM::initWBM: %s', wbmErrorMsg.WRONG_VEC_DIM); 
+            if ~isempty(robot_config.initStateParams)
+                % the state parameters must be column-vectors ...
+                if ~iscolumn(robot_config.initStateParams.x_b)
+                   error('WBM::initWBM: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM); 
+                end
             end
 
-            obj.wbm_config = wbmBaseRobotConfig;
+            obj.wbm_config = WBM.wbmBaseRobotConfig;
             obj.wbm_config.ndof = robot_config.ndof;
             obj.wbm_config.nCstrs = robot_config.nCstrs;
             obj.wbm_config.cstrLinkNames = robot_config.cstrLinkNames;
@@ -238,7 +241,7 @@ classdef WBM < WBMBase
         end
 
         function stParams = initStateParams(obj)
-            stParams = wbmStateParams;
+            stParams = WBM.wbmStateParams;
             % allocate memory for each variable ...
             stParams.x_b  = zeros(3,1);
             stParams.qt_b = zeros(4,1);

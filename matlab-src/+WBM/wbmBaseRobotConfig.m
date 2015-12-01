@@ -4,7 +4,7 @@ classdef wbmBaseRobotConfig
        nCstrs@int16
        cstrLinkNames = {};
        dampCoeff@double
-       initStateParams@wbmStateParams
+       initStateParams@WBM.wbmStateParams
        stvSize@int16
     end
 end

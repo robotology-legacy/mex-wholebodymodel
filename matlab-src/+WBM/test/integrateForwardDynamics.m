@@ -5,19 +5,19 @@ import WBM.utilities.*
 
 %% Initialization of the WBM:
 %
-iCub_model  = wbmBaseModelParams; 
-iCub_config = wbmHumanoidConfig;
-% base robot config:
-iCub_config.ndof          = 25; 
-iCub_config.nCstrs        = 2; 
-iCub_config.cstrLinkNames = {'l_sole', 'r_sole'};
-iCub_config.dampCoeff     = 0.0; %0.5;
 % base model parameters:
+iCub_model = wbmBaseModelParams; 
 %iCub_model.urdfRobot    = 'icubGazeboSim';
 %iCub_model.urdfLinkName = 'l_sole';
 %iCub_model.wf_R_rootLnk = zeros(3,3);
 %iCub_model.wf_p_rootLnk = zeros(3,1);
 iCub_model.g_wf         = [0; 0; 9.81]; %zeros(6+iCub_config.ndof,1);
+% base robot config:
+iCub_config = wbmHumanoidConfig;
+iCub_config.ndof          = 25; 
+iCub_config.nCstrs        = 2; 
+iCub_config.cstrLinkNames = {'l_sole', 'r_sole'};
+iCub_config.dampCoeff     = 0.0; %0.5;
 % body positions of the iCub-Robot (in degrees):
 % (this configuration assumes an iCub-Robot with 25 DoFs.)
 iCub_config.pos_torso    = [-10.0; 0.0; 0.0];
@@ -45,15 +45,11 @@ wbm_iCub = WBM(iCub_model, iCub_config, wf2FixLnk);
 %    chapter 3, pages 40-42, formula (3.8).
 chi_init = wbm_iCub.getStateVector();
 
-
-% The function tau(t) is usually called a "forcing term" on the ode. 
-
-
 %% Control torques:
-%  Setup the time-dependent variable "tau" that refers to the control torques of each
-%  equation in the ODEs. This variable is a forcing term that is needed in the
-%  forward dynamic function to calculate the constraint forces f_c and the
-%  generalized acceleration dv (q_ddot).
+%  Setup the time-dependent variable "tau" which describes a forcing function/term on
+%  the ODEs to control the dynamics of the equation-system. It refers to the control
+%  torques of each time-step t and is needed to calculate the constraint forces f_c
+%  which influences the outcome of each equation, the generalized acceleration dv (q_ddot).
 vqT_b_init = chi_init(1,1);
 [p_b, R_b] = frame2posRotm(vqT_b_init);
 g_init = wbm_iCub.generalBiasForces(R_b, p_b, iCub_config.initStateParams.q_j, zeros(25,1), zeros(6,1));
@@ -80,6 +76,7 @@ ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);           % setup the erro
 save('testTrajectory.mat', 't', 'chi', 'ctrlTrqs', 'iCub_model', 'iCub_config');
 disp('Numerical integration finished.');
 
+%% iCub-Simulator:
 % it_step = 1;
 % while (it_step < 10)
     %% Setup the window and plot parameters for the WBM-simulator:
