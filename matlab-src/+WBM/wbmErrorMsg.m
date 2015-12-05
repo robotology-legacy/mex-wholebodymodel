@@ -1,12 +1,16 @@
 classdef wbmErrorMsg
     properties(Constant)
+        DIM_MISMATCH    = 'Mismatching dimensions!';
+        EMPTY_CELL_ARR  = 'Cell array is empty!';
+        EMPTY_DATA_TYPE = 'Empty data type!';
+        EMPTY_STRING    = 'Empty string!';
+        EMPTY_VECTOR    = 'Empty vector(s)!';
+        FILE_NOT_EXIST  = 'File not exist on given path!';
+        UNKNOWN_EXC     = 'Unknown exception!';
         WRONG_ARG       = 'Wrong number of input arguments!';
+        WRONG_DATA_TYPE = 'Wrong data type!';
         WRONG_MAT_DIM   = 'Wrong matrix dimension!';
         WRONG_VEC_DIM   = 'Wrong vector dimension!';
         WRONG_VEC_SIZE  = 'Wrong vector size!';
-        WRONG_DATA_TYPE = 'Wrong data type!';
-        CARRAY_IS_EMPTY = 'The cell array is empty!';
-        FILE_NOT_EXIST  = 'File does not exist on given path!';
-        UNKNOWN_EXCP    = 'Unknown exception!';
     end
 end

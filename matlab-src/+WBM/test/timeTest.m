@@ -8,11 +8,11 @@ import WBM.utilities.*
 iCub_model = wbmBaseModelParams;
 iCub_model.urdfRobot = 'icubGazeboSim';
 iCub_model.wf_R_rootLnk = eye(3,3);
-iCub_model.g_wf         = [0; 0; 9.81];
+iCub_model.g_wf         = [0; 0; -9.81];
 % base robot config:
 iCub_config = wbmHumanoidConfig;
-iCub_config.ndof          = int16(25); 
-iCub_config.nCstrs        = int16(2); 
+iCub_config.ndof          = 25;
+iCub_config.nCstrs        = 2;
 iCub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
 
 nIter    = 1000;
@@ -75,13 +75,13 @@ fprintf('\n\nStarting optimised mode trial\n--------------------------\n');
 %% Second initialization of the WBM:
 % base model:
 iCub_model = wbmBaseModelParams;
-iCub_model.urdfRobot = 'icubGazeboSim';
+%iCub_model.urdfRobot = 'icubGazeboSim';
 iCub_model.wf_R_rootLnk = eye(3,3);
 iCub_model.g_wf         = [0; 0; 9.81];
 % base robot config:
 iCub_config = wbmHumanoidConfig;
-iCub_config.ndof          = int16(25); 
-iCub_config.nCstrs        = int16(2);
+iCub_config.ndof          = 25;
+iCub_config.nCstrs        = 2;
 iCub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
 
 nIter    = 1000;
@@ -92,7 +92,7 @@ tic;
 wbm_iCub = WBM(iCub_model, iCub_config);
 initTime = toc();
 
-fprintf('Initialisation time : %e secs\nStarting Trial...\n ', initTime);
+fprintf('Initialisation time : %e secs\nStarting Trial...\n', initTime);
 
 R = iCub_model.wf_R_rootLnk;
 g = iCub_model.g_wf;

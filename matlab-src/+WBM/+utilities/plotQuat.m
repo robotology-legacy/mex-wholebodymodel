@@ -2,7 +2,7 @@ function plotQuat(vqT)
     % the matrix-dimension must be of m-by-7:
     [m,n] = size(vqT);
     if (n ~= 7)
-        error('plotQuat: %s', wbmErrMsg.WRONG_MAT_DIM);
+        error('plotQuat: %s', WBM.wbmErrMsg.WRONG_MAT_DIM);
     end
     len = m;
 
@@ -35,7 +35,13 @@ function plotQuat(vqT)
     oriz = line('xdata', [x(1) (x(1)+R(1,3))], 'ydata', [y(1) (y(1)+R(2,3))], 'zdata', [z(1) (z(1)+R(3,3))], ...
                 'erasemode', 'normal', 'LineWidth', 2, 'color', 'blue');
 
-    set(gca, 'drawmode', 'fast');
+    if verLessThan('matlab', '8.4.0')
+        % for Matlab R2014b and later ...
+        set(gca, 'SortMethod', 'childorder');
+    else
+        % for older Matlab versions (<= R2014a) ...
+        set(gca, 'DrawMode', 'fast');
+    end
 
     pause;
     for i = 1:len

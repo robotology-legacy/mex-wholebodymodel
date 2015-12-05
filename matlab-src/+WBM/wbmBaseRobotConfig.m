@@ -1,10 +1,10 @@
 classdef wbmBaseRobotConfig
     properties
-       ndof@int16
-       nCstrs@int16
+       ndof@uint16 scalar
+       nCstrs@uint16 scalar
        cstrLinkNames = {};
-       dampCoeff@double
-       initStateParams@WBM.wbmStateParams
-       stvSize@int16
+       dampCoeff@double scalar
+       initStateParams = WBM.wbmStateParams;
+       stvLen@uint16 scalar
     end
 end

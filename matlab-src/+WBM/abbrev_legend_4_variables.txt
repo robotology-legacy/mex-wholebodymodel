@@ -16,13 +16,14 @@ Legend of abbreviations and acronyms which are used for the variable names:
 	qt, q   ... quaternion
 	quat    ... quaternion
 	r       ... root
-	vqT     ... vector-quaternion transformation [VQS-Transformation without scale S] (vector) (*)
+	vqT     ... vector-quaternion transformation [VQS-Transformation] (vector) (*)
 	w       ... world
 	wf      ... world frame
 	wf_T_b  ... transformation FROM the 'base' TO the 'world frame'
     b       ... base
     ctrl    ... control
     fb      ... floating base
+    iwbm    ... "inner"wbm ("i" declares that this variable is private)
     j       ... joint
     lnk     ... link
     nw      ... new world
@@ -34,10 +35,12 @@ Legend of abbreviations and acronyms which are used for the variable names:
     stm     ... state matrix
     str     ... string
     stv     ... state vector
+    stvqT   ... state vector-quaternion transformation [VQS-Transformation of
+    			the current state vector] (vector) (*)
     trqs    ... torques
     vel     ... velocit(y/ies)
     wbm     ... whole body model
 
 
 
-(*) ... Note: without scale factor is the same as if scale S = 1.
+(*) ... Without scale factor S. This is the same as if scale S = 1.

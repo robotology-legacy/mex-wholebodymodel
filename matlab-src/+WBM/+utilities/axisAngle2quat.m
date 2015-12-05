@@ -1,6 +1,6 @@
 function quat = axisAngle2quat(axang)
     if (size(axang,1) ~= 4)
-        error('axisAngle2quat: %s', wbmErrMsg.WRONG_VEC_DIM);
+        error('axisAngle2quat: %s', WBM.wbmErrMsg.WRONG_VEC_DIM);
     end
 
     q = zeros(4,1);

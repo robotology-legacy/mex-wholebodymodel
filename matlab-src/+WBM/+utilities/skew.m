@@ -1,6 +1,6 @@
 function S = skew(w)
     if (length(w) ~= 3)
-        error('skew: %s', wbmErrMsg.WRONG_VEC_SIZE);
+        error('skew: %s', WBM.wbmErrMsg.WRONG_VEC_SIZE);
     end
     
     % twice faster than an array-concatenation ...
