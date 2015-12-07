@@ -45,7 +45,8 @@ wbm_modelInitialise('icubGazeboSim');
 
     qt_b_mod_s = T_bInit(4);
     qt_b_mod_r = T_bInit(5:end);
-    R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
+    %R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
+    R_b = eye(3) + 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
     p_b = T_bInit(1:3);
     
     params.chiInit = [T_bInit;params.qjInit;...

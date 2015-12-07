@@ -1,12 +1,12 @@
 classdef wbmStateParams
     properties
         % postions & orientation:
-        x_b@double matrix
+        x_b@double  matrix
         qt_b@double matrix
-        q_j@double matrix
+        q_j@double  matrix
         % velocities:
-        dx_b@double matrix
+        dx_b@double    matrix
         omega_b@double matrix
-        dq_j@double matrix
+        dq_j@double    matrix
     end
 end

@@ -1,10 +1,10 @@
-function [dchi, h] = forwardDynamics(obj, t, chi, ctrlTrqs)
+function [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
     ndof = obj.iwbm_config.ndof;
     nCstrs = obj.iwbm_config.nCstrs;
     dampCoeff = obj.iwbm_config.dampCoeff;
 
-    % get the current state parameters from the run-time variable "chi" ...
-    stp = obj.getStateParams(chi);
+    % get the state parameters from the current state vector "stvChi" ...
+    stp = obj.getStateParams(stvChi);
     omega_w = stp.omega_b;
     v_bw = [stp.dx_b; omega_w];
     %v = [stp.dx_b; omega_w; stp.dq_j];
@@ -21,8 +21,8 @@ function [dchi, h] = forwardDynamics(obj, t, chi, ctrlTrqs)
     M = obj.massMatrix();
     h = obj.generalBiasForces();
 
-    % compute the Jacobian and the corresponding derivative Jacobian for
-    % each contact constraint:
+    % compute for each contact constraint the Jacobian and the corresponding
+    % derivative Jacobian: 
     Jc = zeros(6*nCstrs,6+ndof);
     dJcDq = zeros(6*nCstrs,1);
     for i = 1:nCstrs
@@ -49,6 +49,6 @@ function [dchi, h] = forwardDynamics(obj, t, chi, ctrlTrqs)
 
     dx = [stp.dx_b; dqt_b; stp.dq_j];
     dv = M \ (Jc'*f_c + [zeros(6,1); (tau + tauDamp)] - h);
-    dchi = [dx; dv];
+    dstvChi = [dx; dv];
     %kinEnergy = 0.5*v'*M*v;
 end

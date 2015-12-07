@@ -1,22 +1,16 @@
 classdef (Abstract) wbmSimConfig
-    properties
+    properties(Abstract)
         main_title@char
         hFigure_main
-        hAxes     = zeros(1,4);
-        plot_objs = cell(1,4);
+        hAxes@double   vector
+        plot_objs@cell vector
     end
-    properties(Constant)
-        MAIN_POS@double vector
-        AXES_POS@double matrix
+    properties(Abstract, Constant)
+        MAIN_POS@double    vector
+        AXES_POS@double    matrix
         AXES_COLORS@double matrix
         AXIS_LIMITS@double vector
         PATCH_SHAPE@double matrix
         PATCH_COLOR@double vector
-        % MAIN_POS     = zeros(1,4);
-        % AXES_POS     = zeros(4,4);
-        % AXES_COLORS  = zeros(4,3);
-        % AXIS_LIMITS  = zeros(1,6);
-        % PATCH_SHAPE  = zeros(3,4);
-        % PATCH_COLOR  = zeros(1,3);
     end
 end

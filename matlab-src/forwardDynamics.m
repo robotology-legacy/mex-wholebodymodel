@@ -44,7 +44,8 @@ wbm_updateState(qj,dqj,[dx_b;omega_W]);
 
 qt_b_mod_s = T_b(4);
 qt_b_mod_r = T_b(5:end);
-R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
+%R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
+R_b = eye(3) + 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
 p_b = T_b(1:3);
 
 M = wbm_massMatrix();

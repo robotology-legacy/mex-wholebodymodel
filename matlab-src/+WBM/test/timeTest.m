@@ -25,7 +25,7 @@ tic;
 wbm_iCub = WBM(iCub_model, iCub_config);
 initTime = toc();
 
-fprintf('Initialisation time : %e secs\n', initTime);
+fprintf('Initialization time : %e secs\n', initTime);
 fprintf('Num Trials : %d\nStarting Trial...\n', nIter);
 
 R = iCub_model.wf_R_rootLnk;
@@ -92,7 +92,7 @@ tic;
 wbm_iCub = WBM(iCub_model, iCub_config);
 initTime = toc();
 
-fprintf('Initialisation time : %e secs\nStarting Trial...\n', initTime);
+fprintf('Initialization time : %e secs\nStarting Trial...\n', initTime);
 
 R = iCub_model.wf_R_rootLnk;
 g = iCub_model.g_wf;
@@ -133,5 +133,5 @@ end
 totTime = toc();
 
 %% Output the second time-benchmarks:
-fprintf('Optimised-Mode Trial Total Time : %f secs\n', totTime);
-fprintf('Optimised-Mode Trial Average Time : %e secs\n', totTime/nIter);
+fprintf('Optimized-Mode Trial Total Time : %f secs\n', totTime);
+fprintf('Optimized-Mode Trial Average Time : %e secs\n', totTime/nIter);

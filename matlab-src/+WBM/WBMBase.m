@@ -4,7 +4,7 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
         urdfLinkName@char
         wf_R_rootLnk@double matrix
         wf_p_rootLnk@double vector
-        g_wf@double vector
+        g_wf@double         vector
         wbm_params@WBM.wbmBaseModelParams;
     end
 
@@ -301,7 +301,7 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
         function [nw_p_b, nw_R_b] = computeNewWorld2Base(obj, urdf_link_name, q_j)
             % get the transformation values from the base to the old world ...
             [ow_vqT_b,~,~,~] = obj.getState();
-            % get the homogenous transformation matrix H
+            % get the homogeneous transformation matrix H
             % from the base to the old world ...
             [ow_p_b, ow_R_b] = WBM.utilities.frame2posRotm(ow_vqT_b);
             ow_H_b = WBM.utilities.posRotm2tform(ow_p_b, ow_R_b);

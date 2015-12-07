@@ -83,7 +83,8 @@ chi_init = wbm_iCub.stvChiInit;
 vqT_init = chi_init(1:7,1);
 vqT_init1 = wbm_iCub.vqTInit;
 [p_b, R_b] = frame2posRotm(vqT_init);
-g_init = wbm_iCub.generalBiasForces(R_b, p_b, iCub_config.initStateParams.q_j, zeros(25,1), zeros(6,1));
+g_init = wbm_iCub.generalBiasForces(R_b, p_b, iCub_config.initStateParams.q_j, ...
+                                    zeros(iCub_config.ndof,1), zeros(6,1));
 len = size(g_init,1);
 
 ctrlTrqs.tau = @(t)zeros(size(g_init(7:len)));
@@ -93,9 +94,7 @@ ctrlTrqs.tau = @(t)zeros(size(g_init(7:len)));
 %  of the system. It evaluates the right side of the nonlinear first-order ODEs of the
 %  form chi' = f(t,chi) and returns a vector of rates of change (vector of derivatives)
 %  that will be integrated by the solver.
-%fwdDynFunc = @(t, chi)wbm_iCub.forwardDynamics(t, chi, ctrlTrqs);
-fwdDynFunc = @(t, chi)wbm_iCub.forwardDynamics_test(t, chi, ctrlTrqs);
-%fwdDynFunc = @(t, chi)wbm_iCub.forwardDynamics_test2(t, chi, ctrlTrqs);
+fwdDynFunc = @(t, chi)wbm_iCub.forwardDynamics(t, chi, ctrlTrqs);
 
 % specifying the time interval of the integration ...
 sim_time.start = 0.0;
@@ -111,13 +110,12 @@ ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);           % setup the erro
 save('testTrajectory.mat', 't', 'chi', 'ctrlTrqs', 'iCub_model', 'iCub_config');
 disp('Numerical integration finished.');
 
-
-chi_orig = load('/home/ganymed/Library/mex-wholebodymodel/matlab-src/storedTestTrajectory.mat', 'chi');
-
+% compare the calculated data with the saved results of the original method ...
+chi_orig = load('/../../matlab-src/storedTestTrajectory.mat', 'chi');
 if isequal(chi, chi_orig.chi)
-    disp('CORRECT.');
+    disp('IDENT --> CORRECT.');
 else
-    disp('NOT CORRECT.');
+    disp('NOT IDENT --> NOT CORRECT.');
 end
 
 %% iCub-Simulator:
@@ -134,7 +132,7 @@ end
 
 %% Plot results - CoM trajectory:
 stPData = wbm_iCub.getStateParamsData(chi);
-m = size(stPData, wbm_iCub.stvSize);
+[m,~] = size(chi);
 
 figure(2);
 

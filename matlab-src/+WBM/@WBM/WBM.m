@@ -1,8 +1,9 @@
 classdef WBM < WBM.WBMBase
     properties(Dependent)
         stvChiInit@double vector
-        vqTInit@double vector
-        stvqT@double vector
+        stvLen@uint16     scalar
+        vqTInit@double    vector
+        stvqT@double      vector
         wbm_config@WBM.wbmBaseRobotConfig
     end
 
@@ -73,155 +74,11 @@ classdef WBM < WBM.WBMBase
             obj.iwbm_config.initStateParams.qt_b = vqT_init(4:7,1); % orientation (quaternion)
         end
         
-        forwardDynamics(obj, t, chi, ctrlTrqs)
+        [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
 
-        function [dchi, h] = forwardDynamics_test(obj, t, chi, ctrlTrqs)
-            ndof = obj.iwbm_config.ndof;
-            nCstrs = obj.iwbm_config.nCstrs;
-            dampCoeff = obj.iwbm_config.dampCoeff;
+        % [] = visualizeForwardDynamics(obj, x_out, tspan, sim_config)
 
-            % get the current state parameters from the run-time variable "chi" ...
-            stp = obj.getStateParams(chi);
-            omega_w = stp.omega_b;
-            v_bw = [stp.dx_b; omega_w];
-            %v = [stp.dx_b; omega_w; stp.dq_j];
-
-            % mex-WBM calls:
-            %
-            obj.setState(stp.q_j, stp.dq_j, v_bw);
-
-            % reconstruct the rotation of the 'root link' to the 'world'
-            % from the quaternion part of the transformation vector vqT_b:
-            vqT_b = obj.stvqT;
-            [~,R_b] = WBM.utilities.frame2posRotm(vqT_b);
-
-            M = obj.massMatrix();
-            h = obj.generalBiasForces();
-
-            % compute the Jacobian and the corresponding derivative Jacobian for
-            % each contact constraint:
-            Jc = zeros(6*nCstrs,6+ndof);
-            dJcDq = zeros(6*nCstrs,1);
-            for i = 1:nCstrs
-                Jc(6*i-5:6*i,:)    = obj.jacobian(obj.iwbm_config.cstrLinkNames{i}); % 6*(i-1)+1 == 6*i-5
-                dJcDq(6*i-5:6*i,:) = obj.dJdq(obj.iwbm_config.cstrLinkNames{i});
-            end
-
-            % get the current control torque vector ...
-            tau = ctrlTrqs.tau(t);
-
-            % contact force computations:
-            JcMinv = Jc/M;
-            JcMinvJct = JcMinv * Jc';
-            tauDamp = -dampCoeff * stp.dq_j;
-
-            % calculate the contact (constraint) force ...
-            f_c = JcMinvJct \ (JcMinv * (h - [zeros(6,1); (tau + tauDamp)]) - dJcDq);
-
-            % need to apply root-to-world rotation to the spatial angular velocity omega_w to
-            % obtain angular velocity in body frame omega_b. This is then used in the
-            % quaternion derivative computation:
-            omega_b = R_b * omega_w;
-            dqt_b = WBM.utilities.quatDerivative(stp.qt_b, omega_b);
-
-            dx = [stp.dx_b; dqt_b; stp.dq_j];
-            dv = M \ (Jc'*f_c + [zeros(6,1); (tau + tauDamp)] - h);
-            dchi = [dx; dv];
-            %kinEnergy = 0.5*v'*M*v;
-        end
-
-        function [dchi, h] = forwardDynamics_test2(obj, t, chi, ctrlTrqs)
-            %% extraction of state
-            %ndof = param.ndof;
-            ndof = obj.iwbm_config.ndof;
-
-            x_b = chi(1:3,:);
-            qt_b = chi(4:7,:);
-            qj = chi(8:ndof+7,:);
-            %x = [x_b;qt_b;qj];
-
-            dx_b = chi(ndof+8:ndof+10,:);
-            omega_W = chi(ndof+11:ndof+13,:);
-            dqj = chi(ndof+14:2*ndof+13,:);
-
-            v = [dx_b;omega_W;dqj];
-
-            %% MexWholeBodyModel calls
-
-
-            %wbm_updateState(qj,dqj,[dx_b;omega_W]);
-            obj.setState(qj, dqj, [dx_b;omega_W]);
-
-
-            %reconstructing rotation of root to world from the quaternion
-            [~,T_b,~,~] = wbm_getState();
-            %T_b = obj.stvqT;
-
-            qt_b_mod_s = T_b(4);
-            qt_b_mod_r = T_b(5:end);
-            R_b = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
-            p_b = T_b(1:3);
-            %[p_b, R_b] = WBM.utilities.frame2posRotm(T_b);
-
-
-            M = wbm_massMatrix();
-            h = wbm_generalisedBiasForces();
-            % M = obj.massMatrix();
-            % h = obj.generalBiasForces();
-
-            hDash = wbm_generalisedBiasForces(R_b,p_b,qj,dqj,[dx_b;omega_W]);
-            g = wbm_generalisedBiasForces(R_b,p_b,qj,zeros(size(qj)),zeros(6,1));
-            % hDash = obj.generalBiasForces(R_b, p_b, qj, dqj, [dx_b;omega_W]);
-            % g = obj.generalBiasForces(R_b, p_b, qj, zeros(size(qj)), zeros(6,1));
-
-            %% Building up contraints jacobian and djdq
-            %numConstraints = length(param.constraintLinkNames);
-            nCstrs = obj.iwbm_config.nCstrs;
-            Jc = zeros(6*nCstrs,6+ndof);
-            dJcDq = zeros(6*nCstrs,1);
-            for i=1:nCstrs
-                Jc(6*(i-1)+1:6*i,:) = wbm_jacobian(obj.iwbm_config.cstrLinkNames{i});
-                dJcDq(6*(i-1)+1:6*i,:) = wbm_djdq(obj.iwbm_config.cstrLinkNames{i});
-                % Jc(6*(i-1)+1:6*i,:) = obj.jacobian(obj.iwbm_config.cstrLinkNames{i});
-                % dJcDq(6*(i-1)+1:6*i,:) = obj.dJdq(obj.iwbm_config.cstrLinkNames{i});
-            end
-
-
-            %% control torque
-            %tau = param.tau(t);
-            tau = ctrlTrqs.tau(t);
-
-
-            %% Contact forces computation
-            JcMinv = Jc/M;
-            JcMinvJct = JcMinv * Jc';   
-
-            %tauDamp = -param.dampingCoeff*dqj;
-            dampCoeff = obj.iwbm_config.dampCoeff;
-            tauDamp = -dampCoeff * dqj;
-  
-            temp = JcMinv*h;
-            temp2 = JcMinvJct\(JcMinv*h);
-
-            fc = (JcMinvJct)\(JcMinv*(h-[zeros(6,1);tau+tauDamp])-dJcDq);
-
-            % need to apply root-to-world rotation to the spatial angular velocity omega_W to
-            % obtain angular velocity in body frame omega_b. This is then used in the
-            % quaternion derivative computation.
-
-            omega_b = R_b*omega_W;% R_b*omega_W;
-            dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
-
-            dx = [dx_b;dqt_b;dqj];
-            dv = M\(Jc'*fc + [zeros(6,1); tau+tauDamp]-h);
-            dchi = [dx;dv];  
-            %kinEnergy = 0.5*v'*M*v;
-            %dchi = zeros(size(dchi));
-        end
-
-        visualizeForwardDynamics(obj, x_out, tspan, sim_config)
-
-        setupSimulation(sim_config)
+        [] = setupSimulation(obj, sim_config)
 
         % function plotSimulationResults(@simFunc, x_out, tspan, sim_config)
 
@@ -275,7 +132,7 @@ classdef WBM < WBM.WBMBase
 
             % extract the base VQS-Transformation (without S)
             % and the joint positions ...
-            stvPos = zeros(cutp,1);
+            %stvPos = zeros(cutp,1);
             stvPos = stvChi(1:cutp,1); % [x_b; qt_b; q_j]
         end
 
@@ -288,7 +145,7 @@ classdef WBM < WBM.WBMBase
             end
             cutp = obj.iwbm_config.ndof + 7;
 
-            stmPos = zeros(m,cutp);
+            %stmPos = zeros(m,cutp);
             stmPos = chi(1:m,1:cutp); % m -by- [x_b, qt_b, q_j]
         end
 
@@ -299,10 +156,10 @@ classdef WBM < WBM.WBMBase
 
             stvLen = obj.iwbm_config.stvLen;
             cutp = obj.iwbm_config.ndof + 8;
-            len = stvLen - cutp;
+            %len = stvLen - cutp;
 
-            % extract the velocites ...
-            stvVel = zeros(len,1);
+            % extract the velocities ...
+            %stvVel = zeros(len,1);
             stvVel = stvChi(cutp:stvLen,1); % [dx_b; omega_b; dq_j]
         end
 
@@ -315,12 +172,36 @@ classdef WBM < WBM.WBMBase
             end
 
             cutp = obj.iwbm_config.ndof + 8;
-            len = stvLen - cutp;
+            %len = stvLen - cutp;
 
-            stmVel = zeros(m,len);
+            %stmVel = zeros(m,len);
             stmVel = chi(1:m,cutp:stvLen); % m -by- [dx_b, omega_b, dq_j]
         end
+
+        function stvVelb = getStateBaseVelocities(obj, stvChi)
+            if ~iscolumn(stvChi)
+               error('WBM::getStateBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+            end
+
+            cutp1 = obj.iwbm_config.ndof + 8;
+            cutp2 = obj.iwbm_config.ndof + 13;
+
+            stvVelb = stvChi(cutp1:cutp2,1); % [dx_b; omega_b]
+        end
         
+        function stmVelb = getStateBaseVelocitiesData(obj, chi)
+            stvLen = obj.iwbm_config.stvLen;
+
+            [m, n] = size(chi);
+            if (n ~= stvLen) 
+                error('WBM::getStateBaseVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+            end
+
+            cutp1 = obj.iwbm_config.ndof + 8;
+            cutp2 = obj.iwbm_config.ndof + 13;
+
+            stmVelb = chi(1:m,cutp1:cutp2); % m -by- [dx_b, omega_b]
+        end
         function vqT = getRototranslation(obj, stParams)
             if isempty(stParams)
                 error('WBM::getRototranslation: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
@@ -344,6 +225,10 @@ classdef WBM < WBM.WBMBase
             stInit     = obj.iwbm_config.initStateParams;
             vqT_b      = [stInit.x_b; stInit.qt_b];
             stvChiInit = [vqT_b; stInit.q_j; stInit.dx_b; stInit.omega_b; stInit.dq_j]; % optimieren??
+        end
+
+        function stvLen = get.stvLen(obj)
+            stvLen = obj.iwbm_config.stvLen;
         end
 
         function vqTInit = get.vqTInit(obj)
@@ -440,15 +325,15 @@ classdef WBM < WBM.WBMBase
         end
 
         function stParams = initStateParamsMatrices(obj, m)
-            stParams = wbmStateParams;
+            stParams = WBM.wbmStateParams;
 
-            stParams.x_b  = zeros(1:m,3);
-            stParams.qt_b = zeros(1:m,4);
-            stParams.q_j  = zeros(1:m,obj.iwbm_config.ndof);
+            stParams.x_b  = zeros(m,3);
+            stParams.qt_b = zeros(m,4);
+            stParams.q_j  = zeros(m,obj.iwbm_config.ndof);
             
-            stParams.dx_b    = zeros(1:m,3);
-            stParams.omega_b = zeros(1:m,3);
-            stParams.dq_j    = zeros(1:m,obj.iwbm_config.ndof);
+            stParams.dx_b    = zeros(m,3);
+            stParams.omega_b = zeros(m,3);
+            stParams.dq_j    = zeros(m,obj.iwbm_config.ndof);
         end
                         
     end
