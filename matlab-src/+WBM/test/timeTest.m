@@ -75,7 +75,7 @@ fprintf('\n\nStarting optimised mode trial\n--------------------------\n');
 %% Second initialization of the WBM:
 % base model:
 iCub_model = wbmBaseModelParams;
-%iCub_model.urdfRobot = 'icubGazeboSim';
+iCub_model.urdfRobot = 'icubGazeboSim';
 iCub_model.wf_R_rootLnk = eye(3,3);
 iCub_model.g_wf         = [0; 0; 9.81];
 % base robot config:

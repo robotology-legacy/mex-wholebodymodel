@@ -38,31 +38,6 @@ iCub_config.initStateParams.dq_j    = zeros(iCub_config.ndof,1);
 wf2FixLnk = true;
 wbm_iCub = WBM(iCub_model, iCub_config, wf2FixLnk);
 
-
-    % %wbm_setWorldFrame(eye(3), zeros(3,1), [0, 0, -9.81]'); % In Constructor of WBMBase.
-    % wbm_iCub.updateWorldFrame(eye(3), zeros(3,1), [0, 0, -9.81]');
-    % %% BEGIN setWorldFrame2FixedLink:
-    % %wbm_updateState(iCub_config.initStateParams.q_j, zeros(iCub_config.ndof,1), zeros(6,1));
-    % wbm_iCub.setState(iCub_config.initStateParams.q_j, zeros(iCub_config.ndof,1), zeros(6,1));
-    % %[rot, pos] = wbm_getWorldFrameFromFixedLink('l_sole', iCub_config.initStateParams.q_j);
-    % [pos, rot] = wbm_iCub.getWorldFrameFromFixedLink('l_sole', iCub_config.initStateParams.q_j);
-    % % fprintf('Converting to a set world frame... \n');
-    % %wbm_setWorldFrame(rot, pos, [0, 0, -9.81]');
-    % wbm_iCub.setWorldFrame(rot, pos, [0, 0, -9.81]');
-    % %% END setWorldFrame2FixedLink.
-    
-    % %% BEGIN updateInitRototranslation:
-    % %[qj, vqT_init, dqj, vb] = wbm_getState();
-    % vqT_init = wbm_iCub.stvqT;
-    % %% END updateInitRototranslation.
-
-    % %% BEGIN frame2posRotm for generalBiasForces:
-    % qt_b_mod_s = vqT_init(4);
-    % qt_b_mod_r = vqT_init(5:end);
-    % R_b1 = eye(3) - 2*qt_b_mod_s*skew(qt_b_mod_r) + 2 * skew(qt_b_mod_r)^2;
-    % p_b1 = vqT_init(1:3);
-    % %% END frame2posRotm for generalBiasForces.
-
 %% State variable:
 %  Create the initial condition of the state variable "chi" for the integration of the
 %  forward dynamics in state-space form. The state-space form reduces, through variable
@@ -72,16 +47,13 @@ wbm_iCub = WBM(iCub_model, iCub_config, wf2FixLnk);
 %    chapter 3, pages 40-42, formula (3.8).
 chi_init = wbm_iCub.stvChiInit;
 
-    % chi_init = [vqT_init; iCub_config.initStateParams.q_j; iCub_config.initStateParams.dx_b; ...
-    %             iCub_config.initStateParams.omega_b; iCub_config.initStateParams.dq_j];
-
 %% Control torques:
 %  Setup the time-dependent variable "tau" which describes a forcing function/term on
 %  the ODEs to control the dynamics of the equation-system. It refers to the control
 %  torques of each time-step t and is needed to calculate the constraint forces f_c
 %  which influences the outcome of each equation, the generalized acceleration dv (q_ddot).
-vqT_init = chi_init(1:7,1);
-vqT_init1 = wbm_iCub.vqTInit;
+vqT_init = wbm_iCub.vqTInit;
+%vqT_init = chi_init(1:7,1);
 [p_b, R_b] = frame2posRotm(vqT_init);
 g_init = wbm_iCub.generalBiasForces(R_b, p_b, iCub_config.initStateParams.q_j, ...
                                     zeros(iCub_config.ndof,1), zeros(6,1));
@@ -113,9 +85,9 @@ disp('Numerical integration finished.');
 % compare the calculated data with the saved results of the original method ...
 chi_orig = load('/../../matlab-src/storedTestTrajectory.mat', 'chi');
 if isequal(chi, chi_orig.chi)
-    disp('IDENT --> CORRECT.');
+    disp('IDENTICAL --> CORRECT.');
 else
-    disp('NOT IDENT --> NOT CORRECT.');
+    disp('NOT IDENTICAL --> NOT CORRECT.');
 end
 
 %% iCub-Simulator:
@@ -125,12 +97,12 @@ end
     sim_config = iCubSimConfig;
     wbm_iCub.setupSimulation(sim_config);
 
-    x_out = wbm_iCub.getStatePositionsData(chi);
+    x_out = wbm_iCub.getPositionsData(chi);
     %wbm_iCub.visualizeForwardDynamics(x_out, t, sim_config); % not implemented yet ...
     %it_step = it_step + 1;
 % end
 
-%% Plot results - CoM trajectory:
+%% Plot results -- CoM-trajectory:
 stPData = wbm_iCub.getStateParamsData(chi);
 [m,~] = size(chi);
 
@@ -145,3 +117,5 @@ axis square;
 xlabel('X(m)');
 ylabel('Y(m)');
 zlabel('Z(m)');
+
+wbm_iCub.delete();

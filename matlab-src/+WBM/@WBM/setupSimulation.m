@@ -1,4 +1,4 @@
-function setupSimulation(obj, sim_config)
+function setupSimulation(~, sim_config)
     % check if sim_config is an instance from a derived class of "wbmSimConfig" ...
     if ~isa(sim_config, 'WBM.wbmSimConfig')
         error('WBM::setupSimulation: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
@@ -52,8 +52,9 @@ function setupSimulation(obj, sim_config)
         %params.draw_init = 1;
         rotate3d(gca, 'on');
 
-        figure(sim_config.hFigure_main); % check if it is possible to put it outside of the loop!!
+        figure(sim_config.hFigure_main); % check if it is possible to put this outside of the loop!!
     end
-    %axes(sim_config.hAxes(1)); % try to avoid using axes() - slower ...
-    set(sim_config.hFigure_main, 'CurrentAxes', sim_config.hAxes(1)); % much faster ...
+    
+    axes(sim_config.hAxes(1)); % try to avoid using axes() - slower ...
+    %set(sim_config.hFigure_main, 'CurrentAxes', sim_config.hAxes(1)); % much faster ...
 end

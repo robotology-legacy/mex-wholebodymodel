@@ -73,8 +73,8 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
             obj.iwbm_params.urdfRobot = urdf_file_name;
             wholeBodyModel('model-initialise-urdf', obj.iwbm_params.urdfRobot);
         end
-                
-        function setWorldFrame(obj, wf_R_rootLnk, wf_p_rootLnk, g_wf)
+            
+        function setWorldFrame(~, wf_R_rootLnk, wf_p_rootLnk, g_wf)
             if (nargin ~= 4)
                 error('WBMBase::setWorldFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -82,7 +82,7 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
             wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
             wholeBodyModel('set-world-frame', wf_R_rlnk_arr, wf_p_rootLnk, g_wf);
         end
-
+        
         function updateWorldFrame(obj, wf_R_rootLnk, wf_p_rootLnk, g_wf)
             obj.setWorldFrame(wf_R_rootLnk, wf_p_rootLnk, g_wf);
 
@@ -112,8 +112,8 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
                     error('WBMBase::getWorldFrameFromFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end            
         end
-        
-        function setState(obj, q_j, dq_j, v_b)
+    
+        function setState(~, q_j, dq_j, v_b)
             if (nargin ~= 4)
                 error('WBMBase::setState: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -125,11 +125,11 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
             wholeBodyModel('update-state', q_j, dq_j, v_b);
         end
         
-        function [vqT_b, q_j, v_b, dq_j] = getState(obj)
+        function [vqT_b, q_j, v_b, dq_j] = getState(~)
             [q_j, vqT_b, dq_j, v_b] = wholeBodyModel('get-state');
         end
                 
-        function M = massMatrix(obj, wf_R_rootLnk, wf_p_rootLnk, q_j)            
+        function M = massMatrix(~, wf_R_rootLnk, wf_p_rootLnk, q_j)            
             switch nargin
                 case 4
                     % Normal mode:
@@ -143,10 +143,10 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
             end
         end       
         
-        function [jl_lower, jl_upper] = getJointLimits(obj)
+        function [jl_lower, jl_upper] = getJointLimits(~)
             [jl_lower, jl_upper] = wholeBodyModel('joint-limits');
         end
-        
+    
         function J = jacobian(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j)
             if ~exist('urdf_link_name', 'var')
                 % use the default link name ...
@@ -165,7 +165,6 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
         end
         
         function djdq = dJdq(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
-            n = nargin;
             if ~exist('urdf_link_name', 'var')
                 urdf_link_name = obj.iwbm_params.urdfLinkName; % default ...
             end
@@ -180,8 +179,8 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
                     error('WBMBase::dJdq: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
         end
-        
-        function h_c = centroidalMomentum(obj, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
+
+        function h_c = centroidalMomentum(~, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             switch nargin
                 case 6
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
@@ -209,7 +208,7 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
             end            
         end
         
-        function C_qv = generalBiasForces(obj, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
+        function C_qv = generalBiasForces(~, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             switch nargin
                 case 6
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);                    
@@ -221,7 +220,7 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
             end
         end
 
-        function obj = set.urdfLinkName(obj, new_urdf_link_name)
+        function set.urdfLinkName(obj, new_urdf_link_name)
             if isempty(new_urdf_link_name)
                 error('WBMBase::set.urdfLinkName: %s', WBM.wbmErrorMsg.EMPTY_STRING);
             end
@@ -229,21 +228,21 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
             obj.iwbm_params.urdfLinkName = new_urdf_link_name;
         end
 
-        function obj = set.wf_R_rootLnk(obj, wf_R_rlnk)
+        function set.wf_R_rootLnk(obj, wf_R_rlnk)
             if (size(wf_R_rlnk,3) ~= 3)
                 error('WBMBase::set.wf_R_rootLnk: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
             obj.iwbm_params.wf_R_rootLnk = wf_R_rlnk;
         end
   
-        function obj = set.wf_p_rootLnk(obj, wf_p_rlnk)
+        function set.wf_p_rootLnk(obj, wf_p_rlnk)
             if (size(wf_p_rlnk,1) ~= 3)
                 error('WBMBase::set.wf_p_rootLnk: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
             obj.iwbm_params.wf_p_rootLnk = wf_p_rlnk;
         end
 
-        function obj = set.g_wf(obj, g)
+        function set.g_wf(obj, g)
             if (size(g,1) ~= 3)
                 error('WBMBase::set.g_wf: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end

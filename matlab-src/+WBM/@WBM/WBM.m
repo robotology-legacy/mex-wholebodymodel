@@ -78,7 +78,7 @@ classdef WBM < WBM.WBMBase
 
         % [] = visualizeForwardDynamics(obj, x_out, tspan, sim_config)
 
-        [] = setupSimulation(obj, sim_config)
+        [] = setupSimulation(~, sim_config)
 
         % function plotSimulationResults(@simFunc, x_out, tspan, sim_config)
 
@@ -89,8 +89,8 @@ classdef WBM < WBM.WBMBase
                error('WBM::getStateParams: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
-            ndof = obj.iwbm_config.ndof;
-            stvLen = obj.iwbm_config.stvLen;
+            ndof     = obj.iwbm_config.ndof;
+            stvLen   = obj.iwbm_config.stvLen;
             stParams = obj.initStateParams();
 
             % get the base/joint positions and the base orientation ...
@@ -111,7 +111,7 @@ classdef WBM < WBM.WBMBase
                 error('WBM::getStateParamsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
-            ndof = obj.iwbm_config.ndof;
+            ndof     = obj.iwbm_config.ndof;
             stParams = obj.initStateParamsMatrices(m);
 
             % extract all values ...
@@ -124,85 +124,76 @@ classdef WBM < WBM.WBMBase
             stParams.dq_j    = chi(1:m,ndof+14:stvLen);
         end
 
-        function stvPos = getStatePositions(obj, stvChi)
+        function stvPos = getPositions(obj, stvChi)
             if ~iscolumn(stvChi)
-               error('WBM::getStatePositions: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+               error('WBM::getPositions: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
-            cutp = obj.iwbm_config.ndof + 7;
-
+            
             % extract the base VQS-Transformation (without S)
             % and the joint positions ...
-            %stvPos = zeros(cutp,1);
+            cutp = obj.iwbm_config.ndof + 7;
             stvPos = stvChi(1:cutp,1); % [x_b; qt_b; q_j]
         end
 
-        function stmPos = getStatePositionsData(obj, chi)
+        function stmPos = getPositionsData(obj, chi)
             stvLen = obj.iwbm_config.stvLen;
 
             [m, n] = size(chi);
             if (n ~= stvLen) 
-                error('WBM::getStatePositionsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+                error('WBM::getPositionsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
+            
             cutp = obj.iwbm_config.ndof + 7;
-
-            %stmPos = zeros(m,cutp);
             stmPos = chi(1:m,1:cutp); % m -by- [x_b, qt_b, q_j]
         end
 
-        function stvVel = getStateVelocities(obj, stvChi)
+        function stvVel = getVelocities(obj, stvChi)
             if ~iscolumn(stvChi)
-               error('WBM::getStateVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+               error('WBM::getVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
             stvLen = obj.iwbm_config.stvLen;
             cutp = obj.iwbm_config.ndof + 8;
-            %len = stvLen - cutp;
-
             % extract the velocities ...
-            %stvVel = zeros(len,1);
             stvVel = stvChi(cutp:stvLen,1); % [dx_b; omega_b; dq_j]
         end
 
-        function stmVel = getStateVelocitiesData(obj, chi)
+        function stmVel = getVelocitiesData(obj, chi)
             stvLen = obj.iwbm_config.stvLen;
 
             [m, n] = size(chi);
             if (n ~= stvLen) 
-                error('WBM::getStateVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+                error('WBM::getVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
             cutp = obj.iwbm_config.ndof + 8;
-            %len = stvLen - cutp;
-
-            %stmVel = zeros(m,len);
             stmVel = chi(1:m,cutp:stvLen); % m -by- [dx_b, omega_b, dq_j]
         end
 
-        function stvVelb = getStateBaseVelocities(obj, stvChi)
+        function stvVelb = getBaseVelocities(obj, stvChi)
             if ~iscolumn(stvChi)
-               error('WBM::getStateBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+               error('WBM::getBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
             cutp1 = obj.iwbm_config.ndof + 8;
             cutp2 = obj.iwbm_config.ndof + 13;
-
             stvVelb = stvChi(cutp1:cutp2,1); % [dx_b; omega_b]
         end
         
-        function stmVelb = getStateBaseVelocitiesData(obj, chi)
+        function stmVelb = getBaseVelocitiesData(obj, chi)
             stvLen = obj.iwbm_config.stvLen;
 
             [m, n] = size(chi);
             if (n ~= stvLen) 
-                error('WBM::getStateBaseVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+                error('WBM::getBaseVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
             cutp1 = obj.iwbm_config.ndof + 8;
             cutp2 = obj.iwbm_config.ndof + 13;
-
             stmVelb = chi(1:m,cutp1:cutp2); % m -by- [dx_b, omega_b]
         end
-        function vqT = getRototranslation(obj, stParams)
+        
+        function vqT = getRototranslation(~, stParams)
             if isempty(stParams)
                 error('WBM::getRototranslation: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
             end
@@ -217,14 +208,40 @@ classdef WBM < WBM.WBMBase
                 error('WBM::toStateVector: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
             end
 
-            vqT_b  = [stParams.x_b; stParams.qt_b];
-            stvChi = [vqT_b; stParams.q_j; stParams.dx_b; stParams.omega_b; stParams.dq_j]; % optimieren??
+            ndof   = obj.iwbm_config.ndof;
+            stvLen = obj.iwbm_config.stvLen;
+
+            stvChi = zeros(stvLen,1);
+            % positions ...
+            stvChi(1:3,1)      = stParams.x_b;
+            stvChi(4:7,1)      = stParams.qt_b;
+            stvChi(8:ndof+7,1) = stParams.q_j;
+            % velocities ...
+            stvChi(ndof+8:ndof+10,1)  = stParams.dx_b;
+            stvChi(ndof+11:ndof+13,1) = stParams.omega_b;
+            stvChi(ndof+14:stvLen,1)  = stParams.dq_j;
+
+            % vqT_b  = [stParams.x_b; stParams.qt_b];
+            % stvChi = [vqT_b; stParams.q_j; stParams.dx_b; stParams.omega_b; stParams.dq_j]; % slower ...
         end
 
         function stvChiInit = get.stvChiInit(obj)
-            stInit     = obj.iwbm_config.initStateParams;
-            vqT_b      = [stInit.x_b; stInit.qt_b];
-            stvChiInit = [vqT_b; stInit.q_j; stInit.dx_b; stInit.omega_b; stInit.dq_j]; % optimieren??
+            stInit = obj.iwbm_config.initStateParams;
+            ndof   = obj.iwbm_config.ndof;
+            stvLen = obj.iwbm_config.stvLen;            
+
+            stvChiInit = zeros(stvLen,1);
+            % positions ...
+            stvChiInit(1:3,1)      = stInit.x_b;
+            stvChiInit(4:7,1)      = stInit.qt_b;
+            stvChiInit(8:ndof+7,1) = stInit.q_j;
+            % velocities ...
+            stvChiInit(ndof+8:ndof+10,1)  = stInit.dx_b;
+            stvChiInit(ndof+11:ndof+13,1) = stInit.omega_b;
+            stvChiInit(ndof+14:stvLen,1)  = stInit.dq_j;
+
+            % vqT_b      = [stInit.x_b; stInit.qt_b];
+            % stvChiInit = [vqT_b; stInit.q_j; stInit.dx_b; stInit.omega_b; stInit.dq_j]; % slower ...
         end
 
         function stvLen = get.stvLen(obj)
@@ -286,6 +303,10 @@ classdef WBM < WBM.WBMBase
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             obj.iwbm_config = WBM.wbmBaseRobotConfig;
+            
+            if (robot_config.ndof == 0)
+                error('WBM::initWBM: %s', WBM.wbmErrorMsg.VALUE_IS_ZERO);
+            end            
             obj.iwbm_config.ndof          = robot_config.ndof;
             obj.iwbm_config.stvLen        = 2*obj.iwbm_config.ndof + 13;
 
@@ -298,17 +319,16 @@ classdef WBM < WBM.WBMBase
 
             if isempty(robot_config.initStateParams)
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
-            end
-            % if 'initStateParams' is not empty, check the dimensions ... 
+            end            
+            % if 'initStateParams' is not empty, check the dimensions ...
             stInit = robot_config.initStateParams;
             len = size(stInit.x_b,1) + size(stInit.qt_b,1) + size(stInit.q_j,1) + ...
                   size(stInit.dx_b,1) + size(stInit.omega_b,1) + size(stInit.dq_j,1);
-            if (len ~= obj.iwbm_config.stvLen)
-                if (len ~= (obj.iwbm_config.stvLen - 7)) % length without x_b & qt_b (they will be updated)
+            if ( (len ~= 0) && (len ~= obj.iwbm_config.stvLen) )
+                if (len ~= (obj.iwbm_config.stvLen - 7)) % length without x_b & qt_b (they will be updated afterwards)
                     error('WBM::initWBM: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
                 end
             end
-
             obj.iwbm_config.initStateParams = robot_config.initStateParams;
         end
 

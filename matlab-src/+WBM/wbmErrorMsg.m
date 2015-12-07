@@ -7,6 +7,7 @@ classdef wbmErrorMsg
         EMPTY_VECTOR    = 'Empty vector(s)!';
         FILE_NOT_EXIST  = 'File not exist on given path!';
         UNKNOWN_EXC     = 'Unknown exception!';
+        VALUE_IS_ZERO   = 'The value is zero!';
         WRONG_ARG       = 'Wrong number of input arguments!';
         WRONG_DATA_TYPE = 'Wrong data type!';
         WRONG_MAT_DIM   = 'Wrong matrix dimension!';
