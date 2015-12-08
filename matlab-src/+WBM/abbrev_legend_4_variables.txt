@@ -1,47 +1,49 @@
 Legend of abbreviations and acronyms which are used for the variable names:
 
-	H       ... homogenous transformation (matrix)
-	R       ... rotation (matrix)
-	T       ... transformation (matrix)
-	arr     ... array
-	config  ... configuration
-	cstr    ... constraint
-	fix     ... fixed
-	g       ... gravity acceleration (vector)
-	h_c     ... centroidal momentum (vector)
-	p       ... position OR translation (vector)
-	params  ... parameters
-	pos     ... position(s)
-	q_j     ... joint angle(s)
-	qt, q   ... quaternion
-	quat    ... quaternion
-	r       ... root
-	vqT     ... vector-quaternion transformation [VQS-Transformation] (vector) (*)
-	w       ... world
-	wf      ... world frame
-	wf_T_b  ... transformation FROM the 'base' TO the 'world frame'
+    H       ... homogenous transformation (matrix)
+    R       ... rotation (matrix)
+    T       ... transformation (matrix)
+    arr     ... array
     b       ... base
+    config  ... configuration
+    cstr    ... constraint
     ctrl    ... control
     d...    ... derivative (dot) of a variable, like dv of v (= v_dot), etc.
     dstv    ... derivative of state vector
     fb      ... floating base
+    fix     ... fixed
+    g       ... gravity acceleration (vector)
+    h...    ... "handle" to an object, e.g. hFig = handle to the figure object
+    h_c     ... centroidal momentum (vector)
     iwbm    ... "inner"wbm ("i" declares that this variable is private)
     j       ... joint
+    ln      ... line
     lnk     ... link
     nw      ... new world
     op      ... operator
+    or      ... orientation
     ow      ... old world
+    p       ... position OR translation (vector)
+    params  ... parameters
+    pos     ... position(s)
+    q_j     ... joint angle(s)
+    qt, q   ... quaternion
+    quat    ... quaternion
+    r       ... root
     ref     ... reference
     rlnk    ... root link OR reference link
     st      ... state
     stm     ... state matrix
     str     ... string
     stv     ... state vector
-    stvqT   ... state vector-quaternion transformation [VQS-Transformation of the
-    			current state vector] (vector) (*)
+    stvqT   ... state vector-quaternion transformation [VQS-Transformation of the current state vector] (vector) (*)
     trqs    ... torques
     vel     ... velocit(y/ies)
+    vqT     ... vector-quaternion transformation [VQS-Transformation] (vector) (*)
+    w       ... world
     wbm     ... whole body model
+    wf      ... world frame
+    wf_T_b  ... transformation FROM the 'base' TO the 'world frame'
 
 
 

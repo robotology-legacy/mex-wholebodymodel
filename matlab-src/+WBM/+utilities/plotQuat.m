@@ -8,56 +8,91 @@ function plotQuat(vqT)
 
     figure;
 
-    x = vqT(:,1);
-    y = vqT(:,2);
-    z = vqT(:,3);
+    x = vqT(1:len,1);
+    y = vqT(1:len,2);
+    z = vqT(1:len,3);
 
-    angle = acos(vqT(:, 4))*2;
-    rx = vqT(:,5)./sqrt(1 - vqT(:,4).*vqT(:,4));
-    ry = vqT(:,6)./sqrt(1 - vqT(:,4).*vqT(:,4));
-    rz = vqT(:,7)./sqrt(1 - vqT(:,4).*vqT(:,4));
+    angle = acos(vqT(:,4))*2;
+    rx = vqT(1:len,5)./sqrt(1 - vqT(1:len,4).*vqT(1:len,4));
+    ry = vqT(1:len,6)./sqrt(1 - vqT(1:len,4).*vqT(1:len,4));
+    rz = vqT(1:len,7)./sqrt(1 - vqT(1:len,4).*vqT(1:len,4));
 
-    R = vrrotvec2mat([rx(1) ry(1) rz(1) angle(1)]);
+    R = vrrotvec2mat( horzcat(rx(1), ry(1), rz(1), angle(1)) );
 
-    pos3 = plot3(x(1), y(1), z(1), 'erasemode', 'normal');
-    axis([-2 2 -2 2 -2 2]);
+    if ~verLessThan('matlab', '8.4.0')
+        % Matlab >= R2014b:
+        hPos_3d = plot3(x(1), y(1), z(1), 'LineStyle', '-');
+    else
+        % Matlab <= R2014a:
+        hPos_3d = plot3(x(1), y(1), z(1), 'EraseMode', 'normal', 'LineStyle', '-');
+    end
+    axis( repmat([-2 2], 1, 3) );
+
     hold on;
+    
     xlabel('x');
     ylabel('y');
     zlabel('z');
     legend;
 
     grid on;
-    orix = line('xdata', [x(1) (x(1)+R(1,1))], 'ydata', [y(1) (y(1)+R(2,1))], 'zdata', [z(1) (z(1)+R(3,1))], ...
-                'erasemode', 'normal', 'LineWidth', 2, 'color', 'red');
-    oriy = line('xdata', [x(1) (x(1)+R(1,2))], 'ydata', [y(1) (y(1)+R(2,2))], 'zdata', [z(1) (z(1)+R(3,2))], ...
-                'erasemode', 'normal', 'LineWidth', 2, 'color', 'green');
-    oriz = line('xdata', [x(1) (x(1)+R(1,3))], 'ydata', [y(1) (y(1)+R(2,3))], 'zdata', [z(1) (z(1)+R(3,3))], ...
-                'erasemode', 'normal', 'LineWidth', 2, 'color', 'blue');
 
-    if verLessThan('matlab', '8.4.0')
-        % for Matlab R2014b and later ...
+    title(sprintf('Quaternion (%d):', 1));
+
+    if ~verLessThan('matlab', '8.4.0')
+        % for Matlab R2014b and later:
         set(gca, 'SortMethod', 'childorder');
+
+        hLn_orX = animatedline(horzcat(x(1), x(1)+R(1,1)), horzcat(y(1), y(1)+R(2,1)), ...
+                               horzcat(z(1), z(1)+R(3,1)), 'LineWidth', 2, 'Color', 'red');
+        hLn_orY = animatedline(horzcat(x(1), x(1)+R(1,2)), horzcat(y(1), y(1)+R(2,2)), ...
+                               horzcat(z(1), z(1)+R(3,2)), 'LineWidth', 2, 'Color', 'green');
+        hLn_orZ = animatedline(horzcat(x(1), x(1)+R(1,3)), horzcat(y(1), y(1)+R(2,3)), ...
+                               horzcat(z(1), z(1)+R(3,3)), 'LineWidth', 2, 'Color', 'blue');
+        pause;
+    
+        for i = 2:len
+            title(sprintf('Quaternion (%d):', i));
+
+            set(hPos_3d, 'XData', x(i), 'YData', y(i), 'ZData', z(i));
+
+            R = vrrotvec2mat( horzcat(rx(i), ry(i), rz(i), angle(i)) );
+
+            addpoints(hLn_orX, horzcat(x(i), x(i)+R(1,1)), horzcat(y(i), y(i)+R(2,1)), horzcat(z(i), z(i)+R(3,1)));
+            addpoints(hLn_orY, horzcat(x(i), x(i)+R(1,2)), horzcat(y(i), y(i)+R(2,2)), horzcat(z(i), z(i)+R(3,2)));
+            addpoints(hLn_orZ, horzcat(x(i), x(i)+R(1,3)), horzcat(y(i), y(i)+R(2,3)), horzcat(z(i), z(i)+R(3,3)));
+
+            pause(0.0005);
+            %drawnow;
+        end
     else
-        % for older Matlab versions (<= R2014a) ...
+        % for older Matlab versions (<= R2014a):
         set(gca, 'DrawMode', 'fast');
-    end
 
-    pause;
-    for i = 1:len
-        R = vrrotvec2mat([rx(i) ry(i) rz(i) angle(i)]);
+        hLn_orX = line('XData', horzcat(x(1), x(1)+R(1,1)), 'YData', horzcat(y(1), y(1)+R(2,1)), ...
+                       'ZData', horzcat(z(1), z(1)+R(3,1)), 'EraseMode', 'normal', 'LineWidth', 2, 'Color', 'red');
+        hLn_orY = line('XData', horzcat(x(1), x(1)+R(1,2)), 'YData', horzcat(y(1), y(1)+R(2,2)), ...
+                       'ZData', horzcat(z(1), z(1)+R(3,2)), 'EraseMode', 'normal', 'LineWidth', 2, 'Color', 'green');
+        hLn_orZ = line('XData', horzcat(x(1), x(1)+R(1,3)), 'YData', horzcat(y(1), y(1)+R(2,3)), ...
+                       'ZData', horzcat(z(1), z(1)+R(3,3)), 'EraseMode', 'normal', 'LineWidth', 2, 'Color', 'blue');
+        pause;
 
-        plot3(x(i), y(i), z(i), '.');
-        set(pos3, 'xdata', x(i), 'ydata', y(i), 'zdata', z(i));
-        
-        set(orix, 'xdata', [x(i) (x(i)+R(1,1))], 'ydata', [y(i) (y(i)+R(2,1))], 'zdata', [z(i) (z(i)+R(3,1))], ...
-                  'erasemode', 'normal', 'LineWidth', 2, 'color', 'blue');
-        set(oriy, 'xdata', [x(i) (x(i)+R(1,2))], 'ydata', [y(i) (y(i)+R(2,2))], 'zdata', [z(i) (z(i)+R(3,2))], ...
-                  'erasemode', 'normal', 'LineWidth', 2, 'color', 'green');
-        set(oriz, 'xdata', [x(i) (x(i)+R(1,3))], 'ydata', [y(i) (y(i)+R(2,3))], 'zdata', [z(i) (z(i)+R(3,3))], ...
-                  'erasemode', 'normal', 'LineWidth', 2, 'color', 'red');
+        for i = 2:len
+            title(sprintf('Quaternion (%d):', i));
 
-        title(num2str(i));
-        pause(0.0005);
+            %plot3(x(i), y(i), z(i), '.'); % don't create a line inside the loop!
+            set(hPos_3d, 'XData', x(i), 'YData', y(i), 'ZData', z(i)); % faster!
+            
+            R = vrrotvec2mat( horzcat(rx(i), ry(i), rz(i), angle(i)) );
+
+            set(hLn_orX, 'XData', horzcat(x(i), x(i)+R(1,1)), 'YData', horzcat(y(i), y(i)+R(2,1)), ...
+                         'ZData', horzcat(z(i), z(i)+R(3,1)), 'EraseMode', 'normal', 'LineWidth', 2, 'Color', 'blue');
+            set(hLn_orY, 'XData', horzcat(x(i), x(i)+R(1,2)), 'YData', horzcat(y(i), y(i)+R(2,2)), ...
+                         'ZData', horzcat(z(i), z(i)+R(3,2)), 'EraseMode', 'normal', 'LineWidth', 2, 'Color', 'green');
+            set(hLn_orZ, 'XData', horzcat(x(i), x(i)+R(1,3)), 'YData', horzcat(y(i), y(i)+R(2,3)), ...
+                         'ZData', horzcat(z(i), z(i)+R(3,3)), 'EraseMode', 'normal', 'LineWidth', 2, 'Color', 'red');
+            pause(0.0005);
+            %drawnow;
+        end
     end
 end

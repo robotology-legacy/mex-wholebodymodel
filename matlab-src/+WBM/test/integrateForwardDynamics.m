@@ -66,6 +66,8 @@ ctrlTrqs.tau = @(t)zeros(size(g_init(7:len)));
 %  of the system. It evaluates the right side of the nonlinear first-order ODEs of the
 %  form chi' = f(t,chi) and returns a vector of rates of change (vector of derivatives)
 %  that will be integrated by the solver.
+%wbm_config = wbm_iCub.wbm_config;
+%fwdDynFunc = @(t, chi)WBM.fastForwardDynamics(t, chi, ctrlTrqs, wbm_config);
 fwdDynFunc = @(t, chi)wbm_iCub.forwardDynamics(t, chi, ctrlTrqs);
 
 % specifying the time interval of the integration ...
@@ -77,8 +79,9 @@ tspan = sim_time.start:sim_time.step:sim_time.end;
 disp('Start the numerical integration:');
 
 ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);           % setup the error tolerances ...
+tic;
 [t, chi]    = ode15s(fwdDynFunc, tspan, chi_init, ode_options); % ODE-Solver
-
+toc
 save('testTrajectory.mat', 't', 'chi', 'ctrlTrqs', 'iCub_model', 'iCub_config');
 disp('Numerical integration finished.');
 
@@ -118,4 +121,6 @@ xlabel('X(m)');
 ylabel('Y(m)');
 zlabel('Z(m)');
 
-wbm_iCub.delete();
+%wbm_iCub.delete();
+%wbm_cpy = wbm_iCub.copy();
+%wbm_cpy2 = copy(wbm_iCub);

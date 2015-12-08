@@ -28,9 +28,8 @@ classdef WBM < WBM.WBMBase
             if wf2FixLnk
                 % set the world frame (WF) at a given rototranslation from
                 % a chosen fixed link (the first entry of the constraint list):
-                v_b = zeros(6,1);
-                v_b(1:3,1) = obj.iwbm_config.initStateParams.dx_b;
-                v_b(4:6,1) = obj.iwbm_config.initStateParams.omega_b;
+                v_b = vertcat(obj.iwbm_config.initStateParams.dx_b, ...
+                              obj.iwbm_config.initStateParams.omega_b);
                 obj.setWorldFrame2FixedLink(obj.iwbm_config.initStateParams.q_j, obj.iwbm_config.initStateParams.dq_j, ...
                                             v_b, obj.iwbm_params.g_wf, obj.iwbm_config.cstrLinkNames{1});
             end
@@ -91,7 +90,8 @@ classdef WBM < WBM.WBMBase
 
             ndof     = obj.iwbm_config.ndof;
             stvLen   = obj.iwbm_config.stvLen;
-            stParams = obj.initStateParams();
+            %stParams = WBM.wbmStateParams;
+            stParams = obj.initStateParams(); % useful ??
 
             % get the base/joint positions and the base orientation ...
             stParams.x_b  = stvChi(1:3,1);
@@ -112,7 +112,8 @@ classdef WBM < WBM.WBMBase
             end
 
             ndof     = obj.iwbm_config.ndof;
-            stParams = obj.initStateParamsMatrices(m);
+            %stParams = WBM.wbmStateParams;
+            stParams = obj.initStateParamsMatrices(m); % useful ??
 
             % extract all values ...
             stParams.x_b  = chi(1:m,1:3);
@@ -198,50 +199,22 @@ classdef WBM < WBM.WBMBase
                 error('WBM::getRototranslation: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
             end
 
-            vqT = zeros(7,1);
-            vqT(1:3,1) = stParams.x_b;
-            vqT(4:7,1) = stParams.qt_b;
+            vqT = vertcat(stParams.x_b, stParams.qt_b);
         end
 
-        function stvChi = toStateVector(obj, stParams)
+        function stvChi = toStateVector(~, stParams)
             if isempty(stParams)
                 error('WBM::toStateVector: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
             end
 
-            ndof   = obj.iwbm_config.ndof;
-            stvLen = obj.iwbm_config.stvLen;
-
-            stvChi = zeros(stvLen,1);
-            % positions ...
-            stvChi(1:3,1)      = stParams.x_b;
-            stvChi(4:7,1)      = stParams.qt_b;
-            stvChi(8:ndof+7,1) = stParams.q_j;
-            % velocities ...
-            stvChi(ndof+8:ndof+10,1)  = stParams.dx_b;
-            stvChi(ndof+11:ndof+13,1) = stParams.omega_b;
-            stvChi(ndof+14:stvLen,1)  = stParams.dq_j;
-
-            % vqT_b  = [stParams.x_b; stParams.qt_b];
-            % stvChi = [vqT_b; stParams.q_j; stParams.dx_b; stParams.omega_b; stParams.dq_j]; % slower ...
+            stvChi = vertcat(stParams.x_b, stParams.qt_b, stParams.q_j, ...
+                             stParams.dx_b, stParams.omega_b, stParams.dq_j);
         end
 
         function stvChiInit = get.stvChiInit(obj)
             stInit = obj.iwbm_config.initStateParams;
-            ndof   = obj.iwbm_config.ndof;
-            stvLen = obj.iwbm_config.stvLen;            
-
-            stvChiInit = zeros(stvLen,1);
-            % positions ...
-            stvChiInit(1:3,1)      = stInit.x_b;
-            stvChiInit(4:7,1)      = stInit.qt_b;
-            stvChiInit(8:ndof+7,1) = stInit.q_j;
-            % velocities ...
-            stvChiInit(ndof+8:ndof+10,1)  = stInit.dx_b;
-            stvChiInit(ndof+11:ndof+13,1) = stInit.omega_b;
-            stvChiInit(ndof+14:stvLen,1)  = stInit.dq_j;
-
-            % vqT_b      = [stInit.x_b; stInit.qt_b];
-            % stvChiInit = [vqT_b; stInit.q_j; stInit.dx_b; stInit.omega_b; stInit.dq_j]; % slower ...
+            stvChiInit = vertcat(stInit.x_b, stInit.qt_b, stInit.q_j, ...
+                                 stInit.dx_b, stInit.omega_b, stInit.dq_j);
         end
 
         function stvLen = get.stvLen(obj)
@@ -250,10 +223,7 @@ classdef WBM < WBM.WBMBase
 
         function vqTInit = get.vqTInit(obj)
             stInit = obj.iwbm_config.initStateParams;
-
-            vqTInit = zeros(7,1);
-            vqTInit(1:3,1) = stInit.x_b;
-            vqTInit(4:7,1) = stInit.qt_b;
+            vqTInit = vertcat(stInit.x_b, stInit.qt_b);
         end
 
         function stvqT = get.stvqT(obj)
@@ -271,20 +241,21 @@ classdef WBM < WBM.WBMBase
                         
             cellLnkNames = [num2cell(1:obj.iwbm_config.nCstrs); obj.iwbm_config.cstrLinkNames];
             strLnkNamesLst = sprintf('  %d  %s\n', cellLnkNames{:});
+            stInit = obj.iwbm_config.initStateParams;
             
-            cellInitSt{1} = sprintf('  q_j:      %s\n', mat2str(obj.iwbm_config.initState.q_j, prec));
-            cellInitSt{2} = sprintf('  dq_j:     %s\n', mat2str(obj.iwbm_config.initState.dq_j, prec));
-            cellInitSt{3} = sprintf('  x_b:      %s\n', mat2str(obj.iwbm_config.initState.x_b, prec));
-            cellInitSt{4} = sprintf('  qt_b:     %s\n', mat2str(obj.iwbm_config.initState.qt_b, prec));
-            cellInitSt{5} = sprintf('  dx_b:     %s\n', mat2str(obj.iwbm_config.initState.dx_b, prec));
-            cellInitSt{6} = sprintf('  omega_b:  %s\n', mat2str(obj.iwbm_config.initState.omega_b, prec));
-            strInitState = strcat(cellInitSt{1}, cellInitSt{2}, cellInitSt{3}, ...
-                                  cellInitSt{4}, cellInitSt{5}, cellInitSt{6});
+            cellInitSt{1} = sprintf('  q_j:      %s', mat2str(stInit.q_j, prec));
+            cellInitSt{2} = sprintf('  dq_j:     %s', mat2str(stInit.dq_j, prec));
+            cellInitSt{3} = sprintf('  x_b:      %s', mat2str(stInit.x_b, prec));
+            cellInitSt{4} = sprintf('  qt_b:     %s', mat2str(stInit.qt_b, prec));
+            cellInitSt{5} = sprintf('  dx_b:     %s', mat2str(stInit.dx_b, prec));
+            cellInitSt{6} = sprintf('  omega_b:  %s', mat2str(stInit.omega_b, prec));
+            strInitState  = sprintf('%s\n%s\n%s\n%s\n%s\n%s', cellInitSt{1}, cellInitSt{2}, ...
+                                    cellInitSt{3}, cellInitSt{4}, cellInitSt{5}, cellInitSt{6});
                               
             strConfig = sprintf(['Robot configuration:\n\n' ...
                                  ' NDOFs:         %d\n' ...
                                  ' # constraints: %d\n\n' ...
-                                 ' Constraint link names:\n\n%s\n' ...
+                                 ' constraint link names:\n\n%s\n' ...
                                  ' damping coefficient: %f\n\n' ...
                                  ' initial state:\n\n%s\n'], ...
                                 obj.iwbm_config.ndof, obj.iwbm_config.nCstrs, ...
