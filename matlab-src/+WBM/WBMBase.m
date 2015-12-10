@@ -1,4 +1,4 @@
-classdef WBMBase < handle %& matlab.mixin.Copyable
+classdef WBMBase < handle
     properties(Dependent) 
         % public properties for fast get/set methods:
         urdfLinkName@char
@@ -44,8 +44,8 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
         end
         
         % Destructor:
-        function delete(obj)
-            clear obj.iwbm_params; % remove from workspace (free-up memory) ...
+        function delete(~)
+            % remove all class properties from workspace (free-up memory) ...
         end
         
         function initModel(obj, urdf_robot_name)
@@ -287,7 +287,7 @@ classdef WBMBase < handle %& matlab.mixin.Copyable
                 obj.initModel(); % use the default URDF
             else
                 % Normal mode:
-                if WBM.urdfFileExist(model_params.urdfRobot)
+                if WBM.utilities.fileExist(model_params.urdfRobot)
                     % use directly a specific URDF-file for the robot ...
                     obj.initModelURDF(model_params.urdfRobot);
                 else

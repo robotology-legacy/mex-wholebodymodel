@@ -19,6 +19,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     j       ... joint
     ln      ... line
     lnk     ... link
+    noi     ... number of iterations
     nw      ... new world
     op      ... operator
     or      ... orientation

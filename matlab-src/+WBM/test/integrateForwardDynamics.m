@@ -66,9 +66,9 @@ ctrlTrqs.tau = @(t)zeros(size(g_init(7:len)));
 %  of the system. It evaluates the right side of the nonlinear first-order ODEs of the
 %  form chi' = f(t,chi) and returns a vector of rates of change (vector of derivatives)
 %  that will be integrated by the solver.
-%wbm_config = wbm_iCub.wbm_config;
-%fwdDynFunc = @(t, chi)WBM.fastForwardDynamics(t, chi, ctrlTrqs, wbm_config);
-fwdDynFunc = @(t, chi)wbm_iCub.forwardDynamics(t, chi, ctrlTrqs);
+wbm_config = wbm_iCub.wbm_config;
+fwdDynFunc = @(t, chi)WBM.fastForwardDynamics(t, chi, ctrlTrqs, wbm_config);
+%fwdDynFunc = @(t, chi)wbm_iCub.forwardDynamics(t, chi, ctrlTrqs);
 
 % specifying the time interval of the integration ...
 sim_time.start = 0.0;
@@ -79,9 +79,8 @@ tspan = sim_time.start:sim_time.step:sim_time.end;
 disp('Start the numerical integration:');
 
 ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);           % setup the error tolerances ...
-tic;
 [t, chi]    = ode15s(fwdDynFunc, tspan, chi_init, ode_options); % ODE-Solver
-toc
+
 save('testTrajectory.mat', 't', 'chi', 'ctrlTrqs', 'iCub_model', 'iCub_config');
 disp('Numerical integration finished.');
 
@@ -94,33 +93,29 @@ else
 end
 
 %% iCub-Simulator:
-% it_step = 1;
-% while (it_step < 10)
+% it = 1;
+% while (it < 10)
     % setup the window and plot parameters for the WBM-simulator:
     sim_config = iCubSimConfig;
     wbm_iCub.setupSimulation(sim_config);
 
     x_out = wbm_iCub.getPositionsData(chi);
     %wbm_iCub.visualizeForwardDynamics(x_out, t, sim_config); % not implemented yet ...
-    %it_step = it_step + 1;
+    %it = it + 1;
 % end
 
-%% Plot results -- CoM-trajectory:
+%% Plot the results -- CoM-trajectory:
 stPData = wbm_iCub.getStateParamsData(chi);
 [m,~] = size(chi);
 
 figure(2);
 
-plot3(stPData.x_b(1:m,1), stPData.x_b(1:m,2), stPData.x_b(1:m,3));
+plot3(stPData.x_b(1:m,1), stPData.x_b(1:m,2), stPData.x_b(1:m,3), 'Color', 'b');
 hold on;
-plot3(stPData.x_b(1,1), stPData.x_b(1,2), stPData.x_b(1,3), 'ro');
+plot3(stPData.x_b(1,1), stPData.x_b(1,2), stPData.x_b(1,3), 'Marker', 'o', 'MarkerEdgeColor', 'r');
 
 grid on;
 axis square;
 xlabel('X(m)');
 ylabel('Y(m)');
 zlabel('Z(m)');
-
-%wbm_iCub.delete();
-%wbm_cpy = wbm_iCub.copy();
-%wbm_cpy2 = copy(wbm_iCub);
