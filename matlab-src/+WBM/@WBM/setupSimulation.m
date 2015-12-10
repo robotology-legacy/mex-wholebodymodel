@@ -22,7 +22,7 @@ function setupSimulation(~, sim_config)
     end
 
     sort_meth = true;
-    if verLessThan('matlab', '8.4.0') % Matlab version check ...
+    if verLessThan('matlab', '8.4.0') % check Matlab version ...
         sort_meth = false;
     end
     % split up the main figure into a 2x2 grid, create and setup the axes for each
@@ -57,6 +57,5 @@ function setupSimulation(~, sim_config)
         sim_config.plot_objs{i} = plot3(0, 0, 0, 'Marker', '.', 'MarkerEdgeColor', 'k');
     end
     % set the current axes handle of the main figure to the first subplot ...
-    set(sim_config.hFigure_main, 'CurrentAxes', sim_config.hAxes(1)); % much faster ...
-    %axes(sim_config.hAxes(1)); % try to avoid using axes() --> slow ...
+    set(sim_config.hFigure_main, 'CurrentAxes', sim_config.hAxes(1));
 end

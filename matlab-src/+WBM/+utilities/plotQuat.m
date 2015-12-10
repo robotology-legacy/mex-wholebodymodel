@@ -82,8 +82,7 @@ function plotQuat(vqT)
         for i = 2:len
             title(sprintf('Quaternion (%d):', i));
 
-            %plot3(x(i), y(i), z(i), '.'); % don't create a line inside the loop!
-            set(hPos3D, 'XData', x(i), 'YData', y(i), 'ZData', z(i)); % faster!
+            set(hPos3D, 'XData', x(i), 'YData', y(i), 'ZData', z(i));
             
             R = vrrotvec2mat( horzcat(rx(i), ry(i), rz(i), angle(i)) );
 

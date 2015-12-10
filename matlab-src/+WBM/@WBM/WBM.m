@@ -94,7 +94,6 @@ classdef WBM < WBM.WBMBase
             ndof     = obj.iwbm_config.ndof;
             stvLen   = obj.iwbm_config.stvLen;
             stParams = WBM.wbmStateParams;
-            %stParams = obj.initStateParams(); % useful?
 
             % get the base/joint positions and the base orientation ...
             stParams.x_b  = stvChi(1:3,1);
@@ -116,7 +115,6 @@ classdef WBM < WBM.WBMBase
 
             ndof     = obj.iwbm_config.ndof;
             stParams = WBM.wbmStateParams;
-            %stParams = obj.initStateParamsMatrices(m); % useful? no, unnecessary, slows down ...
 
             % extract all values ...
             stParams.x_b  = chi(1:m,1:3);
@@ -306,29 +304,5 @@ classdef WBM < WBM.WBMBase
             obj.iwbm_config.initStateParams = robot_config.initStateParams;
         end
 
-        % function stParams = initStateParams(obj)
-        %     stParams = WBM.wbmStateParams;
-        %     % allocate memory for each variable ...
-        %     stParams.x_b  = zeros(3,1);
-        %     stParams.qt_b = zeros(4,1);
-        %     stParams.q_j  = zeros(obj.iwbm_config.ndof,1);
-
-        %     stParams.dx_b    = zeros(3,1);
-        %     stParams.omega_b = zeros(3,1);
-        %     stParams.dq_j    = zeros(obj.iwbm_config.ndof,1);
-        % end
-
-        % function stParams = initStateParamsMatrices(obj, m)
-        %     stParams = WBM.wbmStateParams;
-
-        %     stParams.x_b  = zeros(m,3);
-        %     stParams.qt_b = zeros(m,4);
-        %     stParams.q_j  = zeros(m,obj.iwbm_config.ndof);
-            
-        %     stParams.dx_b    = zeros(m,3);
-        %     stParams.omega_b = zeros(m,3);
-        %     stParams.dq_j    = zeros(m,obj.iwbm_config.ndof);
-        % end
-                        
     end
 end

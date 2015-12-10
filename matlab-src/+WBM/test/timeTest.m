@@ -42,7 +42,7 @@ for i = 1:nIter
     q_j  = rand(25,1);
     dq_j = rand(25,1);
     v_b  = rand(6,1);
-    % update the translation to the WF with random values ...`
+    % update the translation to the WF with random values ...
     p    = rand(3,1);
 
     wbm_iCub.setWorldFrame(R, p, g);
@@ -70,7 +70,7 @@ fprintf('Normal-Mode Trial Average Time : %e secs\n', totTime/nIter);
 
 clear all; % clear completely the workspace ...
 
-fprintf('\n\nStarting optimised mode trial\n--------------------------\n');
+fprintf('\n\nStarting optimized mode trial\n--------------------------\n');
 
 %% Second initialization of the WBM:
 % base model:
