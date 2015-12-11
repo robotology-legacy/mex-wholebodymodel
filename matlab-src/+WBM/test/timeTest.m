@@ -15,7 +15,7 @@ iCub_config.ndof          = 25;
 iCub_config.nCstrs        = 2;
 iCub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
 
-nIter    = 1000;
+noi      = 1000;
 initTime = 0;
 totTime  = 0;
 
@@ -26,7 +26,7 @@ wbm_iCub = WBM(iCub_model, iCub_config);
 initTime = toc();
 
 fprintf('Initialization time : %e secs\n', initTime);
-fprintf('Num Trials : %d\nStarting Trial...\n', nIter);
+fprintf('Num Trials : %d\nStarting Trial...\n', noi);
 
 R = iCub_model.wf_R_rootLnk;
 g = iCub_model.g_wf;
@@ -37,7 +37,7 @@ dq_j = zeros(25,1);
 v_b  = zeros(6,1);
 
 tic;
-for i = 1:nIter
+for i = 1:noi
     % set the current state with random values ...
     q_j  = rand(25,1);
     dq_j = rand(25,1);
@@ -46,12 +46,12 @@ for i = 1:nIter
     p    = rand(3,1);
 
     wbm_iCub.setWorldFrame(R, p, g);
-    
+
     % calculate some mex-WholeBodyModel (WBM) Components:
     M      = wbm_iCub.massMatrix(R, p, q_j);
 
-    h_c    = wbm_iCub.generalBiasForces(R, p, q_j, dq_j, v_b);    
-    h_c    = wbm_iCub.generalBiasForces(R, p, q_j, dq_j, v_b); 
+    h_c    = wbm_iCub.generalBiasForces(R, p, q_j, dq_j, v_b);
+    h_c    = wbm_iCub.generalBiasForces(R, p, q_j, dq_j, v_b);
     h_c    = wbm_iCub.generalBiasForces(R, p, q_j, dq_j, v_b);
 
     dJdq_1 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{1}, R, p, q_j, dq_j, v_b);
@@ -66,7 +66,7 @@ totTime = toc();
 
 %% Output the first time-benchmark results:
 fprintf('Normal-Mode Trial Total Time : %f secs\n', totTime);
-fprintf('Normal-Mode Trial Average Time : %e secs\n', totTime/nIter);
+fprintf('Normal-Mode Trial Average Time : %e secs\n', totTime/noi);
 
 clear all; % clear completely the workspace ...
 
@@ -84,7 +84,7 @@ iCub_config.ndof          = 25;
 iCub_config.nCstrs        = 2;
 iCub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
 
-nIter    = 1000;
+noi      = 1000;
 initTime = 0;
 totTime  = 0;
 
@@ -103,7 +103,7 @@ dq_j = zeros(25,1);
 v_b  = zeros(6,1);
 
 tic;
-for i = 1:nIter 
+for i = 1:noi
     % fill the state with random values ...
     q_j  = rand(25,1);
     dq_j = rand(25,1);
@@ -114,13 +114,13 @@ for i = 1:nIter
     % wbm_iCub.setState(q_j, dq_j, v_b);
     wbm_iCub.setWorldFrame(R, p, g);
     wbm_iCub.setState(q_j, dq_j, v_b);
-    
+
     % mex-WholeBodyModel functions ...
-    M      = wbm_iCub.massMatrix();    
-    
-    h_c    = wbm_iCub.generalBiasForces();    
-    h_c    = wbm_iCub.generalBiasForces();  
-    h_c    = wbm_iCub.generalBiasForces();  
+    M      = wbm_iCub.massMatrix();
+
+    h_c    = wbm_iCub.generalBiasForces();
+    h_c    = wbm_iCub.generalBiasForces();
+    h_c    = wbm_iCub.generalBiasForces();
 
     dJdq_1 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{1});
     dJdq_2 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{2});
@@ -134,4 +134,4 @@ totTime = toc();
 
 %% Output the second time-benchmarks:
 fprintf('Optimized-Mode Trial Total Time : %f secs\n', totTime);
-fprintf('Optimized-Mode Trial Average Time : %e secs\n', totTime/nIter);
+fprintf('Optimized-Mode Trial Average Time : %e secs\n', totTime/noi);

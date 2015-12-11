@@ -10,8 +10,8 @@ refLink2 = 'l_gripper';
 fprintf('Starting normal mode trial \n-------------------------- \n');
 
 tic;
-%wbm_modelInitialise('icubGazeboSim');
-wbm_modelInitialise();
+wbm_modelInitialise('icubGazeboSim');
+%wbm_modelInitialise();
 initTime = toc();
 
 fprintf('Initialisation time : %e secs\n',initTime);
@@ -45,8 +45,8 @@ fprintf('\n\nStarting optimised mode trial \n-------------------------- \n');
 
 totTime = 0;numRuns = 1000;
 tic;
-%wbm_modelInitialise('icubGazeboSim');
-wbm_modelInitialise();
+wbm_modelInitialise('icubGazeboSim');
+%wbm_modelInitialise();
 initTime = toc();
 fprintf('Initialisation time : %e secs \n Starting Trial...\n ',initTime);
 
