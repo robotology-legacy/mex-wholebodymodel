@@ -10,57 +10,63 @@ classdef WBM < WBM.WBMBase
     properties(Access = protected)
         iwbm_config@WBM.wbmBaseRobotConfig
     end
-        
+
     methods%(Access = public)
         % Constructor:
         function obj = WBM(model_params, robot_config, wf2FixLnk)
             % call the constructor of the superclass ...
             obj = obj@WBM.WBMBase(model_params);
-            
+
             if ~exist('robot_config', 'var')
                 error('WBM::WBM: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             if ~exist('wf2FixLnk', 'var')
                 wf2FixLnk = false; % default value ...
             end
- 
+
             obj.initConfig(robot_config);
             if wf2FixLnk
                 % set the world frame (WF) at a given rototranslation from
                 % a chosen fixed link (the first entry of the constraint list):
                 v_b = vertcat(obj.iwbm_config.initStateParams.dx_b, ...
                               obj.iwbm_config.initStateParams.omega_b);
-                obj.setWorldFrame2FixedLink(obj.iwbm_config.initStateParams.q_j, obj.iwbm_config.initStateParams.dq_j, ...
-                                            v_b, obj.iwbm_params.g_wf, obj.iwbm_config.cstrLinkNames{1});
+                obj.setWorldFrame2FixedLink(obj.iwbm_config.cstrLinkNames{1}, obj.iwbm_config.initStateParams.q_j, ...
+                                            obj.iwbm_config.initStateParams.dq_j, v_b, obj.iwbm_params.g_wf);
             end
             % retrieve and update the initial rototranslation (VQS-Transf.) of the robot base (world frame) ...
             obj.updateInitRototranslation();
         end
-        
+
         % Copy-function:
         function newObj = copy(obj)
             newObj = copy@WBM.WBMBase(obj);
         end
-        
+
         % Destructor:
         function delete(obj)
             delete@WBM.WBMBase(obj);
         end
-                
-        function setWorldFrame2FixedLink(obj, q_j, dq_j, v_b, g_wf, urdf_link_name)
-            if ~exist('urdf_link_name', 'var')
-                % use the default link ...
-                urdf_link_name = obj.iwbm_params.urdfLinkName;
-            else
+
+        function setWorldFrame2FixedLink(obj, urdf_link_name, q_j, dq_j, v_b, g_wf)
+            if exist('urdf_link_name', 'var')
                 % replace the (old) default link with a new link ...
                 obj.urdfLinkName = urdf_link_name;
+            else
+                % use the default link ...
+                urdf_link_name = obj.iwbm_params.urdfLinkName;
             end
-            
+
             switch nargin
-                case {5, 6}            
+                case {5, 6}
                     obj.setState(q_j, dq_j, v_b);
                     [w_p_b, w_R_b] = obj.getWorldFrameFromFixedLink(urdf_link_name, q_j);
                     obj.setWorldFrame(w_R_b, w_p_b, g_wf);
+                case 2
+                    if isempty(urdf_link_name)
+                        error('WBM::setWorldFrame2FixedLink: %s', WBM.wbmErrorMsg.EMPTY_STRING);
+                    end
+                    [w_p_b, w_R_b] = obj.getWorldFrameFromFixedLink(urdf_link_name);
+                    obj.setWorldFrame(w_R_b, w_p_b, obj.iwbm_params.g_wf);
                 otherwise
                     error('WBM::setWorldFrame2FixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -71,7 +77,7 @@ classdef WBM < WBM.WBMBase
             obj.iwbm_config.initStateParams.x_b  = vqT_init(1:3,1); % translation/position
             obj.iwbm_config.initStateParams.qt_b = vqT_init(4:7,1); % orientation (quaternion)
         end
-        
+
         [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
 
         % [] = visualizeForwardDynamics(obj, x_out, tspan, sim_config)
@@ -85,7 +91,7 @@ classdef WBM < WBM.WBMBase
         % function plotSimulationResults(obj, @simFunc, x_out, tspan, sim_config) % ??
 
         % end
-        
+
         function stParams = getStateParams(obj, stvChi)
             if ~iscolumn(stvChi)
                error('WBM::getStateParams: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
@@ -109,7 +115,7 @@ classdef WBM < WBM.WBMBase
             stvLen = obj.iwbm_config.stvLen;
 
             [m, n] = size(chi);
-            if (n ~= stvLen) 
+            if (n ~= stvLen)
                 error('WBM::getStateParamsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
@@ -120,9 +126,9 @@ classdef WBM < WBM.WBMBase
             stParams.x_b  = chi(1:m,1:3);
             stParams.qt_b = chi(1:m,4:7);
             stParams.q_j  = chi(1:m,8:ndof+7);
-            
+
             stParams.dx_b    = chi(1:m,ndof+8:ndof+10);
-            stParams.omega_b = chi(1:m,ndof+11:ndof+13);           
+            stParams.omega_b = chi(1:m,ndof+11:ndof+13);
             stParams.dq_j    = chi(1:m,ndof+14:stvLen);
         end
 
@@ -130,7 +136,7 @@ classdef WBM < WBM.WBMBase
             if ~iscolumn(stvChi)
                error('WBM::getPositions: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
-            
+
             % extract the base VQS-Transformation (without S)
             % and the joint positions ...
             cutp = obj.iwbm_config.ndof + 7;
@@ -141,10 +147,10 @@ classdef WBM < WBM.WBMBase
             stvLen = obj.iwbm_config.stvLen;
 
             [m, n] = size(chi);
-            if (n ~= stvLen) 
+            if (n ~= stvLen)
                 error('WBM::getPositionsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
-            
+
             cutp = obj.iwbm_config.ndof + 7;
             stmPos = chi(1:m,1:cutp); % m -by- [x_b, qt_b, q_j]
         end
@@ -164,7 +170,7 @@ classdef WBM < WBM.WBMBase
             stvLen = obj.iwbm_config.stvLen;
 
             [m, n] = size(chi);
-            if (n ~= stvLen) 
+            if (n ~= stvLen)
                 error('WBM::getVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
@@ -181,12 +187,12 @@ classdef WBM < WBM.WBMBase
             cutp2 = obj.iwbm_config.ndof + 13;
             stvVelb = stvChi(cutp1:cutp2,1); % [dx_b; omega_b]
         end
-        
+
         function stmVelb = getBaseVelocitiesData(obj, chi)
             stvLen = obj.iwbm_config.stvLen;
 
             [m, n] = size(chi);
-            if (n ~= stvLen) 
+            if (n ~= stvLen)
                 error('WBM::getBaseVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
@@ -194,7 +200,7 @@ classdef WBM < WBM.WBMBase
             cutp2 = obj.iwbm_config.ndof + 13;
             stmVelb = chi(1:m,cutp1:cutp2); % m -by- [dx_b, omega_b]
         end
-        
+
         function vqT = getRototranslation(~, stParams)
             if isempty(stParams)
                 error('WBM::getRototranslation: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
@@ -234,16 +240,16 @@ classdef WBM < WBM.WBMBase
         function wbm_config = get.wbm_config(obj)
             wbm_config = obj.iwbm_config;
         end
-        
+
         function dispWBMConfig(obj, prec)
             if ~exist('prec', 'var')
                 prec = 2;
             end
-                        
+
             cellLnkNames = [num2cell(1:obj.iwbm_config.nCstrs); obj.iwbm_config.cstrLinkNames];
             strLnkNamesLst = sprintf('  %d  %s\n', cellLnkNames{:});
             stInit = obj.iwbm_config.initStateParams;
-            
+
             cellInitSt{1} = sprintf('  q_j:      %s', mat2str(stInit.q_j, prec));
             cellInitSt{2} = sprintf('  dq_j:     %s', mat2str(stInit.dq_j, prec));
             cellInitSt{3} = sprintf('  x_b:      %s', mat2str(stInit.x_b, prec));
@@ -252,7 +258,7 @@ classdef WBM < WBM.WBMBase
             cellInitSt{6} = sprintf('  omega_b:  %s', mat2str(stInit.omega_b, prec));
             strInitState  = sprintf('%s\n%s\n%s\n%s\n%s\n%s', cellInitSt{1}, cellInitSt{2}, ...
                                     cellInitSt{3}, cellInitSt{4}, cellInitSt{5}, cellInitSt{6});
-                              
+
             strConfig = sprintf(['Robot configuration:\n\n' ...
                                  ' NDOFs:         %d\n' ...
                                  ' # constraints: %d\n\n' ...
@@ -264,9 +270,9 @@ classdef WBM < WBM.WBMBase
                                 strInitState);
            disp(strConfig);
         end
-        
+
     end
-    
+
     methods(Access = private)
         function initConfig(obj, robot_config)
             % check if robot_config is an instance of a class that
@@ -275,10 +281,10 @@ classdef WBM < WBM.WBMBase
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             obj.iwbm_config = WBM.wbmBaseRobotConfig;
-            
+
             if (robot_config.ndof == 0)
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.VALUE_IS_ZERO);
-            end            
+            end
             obj.iwbm_config.ndof          = robot_config.ndof;
             obj.iwbm_config.stvLen        = 2*obj.iwbm_config.ndof + 13;
 
@@ -291,7 +297,7 @@ classdef WBM < WBM.WBMBase
 
             if isempty(robot_config.initStateParams)
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
-            end            
+            end
             % if 'initStateParams' is not empty, check the dimensions ...
             stInit = robot_config.initStateParams;
             len = size(stInit.x_b,1) + size(stInit.qt_b,1) + size(stInit.q_j,1) + ...

@@ -1,5 +1,5 @@
 classdef WBMBase < handle
-    properties(Dependent) 
+    properties(Dependent)
         % public properties for fast get/set methods:
         urdfLinkName@char
         wf_R_rootLnk@double matrix
@@ -11,27 +11,27 @@ classdef WBMBase < handle
     properties(Access = protected)
         iwbm_params@WBM.wbmBaseModelParams
     end
-        
+
     methods%(Access = public)
         % Constructor:
         function obj = WBMBase(model_params)
             if ~exist('model_params', 'var')
                 error('WBMBase::WBMBase: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            
+
             obj.initWBM(model_params);
             % set the world frame (WF) to the initial parameters ...
             obj.updateWorldFrame(model_params.wf_R_rootLnk, model_params.wf_p_rootLnk, ...
                                  model_params.g_wf);
         end
-        
+
         % Copy-function:
         function newObj = copy(obj)
             try
                 % Matlab-tuning: try to use directly the memory (faster)
                 % note: this works only for R2010b or newer.
                 objByteArray = getByteStreamFromArray(obj);
-                newObj = getArrayFromByteStream(objByteArray);                
+                newObj = getArrayFromByteStream(objByteArray);
             catch
                 % else, for R2010a and earlier, serialize via a
                 % temporary file (slower).
@@ -39,29 +39,30 @@ classdef WBMBase < handle
                 save(fname, 'obj');
                 newObj = load(fname);
                 newObj = newObj.obj;
-                delete(fname);                
-            end            
+                delete(fname);
+            end
         end
-        
+
         % Destructor:
         function delete(~)
             % remove all class properties from workspace (free-up memory) ...
         end
-        
+
         function initModel(obj, urdf_robot_name)
             if ~exist('urdf_robot_name', 'var')
-                % Optimized mode: use as default the URDF of the iCub-Robot
-                %                 for the Gazebo simulator ...
-                obj.iwbm_params.urdfRobot = 'icubGazeboSim';
+                % Optimized mode: use the default (URDF) robot name which is
+                % defined in the environment variable YARP_ROBOT_NAME for
+                % the WB(I)-Toolbox ...
+                obj.iwbm_params.urdfRobot = getenv('YARP_ROBOT_NAME');
                 wholeBodyModel('model-initialise');
                 return
             end
-            % else, use the robot-name that is supported by the WBI
-            % (URDF-file must exist in the directory of the WBI ) ...
+            % else, use the robot name that is supported by the WB(I)-Toolbox
+            % [URDF-file(s) must exist in the directory of the WB(I)-Tbx] ...
             obj.iwbm_params.urdfRobot = urdf_robot_name;
             wholeBodyModel('model-initialise', obj.iwbm_params.urdfRobot);
         end
-        
+
         function initModelURDF(obj, urdf_file_name)
             if ~exist('urdf_file_name', 'var')
                 error('WBMBase::initModelURDF: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -69,11 +70,11 @@ classdef WBMBase < handle
             if ~exist('urdf_file_name', 'file')
                 error('WBMBase::initModelURDF: %s', WBM.wbmErrorMsg.FILE_NOT_EXIST);
             end
-            
+
             obj.iwbm_params.urdfRobot = urdf_file_name;
             wholeBodyModel('model-initialise-urdf', obj.iwbm_params.urdfRobot);
         end
-            
+
         function setWorldFrame(~, wf_R_rootLnk, wf_p_rootLnk, g_wf)
             if (nargin ~= 4)
                 error('WBMBase::setWorldFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -82,16 +83,22 @@ classdef WBMBase < handle
             wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
             wholeBodyModel('set-world-frame', wf_R_rlnk_arr, wf_p_rootLnk, g_wf);
         end
-        
-        function updateWorldFrame(obj, wf_R_rootLnk, wf_p_rootLnk, g_wf)
-            obj.setWorldFrame(wf_R_rootLnk, wf_p_rootLnk, g_wf);
 
-            obj.iwbm_params.wf_R_rootLnk = wf_R_rootLnk;
-            obj.iwbm_params.wf_p_rootLnk = wf_p_rootLnk;
-            obj.iwbm_params.g_wf         = g_wf;
+        function updateWorldFrame(obj, wf_R_rootLnk, wf_p_rootLnk, g_wf)
+            if ( (nargin > 1) && (nargin < 4) )
+                error('WBMBase::updateWorldFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+
+            if (nargin == 4)
+                obj.iwbm_params.wf_R_rootLnk = wf_R_rootLnk;
+                obj.iwbm_params.wf_p_rootLnk = wf_p_rootLnk;
+                obj.iwbm_params.g_wf         = g_wf;
+            end
+            obj.setWorldFrame(obj.iwbm_params.wf_R_rootLnk, obj.iwbm_params.wf_p_rootLnk, ...
+                              obj.iwbm_params.g_wf);
         end
-                
-        function [w_p_b, w_R_b] = getWorldFrameFromFixedLink(obj, urdf_link_name, q_j)            
+
+        function [w_p_b, w_R_b] = getWorldFrameFromFixedLink(obj, urdf_link_name, q_j)
             switch nargin
                 case 3
                     % use another contact (constraint) link (*)
@@ -110,9 +117,9 @@ classdef WBMBase < handle
                 otherwise
                     % should be never reached ...
                     error('WBMBase::getWorldFrameFromFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
-            end            
+            end
         end
-    
+
         function setState(~, q_j, dq_j, v_b)
             if (nargin ~= 4)
                 error('WBMBase::setState: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -121,15 +128,15 @@ classdef WBMBase < handle
             %     (length(v_b) ~= 6) )
             %    error('WBMBase::setState: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
             %end
-            
+
             wholeBodyModel('update-state', q_j, dq_j, v_b);
         end
-        
+
         function [vqT_b, q_j, v_b, dq_j] = getState(~)
             [q_j, vqT_b, dq_j, v_b] = wholeBodyModel('get-state');
         end
-                
-        function M = massMatrix(~, wf_R_rootLnk, wf_p_rootLnk, q_j)            
+
+        function M = massMatrix(~, wf_R_rootLnk, wf_p_rootLnk, q_j)
             switch nargin
                 case 4
                     % Normal mode:
@@ -141,18 +148,18 @@ classdef WBMBase < handle
                 otherwise
                     error('WBMBase::massMatrix: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-        end       
-        
+        end
+
         function [jl_lower, jl_upper] = getJointLimits(~)
             [jl_lower, jl_upper] = wholeBodyModel('joint-limits');
         end
-    
+
         function J = jacobian(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j)
             if ~exist('urdf_link_name', 'var')
                 % use the default link name ...
                 urdf_link_name = obj.iwbm_params.urdfLinkName;
             end
-            
+
             switch nargin
                 case {4, 5}
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
@@ -163,7 +170,7 @@ classdef WBMBase < handle
                     error('WBMBase::jacobian: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
         end
-        
+
         function djdq = dJdq(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             if ~exist('urdf_link_name', 'var')
                 urdf_link_name = obj.iwbm_params.urdfLinkName; % default ...
@@ -185,18 +192,18 @@ classdef WBMBase < handle
                 case 6
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
                     h_c = wholeBodyModel('centroidal-momentum', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b);
-                case 1 
+                case 1
                     h_c = wholeBodyModel('centroidal-momentum');
                 otherwise
                     error('WBMBase::centroidalMomentum: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
         end
-        
+
         function wf_vqT_rlnk = forwardKinematics(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j)
             if ~exist('urdf_link_name', 'var')
                 urdf_link_name = obj.iwbm_params.urdfLinkName; % default ...
             end
-  
+
             switch nargin
                 case {4, 5}
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
@@ -204,14 +211,14 @@ classdef WBMBase < handle
                 case {1, 2}
                     wf_vqT_rlnk = wholeBodyModel('forward-kinematics', urdf_link_name);
                 otherwise
-                    error('WBMBase::forwardKinematics: %s', WBM.wbmErrorMsg.WRONG_ARG);                    
-            end            
+                    error('WBMBase::forwardKinematics: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
         end
-        
+
         function C_qv = generalBiasForces(~, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             switch nargin
                 case 6
-                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);                    
+                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
                     C_qv = wholeBodyModel('generalised-forces', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b);
                 case 1
                     C_qv = wholeBodyModel('generalised-forces');
@@ -220,21 +227,25 @@ classdef WBMBase < handle
             end
         end
 
-        function set.urdfLinkName(obj, new_urdf_link_name)
-            if isempty(new_urdf_link_name)
+        function set.urdfLinkName(obj, new_link_name)
+            if isempty(new_link_name)
                 error('WBMBase::set.urdfLinkName: %s', WBM.wbmErrorMsg.EMPTY_STRING);
             end
             % update the default link name ...
-            obj.iwbm_params.urdfLinkName = new_urdf_link_name;
+            obj.iwbm_params.urdfLinkName = new_link_name;
+        end
+
+        function lnk_name = get.urdfLinkName(obj)
+            lnk_name = obj.iwbm_params.urdfLinkName;
         end
 
         function set.wf_R_rootLnk(obj, wf_R_rlnk)
-            if (size(wf_R_rlnk,3) ~= 3)
+            if ~isequal(size(wf_R_rlnk), [3,3])
                 error('WBMBase::set.wf_R_rootLnk: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
             obj.iwbm_params.wf_R_rootLnk = wf_R_rlnk;
         end
-  
+
         function set.wf_p_rootLnk(obj, wf_p_rlnk)
             if (size(wf_p_rlnk,1) ~= 3)
                 error('WBMBase::set.wf_p_rootLnk: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
@@ -252,7 +263,7 @@ classdef WBMBase < handle
         function wbm_params = get.wbm_params(obj)
             wbm_params = obj.iwbm_params;
         end
-        
+
         function dispWBMParams(obj, prec)
             if ~exist('prec', 'var')
                 prec = 2;
@@ -271,20 +282,20 @@ classdef WBMBase < handle
         end
 
     end
-    
+
     methods(Access = private)
         function initWBM(obj, model_params)
             if ~isa(model_params, 'WBM.wbmBaseModelParams')
                 error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
-            end            
+            end
             obj.iwbm_params = WBM.wbmBaseModelParams;
             obj.iwbm_params.urdfLinkName = model_params.urdfLinkName;
-            
+
             % Initialize the mex-wholeBodyModel for a floating base robot,
             % using Unified Robot Description Format (URDF):
             if isempty(model_params.urdfRobot)
                 % Optimized mode:
-                obj.initModel(); % use the default URDF
+                obj.initModel(); % use the default (URDF) robot name ...
             else
                 % Normal mode:
                 if WBM.utilities.fileExist(model_params.urdfRobot)
@@ -296,7 +307,7 @@ classdef WBMBase < handle
                 end
             end
         end
-        
+
         function [nw_p_b, nw_R_b] = computeNewWorld2Base(obj, urdf_link_name, q_j)
             % get the transformation values from the base to the old world ...
             [ow_vqT_b,~,~,~] = obj.getState();
@@ -304,10 +315,10 @@ classdef WBMBase < handle
             % from the base to the old world ...
             [ow_p_b, ow_R_b] = WBM.utilities.frame2posRotm(ow_vqT_b);
             ow_H_b = WBM.utilities.posRotm2tform(ow_p_b, ow_R_b);
-            
+
             % get the transformation values from the reference link to the
             % old world:
-            if (nargin == 1)
+            if (nargin == 2)
                 ow_vqT_refLnk = obj.forwardKinematics(urdf_link_name);
             else
                 ow_vqT_refLnk = obj.forwardKinematics(urdf_link_name, ow_R_b, ow_p_b, q_j);
@@ -317,7 +328,7 @@ classdef WBMBase < handle
             % the new world:
             ow_H_refLnk = WBM.utilities.frame2tform(ow_vqT_refLnk);
             nw_H_b = ow_H_refLnk \ ow_H_b;
-            
+
             % extract the translation and the rotation values ...
             nw_p_b = nw_H_b(1:3,4);
             nw_R_b = nw_H_b(1:3,1:3);
