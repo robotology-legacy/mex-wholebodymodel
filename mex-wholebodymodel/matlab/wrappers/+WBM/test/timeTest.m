@@ -15,9 +15,7 @@ iCub_config.ndof          = 25;
 iCub_config.nCstrs        = 2;
 iCub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
 
-noi      = 1000;
-initTime = 0;
-totTime  = 0;
+noi = 1000;
 
 fprintf('Starting normal mode trial\n--------------------------\n');
 
@@ -30,11 +28,6 @@ fprintf('Num Trials : %d\nStarting Trial...\n', noi);
 
 R = iCub_model.wf_R_rootLnk;
 g = iCub_model.g_wf;
-p = zeros(3,1);
-
-q_j  = zeros(25,1);
-dq_j = zeros(25,1);
-v_b  = zeros(6,1);
 
 tic;
 for i = 1:noi
@@ -42,12 +35,12 @@ for i = 1:noi
     q_j  = rand(25,1);
     dq_j = rand(25,1);
     v_b  = rand(6,1);
-    % update the translation to the WF with random values ...
+    % set the translation to the WF with some random values ...
     p    = rand(3,1);
 
     wbm_iCub.setWorldFrame(R, p, g);
 
-    % calculate some mex-WholeBodyModel (WBM) Components:
+    % calculate some mex-WholeBodyModel (WBM) components:
     M      = wbm_iCub.massMatrix(R, p, q_j);
 
     h_c    = wbm_iCub.generalBiasForces(R, p, q_j, dq_j, v_b);
@@ -64,11 +57,11 @@ for i = 1:noi
 end
 totTime = toc();
 
-%% Output the first time-benchmark results:
+%% Output the first time-benchmark result:
 fprintf('Normal-Mode Trial Total Time : %f secs\n', totTime);
 fprintf('Normal-Mode Trial Average Time : %e secs\n', totTime/noi);
 
-clear all; % clear completely the workspace ...
+clearvars; % clear all variables from the workspace ...
 
 fprintf('\n\nStarting optimized mode trial\n--------------------------\n');
 
@@ -84,9 +77,7 @@ iCub_config.ndof          = 25;
 iCub_config.nCstrs        = 2;
 iCub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
 
-noi      = 1000;
-initTime = 0;
-totTime  = 0;
+noi = 1000;
 
 tic;
 wbm_iCub = WBM(iCub_model, iCub_config);
@@ -96,26 +87,20 @@ fprintf('Initialization time : %e secs\nStarting Trial...\n', initTime);
 
 R = iCub_model.wf_R_rootLnk;
 g = iCub_model.g_wf;
-p = zeros(3,1);
-
-q_j  = zeros(25,1);
-dq_j = zeros(25,1);
-v_b  = zeros(6,1);
 
 tic;
 for i = 1:noi
-    % fill the state with random values ...
+    % fill the state with some random values ...
     q_j  = rand(25,1);
     dq_j = rand(25,1);
     v_b  = rand(6,1);
     % fill the translation to the WF with random values ...
     p    = rand(3,1);
 
-    % wbm_iCub.setState(q_j, dq_j, v_b);
-    wbm_iCub.setWorldFrame(R, p, g);
     wbm_iCub.setState(q_j, dq_j, v_b);
+    wbm_iCub.setWorldFrame(R, p, g);
 
-    % mex-WholeBodyModel functions ...
+    % call some mex-WBM functions ...
     M      = wbm_iCub.massMatrix();
 
     h_c    = wbm_iCub.generalBiasForces();
@@ -132,6 +117,6 @@ for i = 1:noi
 end
 totTime = toc();
 
-%% Output the second time-benchmarks:
+%% Output the second time-benchmark:
 fprintf('Optimized-Mode Trial Total Time : %f secs\n', totTime);
 fprintf('Optimized-Mode Trial Average Time : %e secs\n', totTime/noi);
