@@ -63,9 +63,9 @@ fprintf('Normal-Mode Trial Average Time : %e secs\n', totTime/noi);
 
 clearvars; % clear all variables from the workspace ...
 
-fprintf('\n\nStarting optimized mode trial\n--------------------------\n');
-
 %% Second initialization of the WBM:
+fprintf('\n\nStarting optimized mode trial\n-----------------------------\n');
+
 % base model:
 iCub_model = wbmBaseModelParams;
 iCub_model.urdfRobot = 'icubGazeboSim';
@@ -117,6 +117,6 @@ for i = 1:noi
 end
 totTime = toc();
 
-%% Output the second time-benchmark:
+%% Output the result of the second time-benchmark:
 fprintf('Optimized-Mode Trial Total Time : %f secs\n', totTime);
 fprintf('Optimized-Mode Trial Average Time : %e secs\n', totTime/noi);
