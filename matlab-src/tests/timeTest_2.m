@@ -10,8 +10,8 @@ refLink2 = 'l_gripper';
 fprintf('Starting normal mode trial \n-------------------------- \n');
 
 tic;
-wbm_modelInitialise('icubGazeboSim');
-%wbm_modelInitialise();
+%wbm_modelInitialise('icubGazeboSim');
+wbm_modelInitialise();
 initTime = toc();
 
 fprintf('Initialisation time : %e secs\n',initTime);
