@@ -7,6 +7,12 @@ Once you installed the `codyco-superbuild`, the `mex-wholebodymodel` files shoul
 `${CODYCO_SUPERBUILD_ROOT}/build/install/mex` and its subdirectories (for the `mex-wholebodymodel`, this directories are `mexwbi-wrappers` and `mexwbi-utilities`).
 To execute scripts that use `mex-wholebodymodel`, make sure that this directories are part of your [MATLAB search path](mathworks.com/help/matlab/ref/path.html).
 
+## Examples 
+
+### Rigid Body Dynamics
+An example on how to use mex-wholebodymodel to compute the dynamics quantities of 
+a rigid body is available at [examples/rigidBodyDynamics.m](examples/rigidBodyDynamics.m).
+
 
 ## Controller simulation
 In the [matlab-src/mex-wholebodymodel_balancing](matlab-src/mex-wholebodymodel_balancing/) and
