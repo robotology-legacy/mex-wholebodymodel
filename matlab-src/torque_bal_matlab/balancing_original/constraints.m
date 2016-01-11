@@ -1,7 +1,6 @@
 function [CFoot,dConstraints] = constraints(staticFrictionCoefficient,numberOfPoints,torsionalFrictionCoefficient,footSize,fZmin)
-
-% compute friction cones contraints
-% approximation with straight lines
+%% constraints
+% computes friction cones contraints. Approximation with straight lines
 
 % split the pi/2 angle into numberOfPoints - 1;
 segmentAngle = pi/2 / (numberOfPoints - 1);
@@ -23,13 +22,12 @@ for i = 1 : numberOfEquations
    
    % define line passing through the above points
    angularCoefficients = (secondPoint(2) - firstPoint(2)) / (secondPoint(1) - firstPoint(1));
-   
    offsets = firstPoint(2) - angularCoefficients * firstPoint(1);
-
    inequalityFactor = +1;
    
    % if any of the two points are between pi and 2pi, then the inequality is
    % in the form of y >= m*x + q, and I need to change the sign of it.
+
    if (angle(i) > pi || angle(rem(i, numberOfEquations) + 1) > pi)
        inequalityFactor = -1;
    end
@@ -37,7 +35,6 @@ for i = 1 : numberOfEquations
    % a force is 6 dimensional f = [fx, fy, fz, mux, muy, muz]'
    % I have constraints on fy and fz, and the offset will be multiplied by
    % mu * fx
-   
    Aineq(i,:) = inequalityFactor .*  [-angularCoefficients, 1, -offsets * staticFrictionCoefficient, 0, 0, 0];
 
 end
@@ -57,6 +54,4 @@ dConstraints = [zeros(size(Aineq,1), 1); zeros(7,1)];
 
 dConstraints(3 + size(Aineq,1)) = -fZmin; 
 
-
 end
-

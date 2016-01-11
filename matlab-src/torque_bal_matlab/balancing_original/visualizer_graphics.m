@@ -1,5 +1,5 @@
 function [] = visualizer_graphics(t,chi,params)
-
+%% visualizer_graphics
 %Plot all the desired quantities
 %for now, these are the parameters calculated in ForwardDynamics.m
 qj     = [];

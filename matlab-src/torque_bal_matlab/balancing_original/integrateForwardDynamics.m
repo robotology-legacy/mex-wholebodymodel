@@ -1,91 +1,91 @@
+%% integrateForwardDynamics
+% This is the main program for integrating the forward dynamics of the
+% robot iCub in matlab
 clear all
 close all
 clc
 
-% This is the main program for integrating the forward dynamics of the
-% robot iCub in matlab
-
 %% Setup path
-% Don't forget to set the path properly depending on where are the necessary
-% folders in your computer
+% Set the path properly depending on where are the required folders in your computer
 addpath('./../../../mex-wholebodymodel/matlab/utilities');
 addpath('./../../../mex-wholebodymodel/matlab/wrappers');
 addpath('./../../../../../build/');
 addpath('./../../');
 
 %% Initialise the mexWholeBodyModel
- wbm_modelInitialise('icubGazeboSim');
+wbm_modelInitialise('icubGazeboSim');
 
 %% Setup params for balancing controller
-% the user can set this parameters depending on what he wants to do with
-% the robot
- params.demo_left_and_right      =  1;                                      %either 0 or 1; only for two feet on the ground
- params.QP_solver                =  0;                                      %either 0 or 1
+params.demo_left_and_right      =  1;                                      %either 0 or 1; only for two feet on the ground
+params.QP_solver                =  0;                                      %either 0 or 1
  
 % balancing on two feet or one foot
- params.feet_on_ground           =  2;                                      %either 1 or 2
+params.feet_on_ground           =  [1,1];                                      %either 1 or 2
 
-% for the visualization of torques, forces and other user-defined graphics 
- vis_graphics                    =  1;                                      %either 0 or 1
+% allows the visualization of torques, forces and other user-defined graphics 
+vis_graphics                    =  1;                                      %either 0 or 1
  
 %% Setup general params
 % this is assuming a 25DoF iCub
- params.ndof         = 25;
+params.ndof         = 25;
 
 % initial conditions                  
- params.leftArmInit  = [ -19.7   29.7  0.0  44.9   0.0]';          
- params.rightArmInit = [ -19.7   29.7  0.0  44.9   0.0]';         
+params.leftArmInit  = [ -19.7   29.7  0.0  44.9   0.0]';          
+params.rightArmInit = [ -19.7   29.7  0.0  44.9   0.0]';         
  
- if     params.feet_on_ground == 2
+if     params.feet_on_ground == 2
      
 % initial conditions for balancing on two feet 
  params.torsoInit    = [ -10.0   0.0   0.0]'; 
  params.leftLegInit  = [  25.5   0.1   0.0  -18.5  -5.5  -0.1]';
  params.rightLegInit = [  25.5   0.1   0.0  -18.5  -5.5  -0.1]';
 
- elseif params.feet_on_ground == 1
+elseif params.feet_on_ground == 1
      
 % initial conditions for the robot standing on one foot
  params.torsoInit    = [ -10.0   0.0    0.0]';
  params.leftLegInit  = [  25.5   15.0   0.0  -18.5  -5.5  -0.1]';
  params.rightLegInit = [  25.5   5.0    0.0  -40    -5.5  -0.1]'; 
 
- end
+end
  
- params.qjInit  = [params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit] * (pi/180);
- params.dqjInit = zeros(params.ndof,1);
+params.qjInit  = [params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit] * (pi/180);
+params.dqjInit = zeros(params.ndof,1);
    
- params.dx_bInit    = zeros(3,1);
- params.omega_bInit = zeros(3,1);
+params.dx_bInit    = zeros(3,1);
+params.omega_bInit = zeros(3,1);
   
 %% Fixing the world reference frame to the ground, not to the left foot 
 wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit]);
 
 % fixing the world reference frame w.r.t. the left foot position
-[rot,pos]   = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
+[rot,pos] = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
 
 wbm_setWorldFrame(rot,pos,[0 0 -9.81]')
 
 [~,T_b,~,~] = wbm_getState();
  
- params.chiInit = [T_b;params.qjInit;...
+params.chiInit = [T_b;params.qjInit;...
                   params.dx_bInit;params.omega_bInit;params.dqjInit];
 
-%% contact constraints         
-if     params.feet_on_ground == 2
+%% Contact constraints definition         
+if     params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 1
      
  params.constraintLinkNames      = {'l_sole','r_sole'}; 
 
-elseif params.feet_on_ground == 1
+elseif   params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 0
      
-% this is for only for the left foot on the ground
  params.constraintLinkNames      = {'l_sole'}; 
+ 
+elseif   params.feet_on_ground(1) == 0 && params.feet_on_ground(2) == 1
+    
+ params.constraintLinkNames      = {'r_sole'};
 
 end
 
  params.numConstraints           = length(params.constraintLinkNames);
    
-%% others parameters for balancing controller
+%% Others parameters for balancing controller
  load('jointLimits.mat')
  
  limits           = [jl1 jl2];
@@ -95,7 +95,7 @@ end
  params.lfoot_ini = wbm_forwardKinematics('l_sole');
  params.rfoot_ini = wbm_forwardKinematics('r_sole');
  
-%% setup integration
+%% Setup integration
  params.tStart   = 0;
  params.tEnd     = 10;   
  params.sim_step = 0.01;
@@ -104,17 +104,15 @@ end
 
  forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,params);
     
-%% integrate forward dynamics
+%% Integrate forward dynamics
  disp('starting numerical integration');
- 
- options = odeset('RelTol',1e-4,'AbsTol',1e-4);
+ options = odeset('RelTol',1e-5,'AbsTol',1e-5);
    
  [t,chi] = ode15s(forwardDynFunc,params.tStart:params.sim_step:params.tEnd,params.chiInit,options);
 
- save('storedTestTrajectory.mat','t','chi','params');
  disp('numerical integration complete..rendering.');
 
-%% visualize forward dynamics
+%% Visualize forward dynamics
 % demo of the dynamics
  visualizer_demo(t,chi,params);
 
@@ -125,5 +123,4 @@ if vis_graphics == 1
  visualizer_graphics(t,chi,params);
 
 end
-
-    
+   

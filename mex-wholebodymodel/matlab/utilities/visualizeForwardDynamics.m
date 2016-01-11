@@ -49,7 +49,6 @@ L{13} = 'l_elbow_1'   ;
 L{14} = 'l_gripper'   ;
 L{15} = 'com'         ;
 
-
 % RELATED TO WORLD REFERENCE FRAME ISSUE
 % since for now the world reference frame is that of the codyco_balancing_world, 
 % the z-axis is the vertical axis for the robot.
