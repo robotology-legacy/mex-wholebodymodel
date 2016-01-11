@@ -8,6 +8,9 @@ close all;
 %% initialise mexWholeBodyModel using the rigidBody.urdf file.
 %% Check the rigidBody.urdf for comments on how the inertial 
 %% parameters are encoded in the URDF file 
+%% The function is searching the file in the current working
+%% directory, so make sure that you are launching the script 
+%% in the directory where rigidBody.urdf is found 
 wbm_modelInitialiseFromURDF('rigidBody.urdf');
 
 %% the number of (internal) dofs is 0 for a rigid body 
