@@ -10,7 +10,6 @@ clc
 addpath('./../../../mex-wholebodymodel/matlab/utilities');
 addpath('./../../../mex-wholebodymodel/matlab/wrappers');
 addpath('./../../../../../build/');
-addpath('./../../');
 
 %% Initialise the mexWholeBodyModel
 wbm_modelInitialise('icubGazeboSim');
@@ -20,10 +19,12 @@ params.demo_left_and_right      =  1;                                      %eith
 params.QP_solver                =  0;                                      %either 0 or 1
  
 % balancing on two feet or one foot
-params.feet_on_ground           =  [1,1];                                      %either 1 or 2
+params.feet_on_ground           =  [1,1];                                  %either 0 or 1
 
 % allows the visualization of torques, forces and other user-defined graphics 
-vis_graphics                    =  1;                                      %either 0 or 1
+params.visualizer_graphics      =  1;                                      %either 0 or 1
+params.visualizer_demo          =  1;                                      %either 0 or 1
+params.visualizer_joints        =  1;                                      %either 0 or 1
  
 %% Setup general params
 % this is assuming a 25DoF iCub
@@ -31,22 +32,27 @@ params.ndof         = 25;
 
 % initial conditions                  
 params.leftArmInit  = [ -19.7   29.7  0.0  44.9   0.0]';          
-params.rightArmInit = [ -19.7   29.7  0.0  44.9   0.0]';         
+params.rightArmInit = [ -19.7   29.7  0.0  44.9   0.0]'; 
+params.torsoInit    = [ -10.0   0.0    0.0]';
  
-if     params.feet_on_ground == 2
+if     params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 1
      
 % initial conditions for balancing on two feet 
- params.torsoInit    = [ -10.0   0.0   0.0]'; 
  params.leftLegInit  = [  25.5   0.1   0.0  -18.5  -5.5  -0.1]';
  params.rightLegInit = [  25.5   0.1   0.0  -18.5  -5.5  -0.1]';
 
-elseif params.feet_on_ground == 1
+elseif   params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 0
      
 % initial conditions for the robot standing on one foot
- params.torsoInit    = [ -10.0   0.0    0.0]';
  params.leftLegInit  = [  25.5   15.0   0.0  -18.5  -5.5  -0.1]';
  params.rightLegInit = [  25.5   5.0    0.0  -40    -5.5  -0.1]'; 
-
+ 
+elseif   params.feet_on_ground(1) == 0 && params.feet_on_ground(2) == 1
+  
+% initial conditions for the robot standing on one foot
+ params.rightLegInit = [  25.5   15.0   0.0  -18.5  -5.5  -0.1]';
+ params.leftLegInit  = [  25.5   5.0    0.0  -40    -5.5  -0.1]';
+   
 end
  
 params.qjInit  = [params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit] * (pi/180);
@@ -59,7 +65,15 @@ params.omega_bInit = zeros(3,1);
 wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit]);
 
 % fixing the world reference frame w.r.t. the left foot position
+if params.feet_on_ground(1) == 1
+
 [rot,pos] = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
+
+else
+    
+[rot,pos] = wbm_getWorldFrameFromFixedLink('r_sole',params.qjInit);
+    
+end
 
 wbm_setWorldFrame(rot,pos,[0 0 -9.81]')
 
@@ -69,7 +83,7 @@ params.chiInit = [T_b;params.qjInit;...
                   params.dx_bInit;params.omega_bInit;params.dqjInit];
 
 %% Contact constraints definition         
-if     params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 1
+if       params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 1
      
  params.constraintLinkNames      = {'l_sole','r_sole'}; 
 
@@ -86,8 +100,7 @@ end
  params.numConstraints           = length(params.constraintLinkNames);
    
 %% Others parameters for balancing controller
- load('jointLimits.mat')
- 
+ jointLimits
  limits           = [jl1 jl2];
  params.limits    = limits;
  params.com_ini   = wbm_forwardKinematics('com');
@@ -97,7 +110,7 @@ end
  
 %% Setup integration
  params.tStart   = 0;
- params.tEnd     = 10;   
+ params.tEnd     = 50;   
  params.sim_step = 0.01;
  
  params.wait     = waitbar(0,'Integration in process...');
@@ -105,22 +118,14 @@ end
  forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,params);
     
 %% Integrate forward dynamics
- disp('starting numerical integration');
  options = odeset('RelTol',1e-5,'AbsTol',1e-5);
    
  [t,chi] = ode15s(forwardDynFunc,params.tStart:params.sim_step:params.tEnd,params.chiInit,options);
 
- disp('numerical integration complete..rendering.');
-
-%% Visualize forward dynamics
-% demo of the dynamics
- visualizer_demo(t,chi,params);
-
-% desired graphics 
-if vis_graphics == 1
+ delete(params.wait)       
  
- disp('preparing the graphics...')
- visualizer_graphics(t,chi,params);
-
-end
+%% Visualize forward dynamics
+params.wait     = waitbar(0,'Visualization in process...');
+visualizer(t,chi,params)
+delete(params.wait)
    

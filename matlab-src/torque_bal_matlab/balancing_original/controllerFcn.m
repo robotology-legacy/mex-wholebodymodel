@@ -1,26 +1,30 @@
-function [tauModel, Sigma, NA, fHdotDesC1C2, errorCoM, f0] = ...
-          controllerFcn (LEFT_RIGHT_FOOT_IN_CONTACT, DOF, USE_QP_SOLVER, ConstraintsMatrix, bVectorConstraints,...
-                         qj, qjDes, Nu, M, h, H, posLeftFoot, posRightFoot, footSize, Jc, JcNu, xCom, J_CoM, desired_x_dx_ddx_CoM, ...
-                         gainsPCOM, gainsDCOM, gainMomentum, impedances, dampings)
+function [f_c,tau,errorCoM,f0]   = controllerFcn(param, constraintParam, Nu, M, h, H, feetParam, Jc,...
+                                                 dJcNu, xCom, J_CoM, desired_x_dx_ddx_CoM, gainParam)
 %% controllerFCN
 % Generates the desired control torques from a given robot state. 
 % It also uses a QP solver for the minimization of torques by means of contact forces' null space  
+LEFT_RIGHT_FOOT_IN_CONTACT = param.feet_on_ground;
+DOF                        = param.ndof;
+USE_QP_SOLVER              = param.QP_solver;
 
-%% Variables definition and tolerances
+ConstraintsMatrix  = constraintParam.ConstraintsMatrix;
+bVectorConstraints = constraintParam.bVectorConstraints ;
+footSize           = constraintParam.footSize;
+
+%% Variables and tolerances definition
  PINV_TOL        = 1e-8;
  regHessiansQP   = 1e-3;
 %reg             = 0.01;
 
-e1               = [1;0;0];
-e2               = [0;1;0];
-e3               = [0;0;1];
+e1              = [1;0;0];
+e2              = [0;1;0];
+e3              = [0;0;1];
 
-gravAcc          = 9.81;
+gravAcc         = 9.81;
 
- m              = M(1,1);
- Mb             = M(1:6,1:6);
- Mbj            = M(1:6,7:end);
-%Mj             = M(7:end,7:end);
+m               = M(1,1);
+Mb              = M(1:6,1:6);
+Mbj             = M(1:6,7:end);
 
 St              = [ zeros(6,DOF);
                     eye(DOF,DOF)];
@@ -29,36 +33,37 @@ grav            = [ zeros(2,1);
                    -m*gravAcc;
                     zeros(3,1)];
   
-pos_leftFoot    = posLeftFoot(1:3);
-rotMatLeftFoot  = Rf(posLeftFoot(4:7));
-
-pos_rightFoot   = posRightFoot(1:3);
-rotMatRightFoot = Rf(posRightFoot(4:7));
+[pos_rightFoot,rotMatRightFoot] = frame2posrot(feetParam.r_sole);
+[pos_leftFoot,rotMatLeftFoot]   = frame2posrot(feetParam.l_sole);
 
 dxCom           = J_CoM(1:3,:)*Nu;
 dq              = Nu(7:end);
 
-ddxComStar      = desired_x_dx_ddx_CoM(:,3) - gainsPCOM*(xCom-desired_x_dx_ddx_CoM(:,1)) - gainsDCOM*(dxCom-desired_x_dx_ddx_CoM(:,2));
+ddxComStar      = desired_x_dx_ddx_CoM(:,3) - gainParam.gainsPCOM*(xCom-desired_x_dx_ddx_CoM(:,1))...
+                 -gainParam.gainsDCOM*(dxCom-desired_x_dx_ddx_CoM(:,2));
 
 Pr              = pos_rightFoot - xCom;   % Application point of the contact force on the right foot w.r.t. CoM
-Pl              = pos_leftFoot  - xCom;   % Application point of the contact force on the left foot w.r.t. CoM
+Pl              = pos_leftFoot  - xCom;   % Application point of the contact force on the left  foot w.r.t. CoM
 
 AL              = [ eye(3),zeros(3);
                     skew(Pl),eye(3)];
 AR              = [ eye(3),zeros(3);
-                    skew(Pr),eye(3) ];
+                    skew(Pr),eye(3)];
 
 %% One foot or two feet on ground selector
-if     LEFT_RIGHT_FOOT_IN_CONTACT == 1  
+if      LEFT_RIGHT_FOOT_IN_CONTACT(1) == 1 &&  LEFT_RIGHT_FOOT_IN_CONTACT(2) == 0
     
     A      = AL;
-    
     pinvA  = eye(6)/A;
-
-elseif LEFT_RIGHT_FOOT_IN_CONTACT == 2
+    
+elseif  LEFT_RIGHT_FOOT_IN_CONTACT(1) == 0 &&  LEFT_RIGHT_FOOT_IN_CONTACT(2) == 1
+    
+    A      = AR;
+    pinvA  = eye(6)/A;
+    
+elseif  LEFT_RIGHT_FOOT_IN_CONTACT(1) == 1 &&  LEFT_RIGHT_FOOT_IN_CONTACT(2) == 1
 
     A      = [AL,AR];
-    
     pinvA  = pinv(A,PINV_TOL);
     
 end
@@ -72,36 +77,32 @@ end
 %PInv_JcMinvSt   = JcMinvSt'/(JcMinvSt*JcMinvSt' + reg*eye(size(JcMinvSt,1)));
 
 %% Newton-Euler equations of motion at CoM
-HDotDes         = [  m*ddxComStar;
-                    -gainMomentum*H(4:end)];
+HDotDes         = [ m*ddxComStar;
+                   -gainParam.gainMomentum*H(4:end)];
                       
 NL              = eye(DOF) - PInv_JcMinvSt*JcMinvSt;
 
 f_HDot          = pinvA*(HDotDes - grav);
 
 %% One foot or two feet on ground selector
+if     sum(LEFT_RIGHT_FOOT_IN_CONTACT) == 1 && USE_QP_SOLVER == 0
+
 NA              =  zeros(6);
+    
+elseif sum(LEFT_RIGHT_FOOT_IN_CONTACT) == 2
+    
+NA              =  eye(6*param.numConstraints)-pinvA*A;
 
-if     LEFT_RIGHT_FOOT_IN_CONTACT == 1 && USE_QP_SOLVER == 0
-     
-fHdotDesC1C2    =  f_HDot; 
-    
-elseif LEFT_RIGHT_FOOT_IN_CONTACT == 2
-    
-NA              =  eye(6*LEFT_RIGHT_FOOT_IN_CONTACT)-pinvA*A;
-    
-fHdotDesC1C2    =  f_HDot;
-   
 end
-
+   
 %% Terms used for torques equation definition
-JBar             =  transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));   % multiplier of f in tau0
-qTilde           =  qj-qjDes;
+JBar             =  transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));    % multiplier of f in tau0
+qTilde           =  param.qj-param.qjInit;
 
 Sigma            = -(PInv_JcMinvSt*JcMinvJct + NL*JBar);
 SigmaNA          =  Sigma*NA;
 
-tauModel         = PInv_JcMinvSt*(JcMinv*h - JcNu) + NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(impedances)*qTilde - diag(dampings)*dq);
+tauModel         = PInv_JcMinvSt*(JcMinv*h - dJcNu) + NL*(h(7:end) - Mbj'/Mb*h(1:6) - diag(gainParam.impedances)*qTilde - diag(gainParam.dampings)*dq);
 
 %% Quadratic Programming solver
 CL               =  ConstraintsMatrix; 
@@ -127,15 +128,13 @@ bVectorConstraints2Feet   = [bVectorConstraints;bVectorConstraints];
 ConstraintsMatrixQP1Foot  = CL;
 bVectorConstraintsQP1Foot = bVectorConstraints;
 
-%% One foot or two feet on ground selector
-if  LEFT_RIGHT_FOOT_IN_CONTACT == 1 && USE_QP_SOLVER == 1
+if  sum(LEFT_RIGHT_FOOT_IN_CONTACT) == 1 && USE_QP_SOLVER == 1
     
-A1Foot                     =  AL;
-HessianMatrixQP1Foot       =  A1Foot'*A1Foot;
-gradientQP1Foot            = -A1Foot'*(HDotDes - grav);
+HessianMatrixQP1Foot       =  A'*A;
+gradientQP1Foot            = -A'*(HDotDes - grav);
 
-[fHdotDesC1C2, ~, exitFlag, iter, lambda, auxOutput] = qpOASES (HessianMatrixQP1Foot, gradientQP1Foot, ConstraintsMatrixQP1Foot,...
-                                                                [], [], [], bVectorConstraintsQP1Foot);           
+[f_HDot, ~, exitFlag, iter, lambda, auxOutput] = qpOASES(HessianMatrixQP1Foot, gradientQP1Foot, ConstraintsMatrixQP1Foot,...
+                                                               [], [], [], bVectorConstraintsQP1Foot);           
 
   if exitFlag ~= 0
       
@@ -148,7 +147,7 @@ gradientQP1Foot            = -A1Foot'*(HDotDes - grav);
       
   end
  
-elseif LEFT_RIGHT_FOOT_IN_CONTACT == 2 && USE_QP_SOLVER == 1
+elseif sum(LEFT_RIGHT_FOOT_IN_CONTACT) == 2 && USE_QP_SOLVER == 1
 
 ConstraintsMatrixQP2Feet  = ConstraintsMatrix2Feet*NA;
 bVectorConstraintsQp2Feet = bVectorConstraints2Feet-ConstraintsMatrix2Feet*f_HDot;
@@ -156,12 +155,12 @@ bVectorConstraintsQp2Feet = bVectorConstraints2Feet-ConstraintsMatrix2Feet*f_HDo
 HessianMatrixQP2Feet      = SigmaNA'*SigmaNA + eye(size(SigmaNA,2))*regHessiansQP;
 gradientQP2Feet           = SigmaNA'*(tauModel + Sigma*f_HDot);
 
-[f0, ~, exitFlag, iter, lambda, auxOutput] = qpOASES (HessianMatrixQP2Feet, gradientQP2Feet, ConstraintsMatrixQP2Feet,...
-                                                           [], [], [], bVectorConstraintsQp2Feet);           
+[f0, ~, exitFlag, iter, lambda, auxOutput] = qpOASES(HessianMatrixQP2Feet, gradientQP2Feet, ConstraintsMatrixQP2Feet,...
+                                                     [], [], [], bVectorConstraintsQp2Feet);           
             
  if exitFlag ~= 0
 
-   disp('QP failed');
+   disp('QP failed')
    disp(exitFlag);
    disp(iter);
    disp(auxOutput);
@@ -173,16 +172,25 @@ gradientQP2Feet           = SigmaNA'*(tauModel + Sigma*f_HDot);
 end
 
 %% Desired f0 without Quadratic Programming
-if     LEFT_RIGHT_FOOT_IN_CONTACT == 1
+if      sum(LEFT_RIGHT_FOOT_IN_CONTACT) == 1
 
-  f0                  =  zeros(6,1);
+  f0      =  zeros(6,1);
 
-elseif LEFT_RIGHT_FOOT_IN_CONTACT == 2 && USE_QP_SOLVER == 0 
+elseif  sum(LEFT_RIGHT_FOOT_IN_CONTACT) == 2 && USE_QP_SOLVER == 0 
 
-  f0                  = -pinv(SigmaNA,PINV_TOL)*(tauModel+Sigma*f_HDot);
+  f0      = -pinv(SigmaNA,PINV_TOL)*(tauModel+Sigma*f_HDot);
 
 end
 
-errorCoM              = xCom - desired_x_dx_ddx_CoM(:,1);
+%% Joint torques and contact forces
+% CoM error
+errorCoM = xCom - desired_x_dx_ddx_CoM(:,1);
+
+% Desired contact forces at feet and control torques
+fc_des   = f_HDot + NA*f0;
+tau      = tauModel + Sigma*fc_des;
+
+% Real contact forces computation
+f_c      = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvSt*tau -dJcNu -feetParam.K_corr_vel.*Jc*Nu -feetParam.K_corr_pos.*feetParam.pos_feet_delta);
 
 end

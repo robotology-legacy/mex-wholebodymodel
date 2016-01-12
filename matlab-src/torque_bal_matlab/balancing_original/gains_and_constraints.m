@@ -18,9 +18,9 @@ qTildeMax                  = 20*pi/180;
 %% PARAMETERS FOR TWO FEET ON THE GROUND
 if Contact_constraints == 2
     
-   gainParam.gainsPCOM                 = diag([ 50   50  50]);
-   gainParam.gainsDCOM                 = 2*sqrt(gainParam.gainsPCOM);
-   gainParam.gainMomentum              = 1;
+   gainParam.gainsPCOM               = diag([ 50   50  50]);
+   gainParam.gainsDCOM               = 2*sqrt(gainParam.gainsPCOM);
+   gainParam.gainMomentum            = 1;
 
 % impedances acting in the null space of the desired contact forces 
     impTorso            = [ 50  50  50
@@ -73,7 +73,7 @@ end
 
   increasingRatesImp     = [impTorso(2,:),impArms(2,:),impArms(2,:),impLeftLeg(2,:),impRightLeg(2,:)];
 
-if (size(gainParam.impedances,2) ~= ndof)
+if (size(impedances,2) ~= ndof)
     
   error('Dimension mismatch between ROBOT_DOF and dimension of the variable impedences. Check these variables in the file gains.m');
     
@@ -94,11 +94,11 @@ fZmin                        = 10;
 
 % The QP solver will search a solution f0 that 
 % satisfies the inequality Aineq_f F(fo) < bineq_f 
-
 [constraintParam.ConstraintsMatrix,constraintParam.bVectorConstraints] = constraints(forceFrictionCoefficient,numberOfPoints,...
                                                                                      torsionalFrictionCoefficient,footSize,fZmin);
+constraintParam.footSize = footSize;
 
 %% Impedances correction with a nonlinear term
- gainParam.impedances = nonLinImp(param.qjInit,param.qj,impedances,increasingRatesImp,qTildeMax);
+gainParam.impedances = nonLinImp(param.qjInit,param.qj,impedances,increasingRatesImp,qTildeMax);
  
 end
