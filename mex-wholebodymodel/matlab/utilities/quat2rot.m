@@ -18,8 +18,8 @@ q = qT(4:end);
         2*(q1*q2+q0*q3)    2*(q0^2+q2^2) - 1  2*(q2*q3-q0*q1);
         2*(q1*q3-q0*q2)    2*(q2*q3+q0*q1)    2*(q0^2+q3^2)-1];
 
-%R = zeros(3); %vrrotvec2mat([rx(1) ry(1) rz(1) q_ang(1)]);
+% R = zeros(3); %vrrotvec2mat([rx(1) ry(1) rz(1) q_ang(1)]);
 % R=0.25*fliplr(R);
-%R=0.25*R;
+% R=0.25*R;
 
 end

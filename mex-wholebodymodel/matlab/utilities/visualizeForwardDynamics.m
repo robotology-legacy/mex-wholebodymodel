@@ -11,10 +11,10 @@ function visualizeForwardDynamics(xout,tSpan,params)
 %   struct variable which contains constant parameters related to the 
 %   simulation environment, robot, controller etc.
 %  
-
-n  = size(xout,1); % number of instances of the simulation results
+%% Setup visualization
+n  = size(xout,1);   % number of instances of the simulation results
 q  = xout(:,1:7);    % first 3 elements provide the position and next 4 elements provide the orientation of the base 
-qj = xout(:,8:32);  % joint positions
+qj = xout(:,8:32);   % joint positions
 
 % time span vector of the simulation
 %tSpan   = linspace(  params.sim_start_time,  params.sim_start_time+params.sim_duration,  params.sim_duration/params.sim_step);
@@ -29,8 +29,6 @@ vis_speed = 1;    % this variable is set to change the visualization speed,
 wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
 wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
 
-
-    
 % the list of link/joint names that are used to construct the robot in the visualizer                  
 L = cell(15,1);
 L{1}  = 'root_link'   ;
