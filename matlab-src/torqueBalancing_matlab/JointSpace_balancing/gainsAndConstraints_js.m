@@ -1,9 +1,17 @@
-function [impedances, dampings] = gains (DOF, LEFT_RIGHT_FOOT_IN_CONTACT)
-% gains 
-% defines the gains for joints space balancing controller
-% both impedances and damping at joints are calculated
+function gains = gainsAndConstraints_js (param)
+%% gainsAndConstraints_js 
+%  Generates the desired gains for both the joint and the CoM
+%  dynamics.
+%  The output is:
+%
+%  gains            this is a structure which contains both CoM and joints gains
+
+%% Setup parameters
+feet_on_ground   = param.feet_on_ground;
+ndof             = param.ndof;
+
 %% Two feet impedances
-if LEFT_RIGHT_FOOT_IN_CONTACT == 2
+if sum(feet_on_ground)  == 2
     
        impTorso            = [ 50    50   50
                                 0     0    0]; 
@@ -11,15 +19,15 @@ if LEFT_RIGHT_FOOT_IN_CONTACT == 2
        impArms             = [ 10    10   10   10  20  
                                 0     0    0    0   0];
                         
-       impLeftLeg          = [ 35   50    2   30   2  10
+       impLeftLeg          = [ 35   50    5   30   5  10
                                 0    0    0    0   0   0]; 
 
-       impRightLeg         = [35   50    2   30   2  10
+       impRightLeg         = [35   50    5   30   5  10
                                0    0    0    0   0   0];                                                 
 end
 
 %% One foot impedances
-if  LEFT_RIGHT_FOOT_IN_CONTACT == 1
+if  sum(feet_on_ground) == 1
 
       impTorso            = [  20    20   20
                                 0     0    0]; 
@@ -34,15 +42,14 @@ if  LEFT_RIGHT_FOOT_IN_CONTACT == 1
                                0    0   0   0   0   0];
 end
 
-%% damping
-impedances          = [impTorso(1,:),impArms(1,:),impArms(1,:),impLeftLeg(1,:),impRightLeg(1,:)];
+%% Dampings and impedances
+gains.impedances          = [impTorso(1,:),impArms(1,:),impArms(1,:),impLeftLeg(1,:),impRightLeg(1,:)];
    
-dampings            = 1*ones(1,DOF);
-%dampings           = 2*sqrt(impedances);
+gains.dampings            = 0.5*ones(1,ndof);
 
-if (size(impedances,2) ~= DOF)
+if (size(gains.impedances,2) ~= ndof)
     
-    error('Dimension mismatch between ROBOT_DOF and dimension of the variable impedences. Check these variables in the file gains.m');
+    error('Dimension mismatch between ndof and dimension of the variable impedences. Check these variables in the file gains.m');
     
 end
 

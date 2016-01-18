@@ -1,6 +1,8 @@
 function [t,u] = euler_f(f,y0,tmax,tmin,h)
-
-%Euler forward integrator
+%% euler_f
+%  Euler forward integrator. it can be used instead of ode15s to test new
+%  programs.
+%% integration code
 t   = tmin:h:tmax;
 t   = t.';
 

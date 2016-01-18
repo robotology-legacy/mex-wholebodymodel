@@ -11,8 +11,11 @@ traj     = params.joints_traj.traj;
 delta    = params.joints_traj.delta;
 
 %% visualizer
-tit  = {'X direction' 'Y direction' 'Z direction'};
-tit2 = {'Error on desired x CoM trajectory' 'Error on desired y CoM trajectory' 'Error on desired z CoM trajectory'};
+
+if params.visualizerIkin == 1
+    
+title_graphics  = {'X direction' 'Y direction' 'Z direction'};
+title2          = {'Error on desired x CoM trajectory' 'Error on desired y CoM trajectory' 'Error on desired z CoM trajectory'};
 
 for k = 1:3
 % desired and obtained trajectory at CoM
@@ -26,7 +29,7 @@ plot(t,traj(k+9,:),'r')
 
 xlabel('s')
 ylabel('m')
-title(tit(k))
+title(title_graphics(k))
 legend('desired CoM pos','obtained CoM pos')
 
 % velocity
@@ -39,7 +42,7 @@ plot(t,traj(k+9+3,:),'r')
 
 xlabel('s')
 ylabel('m/s')
-title(tit(k))
+title(title_graphics(k))
 legend('desired CoM vel','obtained CoM vel')
 
 % acceleration
@@ -52,7 +55,7 @@ plot(t,traj(k+9+6,:),'r')
 
 xlabel('s')
 ylabel('m/s^2')
-title(tit(k))
+title(title_graphics(k))
 legend('desired CoM acc','obtained CoM acc')
 
 % error on desired CoM trajectory
@@ -61,7 +64,9 @@ subplot(3,1,k)
 plot(t,delta(k,:),'b')
 hold on
 grid on
-title(tit2(k))
+title(title2(k))
+xlabel('s')
+ylabel('m')
 
 end
 
@@ -71,6 +76,8 @@ tit3 = {'Error on desired left foot pos along x axis','Error on desired left foo
         'Error on desired right foot pos along x axis','Error on desired right foot pos along y axis','Error on desired right foot pos along z axis',...
         'Error on desired right foot orient along x axis','Error on desired right foot orient along y axis','Error on desired right foot orient along z axis'};
     
+tit4 = {'m' 'm' 'm' 'rad' 'rad' 'rad'};
+
 if     params.numConstraints == 1
     
 for k=1:6
@@ -80,6 +87,8 @@ subplot(3,2,k)
 plot(t,delta(k,:))
 grid on
 title(tit3(k))
+xlabel('s')
+ylabel(tit4(k))
 
 end
 
@@ -92,15 +101,21 @@ subplot(3,2,k)
 plot(t,delta(k,:))
 grid on
 title(tit3(k))
+xlabel('s')
+ylabel(tit4(k))
 
 figure(6)
 subplot(3,2,k)
 plot(t,delta(k+6,:))
 grid on
 title(tit3(k+6))
+xlabel('s')
+ylabel(tit4(k))
 
 end
 
 end    
+
+end
 
 end
