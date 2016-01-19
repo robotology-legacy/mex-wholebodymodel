@@ -3,10 +3,9 @@ close all
 clc
 
 %% paths
-addpath('./../../mex-wholebodymodel/matlab/utilities');
-addpath('./../../mex-wholebodymodel/matlab/wrappers');
-addpath('./../../../../build/');
-addpath('./../');
+addpath('./../../../mex-wholebodymodel/matlab/utilities');
+addpath('./../../../mex-wholebodymodel/matlab/wrappers');
+addpath('./../../../../../build/');
 
 %% fixed values and initial conditions
 n_tot    = 31;
@@ -66,10 +65,9 @@ dampings            = 1*ones(1,n_joints);
 Kimp = diag(impedances);
 Kder = diag(dampings);
  
-Kp   = gainsPCOM;
-Kd   = gainsDCOM;
-Kg   = gainMomentum*eye(3);
-Kg2  = 15*eye(3);
+Kp = gainsPCOM;
+Kd = gainsDCOM;
+Kg = gainMomentum*eye(3);
 
 %% Position and velocity variation form steady state
 rot_tr0 = rot0.';
@@ -77,13 +75,6 @@ rot_tr0 = rot0.';
 com0     = wbm_forwardKinematics(rot_tr0,pos0,qj0,'com');
 xcom0    = com0(1:3);
 
-%torso orientation
-qt_torso         = wbm_forwardKinematics(rot_tr0,pos0,qj0,'torso');
-[~,rot_t]        = frame2posrot(qt_torso);
- 
-[~,phi0]         = parametrization(rot_t);
-phi0             = phi0.';
- 
 space = 500;
 toll  = 2.5*pi/180;
 
@@ -177,15 +168,8 @@ conv_vb        = -(eye(n_base)/Jc_base)*Jc_qj;
 xDcom    = (Jcom_lin_base*conv_vb + Jcom_lin_qj)*dqj0;
 lin_dyn  = -Kp*(xcom-xcom0) -Kd*xDcom;
 
-%torso orientation
-qt_torso         = wbm_forwardKinematics(rot_tr,pos,qj,'torso');
-[~,rot_t]        = frame2posrot(qt_torso);
- 
-[~,phi]         = parametrization(rot_t);
-phi             = phi.';
-
 HDotDes = [  m*lin_dyn;
-           -Kg*H(4:end)-Kg2*(phi-phi0)];
+           -Kg*H(4:end)];
 
 %% nonlinear torques
 f     = pinvA*(HDotDes-grav);
@@ -209,7 +193,7 @@ graphics(q2*180/pi,tau_q,tau_q_lin,qj0*180/pi,tau_reg);
 %definition of vb
 wbm_updateState(qj0,zeros(n_joints,1),zeros(n_base,1));
 
-[rot,pos]   = wbm_getWorldFrameFromFixedLink('l_sole',qj0);
+[rot,pos]   = wbm_getWorldFrameFromFixedLink('l_sole',qj);
 
 rot_tr    = rot.';
 Jc        = wbm_jacobian(rot_tr,pos,qj0,'l_sole');
@@ -297,15 +281,8 @@ conv_vb        = -(eye(n_base)/Jc_base)*Jc_qj;
 xDcom    = (Jcom_lin_base*conv_vb + Jcom_lin_qj)*dqj;
 lin_dyn  = -Kp*(xcom-xcom0) -Kd*xDcom;
 
-%torso orientation
-qt_torso         = wbm_forwardKinematics(rot_tr,pos,qj,'torso');
-[~,rot_t]        = frame2posrot(qt_torso);
- 
-[~,phi]          = parametrization(rot_t);
-phi              = phi.';
-
 HDotDes = [  m*lin_dyn;
-           -Kg*H(4:end)-Kg2*(phi-phi0)];
+           -Kg*H(4:end)];
 
 %% nonlinaer torques
 f     = pinvA*(HDotDes-grav);
