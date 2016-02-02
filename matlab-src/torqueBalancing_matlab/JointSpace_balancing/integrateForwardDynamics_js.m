@@ -183,7 +183,7 @@ params.chiInit     = [T_b; params.qjInit; Nu_ikin];
 
 %% Final and initial integration time
 params.tStart        = 0;
-params.tEnd          = 20;
+params.tEnd          = 10;
  
 %% Inverse kinematics integrator
 % integration step for inverse kinematics integrator

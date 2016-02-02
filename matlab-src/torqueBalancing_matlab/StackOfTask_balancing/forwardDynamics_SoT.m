@@ -144,14 +144,14 @@ desired_x_dx_ddx_CoM = generTraj_SoT(xCoMDes,t,trajectory);
 
 % balancing controller
 [tau,errorCoM,f0] = stackOfTaskController(param, constraints, feet, gains, Nu, M, h, H, Jc, dJcNu, xCoM, J_CoM, desired_x_dx_ddx_CoM);    
-                                  
+        
 % Real contact forces computation
 S               = [ zeros(6,ndof);
                     eye(ndof,ndof)];
 JcMinv          = Jc/M;
 JcMinvS         = JcMinv*S;
 
-fc             = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*tau -dJcNu -K_corr_vel.*Jc*Nu -K_corr_pos.*pos_feet_delta);
+fc              = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*tau -dJcNu -K_corr_vel.*Jc*Nu -K_corr_pos.*pos_feet_delta);
 
 %% State derivative computation
 % Need to calculate the quaternions derivative

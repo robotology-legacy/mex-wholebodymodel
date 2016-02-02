@@ -53,7 +53,7 @@ end
 [Rb,position] = wbm_getWorldFrameFromFixedLink(linParam.nameLink,qjDes);
     
 %% Parameters definition
-linParam.toll         = 1e-12;
+linParam.toll         = 1e-8;
 linParam.gBar         = 9.81;
 linParam.e3           = zeros(ndof+6,1);
 linParam.e3(3)        = 1;
@@ -69,26 +69,14 @@ acc_steady            = accParam.acc_steady;
 NL                    = accParam.NL;
 R1                    = accParam.R1;
 linParam.m            = accParam.m;
-m                     = linParam.m;
+m                     = accParam.m;
 Jc                    = accParam.Jc;
 
 %% Gains definition
-gainsPCoM         = diag(1*ones(3,1));
-gainsDCoM         = diag(sqrt(1)*ones(3,1));
+gainsPCoM         = diag([50 50 50]);
+gainsDCoM         = diag([1  1  1]);
 gainMomentum      = 1;
 
-% impTorso          = [1  1  1
-%                      0  0  0]; 
-% 
-% impArms           = [ 1  1  1  1  1
-%                       0  0  0  0  0 ];
-% 
-% impLeftLeg        = [ 1  1  1  1  1  1
-%                       0  0  0  0  0  0]; 
-%                          
-% impRightLeg       = [ 1  1  1  1  1  1
-%                       0  0  0  0  0  0];
-                       
 impTorso          = [20  20  20
                       0   0   0]; 
 
@@ -100,10 +88,9 @@ impLeftLeg        = [ 70  70  65  30  10  10
                          
 impRightLeg       = [ 20  20  20  10  10  10
                        0   0   0   0   0   0];
-
-
+                         
 impedances        = [impTorso(1,:),impArms(1,:),impArms(1,:),impLeftLeg(1,:),impRightLeg(1,:)]; 
-dampings          =  1*ones(1,ndof); 
+dampings          =  0.5*ones(1,ndof);
 
 %% Base frame orientation conversion to Euler angles
 [T_bar,~]  = parametrization(Rb);
@@ -174,10 +161,8 @@ xCoM_posDerivative = JCoM_analitBase*(eye(6)/T_tilde)*Nu_baseFrom_dqj + JCoM_ana
 
 HDot_posDerivative = [-m*gainsPCoM*xCoM_posDerivative; zeros(3,ndof)];
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-NL_old = accParam.NL_old;
 % partial derivative and linearized stiffness matrix
-ddqj_posDerivative =  0*ddqj_noGains -R1*HDot_posDerivative -NL*diag(impedances)*NL_old;
+ddqj_posDerivative =  ddqj_noGains -R1*HDot_posDerivative -NL*diag(ones(25,1));
 KS                 = -ddqj_posDerivative;
 
 %% Analytical derivative with respect of joint velocity
@@ -186,9 +171,8 @@ Hw_velDerivative    = Jw_base*Nu_baseFrom_dqj + Jw_qj;
 
 HDot_velDerivative  = [-m*gainsDCoM*dxCoM_velDerivative; -gainMomentum*Hw_velDerivative];
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % partial derivative and linearized damping matrix
-ddqj_velderivative = -R1*HDot_velDerivative -NL*diag(dampings)*NL_old;
+ddqj_velderivative = -R1*HDot_velDerivative -NL*diag(dampings);
 KD                 = -ddqj_velderivative;
 
 %% Stability verify and visualization
@@ -243,14 +227,51 @@ else
 end      
 
 % eigenvalues visualization
-disp('eigenvalues: KSsym, KDsym, KS, KD')
-disp([eig_KS_sym eig_KD_sym eig(KS) eig(KD)])
+disp('eigenvalues from symmetrized KS and KD')
+disp([eig_KS_sym eig_KD_sym])
+
+%% Gains tuning with Kronecher product
+% desired derivative for position
+ddqjPosDer_desired = -ddqj_noGains -diag(impedances);
+
+% parameters definition
+R11 = -R1*[-m*eye(3);zeros(3)];
+R12 = xCoM_posDerivative;
+
+S11 = -NL;
+S12 =  eye(ndof);
+
+[Kp,~,Kimp] = KronecherProd(ddqjPosDer_desired, R11, R12, S11, S12, linParam, 'position');
+
+% new stiffness matrix
+KS_corr = -(ddqj_noGains -R1*[-m*Kp*xCoM_posDerivative; zeros(3,ndof)] -NL*Kimp);
+
+% desired derivative for velocity
+ddqjVelDer_desired = -diag(dampings);
+
+%parameters definition
+
+R21 = -R1;
+R22 =  [dxCoM_velDerivative; Hw_velDerivative];
+
+S21 = -NL;
+S22 =  eye(ndof);
+
+[Kd,Kw,Kdamp] = KronecherProd(ddqjVelDer_desired, R21, R22, S21, S22, linParam, 'velocity');
+
+% new damping matrix
+KD_corr = -(-R1*[-m*Kd*dxCoM_velDerivative; -Kw*Hw_velDerivative] -NL*Kdamp);
+
+% KS_corr and KD_corr visualization
+disp('eigenvalues from symmetrized KS_corr and KD_corr')
+disp([eig((KS_corr+transpose(KS_corr))/2) eig((KD_corr+transpose(KD_corr))/2)])
+
 
 %% State matrix verification
 
-% A_state = [eye(ndof) zeros(ndof);-KD -KS];
-% 
-% disp('eigenvalues of the state matrix')
-% disp(eig(A_state))
+A_state = [-KD -KS; eye(ndof) zeros(ndof)];
+
+disp('eigenvalues of the state matrix')
+disp(eig(A_state))
 
 

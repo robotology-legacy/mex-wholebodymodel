@@ -27,7 +27,7 @@ params.feet_on_ground           =  [1,1];                                  %eith
 % allows the visualization of torques, forces and other user-defined graphics 
 params.visualizer_graphics      =  1;                                      %either 0 or 1
 params.visualizer_demo          =  1;                                      %either 0 or 1
-params.visualizer_joints        =  0;                                      %either 0 or 1; only if visualizer_graphics = 1
+params.visualizer_joints        =  1;                                      %either 0 or 1; only if visualizer_graphics = 1
  
 %% Setup general params
 % this is assuming a 25DoF iCub
@@ -126,7 +126,7 @@ end
 %% Integrate forward dynamics
 if params.demo_movements == 0 || params.numConstraints == 1
 
- options = odeset('RelTol',1e-4,'AbsTol', 1e-3);
+ options = odeset('RelTol',1e-3,'AbsTol', 1e-4);
 
 else
 
