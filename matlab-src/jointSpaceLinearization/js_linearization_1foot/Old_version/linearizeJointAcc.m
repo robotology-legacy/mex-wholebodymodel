@@ -53,7 +53,7 @@ end
 [Rb,position] = wbm_getWorldFrameFromFixedLink(linParam.nameLink,qjDes);
     
 %% Parameters definition
-linParam.toll         = 1e-8;
+linParam.toll         = 1e-10;
 linParam.gBar         = 9.81;
 linParam.e3           = zeros(ndof+6,1);
 linParam.e3(3)        = 1;
@@ -74,7 +74,7 @@ Jc                    = accParam.Jc;
 
 %% Gains definition
 gainsPCoM         = diag([50 50 50]);
-gainsDCoM         = diag([1  1  1]);
+gainsDCoM         = sqrt(gainsPCoM);
 gainMomentum      = 1;
 
 impTorso          = [20  20  20
@@ -157,12 +157,15 @@ JCoM_analitical    = JCoM*T;
 JCoM_analitBase    = JCoM_analitical(1:3,1:6);
 JCoM_analitJoint   = JCoM_analitical(1:3,7:end);
 
-xCoM_posDerivative = JCoM_analitBase*(eye(6)/T_tilde)*Nu_baseFrom_dqj + JCoM_analitJoint;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  xCoM_posDerivative = JCoM_analitJoint;
+% xCoM_posDerivative = JCoM_analitBase*(eye(6)/T_tilde)*Nu_baseFrom_dqj + JCoM_analitJoint;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 HDot_posDerivative = [-m*gainsPCoM*xCoM_posDerivative; zeros(3,ndof)];
 
 % partial derivative and linearized stiffness matrix
-ddqj_posDerivative =  ddqj_noGains -R1*HDot_posDerivative -NL*diag(ones(25,1));
+ddqj_posDerivative =  ddqj_noGains -R1*HDot_posDerivative -NL*diag(impedances);
 KS                 = -ddqj_posDerivative;
 
 %% Analytical derivative with respect of joint velocity
@@ -228,7 +231,7 @@ end
 
 % eigenvalues visualization
 disp('eigenvalues from symmetrized KS and KD')
-disp([eig_KS_sym eig_KD_sym])
+disp([eig_KS_sym eig_KD_sym eig(KS) eig(KD)])
 
 %% Gains tuning with Kronecher product
 % desired derivative for position
@@ -263,12 +266,11 @@ S22 =  eye(ndof);
 KD_corr = -(-R1*[-m*Kd*dxCoM_velDerivative; -Kw*Hw_velDerivative] -NL*Kdamp);
 
 % KS_corr and KD_corr visualization
-disp('eigenvalues from symmetrized KS_corr and KD_corr')
-disp([eig((KS_corr+transpose(KS_corr))/2) eig((KD_corr+transpose(KD_corr))/2)])
+% disp('eigenvalues from symmetrized KS_corr and KD_corr')
+% disp([eig((KS_corr+transpose(KS_corr))/2) eig((KD_corr+transpose(KD_corr))/2)])
 
 
 %% State matrix verification
-
 A_state = [-KD -KS; eye(ndof) zeros(ndof)];
 
 disp('eigenvalues of the state matrix')

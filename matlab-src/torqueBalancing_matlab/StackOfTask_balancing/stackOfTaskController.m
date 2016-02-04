@@ -107,12 +107,7 @@ qTilde           =  param.qj-param.qjInit;
 Sigma            = -(Pinv_JcMinvS*JcMinvJct + NullLambda*JBar);
 SigmaNA          =  Sigma*Nullfc;
 
-% STABLE NULL SPACE VERSION
-Mbar = M(7:end,7:end)-Mbj'*eye(6)/(Mb)*Mbj;
-Kbar = NullLambda*eye(ndof)/Mbar;
-
-tauModel  = Pinv_JcMinvS*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6) -diag(gains.impedances)*Kbar*qTilde -diag(gains.dampings)*Kbar*dqj);
-%tauModel = Pinv_JcMinvS*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6) -diag(gains.impedances)*qTilde -diag(gains.dampings)*dqj);
+tauModel = Pinv_JcMinvS*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6) -diag(gains.impedances)*qTilde -diag(gains.dampings)*dqj);
 
 %% Quadratic Programming solver
 f0               =  zeros(6,1);

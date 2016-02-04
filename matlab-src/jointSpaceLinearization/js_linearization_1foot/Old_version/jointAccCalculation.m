@@ -39,15 +39,9 @@ fgrav        = [0; 0; -m*gBar; zeros(3,1)];
 
 % other variables
 Minv         = eye(ndof+6)/M;
+Mbar         = M(7:end,7:end) - M(7:end,1:6)/M(1:6,1:6)*M(1:6,7:end); 
+Mbar_inv     = Mbar'/(Mbar*Mbar' + toll*eye(size(Mbar,1)));
 
-%% only for the final passage
- Mbar       = M(7:end,7:end) - M(7:end,1:6)/M(1:6,1:6)*M(1:6,7:end);
- Mbar_inv   = Mbar'/(Mbar*Mbar' + toll*eye(size(Mbar,1)));
-% Mbar_inv   = eye(ndof)/Mbar;
-
-%Mbar_inv     = eye(ndof);
-
-%%
 invA         = eye(6)/A;
 Jct          = transpose(Jc);
 
@@ -71,27 +65,5 @@ Lambda       = Jc*Minv*S;
  accParam.m           = m;
  accParam.Jc          = Jc;
  accParam.acc_steady  = pinvL*vec;
-
- accParam.NL_old = NL*Mbar_inv;
-%  
-%  Jb = Jc(1:6,1:6);
-%  Jj = Jc(1:6,7:end);
-%  Mb = M(1:6,1:6);
-%  Mjb = M(7:end,1:6);
-%  Mbj = Mjb';
-%  
-%  B2 = (Jj-Jb*inv(Mb)*Mbj)*Mbar_inv;
-%  B3 = Jb*inv(Mb)*Jb'*inv(A);
-%  
-%  M2  = Minv(1:6,7:end);
-%  M4  = Minv(7:end,7:end);
-%  
-%  BB2 = (Jb*M2 + Jj*M4);
-% 
-%  R1-pinv(B2,toll)*B3;
-%  
-%  Mbar*pinv((Jj-Jb*inv(Mb)*Mbj),toll)-pinv(B2,toll)
- 
- 
  
 end

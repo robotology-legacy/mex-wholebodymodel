@@ -1,4 +1,4 @@
-function [] = graphics(t,tau,tau_lin,t0,tau_reg)
+function [] = graphicsLin(t,tau,tau_lin,t0,tau_reg)
 
 % For linearization
 for k=1:5
