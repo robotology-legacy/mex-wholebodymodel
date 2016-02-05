@@ -1,0 +1,41 @@
+<!-- Model of a single rigid body in URDF -->
+<robot name="rigidBody">
+  <!-- at the moment, the URDF needs a "fake link" as the base link 
+       this is not convenienient, but is due to an old bug:
+       https://github.com/ros/robot_model/issues/6 -->
+  <link name="base_link" />
+  <joint name="base_fixed_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 -0 0" />
+    <axis xyz="0 0 0" />
+    <parent link="base_link" />
+    <child link="root_link" />
+  </joint>
+  <!-- link structure copied by http://wiki.ros.org/urdf/XML/link --> 
+  <link name="root_link">
+    <inertial>
+      <!-- the xyz of the origin element of the inertial is the com wrt the link frame -->
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+      <!-- this is the mass of the link in kilograms -->
+      <mass value="1"/>
+      <!-- the inertia element is the inertia matrix wrt to the com (not the link origin!!) -->
+      <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="1 1 1" />
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="1" length="0.5"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>
