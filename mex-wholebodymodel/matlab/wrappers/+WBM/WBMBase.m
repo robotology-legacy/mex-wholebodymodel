@@ -5,7 +5,7 @@ classdef WBMBase < handle
         wf_R_rootLnk@double matrix
         wf_p_rootLnk@double vector
         g_wf@double         vector
-        wbm_params@WBM.wbmBaseModelParams;
+        wbm_params@WBM.wbmBaseModelParams
     end
 
     properties(Access = protected)
