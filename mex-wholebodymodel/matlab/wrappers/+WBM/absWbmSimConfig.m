@@ -1,4 +1,4 @@
-classdef (Abstract) wbmSimConfig
+classdef (Abstract) absWbmSimConfig
     properties(Abstract)
         main_title@char
         hFigure_main
