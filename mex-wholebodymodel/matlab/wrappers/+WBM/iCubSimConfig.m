@@ -1,4 +1,4 @@
-classdef iCubSimConfig < WBM.absWbmSimConfig
+classdef iCubSimConfig < WBM.absSimConfig
     properties
         main_title@char = 'iCub-Simulator:';
         hFigure_main
