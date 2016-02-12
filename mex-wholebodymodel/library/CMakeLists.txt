@@ -5,6 +5,8 @@ set(SOURCES src/componentmanager.cpp
             src/modeldjdq.cpp
             src/modelforwardkinematics.cpp
             src/modelgeneralisedbiasforces.cpp
+            src/modelcorioliscentrifugalforces.cpp
+            src/modelgravityforces.cpp
             src/modelgetstate.cpp
             src/modelinitialise.cpp
             src/modelinitialiseurdf.cpp
@@ -24,6 +26,8 @@ set(HEADERS include/componentmanager.h
             include/modeldjdq.h
             include/modelforwardkinematics.h
             include/modelgeneralisedbiasforces.h
+            include/modelcorioliscentrifugalforces.h
+            include/modelgravityforces.h
             include/modelgetstate.h
             include/modelinitialise.h
             include/modelinitialiseurdf.h

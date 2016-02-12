@@ -43,9 +43,9 @@ for i = 1:noi
     % calculate some mex-WholeBodyModel (WBM) components:
     M      = wbm_iCub.massMatrix(R, p, q_j);
 
-    h_c    = wbm_iCub.generalBiasForces(R, p, q_j, dq_j, v_b);
-    h_c    = wbm_iCub.generalBiasForces(R, p, q_j, dq_j, v_b);
-    h_c    = wbm_iCub.generalBiasForces(R, p, q_j, dq_j, v_b);
+    h_c    = wbm_iCub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
+    h_c    = wbm_iCub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
+    h_c    = wbm_iCub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
 
     dJdq_1 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{1}, R, p, q_j, dq_j, v_b);
     dJdq_2 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{2}, R, p, q_j, dq_j, v_b);
@@ -103,9 +103,9 @@ for i = 1:noi
     % call some mex-WBM functions ...
     M      = wbm_iCub.massMatrix();
 
-    h_c    = wbm_iCub.generalBiasForces();
-    h_c    = wbm_iCub.generalBiasForces();
-    h_c    = wbm_iCub.generalBiasForces();
+    h_c    = wbm_iCub.generalizedBiasForces();
+    h_c    = wbm_iCub.generalizedBiasForces();
+    h_c    = wbm_iCub.generalizedBiasForces();
 
     dJdq_1 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{1});
     dJdq_2 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{2});

@@ -215,7 +215,7 @@ classdef WBMBase < handle
             end
         end
 
-        function C_qv = generalBiasForces(~, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
+        function C_qv = generalizedBiasForces(~, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             switch nargin
                 case 6
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
@@ -223,7 +223,31 @@ classdef WBMBase < handle
                 case 1
                     C_qv = wholeBodyModel('generalised-forces');
                 otherwise
-                    error('WBMBase::generalBiasForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                    error('WBMBase::generalizedBiasForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+        end
+
+        function tau_c = coriolisCentrifugalForces(~, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
+            switch nargin
+                case 6
+                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
+                    tau_c = wholeBodyModel('coriolis-centrifugal-forces', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b);
+                case 1
+                    tau_c = wholeBodyModel('coriolis-centrifugal-forces');
+                otherwise
+                    error('WBMBase::coriolisCentrifugalForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+        end
+
+        function tau_g = gravityForces(~, wf_R_rootLnk, wf_p_rootLnk, q_j)
+            switch nargin
+                case 4
+                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
+                    tau_g = wholeBodyModel('gravity-forces', wf_R_rlnk_arr, wf_p_rootLnk, q_j);
+                case 1
+                    tau_g = wholeBodyModel('gravity-forces');
+                otherwise
+                    error('WBMBase::gravityForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
         end
 

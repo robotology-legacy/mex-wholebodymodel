@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
+ * modified by: Martin Neururer, email: martin.neururer@gmail.com
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -34,6 +35,8 @@
 #include "modelupdatestate.h"
 #include "modelgetstate.h"
 #include "modelgeneralisedbiasforces.h"
+#include "modelcorioliscentrifugalforces.h"
+#include "modelgravityforces.h"
 #include "modelstate.h"
 #include "modeldjdq.h"
 #include "modeljacobian.h"
@@ -64,27 +67,27 @@ void ComponentManager::deleteInstance()
   deleteObject(&componentManager);
 }
 
-
-
 ComponentManager::ComponentManager(std::string robotName)
 {
 #ifdef DEBUG
-   mexPrintf("ComponentManager constructed \n");
+  mexPrintf("ComponentManager constructed \n");
 #endif
-   initialise(robotName);
-   componentList["joint-limits"] = modelJointLimits;
-   componentList["mass-matrix"] = modelMassMatrix;
-   componentList["generalised-forces"] = modelGeneralisedBiasForces;
-   componentList["djdq"] = modelDjDq;
-   componentList["jacobian"] = modelJacobian;
-   componentList["update-state"] = modelUpdateState;
-   componentList["get-state"] = modelGetState;
-   componentList["model-initialise"] = modelInitialise;
-   componentList["model-initialise-urdf"] = modelInitialiseURDF;
-   componentList["forward-kinematics"] = modelForwardKinematics;
-   componentList["visualize-trajectory"] = modelVisualizeTrajectory;
-   componentList["centroidal-momentum"] = modelCentroidalMomentum;
-   componentList["set-world-frame"] = modelSetWorldFrame;
+  initialise(robotName);
+  componentList["joint-limits"] = modelJointLimits;
+  componentList["mass-matrix"] = modelMassMatrix;
+  componentList["generalised-forces"] = modelGeneralisedBiasForces;
+  componentList["coriolis-centrifugal-forces"] = modelCoriolisCentrifugalForces;
+  componentList["gravity-forces"] = modelGravityForces;
+  componentList["djdq"] = modelDjDq;
+  componentList["jacobian"] = modelJacobian;
+  componentList["update-state"] = modelUpdateState;
+  componentList["get-state"] = modelGetState;
+  componentList["model-initialise"] = modelInitialise;
+  componentList["model-initialise-urdf"] = modelInitialiseURDF;
+  componentList["forward-kinematics"] = modelForwardKinematics;
+  componentList["visualize-trajectory"] = modelVisualizeTrajectory;
+  componentList["centroidal-momentum"] = modelCentroidalMomentum;
+  componentList["set-world-frame"] = modelSetWorldFrame;
 }
 
 void ComponentManager::cleanup()
@@ -98,6 +101,8 @@ void ComponentManager::cleanup()
   ModelUpdateState::deleteInstance();
   ModelGetState::deleteInstance();
   ModelGeneralisedBiasForces::deleteInstance();
+  ModelCoriolisCentrifugalForces::deleteInstance();
+  ModelGravityForces::deleteInstance();
   ModelDjDq::deleteInstance();
   ModelJacobian::deleteInstance();
   ModelForwardKinematics::deleteInstance();
@@ -111,19 +116,19 @@ void ComponentManager::cleanup()
 
 ComponentManager::~ComponentManager(void)
 {
-    cleanup();
+  cleanup();
 }
-
 
 void ComponentManager::initialise(std::string robotName)
 {
-
   modelState = ModelState::getInstance(robotName);
   modelUpdateState = ModelUpdateState::getInstance();
   modelGetState = ModelGetState::getInstance();
   modelJointLimits = ModelJointLimits::getInstance();
   modelMassMatrix = ModelMassMatrix::getInstance();
   modelGeneralisedBiasForces = ModelGeneralisedBiasForces::getInstance();
+  modelCoriolisCentrifugalForces = ModelCoriolisCentrifugalForces::getInstance();
+  modelGravityForces = ModelGravityForces::getInstance();
   modelDjDq = ModelDjDq::getInstance();
   modelJacobian = ModelJacobian::getInstance();
   modelForwardKinematics = ModelForwardKinematics::getInstance();
@@ -134,7 +139,6 @@ void ComponentManager::initialise(std::string robotName)
   modelSetWorldFrame = ModelSetWorldFrame::getInstance();
 }
 
-
 bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 {
   bool returnVal = false;
@@ -142,13 +146,13 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
   char* str;
 
 #ifdef DEBUG
-   mexPrintf("Trying to parseMexArguments\n");
+  mexPrintf("Trying to parseMexArguments\n");
 #endif
 
-     str=mxArrayToString(prhs[0]);
+  str=mxArrayToString(prhs[0]);
 
 #ifdef DEBUG
-     mexPrintf("Searching for the component '%s', of size  %d\n",str,sizeof(str));
+  mexPrintf("Searching for the component '%s', of size  %d\n",str,sizeof(str));
 #endif
 
   std::map<std::string,ModelComponent*>::iterator search = componentList.find(str);

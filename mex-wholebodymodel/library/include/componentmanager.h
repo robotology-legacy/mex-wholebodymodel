@@ -34,6 +34,8 @@ namespace mexWBIComponent{
   class ModelUpdateState;
   class ModelGetState;
   class ModelGeneralisedBiasForces;
+  class ModelCoriolisCentrifugalForces;
+  class ModelGravityForces;
   class ModelDjDq;
   class ModelJacobian;
   class ModelInitialiseURDF;
@@ -77,6 +79,8 @@ private:
   ModelUpdateState *modelUpdateState;
   ModelGetState *modelGetState;
   ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
+  ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
+  ModelGravityForces *modelGravityForces;
   ModelDjDq *modelDjDq;
   ModelJacobian *modelJacobian;
   ModelInitialise *modelInitialise;

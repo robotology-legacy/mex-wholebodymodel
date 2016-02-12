@@ -6,7 +6,7 @@ import WBM.utilities.*
 %% Initialization of the WBM:
 %
 % base model parameters:
-iCub_model = wbmBaseModelParams; 
+iCub_model = wbmBaseModelParams;
 iCub_model.urdfRobot    = 'icubGazeboSim';
 %iCub_model.urdfLinkName = 'l_sole';
 iCub_model.wf_R_rootLnk = eye(3,3);
@@ -14,7 +14,7 @@ iCub_model.wf_p_rootLnk = zeros(3,1);
 iCub_model.g_wf         = [0; 0; -9.81]; %zeros(6+iCub_config.ndof,1);
 % base robot config:
 iCub_config = wbmHumanoidConfig;
-iCub_config.ndof          = 25; 
+iCub_config.ndof          = 25;
 iCub_config.nCstrs        = 2;
 iCub_config.cstrLinkNames = {'l_sole', 'r_sole'};
 iCub_config.dampCoeff     = 0.00; %0.75;
@@ -29,7 +29,7 @@ iCub_config.pos_rightLeg = iCub_config.pos_leftLeg;
 iCub_config.initStateParams.x_b     = zeros(3,1);
 iCub_config.initStateParams.qt_b    = zeros(4,1);
 iCub_config.initStateParams.q_j     = [iCub_config.pos_torso; iCub_config.pos_leftArm; iCub_config.pos_rightArm; ...
-                                        iCub_config.pos_leftLeg; iCub_config.pos_rightLeg] * (pi/180.0); % in radians
+                                       iCub_config.pos_leftLeg; iCub_config.pos_rightLeg] * (pi/180.0); % in radians
 iCub_config.initStateParams.dx_b    = zeros(3,1);
 iCub_config.initStateParams.omega_b = zeros(3,1);
 iCub_config.initStateParams.dq_j    = zeros(iCub_config.ndof,1);
@@ -55,8 +55,8 @@ chi_init = wbm_iCub.stvChiInit;
 vqT_init = wbm_iCub.vqTInit;
 %vqT_init = chi_init(1:7,1);
 [p_b, R_b] = frame2posRotm(vqT_init);
-g_init = wbm_iCub.generalBiasForces(R_b, p_b, iCub_config.initStateParams.q_j, ...
-                                    zeros(iCub_config.ndof,1), zeros(6,1));
+g_init = wbm_iCub.generalizedBiasForces(R_b, p_b, iCub_config.initStateParams.q_j, ...
+                                        zeros(iCub_config.ndof,1), zeros(6,1));
 len = size(g_init,1);
 
 ctrlTrqs.tau = @(t)zeros(size(g_init(7:len)));

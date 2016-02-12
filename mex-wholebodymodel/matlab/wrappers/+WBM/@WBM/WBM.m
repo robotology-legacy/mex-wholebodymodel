@@ -34,7 +34,7 @@ classdef WBM < WBM.WBMBase
                                             obj.iwbm_config.initStateParams.dq_j, v_b, obj.iwbm_params.g_wf);
             end
             % retrieve and update the initial rototranslation (VQS-Transf.) of the robot base (world frame) ...
-            obj.updateInitRototranslation();
+            obj.updateInitRotoTranslation();
         end
 
         % Copy-function:
@@ -72,7 +72,7 @@ classdef WBM < WBM.WBMBase
             end
         end
 
-        function updateInitRototranslation(obj)
+        function updateInitRotoTranslation(obj)
             vqT_init = obj.stvqT; % get the vector-quaternion transf. of the current state ...
             obj.iwbm_config.initStateParams.x_b  = vqT_init(1:3,1); % translation/position
             obj.iwbm_config.initStateParams.qt_b = vqT_init(4:7,1); % orientation (quaternion)
@@ -201,9 +201,9 @@ classdef WBM < WBM.WBMBase
             stmVelb = chi(1:m,cutp1:cutp2); % m -by- [dx_b, omega_b]
         end
 
-        function vqT = getRototranslation(~, stParams)
+        function vqT = getRotoTranslation(~, stParams)
             if isempty(stParams)
-                error('WBM::getRototranslation: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
+                error('WBM::getRotoTranslation: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
             end
 
             vqT = vertcat(stParams.x_b, stParams.qt_b);

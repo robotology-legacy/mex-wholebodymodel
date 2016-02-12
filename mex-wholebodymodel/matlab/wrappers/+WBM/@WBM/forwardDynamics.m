@@ -21,7 +21,7 @@ function [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
     [~,R_b] = WBM.utilities.frame2posRotm(vqT_b);
 
     M = obj.massMatrix();
-    h = obj.generalBiasForces();
+    h = obj.generalizedBiasForces();
 
     % compute for each contact constraint the Jacobian and the corresponding
     % derivative Jacobian:

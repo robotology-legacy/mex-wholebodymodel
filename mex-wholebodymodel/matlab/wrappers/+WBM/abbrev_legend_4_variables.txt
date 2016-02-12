@@ -5,6 +5,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     T       ... transformation (matrix)
     arr     ... array
     b       ... base
+    bf      ... base frame
     config  ... configuration
     cstr    ... constraint
     ctrl    ... control
