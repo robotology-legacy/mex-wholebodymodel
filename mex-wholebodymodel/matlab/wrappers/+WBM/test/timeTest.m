@@ -47,6 +47,12 @@ for i = 1:noi
     h_c    = wbm_iCub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
     h_c    = wbm_iCub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
 
+    tau_c  = wbm_iCub.coriolisCentrifugalForces(R, p, q_j, dq_j, v_b);
+    tau_c  = wbm_iCub.coriolisCentrifugalForces(R, p, q_j, dq_j, v_b);
+
+    tau_g  = wbm_iCub.gravityForces(R, p, q_j);
+    tau_g  = wbm_iCub.gravityForces(R, p, q_j);
+
     dJdq_1 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{1}, R, p, q_j, dq_j, v_b);
     dJdq_2 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{2}, R, p, q_j, dq_j, v_b);
 
@@ -106,6 +112,12 @@ for i = 1:noi
     h_c    = wbm_iCub.generalizedBiasForces();
     h_c    = wbm_iCub.generalizedBiasForces();
     h_c    = wbm_iCub.generalizedBiasForces();
+
+    tau_c  = wbm_iCub.coriolisCentrifugalForces();
+    tau_c  = wbm_iCub.coriolisCentrifugalForces();
+
+    tau_g  = wbm_iCub.gravityForces();
+    tau_g  = wbm_iCub.gravityForces();
 
     dJdq_1 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{1});
     dJdq_2 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{2});

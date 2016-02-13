@@ -30,12 +30,14 @@
 using namespace mexWBIComponent;
 
 ModelGravityForces * ModelGravityForces::modelGravityForces;
+double ModelGravityForces::vb_0[6] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
 ModelGravityForces::ModelGravityForces() : ModelComponent(3,0,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelGravityForces constructed\n");
 #endif
+
   g = modelState->g();
 }
 
@@ -92,9 +94,7 @@ bool ModelGravityForces::computeFast(int nrhs, const mxArray* prhs[])
   std::memset(qjDot_0, 0, numDof*sizeof(double));
 
   g = modelState->g();
-
   world_H_rootLink = modelState->getRootWorldRotoTranslation();
-  double vb_0[6] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
   if(!robotModel->computeGeneralizedBiasForces(qj,world_H_rootLink,qjDot_0,vb_0,g,h))
   {
@@ -111,7 +111,7 @@ bool ModelGravityForces::processArguments(int nrhs, const mxArray* prhs[])
 {
   size_t numDof = modelState->dof();
 
-  if( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || 
+  if( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||
       mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state argument dimensions in ModelGeneralisedForces call");
@@ -134,7 +134,6 @@ bool ModelGravityForces::processArguments(int nrhs, const mxArray* prhs[])
 
   double *qjDot_0 = new double[numDof];
   std::memset(qjDot_0, 0, numDof*sizeof(double));
-  double vb_0[6] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
 #ifdef DEBUG
   mexPrintf("qj received \n");

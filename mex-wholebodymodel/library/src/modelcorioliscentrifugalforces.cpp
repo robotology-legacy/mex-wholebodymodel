@@ -30,13 +30,13 @@
 using namespace mexWBIComponent;
 
 ModelCoriolisCentrifugalForces * ModelCoriolisCentrifugalForces::modelCoriolisCentrifugalForces;
+double ModelCoriolisCentrifugalForces::g_0[3] = {0.0f, 0.0f, 0.0f};
 
 ModelCoriolisCentrifugalForces::ModelCoriolisCentrifugalForces() : ModelComponent(5,0,1)
 {
 #ifdef DEBUG
   mexPrintf("ModelCoriolisCentrifugalForces constructed\n");
 #endif
-
 }
 
 ModelCoriolisCentrifugalForces::~ModelCoriolisCentrifugalForces()
@@ -88,8 +88,6 @@ bool ModelCoriolisCentrifugalForces::computeFast(int nrhs, const mxArray* prhs[]
   qj = modelState->qj();
   qjDot = modelState->qjDot();
 
-  double g_0[3] = {0.0f, 0.0f, 0.0f};
-
   world_H_rootLink = modelState->getRootWorldRotoTranslation();
   vb = modelState->vb();
 
@@ -138,7 +136,6 @@ bool ModelCoriolisCentrifugalForces::processArguments(int nrhs, const mxArray* p
 #endif
 
   world_H_rootLink = tempFrame;
-  double g_0[3] = {0.0f, 0.0f, 0.0f};
 
   if(h != NULL)
   {

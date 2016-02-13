@@ -24,32 +24,34 @@
 
 namespace mexWBIComponent
 {
-class ModelGravityForces : public ModelComponent
-{
-public:
-   static ModelGravityForces* getInstance();
-  /**
-   * Delete the (static) instance of this component,
-   * and set the instance pointer to NULL.
-   */
-  static void deleteInstance();
+  class ModelGravityForces : public ModelComponent
+  {
+  public:
+    static ModelGravityForces* getInstance();
 
-  virtual bool allocateReturnSpace(int, mxArray*[]);
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
+    /**
+     * Delete the (static) instance of this component,
+     * and set the instance pointer to NULL.
+     */
+    static void deleteInstance();
 
-  //virtual bool display(int, const mxArray *[]);
-  virtual ~ModelGravityForces();
+    virtual bool allocateReturnSpace(int, mxArray*[]);
+    virtual bool compute(int, const mxArray *[]);
+    virtual bool computeFast(int, const mxArray *[]);
 
-private:
-  ModelGravityForces();
-  static ModelGravityForces *modelGravityForces;
-  bool processArguments(int, const mxArray *[]);
+    //virtual bool display(int, const mxArray *[]);
+    virtual ~ModelGravityForces();
 
-  double *qj;
-  double *h;
-  double *g;
-};
+  private:
+    ModelGravityForces();
+    static ModelGravityForces *modelGravityForces;
+    bool processArguments(int, const mxArray *[]);
+
+    double *qj;
+    double *h;
+    double *g;
+    static double vb_0[6];
+  };
 
 }
 

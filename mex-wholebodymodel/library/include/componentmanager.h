@@ -46,55 +46,55 @@ namespace mexWBIComponent{
   class ModelSetWorldFrame;
   class ModelInitialise;
 }
-// #include "modelsetworldlink.h"
+//#include "modelsetworldlink.h"
 
 namespace mexWBIComponent
 {
-class ComponentManager
-{
-public:
+  class ComponentManager
+  {
+  public:
 
-  static ComponentManager *getInstance(std::string robotName = "icub");
+    static ComponentManager *getInstance(std::string robotName = "icub");
 
-  /**
-   * Delete the (static) instance of this component,
-   * and set the instance pointer to NULL.
-   */
-  static void deleteInstance();
+    /**
+     * Delete the (static) instance of this component,
+     * and set the instance pointer to NULL.
+     */
+    static void deleteInstance();
 
-  bool processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]);
-  void cleanup();
-   ~ComponentManager(void);
+    bool processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]);
+    void cleanup();
+     ~ComponentManager(void);
 
-  //int getDofs();
-private:
-  ComponentManager(std::string);
-  static ComponentManager *componentManager;
-  void initialise(std::string);
+    //int getDofs();
+  private:
+    ComponentManager(std::string);
+    static ComponentManager *componentManager;
+    void initialise(std::string);
 
-  ModelState *modelState;
-  ModelComponent *currentComponent;
-  ModelJointLimits *modelJointLimits;
-  ModelMassMatrix *modelMassMatrix;
-  ModelUpdateState *modelUpdateState;
-  ModelGetState *modelGetState;
-  ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
-  ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
-  ModelGravityForces *modelGravityForces;
-  ModelDjDq *modelDjDq;
-  ModelJacobian *modelJacobian;
-  ModelInitialise *modelInitialise;
-  ModelInitialiseURDF *modelInitialiseURDF;
-  ModelForwardKinematics *modelForwardKinematics;
-  ModelVisualizeTrajectory *modelVisualizeTrajectory;
-  ModelCentroidalMomentum *modelCentroidalMomentum;
-  ModelSetWorldFrame *modelSetWorldFrame;
+    ModelState *modelState;
+    ModelComponent *currentComponent;
+    ModelJointLimits *modelJointLimits;
+    ModelMassMatrix *modelMassMatrix;
+    ModelUpdateState *modelUpdateState;
+    ModelGetState *modelGetState;
+    ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
+    ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
+    ModelGravityForces *modelGravityForces;
+    ModelDjDq *modelDjDq;
+    ModelJacobian *modelJacobian;
+    ModelInitialise *modelInitialise;
+    ModelInitialiseURDF *modelInitialiseURDF;
+    ModelForwardKinematics *modelForwardKinematics;
+    ModelVisualizeTrajectory *modelVisualizeTrajectory;
+    ModelCentroidalMomentum *modelCentroidalMomentum;
+    ModelSetWorldFrame *modelSetWorldFrame;
 
-  int numDof;
+    int numDof;
 
-  //static wbi::iWholeBodyModel *robotModel;
-  std::map <std::string, ModelComponent*> componentList;
-};
+    //static wbi::iWholeBodyModel *robotModel;
+    std::map <std::string, ModelComponent*> componentList;
+  };
 
 }
 

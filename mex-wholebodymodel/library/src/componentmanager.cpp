@@ -158,17 +158,19 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
   std::map<std::string,ModelComponent*>::iterator search = componentList.find(str);
   if(search == componentList.end())
   {
-    mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Requested component not found. Please request a valid component");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Requested component not found. Please request a valid component");
   }
+  
   activeComponent = search->second;
   if(nlhs!=(int)activeComponent->numReturns())
   {
-    mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Error in number of returned parameters in requested component, check docs");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Error in number of returned parameters in requested component, check docs");
   }
+  
   if(nrhs != (int)(1+activeComponent->numArguments()) && nrhs != (int)(1+activeComponent->numAltArguments()))
   {
      mexPrintf("Requested component uses  uses %d arguments and returns %d items",activeComponent->numArguments(),activeComponent->numReturns());
-     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Error in number of arguments, check docs");
+     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Error in number of arguments, check docs");
   }
   activeComponent->allocateReturnSpace(nlhs,plhs);
 
