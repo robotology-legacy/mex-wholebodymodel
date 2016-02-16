@@ -91,10 +91,50 @@ end
 %Pinv_JcMinvS   = JcMinvS'/(JcMinvS*JcMinvS' + reg*eye(size(JcMinvS,1)));
 
 %% Newton-Euler equations of motion at CoM
-HDotDes         = [ m*ddxCoMStar;
-                   -gains.gainMomentum*H(4:end)];
-                     
-f_HDot          = pinvA*(HDotDes - f_grav);
+% momentum jacobian
+R_b                = param.R_b;
+xb                 = param.xb;
+qTilde             = param.qj-param.qjInit;
+
+Jw_b               = zeros(6,6);
+Jw_j               = zeros(6,ndof);
+
+for ii = 1:6
+    
+Nu_base         = zeros(6,1);
+Nu_base(ii)     = 1;
+
+H2              = wbm_centroidalMomentum(R_b, xb, param.qj, zeros(ndof,1), Nu_base);
+ 
+Jw_b(:,ii)      = H2;
+
+end
+
+for ii = 1:ndof
+
+dqj2         = zeros(ndof,1);
+dqj2(ii)     = 1;
+
+H2           = wbm_centroidalMomentum(R_b, xb, param.qj, dqj2, zeros(6,1));
+
+Jw_j(:,ii)   = H2;
+
+end
+
+linearizedErrorCoM = (Jw_j -Jw_b*(eye(6)/Jc(1:6,1:6))*Jc(1:6,7:end))*(qTilde); 
+
+Kphi               = eye(3);
+
+Jww                = linearizedErrorCoM(4:end);
+
+HDotDes            = [ m*ddxCoMStar;
+                      -gains.gainMomentum*H(4:end)-Kphi*Jww];  
+
+% Old version
+% HDotDes          = [ m*ddxCoMStar;
+%                    -gains.gainMomentum*H(4:end)];
+               
+f_HDot             = pinvA*(HDotDes - f_grav);
     
 % Forces and torques null spaces
 Nullfc          =  eye(6*param.numConstraints)-pinvA*A;
