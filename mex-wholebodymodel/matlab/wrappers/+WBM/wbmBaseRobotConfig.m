@@ -6,5 +6,6 @@ classdef wbmBaseRobotConfig
        dampCoeff@double   scalar
        initStateParams@WBM.wbmStateParams = WBM.wbmStateParams;
        stvLen@uint16      scalar
+       bodyParts@wbmBodyChains
     end
 end

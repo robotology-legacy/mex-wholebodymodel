@@ -92,6 +92,30 @@ classdef WBM < WBM.WBMBase
 
         % end
 
+        function [q_j, dq_j] = getStateChains(obj, q_j, dq_j, chain_names)
+            if ( ~exist('q_j', 'var') && ~exist('dq_j', 'var') )
+                [~,q_j,~,dq_j] = obj.getState(); % get the current state values ...
+            end
+
+            if isempty(chain_names)
+                error('WBM::getStateChains: %s', WBM.wbmErrorMsg.EMPTY_CELL_ARR);
+            end
+
+            switch nargin
+                case {2, 4}
+                    % get the positions of the chains ...
+                    for i = 1:length(chain_names)
+                        for j = 1:obj.iwbm_config.bodyParts.nChains
+
+                            %% continue here!
+                            strcmp(obj.iwbm_config.bodyParts.chains{j}, chain_names{i})
+                        end
+                    end
+                otherwise
+                    error('WBM::getStateChains: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+        end
+
         function stParams = getStateParams(obj, stvChi)
             if ~iscolumn(stvChi)
                error('WBM::getStateParams: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);

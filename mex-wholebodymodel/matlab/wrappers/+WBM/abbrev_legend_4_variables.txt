@@ -18,6 +18,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     h_c     ... centroidal momentum (vector)
     iwbm    ... "inner"wbm ("i" declares that this variable is private)
     j       ... joint
+    jpos    ... joint position(s)
     ln      ... line
     lnk     ... link
     noi     ... number of iterations

@@ -9,6 +9,7 @@ classdef wbmErrorMsg
         UNKNOWN_EXC     = 'Unknown exception!';
         VALUE_IS_ZERO   = 'The value is zero!';
         WRONG_ARG       = 'Wrong number of input arguments!';
+        WRONG_ARR_SIZE  = 'Wrong array size!';
         WRONG_DATA_TYPE = 'Wrong data type!';
         WRONG_MAT_DIM   = 'Wrong matrix dimension!';
         WRONG_VEC_DIM   = 'Wrong vector dimension!';
