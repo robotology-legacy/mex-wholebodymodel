@@ -155,13 +155,23 @@ Jw_j       =  Jw(:,7:end);
 
 % conversion term between Nu_base and dqj, obtained from contact
 % constraints equations
-Nu_baseFrom_dqj  = -(eye(6)/Jb)*Jj;
+Nu_baseFrom_dqj     = -(eye(6)/Jb)*Jj;
 
 %% Analytical derivative with respect of joint position
 
 xCoM_posDerivative  = JCoM_b*Nu_baseFrom_dqj + JCoM_j;
+angularOrientation  = zeros(3,ndof);
 
-HDot_posDerivative  = [-m*gainsPCoM*xCoM_posDerivative; zeros(3,ndof)];
+%%%% CLOSED LOOP %%%%
+
+% Jh  = (Jw_b*Nu_baseFrom_dqj + Jw_j);
+% Jhw = Jh(4:6,:);
+% 
+% angularOrientation  = -Jhw;
+
+%%%%%%%%%%%%%%%%%%%%%
+
+HDot_posDerivative  = [-m*gainsPCoM*xCoM_posDerivative; angularOrientation];
 
 %% Analytical derivative with respect of joint velocity
 HDot_velDerivative  = -[gainsDCoM zeros(3); zeros(3) gainMomentum*eye(3)]*(Jw_b*Nu_baseFrom_dqj + Jw_j);

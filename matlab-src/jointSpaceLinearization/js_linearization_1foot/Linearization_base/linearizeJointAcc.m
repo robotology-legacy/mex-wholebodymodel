@@ -146,9 +146,16 @@ end
 Nu_baseFrom_dqj  = -(eye(6)/Jb)*Jj;
 
 %% Analytical derivative with respect of joint position
-xCoM_posDerivative = JCoM_b*Nu_baseFrom_dqj + JCoM_j;
+xCoM_posDerivative  = JCoM_b*Nu_baseFrom_dqj + JCoM_j;
+angularOrientation  = zeros(3,ndof);
 
-HDot_posDerivative = [-m*gainsPCoM*xCoM_posDerivative; zeros(3,ndof)];
+%%%% CLOSED LOOP %%%%
+
+% angularOrientation  = -(Jw_b*Nu_baseFrom_dqj + Jw_j);
+
+%%%%%%%%%%%%%%%%%%%%%
+
+HDot_posDerivative = [-m*gainsPCoM*xCoM_posDerivative; angularOrientation];
 
 %% Analytical derivative with respect of joint velocity
 dxCoM_velDerivative = JCoM_b*Nu_baseFrom_dqj + JCoM_j;
@@ -226,8 +233,8 @@ else
 end      
 
 % eigenvalues visualization
-disp('eigenvalues: KSsym, KDsym, KS, KD')
-disp([eig_KS_sym eig_KD_sym eig(KS) eig(KD)])
+% disp('eigenvalues: KSsym, KDsym, KS, KD')
+% disp([eig_KS_sym eig_KD_sym eig(KS) eig(KD)])
 
 %% State matrix verification
 A_state = [zeros(ndof) eye(ndof);

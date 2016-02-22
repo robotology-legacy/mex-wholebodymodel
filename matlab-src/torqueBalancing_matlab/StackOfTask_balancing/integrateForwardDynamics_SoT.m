@@ -81,6 +81,10 @@ end
 wbm_setWorldFrame(rot,pos,[0 0 -9.81]')
 
 [~,T_b,~,~]    = wbm_getState();
+
+% For the centroidal momentum orientation
+params.R_b0 = rot;
+params.xb0  = pos;
  
 params.chiInit = [T_b; params.qjInit; params.dx_bInit; params.omega_bInit; params.dqjInit];
 
@@ -126,7 +130,8 @@ end
 %% Integrate forward dynamics
 if params.demo_movements == 0 || params.numConstraints == 1
 
- options = odeset('RelTol',1e-3,'AbsTol', 1e-4);
+%options = odeset('RelTol',1e-3,'AbsTol', 1e-4);
+ options = odeset('RelTol',1e-5,'AbsTol', 1e-5);
 
 else
 

@@ -143,10 +143,7 @@ param.qj      = qj;
 desired_x_dx_ddx_CoM = generTraj_SoT(xCoMDes,t,trajectory);
 
 % balancing controller
-param.R_b = R_b;
-param.xb  = x_b;
-
-[tau,errorCoM,f0] = stackOfTaskController(param, constraints, feet, gains, Nu, M, h, H, Jc, dJcNu, xCoM, J_CoM, desired_x_dx_ddx_CoM);    
+[tau,errorCoM,f0]    = stackOfTaskController(param, constraints, feet, gains, Nu, M, h, H, Jc, dJcNu, xCoM, J_CoM, desired_x_dx_ddx_CoM);    
         
 % Real contact forces computation
 S               = [ zeros(6,ndof);

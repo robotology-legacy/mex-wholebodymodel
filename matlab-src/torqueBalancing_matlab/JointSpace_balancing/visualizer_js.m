@@ -281,7 +281,7 @@ end
 
 end
 
-%% CoP gat feet
+%% CoP at feet
 for k=1:2
 
 figure(18)

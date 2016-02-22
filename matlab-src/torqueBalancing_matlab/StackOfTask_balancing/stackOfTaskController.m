@@ -1,4 +1,5 @@
-function [tau,errorCoM,f0]=stackOfTaskController(param, constraints, feet, gains, Nu, M, h, H, Jc, dJcNu, xCoM, J_CoM, desired_x_dx_ddx_CoM)
+function [tau,errorCoM,f0] = stackOfTaskController(param, constraints, feet, gains, Nu, M, h, H, Jc, dJcNu,...
+                                                   xCoM, J_CoM, desired_x_dx_ddx_CoM)
 %% stackOfTaskController
 %  It computes the desired contact forces and moments and the joint torques for iCub balancing control using the "Stack of Task" control approach. 
 %  If QP_SOLVER is selected, it uses a quadratic programming to calculate the null space of desired contact forces which minimize 
@@ -49,16 +50,16 @@ f_grav          = [ zeros(2,1);
 dxCoM            = J_CoM(1:3,:)*Nu;
 dqj              = Nu(7:end);
 
-ddxCoMStar      = desired_x_dx_ddx_CoM(:,3) - gains.gainsPCoM*(xCoM-desired_x_dx_ddx_CoM(:,1))...
+ddxCoMStar       = desired_x_dx_ddx_CoM(:,3) - gains.gainsPCoM*(xCoM-desired_x_dx_ddx_CoM(:,1))...
                   -gains.gainsDCoM*(dxCoM-desired_x_dx_ddx_CoM(:,2));
 
-Pr              = pos_rightFoot - xCoM;   % Application point of the contact force on the right foot w.r.t. CoM
-Pl              = pos_leftFoot  - xCoM;   % Application point of the contact force on the left  foot w.r.t. CoM
+Pr               = pos_rightFoot - xCoM;   % Application point of the contact force on the right foot w.r.t. CoM
+Pl               = pos_leftFoot  - xCoM;   % Application point of the contact force on the left  foot w.r.t. CoM
 
-AL              = [ eye(3),zeros(3);
-                    skew(Pl),eye(3)];
-AR              = [ eye(3),zeros(3);
-                    skew(Pr),eye(3)];
+AL               = [ eye(3),zeros(3);
+                     skew(Pl),eye(3)];
+AR               = [ eye(3),zeros(3);
+                     skew(Pr),eye(3)];
 
 %% One foot or two feet on ground selector
 if      sum(feet_on_ground) == 2
@@ -90,42 +91,45 @@ end
  Pinv_JcMinvS   = pinv(JcMinvS,Pinv_tol);
 %Pinv_JcMinvS   = JcMinvS'/(JcMinvS*JcMinvS' + reg*eye(size(JcMinvS,1)));
 
-%% Newton-Euler equations of motion at CoM
+%% Newton-Euler equations of motion at CoM: with closed loop on momentum orientation
 % momentum jacobian
-R_b                = param.R_b;
-xb                 = param.xb;
+R_b0               = param.R_b0;
+x_b0               = param.xb0;
 qTilde             = param.qj-param.qjInit;
 
 Jw_b               = zeros(6,6);
 Jw_j               = zeros(6,ndof);
+Jc0                = zeros(6*param.numConstraints,ndof+6);
 
 for ii = 1:6
     
 Nu_base         = zeros(6,1);
 Nu_base(ii)     = 1;
 
-H2              = wbm_centroidalMomentum(R_b, xb, param.qj, zeros(ndof,1), Nu_base);
+Jw_b(:,ii)      = wbm_centroidalMomentum(R_b0, x_b0, param.qjInit, zeros(ndof,1), Nu_base);
  
-Jw_b(:,ii)      = H2;
-
 end
 
 for ii = 1:ndof
 
-dqj2         = zeros(ndof,1);
-dqj2(ii)     = 1;
+dqj_Jw         = zeros(ndof,1);
+dqj_Jw(ii)     = 1;
 
-H2           = wbm_centroidalMomentum(R_b, xb, param.qj, dqj2, zeros(6,1));
-
-Jw_j(:,ii)   = H2;
+Jw_j(:,ii)     = wbm_centroidalMomentum(R_b0, x_b0, param.qjInit, dqj_Jw, zeros(6,1));
 
 end
 
-linearizedErrorCoM = (Jw_j -Jw_b*(eye(6)/Jc(1:6,1:6))*Jc(1:6,7:end))*(qTilde); 
+for i=1:param.numConstraints
+    
+    Jc0(6*(i-1)+1:6*i,:) = wbm_jacobian(R_b0,x_b0,param.qjInit,param.constraintLinkNames{i});
+    
+end
+
+linAngularMomentum = (Jw_j -Jw_b*(eye(6)/Jc0(1:6,1:6))*Jc0(1:6,7:end))*(qTilde);
 
 Kphi               = eye(3);
 
-Jww                = linearizedErrorCoM(4:end);
+Jww                = linAngularMomentum(4:end);
 
 HDotDes            = [ m*ddxCoMStar;
                       -gains.gainMomentum*H(4:end)-Kphi*Jww];  
@@ -137,8 +141,8 @@ HDotDes            = [ m*ddxCoMStar;
 f_HDot             = pinvA*(HDotDes - f_grav);
     
 % Forces and torques null spaces
-Nullfc          =  eye(6*param.numConstraints)-pinvA*A;
-NullLambda      =  eye(ndof) - Pinv_JcMinvS*JcMinvS;
+Nullfc             =  eye(6*param.numConstraints)-pinvA*A;
+NullLambda         =  eye(ndof) - Pinv_JcMinvS*JcMinvS;
 
 %% Terms used for torques equation definition
 JBar             =  transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));    % multiplier of f in tau0
