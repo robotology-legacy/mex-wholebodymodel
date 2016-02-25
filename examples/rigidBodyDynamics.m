@@ -37,3 +37,15 @@ h = wbm_generalisedBiasForces();
 % We can check them by printing them:
 M
 h
+
+% we can also get the forward kinematics of any frame with respect to the world
+% in this case it will be just return the x_b and w_R_b value that we set in the
+% wbm_setWorldFrame method, as root_link is the base frame, but in more complex 
+% models it can compute the forward kinematics for any frame 
+world_T_frame = wbm_forwardKinematics('root_link')
+
+% As it is possible to notice by printing it, world_T_frame is a vector of 7 elements,
+% where the first three elements are the position of the frame origin wrt to the world frame,
+% and the last 4 elements are the quaternion corresponding to the rotation between the frame and the world frame 
+% for more info, check wbm_forwardKinematics options
+world_T_frame
