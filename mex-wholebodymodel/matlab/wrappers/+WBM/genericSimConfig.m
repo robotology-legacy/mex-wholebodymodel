@@ -1,6 +1,6 @@
-classdef iCubSimConfig < WBM.absSimConfig
+classdef genericSimConfig < WBM.absSimConfig
     properties
-        main_title@char = 'iCub-Simulator:';
+        main_title@char = '';
         hFigure_main
         hAxes@double   vector = zeros(1,4);
         plot_objs@cell vector = cell(1,4);

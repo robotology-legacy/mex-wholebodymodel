@@ -92,28 +92,99 @@ classdef WBM < WBM.WBMBase
 
         % end
 
-        function [q_j, dq_j] = getStateChains(obj, q_j, dq_j, chain_names)
-            if ( ~exist('q_j', 'var') && ~exist('dq_j', 'var') )
-                [~,q_j,~,dq_j] = obj.getState(); % get the current state values ...
-            end
-
-            if isempty(chain_names)
-                error('WBM::getStateChains: %s', WBM.wbmErrorMsg.EMPTY_CELL_ARR);
-            end
-
+        function [chn_q, chn_dq] = getStateChains(obj, q_j, dq_j, chain_names)
             switch nargin
                 case {2, 4}
-                    % get the positions of the chains ...
-                    for i = 1:length(chain_names)
-                        for j = 1:obj.iwbm_config.bodyParts.nChains
+                    if isempty(chain_names)
+                        error('WBM::getStateChains: %s', WBM.wbmErrorMsg.EMPTY_CELL_ARR);
+                    end
 
-                            %% continue here!
-                            strcmp(obj.iwbm_config.bodyParts.chains{j}, chain_names{i})
+                    if ( ~exist('q_j', 'var') && ~exist('dq_j', 'var') )
+                        [~,q_j,~,dq_j] = obj.getState(); % get the current state values ...
+                    end
+
+                    len = length(chain_names);
+                    if (len > obj.iwbm_config.bodyParts.nChains)
+                        error('WBM::getStateChains: %s', WBM.wbmErrorMsg.WRONG_ARR_SIZE);
+                    end
+                    chn_dq = chn_q = cell(len,1);
+
+                    % extract the joint angles and velocities of each chain ...
+                    for i = 1:len
+                        ridx = strmatch(chain_names(i), obj.iwbm_config.body.chains, 'exact');
+                        if isempty(ridx)
+                            error('WBM::getStateChains: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
                         end
+
+                        start_idx = obj.iwbm_config.body.chains{ridx,2};
+                        end_idx   = obj.iwbm_config.body.chains{ridx,3};
+
+                        chn_q{i,1}  = q_j(start_idx:end_idx,1);  % joint angles
+                        chn_dq{i,1} = dq_j(start_idx:end_idx,1); % joint velocities
                     end
                 otherwise
                     error('WBM::getStateChains: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
+        end
+
+        function [jnt_q, jnt_dq] = getStateJoints(obj, q_j, dq_j, joint_idx, joint_names)
+            switch nargin
+                case {2, 4}
+                    if ( ~exist('q_j', 'var') && ~exist('dq_j', 'var') )
+                        % if either "joint_names" or "joint_idx" exists, get the state values ...
+                        [~,q_j,~,dq_j] = obj.getState();
+                    end
+
+                    if exist(joint_idx)
+                        % there is a list of joint indices ...
+                        if isempty(joint_idx)
+                            error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.EMPTY_VECTOR);
+                        end
+
+                        len = length(joint_idx);
+                        if (len > obj.iwbm_config.bodyParts.nJoints)
+                            error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
+                        end
+                        jnt_dq = jnt_q = zeros(len,1);
+
+                        % get the angle and velocity of each joint ...
+                        for i = 1:len
+                            idx = joint_idx(i);
+
+                            jnt_q(i,1)  = q_j(idx,1);  % angle
+                            jnt_dq(i,1) = dq_j(idx,1); % velocity
+                        end
+                        return
+
+                    elseif exist(joint_names)
+                        % there is only a list of joint names ...
+                        if isempty(joint_names)
+                            error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.EMPTY_CELL_ARR);
+                        end
+
+                        len = length(joint_names);
+                        if (len > obj.iwbm_config.bodyParts.nChains)
+                            error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.WRONG_ARR_SIZE);
+                        end
+                        jnt_dq = jnt_q = zeros(len,1);
+
+                        % get the angle and velocity of each joint ...
+                        for i = 1:len
+                            ridx = strmatch(joint_names(i), obj.iwbm_config.body.chains, 'exact');
+                            if isempty(ridx)
+                                error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+                            end
+
+                            idx = obj.iwbm_config.body.joints{ridx,2};
+
+                            jnt_q(i,1)  = q_j(idx,1);  % angle
+                            jnt_dq(i,1) = dq_j(idx,1); % velocity
+                        end
+                        return
+                    end
+            end
+            % otherwise ...
+            error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.WRONG_ARG);
         end
 
         function stParams = getStateParams(obj, stvChi)
@@ -283,7 +354,7 @@ classdef WBM < WBM.WBMBase
             strInitState  = sprintf('%s\n%s\n%s\n%s\n%s\n%s', cellInitSt{1}, cellInitSt{2}, ...
                                     cellInitSt{3}, cellInitSt{4}, cellInitSt{5}, cellInitSt{6});
 
-            strConfig = sprintf(['Robot configuration:\n\n' ...
+            strConfig = sprintf(['Robot Configuration:\n\n' ...
                                  ' NDOFs:         %d\n' ...
                                  ' # constraints: %d\n\n' ...
                                  ' constraint link names:\n\n%s\n' ...

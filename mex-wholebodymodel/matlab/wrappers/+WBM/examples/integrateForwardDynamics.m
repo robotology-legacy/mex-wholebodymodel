@@ -96,7 +96,8 @@ end
 % it = 1;
 % while (it < 10)
     % setup the window and plot parameters for the WBM-simulator:
-    sim_config = iCubSimConfig;
+    sim_config = genericSimConfig;
+    sim_config.main_title = 'iCub-Simulator:';
     wbm_iCub.setupSimulation(sim_config);
 
     x_out = wbm_iCub.getPositionsData(chi);

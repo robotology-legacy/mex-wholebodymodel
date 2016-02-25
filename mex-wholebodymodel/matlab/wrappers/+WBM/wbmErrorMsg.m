@@ -6,6 +6,7 @@ classdef wbmErrorMsg
         EMPTY_STRING    = 'Empty string!';
         EMPTY_VECTOR    = 'Empty vector(s)!';
         FILE_NOT_EXIST  = 'File not exist on given path!';
+        STRING_MISMATCH = 'Mismatching string!';
         UNKNOWN_EXC     = 'Unknown exception!';
         VALUE_IS_ZERO   = 'The value is zero!';
         WRONG_ARG       = 'Wrong number of input arguments!';

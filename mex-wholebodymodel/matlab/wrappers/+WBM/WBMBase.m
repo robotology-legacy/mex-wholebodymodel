@@ -85,7 +85,7 @@ classdef WBMBase < handle
         end
 
         function updateWorldFrame(obj, wf_R_rootLnk, wf_p_rootLnk, g_wf)
-            if ( (nargin > 1) && (nargin < 4) )
+            if ( (nargin > 1) && (nargin ~= 4) )
                 error('WBMBase::updateWorldFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
 
@@ -292,7 +292,7 @@ classdef WBMBase < handle
             if ~exist('prec', 'var')
                 prec = 2;
             end
-            strParams = sprintf(['WBM parameters:\n\n' ...
+            strParams = sprintf(['WBM Parameters:\n\n' ...
                                  ' URDF robot name:     %s\n' ...
                                  ' URDF ref. link name: %s\n\n' ...
                                  ' R (root link to world frame):  %s\n' ...
