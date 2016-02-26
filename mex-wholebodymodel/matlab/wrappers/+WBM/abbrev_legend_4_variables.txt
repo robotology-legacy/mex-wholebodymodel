@@ -16,6 +16,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     g       ... gravity acceleration (vector)
     h...    ... "handle" to an object, e.g. hFig = handle to the figure object
     h_c     ... centroidal momentum (vector)
+    idx     ... index(es)
     iwbm    ... "inner"wbm ("i" declares that this variable is private)
     j       ... joint
     jpos    ... joint position(s)
@@ -34,6 +35,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     quat    ... quaternion
     r       ... root
     ref     ... reference
+    ridx    ... row index(es)
     rlnk    ... root link OR reference link
     st      ... state
     stm     ... state matrix

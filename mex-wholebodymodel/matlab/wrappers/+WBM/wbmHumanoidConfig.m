@@ -1,14 +1,14 @@
 classdef wbmHumanoidConfig < WBM.wbmBaseRobotConfig
     properties
-        jpos_head@double      vector
-        jpos_torso@double     vector
-        jpos_leftArm@double   vector 
-        jpos_leftHand@double  vector
-        jpos_leftLeg@double   vector
-        jpos_leftFeet@double  vector
-        jpos_rightArm@double  vector
-        jpos_rightHand@double vector
-        jpos_rightLeg@double  vector
-        jpos_rightFeet@double vector
+        jpos_head@double       vector
+        jpos_torso@double      vector
+        jpos_left_arm@double   vector 
+        jpos_left_hand@double  vector
+        jpos_left_leg@double   vector
+        jpos_left_feet@double  vector
+        jpos_right_arm@double  vector
+        jpos_right_hand@double vector
+        jpos_right_leg@double  vector
+        jpos_right_feet@double vector
     end
 end

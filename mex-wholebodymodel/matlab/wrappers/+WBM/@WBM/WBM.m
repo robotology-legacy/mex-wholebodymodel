@@ -5,6 +5,7 @@ classdef WBM < WBM.WBMBase
         vqTInit@double    vector
         stvqT@double      vector
         wbm_config@WBM.wbmBaseRobotConfig
+        robot_body@WBM.wbmBody
     end
 
     properties(Access = protected)
@@ -104,20 +105,22 @@ classdef WBM < WBM.WBMBase
                     end
 
                     len = length(chain_names);
-                    if (len > obj.iwbm_config.bodyParts.nChains)
+                    if (len > obj.iwbm_config.body.nChains)
                         error('WBM::getStateChains: %s', WBM.wbmErrorMsg.WRONG_ARR_SIZE);
                     end
-                    chn_dq = chn_q = cell(len,1);
+                    chn_q  = cell(len,1);
+                    chn_dq = chn_q;
 
-                    % extract the joint angles and velocities of each chain ...
+                    % get the joint angles and velocities of each chain ...
+                    ridx = find(ismember(obj.iwbm_config.body.chains, chain_names));
+                    if ( isempty(ridx) || (length(ridx) ~= len) )
+                        error('WBM::getStateChains: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+                    end
+
                     for i = 1:len
-                        ridx = strmatch(chain_names(i), obj.iwbm_config.body.chains, 'exact');
-                        if isempty(ridx)
-                            error('WBM::getStateChains: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
-                        end
-
-                        start_idx = obj.iwbm_config.body.chains{ridx,2};
-                        end_idx   = obj.iwbm_config.body.chains{ridx,3};
+                        idx = ridx(i);
+                        start_idx = obj.iwbm_config.body.chains{idx,2};
+                        end_idx   = obj.iwbm_config.body.chains{idx,3};
 
                         chn_q{i,1}  = q_j(start_idx:end_idx,1);  % joint angles
                         chn_dq{i,1} = dq_j(start_idx:end_idx,1); % joint velocities
@@ -135,51 +138,31 @@ classdef WBM < WBM.WBMBase
                         [~,q_j,~,dq_j] = obj.getState();
                     end
 
-                    if exist(joint_idx)
+                    if exist('joint_idx', 'var')
                         % there is a list of joint indices ...
                         if isempty(joint_idx)
                             error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.EMPTY_VECTOR);
                         end
-
                         len = length(joint_idx);
-                        if (len > obj.iwbm_config.bodyParts.nJoints)
-                            error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
-                        end
-                        jnt_dq = jnt_q = zeros(len,1);
 
                         % get the angle and velocity of each joint ...
-                        for i = 1:len
-                            idx = joint_idx(i);
-
-                            jnt_q(i,1)  = q_j(idx,1);  % angle
-                            jnt_dq(i,1) = dq_j(idx,1); % velocity
-                        end
+                        [jnt_q, jnt_dq] = getJointValues(q_j, dq_j, joint_idx, len);
                         return
 
-                    elseif exist(joint_names)
+                    elseif exist('joint_names', 'var')
                         % there is only a list of joint names ...
                         if isempty(joint_names)
                             error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.EMPTY_CELL_ARR);
                         end
-
                         len = length(joint_names);
-                        if (len > obj.iwbm_config.bodyParts.nChains)
-                            error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.WRONG_ARR_SIZE);
+
+                        % get the row indices ...
+                        ridx = find(ismember(obj.iwbm_config.body.joints, joint_names));
+                        if ( isempty(ridx) || (length(ridx) ~= len) )
+                            error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
                         end
-                        jnt_dq = jnt_q = zeros(len,1);
-
-                        % get the angle and velocity of each joint ...
-                        for i = 1:len
-                            ridx = strmatch(joint_names(i), obj.iwbm_config.body.chains, 'exact');
-                            if isempty(ridx)
-                                error('WBM::getStateJoints: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
-                            end
-
-                            idx = obj.iwbm_config.body.joints{ridx,2};
-
-                            jnt_q(i,1)  = q_j(idx,1);  % angle
-                            jnt_dq(i,1) = dq_j(idx,1); % velocity
-                        end
+                        % get the angles and velocities ...
+                        [jnt_q, jnt_dq] = getJointValues(q_j, dq_j, ridx, len);
                         return
                     end
             end
@@ -193,7 +176,7 @@ classdef WBM < WBM.WBMBase
             end
 
             ndof     = obj.iwbm_config.ndof;
-            stvLen   = obj.iwbm_config.stvLen;
+            len      = obj.iwbm_config.stvLen;
             stParams = WBM.wbmStateParams;
 
             % get the base/joint positions and the base orientation ...
@@ -203,14 +186,14 @@ classdef WBM < WBM.WBMBase
             % the corresponding velocities ...
             stParams.dx_b    = stvChi(ndof+8:ndof+10,1);
             stParams.omega_b = stvChi(ndof+11:ndof+13,1);
-            stParams.dq_j    = stvChi(ndof+14:stvLen,1);
+            stParams.dq_j    = stvChi(ndof+14:len,1);
         end
 
         function stParams = getStateParamsData(obj, chi)
-            stvLen = obj.iwbm_config.stvLen;
+            len = obj.iwbm_config.stvLen;
 
             [m, n] = size(chi);
-            if (n ~= stvLen)
+            if (n ~= len)
                 error('WBM::getStateParamsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
@@ -224,7 +207,7 @@ classdef WBM < WBM.WBMBase
 
             stParams.dx_b    = chi(1:m,ndof+8:ndof+10);
             stParams.omega_b = chi(1:m,ndof+11:ndof+13);
-            stParams.dq_j    = chi(1:m,ndof+14:stvLen);
+            stParams.dq_j    = chi(1:m,ndof+14:len);
         end
 
         function stvPos = getPositions(obj, stvChi)
@@ -239,10 +222,10 @@ classdef WBM < WBM.WBMBase
         end
 
         function stmPos = getPositionsData(obj, chi)
-            stvLen = obj.iwbm_config.stvLen;
+            len = obj.iwbm_config.stvLen;
 
             [m, n] = size(chi);
-            if (n ~= stvLen)
+            if (n ~= len)
                 error('WBM::getPositionsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
@@ -255,22 +238,22 @@ classdef WBM < WBM.WBMBase
                error('WBM::getVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
-            stvLen = obj.iwbm_config.stvLen;
+            len  = obj.iwbm_config.stvLen;
             cutp = obj.iwbm_config.ndof + 8;
             % extract the velocities ...
-            stvVel = stvChi(cutp:stvLen,1); % [dx_b; omega_b; dq_j]
+            stvVel = stvChi(cutp:len,1); % [dx_b; omega_b; dq_j]
         end
 
         function stmVel = getVelocitiesData(obj, chi)
-            stvLen = obj.iwbm_config.stvLen;
+            len = obj.iwbm_config.stvLen;
 
             [m, n] = size(chi);
-            if (n ~= stvLen)
+            if (n ~= len)
                 error('WBM::getVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
             cutp = obj.iwbm_config.ndof + 8;
-            stmVel = chi(1:m,cutp:stvLen); % m -by- [dx_b, omega_b, dq_j]
+            stmVel = chi(1:m,cutp:len); % m -by- [dx_b, omega_b, dq_j]
         end
 
         function stvVelb = getBaseVelocities(obj, stvChi)
@@ -284,10 +267,10 @@ classdef WBM < WBM.WBMBase
         end
 
         function stmVelb = getBaseVelocitiesData(obj, chi)
-            stvLen = obj.iwbm_config.stvLen;
+            len = obj.iwbm_config.stvLen;
 
             [m, n] = size(chi);
-            if (n ~= stvLen)
+            if (n ~= len)
                 error('WBM::getBaseVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
@@ -334,6 +317,10 @@ classdef WBM < WBM.WBMBase
 
         function wbm_config = get.wbm_config(obj)
             wbm_config = obj.iwbm_config;
+        end
+
+        function robot_body = get.robot_body(obj)
+            robot_body = obj.iwbm_config.body;
         end
 
         function dispWBMConfig(obj, prec)
@@ -389,6 +376,7 @@ classdef WBM < WBM.WBMBase
             obj.iwbm_config.cstrLinkNames = robot_config.cstrLinkNames;
             obj.iwbm_config.nCstrs        = robot_config.nCstrs;
             obj.iwbm_config.dampCoeff     = robot_config.dampCoeff;
+            obj.iwbm_config.body          = robot_config.body;
 
             if isempty(robot_config.initStateParams)
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
@@ -403,6 +391,21 @@ classdef WBM < WBM.WBMBase
                 end
             end
             obj.iwbm_config.initStateParams = robot_config.initStateParams;
+        end
+
+        function [jnt_q, jnt_dq] = getJointValues(obj, q_j, dq_j, joint_idx, len)
+            if (len > obj.iwbm_config.body.nJoints)
+                error('WBM::getJointValues: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
+            end
+            jnt_q  = zeros(len,1);
+            jnt_dq = jnt_q;
+
+            % get the joint values of the index list ...
+            for i = 1:len
+                idx = joint_idx(i);
+                jnt_q(i,1)  = q_j(idx,1);  % angle
+                jnt_dq(i,1) = dq_j(idx,1); % velocity
+            end
         end
 
     end

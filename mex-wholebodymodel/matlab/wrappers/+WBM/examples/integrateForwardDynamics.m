@@ -1,6 +1,7 @@
 % namespaces:
 import WBM.*
 import WBM.utilities.*
+import WBM.Robot.iCub.*
 
 
 %% Initialization of the WBM:
@@ -18,18 +19,19 @@ iCub_config.ndof          = 25;
 iCub_config.nCstrs        = 2;
 iCub_config.cstrLinkNames = {'l_sole', 'r_sole'};
 iCub_config.dampCoeff     = 0.00; %0.75;
-% body (joint) positions of the iCub-Robot (in degrees):
-% (this configuration assumes an iCub-Robot with 25 DoFs.)
-iCub_config.jpos_torso    = [-10.0; 0.0; 0.0];
-iCub_config.jpos_leftArm  = [-19.7; 29.7; 0.0; 44.9; 0.0];
-iCub_config.jpos_leftLeg  = [25.5; 0.1; 0.0; -38.5; -5.5; -0.1];
-iCub_config.jpos_rightArm = iCub_config.jpos_leftArm;
-iCub_config.jpos_rightLeg = iCub_config.jpos_leftLeg;
+% setup the body of the iCub-Robot with the initial body (joint) positions (in degrees):
+% note: this configuration assumes an iCub-Robot with 25 DoFs.
+iCub_config.body           = setupBody_iCub();
+iCub_config.jpos_torso     = [-10.0; 0.0; 0.0];
+iCub_config.jpos_left_arm  = [-19.7; 29.7; 0.0; 44.9; 0.0];
+iCub_config.jpos_left_leg  = [25.5; 0.1; 0.0; -38.5; -5.5; -0.1];
+iCub_config.jpos_right_arm = iCub_config.jpos_left_arm;
+iCub_config.jpos_right_leg = iCub_config.jpos_left_leg;
 % init-state parameters:
 iCub_config.initStateParams.x_b     = zeros(3,1);
 iCub_config.initStateParams.qt_b    = zeros(4,1);
-iCub_config.initStateParams.q_j     = [iCub_config.jpos_torso; iCub_config.jpos_leftArm; iCub_config.jpos_rightArm; ...
-                                       iCub_config.jpos_leftLeg; iCub_config.jpos_rightLeg] * (pi/180.0); % in radians
+iCub_config.initStateParams.q_j     = [iCub_config.jpos_torso; iCub_config.jpos_left_arm; iCub_config.jpos_right_arm; ...
+                                       iCub_config.jpos_left_leg; iCub_config.jpos_right_leg] * (pi/180.0); % in radians
 iCub_config.initStateParams.dx_b    = zeros(3,1);
 iCub_config.initStateParams.omega_b = zeros(3,1);
 iCub_config.initStateParams.dq_j    = zeros(iCub_config.ndof,1);

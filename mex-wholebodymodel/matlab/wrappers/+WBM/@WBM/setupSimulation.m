@@ -1,6 +1,6 @@
 function setupSimulation(~, sim_config)
     % check if sim_config is an instance from a derived class of "wbmSimConfig" ...
-    if ~isa(sim_config, 'WBM.wbmSimConfig')
+    if ~isa(sim_config, 'WBM.absSimConfig')
         error('WBM::setupSimulation: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
 
