@@ -22,7 +22,7 @@ params.demo_movements           =  1;                                      %eith
 params.use_QPsolver             =  0;                                      %either 0 or 1
  
 % balancing on two feet or one foot
-params.feet_on_ground           =  [1,1];                                  %either 0 or 1
+params.feet_on_ground           =  [1,0];                                  %either 0 or 1
 
 % allows the visualization of torques, forces and other user-defined graphics 
 params.visualizer_graphics      =  1;                                      %either 0 or 1
@@ -81,10 +81,6 @@ end
 wbm_setWorldFrame(rot,pos,[0 0 -9.81]')
 
 [~,T_b,~,~]    = wbm_getState();
-
-% For the centroidal momentum orientation
-params.R_b0 = rot;
-params.xb0  = pos;
  
 params.chiInit = [T_b; params.qjInit; params.dx_bInit; params.omega_bInit; params.dqjInit];
 
@@ -108,6 +104,57 @@ end
 
  params.numConstraints           = length(params.constraintLinkNames);
    
+%% Momentum jacobian and linearization of angular momentum integral
+% momentum jacobian
+Jw_b0               = zeros(6,6);
+Jw_j0               = zeros(6,params.ndof);
+Jc0                 = zeros(6*params.numConstraints,params.ndof+6);
+
+for ii = 1:6
+    
+Nu_base         = zeros(6,1);
+Nu_base(ii)     = 1;
+
+Jw_b0(:,ii)     = wbm_centroidalMomentum(rot, pos, params.qjInit, zeros(params.ndof,1), Nu_base);
+ 
+end
+
+for ii = 1:params.ndof
+
+dqj_Jw         = zeros(params.ndof,1);
+dqj_Jw(ii)     = 1;
+
+Jw_j0(:,ii)    = wbm_centroidalMomentum(rot, pos, params.qjInit, dqj_Jw, zeros(6,1));
+
+end
+
+for i=1:params.numConstraints
+    
+    Jc0(6*(i-1)+1:6*i,:) = wbm_jacobian(rot,pos,params.qjInit,params.constraintLinkNames{i});
+    
+end
+ 
+Jw0  =  Jw_j0 -Jw_b0*(eye(6)/Jc0(1:6,1:6))*Jc0(1:6,7:end);
+
+% angular momentum's integral linearization
+params.linAngInt = Jw0(4:end,:);
+
+params.rot       = rot;
+params.Jc0       = Jc0;
+params.pos       = pos;
+
+% Second derivative
+secondDerivative = zeros(6,params.ndof);
+
+for jj = 1:params.ndof
+
+numerical_der           = num_der(jj, params);
+secondDerivative(:,jj)  = numerical_der;
+ 
+end
+
+params.secondDerivative = 0*secondDerivative(4:end,:);
+
 %% Others parameters for balancing controller
  jointLimits
  limits           = [jl1 jl2];
@@ -121,7 +168,7 @@ end
  plot_set
  
  params.tStart   = 0;
- params.tEnd     = 10;   
+ params.tEnd     = 60;   
  params.sim_step = 0.01;
  params.wait     = waitbar(0,'State integration in process...');
 

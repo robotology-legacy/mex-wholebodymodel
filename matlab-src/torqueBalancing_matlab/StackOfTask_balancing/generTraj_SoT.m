@@ -18,7 +18,7 @@ else
 end
 
  freq    = trajectory.referenceParams(2);
-
+ 
  xCoMDes    =  xCoM_0 + Ampl*sin(2*pi*freq*t)*trajectory.directionOfOscillation;
  dxCoMDes   =  Ampl*2*pi*freq*cos(2*pi*freq*t)*trajectory.directionOfOscillation;
  ddxCoMDes  = -Ampl*(2*pi*freq)^2*sin(2*pi*freq*t)*trajectory.directionOfOscillation;

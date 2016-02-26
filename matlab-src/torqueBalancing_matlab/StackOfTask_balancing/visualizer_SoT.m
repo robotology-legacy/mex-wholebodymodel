@@ -78,6 +78,7 @@ tau           = zeros(param.ndof,length(t));
 error_CoM     = zeros(3,length(t));
 pos_feet      = zeros(14,length(t));
 norm_tau      = zeros(1,length(t));
+norm_ddqj     = zeros(1,length(t));
 CoP           = zeros(4,length(t));
 phi_lfoot     = zeros(3,length(t));
 phi_rfoot     = zeros(3,length(t));
@@ -94,7 +95,8 @@ tau(:,time)         = visual.tau;
 error_CoM(:,time)   = visual.error_com;
 
 % norm of joint torques and CoP
-norm_tau(time) = norm(visual.tau);
+norm_tau(time)  = norm(visual.tau);
+norm_ddqj(time) = norm(visual.ddqj);
  
 CoP(1,time)    = -visual.fc(5)/visual.fc(3);
 CoP(2,time)    =  visual.fc(4)/visual.fc(3);
@@ -349,5 +351,16 @@ ylabel('Y direction (m)')
 axis([-0.1 0.1 -0.1 0.1])
 
 end
+
+%% Square norm of joints accelerations
+figure(15)
+hold on
+grid on
+plot(t,norm_ddqj)
+% axis([0 60 0 1.5])
+
+xlabel('s')
+ylabel('rad/s^2')
+title('Square norm of joints accelerations')
 
 end

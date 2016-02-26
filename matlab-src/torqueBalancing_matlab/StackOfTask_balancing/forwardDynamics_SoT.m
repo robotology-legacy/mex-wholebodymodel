@@ -85,7 +85,7 @@ end
 
 %% Feet correction to avoid numerical integration errors
 % feet correction gain
-K_corr_pos  = 5;
+K_corr_pos  = 2.5;
 K_corr_vel  = 2*sqrt(K_corr_pos);
 
 % feet current position and orientation
@@ -166,6 +166,7 @@ dchi    = [dx;dNu];
 %% Visualization 
 % These are the variables that can be plotted by the visualizer.m
 % function
+ visual_param.ddqj      =  dNu(7:end);
  visual_param.pos_feet  =  [l_sole;r_sole];
  visual_param.fc        =  fc;
  visual_param.tau       =  tau;

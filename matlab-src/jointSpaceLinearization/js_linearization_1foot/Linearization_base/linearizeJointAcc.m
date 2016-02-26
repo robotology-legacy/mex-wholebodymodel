@@ -88,7 +88,8 @@ Mbar         = Mj - Mjb/Mb*Mbj;
 Mbar_inv     = Mbar'/(Mbar*Mbar' + toll*eye(size(Mbar,1)));
 
 %% Gains definition
-gainsPCoM         = diag([50 50 50]);
+% gainsPCoM         = diag([50 50 50]);
+gainsPCoM         = diag([ 1 1 1]);
 gainsDCoM         = sqrt(gainsPCoM);
 gainMomentum      = 1;
                        

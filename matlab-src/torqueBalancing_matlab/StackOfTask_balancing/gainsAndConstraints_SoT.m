@@ -31,6 +31,7 @@ if Contact_constraints == 2
    gains.gainsPCoM               = diag([ 50  50  50]);
    gains.gainsDCoM               = 2*sqrt(gains.gainsPCoM);
    gains.gainMomentum            = 5;
+   gains.gainPhi                 = 1;
 
 % impedances acting in the null space of the desired contact forces 
     impTorso            = [ 50  50  50
@@ -60,6 +61,7 @@ if  Contact_constraints == 1
     gains.gainsPCoM                 = diag([40  45 40]);
     gains.gainsDCoM                 = 2*sqrt(gains.gainsPCoM);
     gains.gainMomentum              = 10 ;
+    gains.gainPhi                   = 1;
 
 % impedances acting in the null space of the desired contact forces 
      impTorso            = [ 20   20   20
@@ -89,7 +91,7 @@ end
     if (demo_movements == 1)
         
         trajectory.directionOfOscillation = [0;1;0];
-        trajectory.referenceParams        = [0.025 0.35];     %referenceParams(1) = amplitude of ascillations in meters
+        trajectory.referenceParams        = [0.035 0.35];     %referenceParams(1) = amplitude of ascillations in meters
     
     end
 
@@ -128,5 +130,62 @@ constraints.footSize = footSize;
 
 %% Impedances correction with a nonlinear term
 gains.impedances = nonLinImp(param.qjInit,param.qj,impedances,increasingRatesImp,qTildeMax);
+
+%% New postural gains for the new controller
+rot = param.rot;
+pos = param.pos;
+Jc0 = param.Jc0;
+
+S               = [ zeros(6,param.ndof);
+                    eye(param.ndof,param.ndof)];
+M0              = wbm_massMatrix(rot,pos,param.qjInit);
+
+JcMinv          = Jc0/M0;
+JcMinvS         = JcMinv*S;
+Pinv_JcMinvS    = pinv(JcMinvS,1e-6);
+
+Mbar            = M0(7:end,7:end)-M0(7:end,1:6)/M0(1:6,1:6)*M0(1:6,7:end);
+NullLambda      = eye(param.ndof)-Pinv_JcMinvS*JcMinvS;
+
+GainCorr       = NullLambda*Mbar;
+
+% Correction of impedances for the new controller
+impedances_old = diag(gains.impedances);
+dampings_old   = diag(gains.dampings);
+
+reg            = 1e-8;
+
+PinvGainCorr   = GainCorr'/(GainCorr*GainCorr' + reg*eye(size(GainCorr,1)));
+
+KImp       = (impedances_old*PinvGainCorr);
+KDamp      = (dampings_old*PinvGainCorr);
  
+[~,v1,~] = svd(KImp);
+[~,v2,~] = svd(KDamp);
+
+dv1 = diag(v1);
+dv2 = diag(v2);
+
+toll_imp  = 0.1;
+toll_damp = 0.01;
+
+for kk = 1:param.ndof
+    
+    if dv1(kk)<toll_imp
+        
+        dv1(kk) = gains.impedances(kk);
+        
+    end
+    
+     if dv2(kk)<toll_damp
+        
+        dv2(kk) = gains.dampings(kk);
+        
+    end
+    
+end
+
+gains.GainImp  = diag(dv1)*NullLambda*Mbar;
+gains.GainDamp = diag(dv2)*NullLambda*Mbar;
+
 end

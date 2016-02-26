@@ -98,7 +98,7 @@ else
 end
 
 %% Feet correction to avoid numerical integration errors
-Kcorr_pos = 5;
+Kcorr_pos = 2.5;
 Kcorr_vel = 2*sqrt(Kcorr_pos);
 
 % feet position and orientation at time t

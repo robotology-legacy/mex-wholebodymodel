@@ -91,48 +91,13 @@ end
  Pinv_JcMinvS   = pinv(JcMinvS,Pinv_tol);
 %Pinv_JcMinvS   = JcMinvS'/(JcMinvS*JcMinvS' + reg*eye(size(JcMinvS,1)));
 
-%% Newton-Euler equations of motion at CoM: with closed loop on momentum orientation
-% momentum jacobian
-R_b0               = param.R_b0;
-x_b0               = param.xb0;
+%% Newton-Euler equations of motion at CoM with closed loop on momentum orientation
+Kphi               = gains.gainPhi;
 qTilde             = param.qj-param.qjInit;
-
-Jw_b               = zeros(6,6);
-Jw_j               = zeros(6,ndof);
-Jc0                = zeros(6*param.numConstraints,ndof+6);
-
-for ii = 1:6
-    
-Nu_base         = zeros(6,1);
-Nu_base(ii)     = 1;
-
-Jw_b(:,ii)      = wbm_centroidalMomentum(R_b0, x_b0, param.qjInit, zeros(ndof,1), Nu_base);
- 
-end
-
-for ii = 1:ndof
-
-dqj_Jw         = zeros(ndof,1);
-dqj_Jw(ii)     = 1;
-
-Jw_j(:,ii)     = wbm_centroidalMomentum(R_b0, x_b0, param.qjInit, dqj_Jw, zeros(6,1));
-
-end
-
-for i=1:param.numConstraints
-    
-    Jc0(6*(i-1)+1:6*i,:) = wbm_jacobian(R_b0,x_b0,param.qjInit,param.constraintLinkNames{i});
-    
-end
-
-linAngularMomentum = (Jw_j -Jw_b*(eye(6)/Jc0(1:6,1:6))*Jc0(1:6,7:end))*(qTilde);
-
-Kphi               = eye(3);
-
-Jww                = linAngularMomentum(4:end);
+DeltaPhi           = param.linAngInt*qTilde+param.secondDerivative*(qTilde).^2;
 
 HDotDes            = [ m*ddxCoMStar;
-                      -gains.gainMomentum*H(4:end)-Kphi*Jww];  
+                      -gains.gainMomentum*H(4:end)-Kphi*DeltaPhi];  
 
 % Old version
 % HDotDes          = [ m*ddxCoMStar;
@@ -142,16 +107,35 @@ f_HDot             = pinvA*(HDotDes - f_grav);
     
 % Forces and torques null spaces
 Nullfc             =  eye(6*param.numConstraints)-pinvA*A;
-NullLambda         =  eye(ndof) - Pinv_JcMinvS*JcMinvS;
+NullLambda         =  eye(ndof)-Pinv_JcMinvS*JcMinvS;
 
 %% Terms used for torques equation definition
 JBar             =  transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));    % multiplier of f in tau0
-qTilde           =  param.qj-param.qjInit;
 
 Sigma            = -(Pinv_JcMinvS*JcMinvJct + NullLambda*JBar);
 SigmaNA          =  Sigma*Nullfc;
 
-tauModel = Pinv_JcMinvS*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6) -diag(gains.impedances)*qTilde -diag(gains.dampings)*dqj);
+% New postural gains
+% GainCorr_imp   = gains.GainDamp;
+% GainCorr_damp  = gains.GainImp;
+% 
+% impedances = eye(ndof);
+% dampings   = eye(ndof);
+
+% Old version for postural gains
+% GainCorr_imp    = eye(ndof);
+% GainCorr_damp   = eye(ndof);
+
+Mbar            = M(7:end,7:end)-M(7:end,1:6)/Mb*Mbj;
+
+GainCorr_imp    = NullLambda/Mbar;
+GainCorr_damp   = NullLambda/Mbar;
+
+impedances      = diag(gains.impedances);
+dampings        = diag(gains.dampings);
+
+tauModel = Pinv_JcMinvS*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
+          -impedances*GainCorr_imp*qTilde -dampings*GainCorr_damp*dqj);
 
 %% Quadratic Programming solver
 f0               =  zeros(6,1);

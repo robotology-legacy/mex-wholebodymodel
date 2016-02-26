@@ -290,8 +290,8 @@ hold on
 grid on
 plot(CoP(1,1),CoP(2,1),'or')
 title('Foot CoP')
-xlabel('X direction (m)')
-ylabel('Y direction (m)')
+xlabel('Y direction (m)')
+ylabel('X direction (m)')
 axis([-0.1 0.1 -0.1 0.1])
 
 if sum(params.feet_on_ground) == 2
@@ -303,8 +303,8 @@ hold on
 grid on
 plot(CoP(1,1),CoP(2,1),'or')
 title('Left foot CoP')
-xlabel('X direction (m)')
-ylabel('Y direction (m)')
+xlabel('Y direction (m)')
+ylabel('X direction (m)')
 axis([-0.1 0.1 -0.1 0.1])
 
 figure(18)
@@ -314,8 +314,8 @@ hold on
 grid on
 plot(CoP(3,1),CoP(4,1),'or')
 title('Right foot CoP')
-xlabel('X direction (m)')
-ylabel('Y direction (m)')
+xlabel('Y direction (m)')
+ylabel('X direction (m)')
 axis([-0.1 0.1 -0.1 0.1])
 
 end
