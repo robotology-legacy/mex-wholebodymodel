@@ -9,7 +9,7 @@ classdef WBMBase < handle
     end
 
     properties(Access = protected)
-        iwbm_params@WBM.wbmBaseModelParams
+        mwbm_params@WBM.wbmBaseModelParams
     end
 
     methods%(Access = public)
@@ -53,14 +53,14 @@ classdef WBMBase < handle
                 % Optimized mode: use the default (URDF) robot name which is
                 % defined in the environment variable YARP_ROBOT_NAME for
                 % the WB(I)-Toolbox ...
-                obj.iwbm_params.urdfRobot = getenv('YARP_ROBOT_NAME');
+                obj.mwbm_params.urdfRobot = getenv('YARP_ROBOT_NAME');
                 wholeBodyModel('model-initialise');
                 return
             end
             % else, use the robot name that is supported by the WB(I)-Toolbox
             % [URDF-file(s) must exist in the directory of the WB(I)-Tbx] ...
-            obj.iwbm_params.urdfRobot = urdf_robot_name;
-            wholeBodyModel('model-initialise', obj.iwbm_params.urdfRobot);
+            obj.mwbm_params.urdfRobot = urdf_robot_name;
+            wholeBodyModel('model-initialise', obj.mwbm_params.urdfRobot);
         end
 
         function initModelURDF(obj, urdf_file_name)
@@ -71,8 +71,8 @@ classdef WBMBase < handle
                 error('WBMBase::initModelURDF: %s', WBM.wbmErrorMsg.FILE_NOT_EXIST);
             end
 
-            obj.iwbm_params.urdfRobot = urdf_file_name;
-            wholeBodyModel('model-initialise-urdf', obj.iwbm_params.urdfRobot);
+            obj.mwbm_params.urdfRobot = urdf_file_name;
+            wholeBodyModel('model-initialise-urdf', obj.mwbm_params.urdfRobot);
         end
 
         function setWorldFrame(~, wf_R_rootLnk, wf_p_rootLnk, g_wf)
@@ -90,12 +90,12 @@ classdef WBMBase < handle
             end
 
             if (nargin == 4)
-                obj.iwbm_params.wf_R_rootLnk = wf_R_rootLnk;
-                obj.iwbm_params.wf_p_rootLnk = wf_p_rootLnk;
-                obj.iwbm_params.g_wf         = g_wf;
+                obj.mwbm_params.wf_R_rootLnk = wf_R_rootLnk;
+                obj.mwbm_params.wf_p_rootLnk = wf_p_rootLnk;
+                obj.mwbm_params.g_wf         = g_wf;
             end
-            obj.setWorldFrame(obj.iwbm_params.wf_R_rootLnk, obj.iwbm_params.wf_p_rootLnk, ...
-                              obj.iwbm_params.g_wf);
+            obj.setWorldFrame(obj.mwbm_params.wf_R_rootLnk, obj.mwbm_params.wf_p_rootLnk, ...
+                              obj.mwbm_params.g_wf);
         end
 
         function [w_p_b, w_R_b] = getWorldFrameFromFixedLink(obj, urdf_link_name, q_j)
@@ -109,11 +109,11 @@ classdef WBMBase < handle
                         [w_p_b, w_R_b] = obj.computeNewWorld2Base(urdf_link_name);
                     else
                         % use the current (default) link name (**)
-                        [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.iwbm_params.urdfLinkName, q_j);
+                        [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.mwbm_params.urdfLinkName, q_j);
                     end
                 case 1
                     % (**) ...
-                    [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.iwbm_params.urdfLinkName);
+                    [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.mwbm_params.urdfLinkName);
                 otherwise
                     % should be never reached ...
                     error('WBMBase::getWorldFrameFromFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -157,7 +157,7 @@ classdef WBMBase < handle
         function J = jacobian(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j)
             if ~exist('urdf_link_name', 'var')
                 % use the default link name ...
-                urdf_link_name = obj.iwbm_params.urdfLinkName;
+                urdf_link_name = obj.mwbm_params.urdfLinkName;
             end
 
             switch nargin
@@ -173,7 +173,7 @@ classdef WBMBase < handle
 
         function djdq = dJdq(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             if ~exist('urdf_link_name', 'var')
-                urdf_link_name = obj.iwbm_params.urdfLinkName; % default ...
+                urdf_link_name = obj.mwbm_params.urdfLinkName; % default ...
             end
 
             switch nargin
@@ -201,7 +201,7 @@ classdef WBMBase < handle
 
         function wf_vqT_rlnk = forwardKinematics(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j)
             if ~exist('urdf_link_name', 'var')
-                urdf_link_name = obj.iwbm_params.urdfLinkName; % default ...
+                urdf_link_name = obj.mwbm_params.urdfLinkName; % default ...
             end
 
             switch nargin
@@ -256,36 +256,36 @@ classdef WBMBase < handle
                 error('WBMBase::set.urdfLinkName: %s', WBM.wbmErrorMsg.EMPTY_STRING);
             end
             % update the default link name ...
-            obj.iwbm_params.urdfLinkName = new_link_name;
+            obj.mwbm_params.urdfLinkName = new_link_name;
         end
 
         function lnk_name = get.urdfLinkName(obj)
-            lnk_name = obj.iwbm_params.urdfLinkName;
+            lnk_name = obj.mwbm_params.urdfLinkName;
         end
 
         function set.wf_R_rootLnk(obj, wf_R_rlnk)
             if ~isequal(size(wf_R_rlnk), [3,3])
                 error('WBMBase::set.wf_R_rootLnk: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
-            obj.iwbm_params.wf_R_rootLnk = wf_R_rlnk;
+            obj.mwbm_params.wf_R_rootLnk = wf_R_rlnk;
         end
 
         function set.wf_p_rootLnk(obj, wf_p_rlnk)
             if (size(wf_p_rlnk,1) ~= 3)
                 error('WBMBase::set.wf_p_rootLnk: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
-            obj.iwbm_params.wf_p_rootLnk = wf_p_rlnk;
+            obj.mwbm_params.wf_p_rootLnk = wf_p_rlnk;
         end
 
         function set.g_wf(obj, g)
             if (size(g,1) ~= 3)
                 error('WBMBase::set.g_wf: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
-            obj.iwbm_params.g_wf = g;
+            obj.mwbm_params.g_wf = g;
         end
 
         function wbm_params = get.wbm_params(obj)
-            wbm_params = obj.iwbm_params;
+            wbm_params = obj.mwbm_params;
         end
 
         function dispWBMParams(obj, prec)
@@ -298,10 +298,10 @@ classdef WBMBase < handle
                                  ' R (root link to world frame):  %s\n' ...
                                  ' p (root link to world frame):  %s\n' ...
                                  ' g (world frame):               %s\n'], ...
-                                obj.iwbm_params.urdfRobot, obj.iwbm_params.urdfLinkName, ...
-                                mat2str(obj.iwbm_params.wf_R_rootLnk, prec), ...
-                                mat2str(obj.iwbm_params.wf_p_rootLnk, prec), ...
-                                mat2str(obj.iwbm_params.g_wf, prec));
+                                obj.mwbm_params.urdfRobot, obj.mwbm_params.urdfLinkName, ...
+                                mat2str(obj.mwbm_params.wf_R_rootLnk, prec), ...
+                                mat2str(obj.mwbm_params.wf_p_rootLnk, prec), ...
+                                mat2str(obj.mwbm_params.g_wf, prec));
             disp(strParams);
         end
 
@@ -312,8 +312,8 @@ classdef WBMBase < handle
             if ~isa(model_params, 'WBM.wbmBaseModelParams')
                 error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            obj.iwbm_params = WBM.wbmBaseModelParams;
-            obj.iwbm_params.urdfLinkName = model_params.urdfLinkName;
+            obj.mwbm_params = WBM.wbmBaseModelParams;
+            obj.mwbm_params.urdfLinkName = model_params.urdfLinkName;
 
             % Initialize the mex-wholeBodyModel for a floating base robot,
             % using Unified Robot Description Format (URDF):

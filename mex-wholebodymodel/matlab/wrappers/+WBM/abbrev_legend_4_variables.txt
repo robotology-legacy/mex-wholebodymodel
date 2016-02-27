@@ -17,11 +17,12 @@ Legend of abbreviations and acronyms which are used for the variable names:
     h...    ... "handle" to an object, e.g. hFig = handle to the figure object
     h_c     ... centroidal momentum (vector)
     idx     ... index(es)
-    iwbm    ... "inner"wbm ("i" declares that this variable is private)
     j       ... joint
     jpos    ... joint position(s)
     ln      ... line
     lnk     ... link
+    m...    ... "member", 'm' declares that this variable is a private member variable, e.g. "mwbm", "mstv", etc.
+    ndof    ... number degrees of freedom
     noi     ... number of iterations
     nw      ... new world
     op      ... operator
