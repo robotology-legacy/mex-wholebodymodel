@@ -88,15 +88,15 @@ Mbar         = Mj - Mjb/Mb*Mbj;
 Mbar_inv     = Mbar'/(Mbar*Mbar' + toll*eye(size(Mbar,1)));
 
 %% Gains definition
-% gainsPCoM         = diag([50 50 50]);
-gainsPCoM         = diag([ 1 1 1]);
+gainsPCoM         = diag([40 45 40]);
 gainsDCoM         = sqrt(gainsPCoM);
-gainMomentum      = 1;
+gainPhi           = 5;
+gainMomentum      = 2*sqrt(gainPhi);
                        
 impTorso          = [20  20  20
                       0   0   0]; 
 
-impArms           = [ 13  13   13   5   5
+impArms           = [ 15  15   15   5   5
                        0   0    0   0   0 ];
 
 impLeftLeg        = [ 70  70  65  30  10  10
@@ -148,15 +148,15 @@ Nu_baseFrom_dqj  = -(eye(6)/Jb)*Jj;
 
 %% Analytical derivative with respect of joint position
 xCoM_posDerivative  = JCoM_b*Nu_baseFrom_dqj + JCoM_j;
-angularOrientation  = zeros(3,ndof);
+% angularOrientation  = zeros(3,ndof);
 
 %%%% CLOSED LOOP %%%%
 
-% angularOrientation  = -(Jw_b*Nu_baseFrom_dqj + Jw_j);
+angularOrientation  = -(Jw_b*Nu_baseFrom_dqj + Jw_j);
 
 %%%%%%%%%%%%%%%%%%%%%
 
-HDot_posDerivative = [-m*gainsPCoM*xCoM_posDerivative; angularOrientation];
+HDot_posDerivative = [-m*gainsPCoM*xCoM_posDerivative; gainPhi*angularOrientation];
 
 %% Analytical derivative with respect of joint velocity
 dxCoM_velDerivative = JCoM_b*Nu_baseFrom_dqj + JCoM_j;
@@ -173,10 +173,10 @@ B       =  pinvB2*B3;
 Nb      =  eye(ndof) - pinvB2*B2; 
 
 %% Stiffness
-KS      =  B*HDot_posDerivative + Nb*diag(impedances);
+KS      =  B*HDot_posDerivative + Nb*diag(impedances)*Nb*Mbar;
 
 %% Damping
-KD      =  B*HDot_velDerivative + Nb*diag(dampings);
+KD      =  B*HDot_velDerivative + Nb*diag(dampings)*Nb*Mbar;
 
 %% if you want to add Mbar:
 KS      = Mbar_inv*KS;
@@ -243,5 +243,3 @@ A_state = [zeros(ndof) eye(ndof);
 
 disp('eigenvalues of the state matrix')
 disp(eig(A_state))
-
-

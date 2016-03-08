@@ -20,6 +20,7 @@ wbm_modelInitialise('icubGazeboSim');
 %% Setup params for balancing controller
 params.demo_movements           =  1;                                      %either 0 or 1; only for two feet on the ground
 params.use_QPsolver             =  0;                                      %either 0 or 1
+params.use_Orientation          =  1;                                      %either 0 or 1
  
 % balancing on two feet or one foot
 params.feet_on_ground           =  [1,0];                                  %either 0 or 1
@@ -27,7 +28,7 @@ params.feet_on_ground           =  [1,0];                                  %eith
 % allows the visualization of torques, forces and other user-defined graphics 
 params.visualizer_graphics      =  1;                                      %either 0 or 1
 params.visualizer_demo          =  1;                                      %either 0 or 1
-params.visualizer_joints        =  1;                                      %either 0 or 1; only if visualizer_graphics = 1
+params.visualizer_jointsPos     =  1;                                      %either 0 or 1; only if visualizer_graphics = 1
  
 %% Setup general params
 % this is assuming a 25DoF iCub
@@ -58,8 +59,8 @@ elseif   params.feet_on_ground(1) == 0 && params.feet_on_ground(2) == 1
    
 end
  
-params.qjInit  = [params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit]*(pi/180);
-params.dqjInit = zeros(params.ndof,1);
+params.qjInit      = [params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit]*(pi/180);
+params.dqjInit     = zeros(params.ndof,1);
    
 params.dx_bInit    = zeros(3,1);
 params.omega_bInit = zeros(3,1);
@@ -70,15 +71,15 @@ wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit
 % fixing the world reference frame w.r.t. the foot on ground position
 if params.feet_on_ground(1) == 1
 
-[rot,pos] = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
+[R_b0,x_b0] = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
 
 else
     
-[rot,pos] = wbm_getWorldFrameFromFixedLink('r_sole',params.qjInit);
+[R_b0,x_b0] = wbm_getWorldFrameFromFixedLink('r_sole',params.qjInit);
     
 end
 
-wbm_setWorldFrame(rot,pos,[0 0 -9.81]')
+wbm_setWorldFrame(R_b0,x_b0,[0 0 -9.81]')
 
 [~,T_b,~,~]    = wbm_getState();
  
@@ -105,7 +106,7 @@ end
  params.numConstraints           = length(params.constraintLinkNames);
    
 %% Momentum jacobian and linearization of angular momentum integral
-% momentum jacobian
+% momentum jacobian at the eq. point
 Jw_b0               = zeros(6,6);
 Jw_j0               = zeros(6,params.ndof);
 Jc0                 = zeros(6*params.numConstraints,params.ndof+6);
@@ -115,7 +116,7 @@ for ii = 1:6
 Nu_base         = zeros(6,1);
 Nu_base(ii)     = 1;
 
-Jw_b0(:,ii)     = wbm_centroidalMomentum(rot, pos, params.qjInit, zeros(params.ndof,1), Nu_base);
+Jw_b0(:,ii)     = wbm_centroidalMomentum(R_b0, x_b0, params.qjInit, zeros(params.ndof,1), Nu_base);
  
 end
 
@@ -124,36 +125,25 @@ for ii = 1:params.ndof
 dqj_Jw         = zeros(params.ndof,1);
 dqj_Jw(ii)     = 1;
 
-Jw_j0(:,ii)    = wbm_centroidalMomentum(rot, pos, params.qjInit, dqj_Jw, zeros(6,1));
+Jw_j0(:,ii)    = wbm_centroidalMomentum(R_b0, x_b0, params.qjInit, dqj_Jw, zeros(6,1));
 
 end
 
+% contacts jacobian at the eq. point
 for i=1:params.numConstraints
     
-    Jc0(6*(i-1)+1:6*i,:) = wbm_jacobian(rot,pos,params.qjInit,params.constraintLinkNames{i});
+    Jc0(6*(i-1)+1:6*i,:) = wbm_jacobian(R_b0,x_b0,params.qjInit,params.constraintLinkNames{i});
     
 end
  
 Jw0  =  Jw_j0 -Jw_b0*(eye(6)/Jc0(1:6,1:6))*Jc0(1:6,7:end);
 
-% angular momentum's integral linearization
-params.linAngInt = Jw0(4:end,:);
+% angular momentum integral linearization
+params.linAngInt  = Jw0(4:end,:);
 
-params.rot       = rot;
-params.Jc0       = Jc0;
-params.pos       = pos;
-
-% Second derivative
-secondDerivative = zeros(6,params.ndof);
-
-for jj = 1:params.ndof
-
-numerical_der           = num_der(jj, params);
-secondDerivative(:,jj)  = numerical_der;
- 
-end
-
-params.secondDerivative = 0*secondDerivative(4:end,:);
+% parameters for the new postural task
+params.M0         = wbm_massMatrix(R_b0,x_b0,params.qjInit);
+params.Jc0        = Jc0;
 
 %% Others parameters for balancing controller
  jointLimits
@@ -168,21 +158,21 @@ params.secondDerivative = 0*secondDerivative(4:end,:);
  plot_set
  
  params.tStart   = 0;
- params.tEnd     = 60;   
+ params.tEnd     = 10;   
  params.sim_step = 0.01;
- params.wait     = waitbar(0,'State integration in process...');
+ params.wait     = waitbar(0,'State integration in progress...');
 
  forwardDynFunc  = @(t,chi)forwardDynamics_SoT(t,chi,params);
     
 %% Integrate forward dynamics
 if params.demo_movements == 0 || params.numConstraints == 1
 
-%options = odeset('RelTol',1e-3,'AbsTol', 1e-4);
- options = odeset('RelTol',1e-5,'AbsTol', 1e-5);
+% options = odeset('RelTol',1e-3,'AbsTol', 1e-4);
+  options = odeset('RelTol',1e-5,'AbsTol', 1e-5);
 
 else
 
- options = odeset('RelTol',1e-5,'AbsTol',1e-5);
+  options = odeset('RelTol',1e-5,'AbsTol',1e-5);
 
 end   
 
@@ -191,7 +181,7 @@ end
  delete(params.wait)       
  
 %% Visualize forward dynamics
-params.wait     = waitbar(0,'Graphics generation in process...');
+params.wait     = waitbar(0,'Graphics generation in progress...');
 
 visualizer_SoT(t,chi,params)
 

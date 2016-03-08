@@ -62,9 +62,9 @@ for i=1:param.numConstraints
 end
 
 % CoM jacobian
-J_CoM = wbm_jacobian(R_b,x_b,qj,'com');
+J_CoM  = wbm_jacobian(R_b,x_b,qj,'com');
 
-%% Joint limits check
+%% Joints limits check
 limits = param.limits;
 l_min  = limits(:,1);
 l_max  = limits(:,2);
@@ -166,7 +166,15 @@ dchi    = [dx;dNu];
 %% Visualization 
 % These are the variables that can be plotted by the visualizer.m
 % function
- visual_param.ddqj      =  dNu(7:end);
+
+% Added for IROS
+ visual_param.xCoM      =  xCoM;
+ visual_param.dxCoM     =  J_CoM(1:3,:)*Nu;
+ visual_param.xCoMdes   =  desired_x_dx_ddx_CoM(:,1);
+ visual_param.dxCoMdes  =  desired_x_dx_ddx_CoM(:,2);
+ visual_param.Href      =  [M(1,1)*desired_x_dx_ddx_CoM(:,2);zeros(3,1)];
+ visual_param.H         =  H;
+ 
  visual_param.pos_feet  =  [l_sole;r_sole];
  visual_param.fc        =  fc;
  visual_param.tau       =  tau;

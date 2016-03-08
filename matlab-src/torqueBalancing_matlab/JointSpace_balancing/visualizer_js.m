@@ -284,23 +284,14 @@ end
 %% CoP at feet
 for k=1:2
 
-figure(18)
-plot(CoP(1,:),CoP(2,:))
-hold on
-grid on
-plot(CoP(1,1),CoP(2,1),'or')
-title('Foot CoP')
-xlabel('Y direction (m)')
-ylabel('X direction (m)')
-axis([-0.1 0.1 -0.1 0.1])
-
 if sum(params.feet_on_ground) == 2
 
 figure(18)
 subplot(1,2,1)
 plot(CoP(1,:),CoP(2,:))
 hold on
-grid on
+grid on 
+subplot(1,2,1)
 plot(CoP(1,1),CoP(2,1),'or')
 title('Left foot CoP')
 xlabel('Y direction (m)')
@@ -312,8 +303,21 @@ subplot(1,2,2)
 plot(CoP(3,:),CoP(4,:))
 hold on
 grid on
+subplot(1,2,2)
 plot(CoP(3,1),CoP(4,1),'or')
 title('Right foot CoP')
+xlabel('Y direction (m)')
+ylabel('X direction (m)')
+axis([-0.1 0.1 -0.1 0.1])
+
+else
+    
+figure(18)
+plot(CoP(1,:),CoP(2,:))
+hold on
+grid on
+plot(CoP(1,1),CoP(2,1),'or')
+title('Foot CoP')
 xlabel('Y direction (m)')
 ylabel('X direction (m)')
 axis([-0.1 0.1 -0.1 0.1])

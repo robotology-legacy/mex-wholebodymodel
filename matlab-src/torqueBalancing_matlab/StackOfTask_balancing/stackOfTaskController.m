@@ -1,20 +1,21 @@
 function [tau,errorCoM,f0] = stackOfTaskController(param, constraints, feet, gains, Nu, M, h, H, Jc, dJcNu,...
                                                    xCoM, J_CoM, desired_x_dx_ddx_CoM)
 %% stackOfTaskController
-%  It computes the desired contact forces and moments and the joint torques for iCub balancing control using the "Stack of Task" control approach. 
+%  Computes the desired contact forces and moments and the joint torques for iCub balancing control using the "Stack of Task" approach. 
 %  If QP_SOLVER is selected, it uses a quadratic programming to calculate the null space of desired contact forces which minimize 
 %  the norm of joint torques.     
 %  The output are:
 %
-%  tau [nDof x 1]   which is the vector of control torques at joints;
+%  tau   [nDof x 1]   which is the vector of control torques at joints;
 %
-%  errorCoM [3 x 1] which is the CoM position error with respect of the
-%                   desired CoM trajectory;
+%  errorCoM [3 x 1]   which is the CoM position error with respect of the
+%                     desired CoM trajectory;
 %
 %  f0 [numConstraints x 1] which is the vector in the null space of contact
 %                          forces and moments
+%
 %% Variables and tolerances definition
- Pinv_tol        = 1e-8;
+ pinv_tol        = 1e-8;
  regHessiansQP   = 5e-2;
 %reg             = 0.01;
 
@@ -65,7 +66,7 @@ AR               = [ eye(3),zeros(3);
 if      sum(feet_on_ground) == 2
     
     A      = [AL,AR];
-    pinvA  = pinv(A,Pinv_tol);
+    pinvA  = pinv(A,pinv_tol);
     
 else  
     
@@ -88,55 +89,62 @@ end
  JcMinvS        = JcMinv*S;
  JcMinvJct      = JcMinv*transpose(Jc);
 
- Pinv_JcMinvS   = pinv(JcMinvS,Pinv_tol);
+ Pinv_JcMinvS   = pinv(JcMinvS,pinv_tol);
 %Pinv_JcMinvS   = JcMinvS'/(JcMinvS*JcMinvS' + reg*eye(size(JcMinvS,1)));
 
-%% Newton-Euler equations of motion at CoM with closed loop on momentum orientation
+%% Newton-Euler equations of motion at CoM
+
+% Closing the loop on angular momentum integral
 Kphi               = gains.gainPhi;
 qTilde             = param.qj-param.qjInit;
-DeltaPhi           = param.linAngInt*qTilde+param.secondDerivative*(qTilde).^2;
+deltaPhi           = param.linAngInt*qTilde;
 
+if param.use_Orientation == 1
+    
 HDotDes            = [ m*ddxCoMStar;
-                      -gains.gainMomentum*H(4:end)-Kphi*DeltaPhi];  
+                      -gains.gainMomentum*H(4:end)-Kphi*deltaPhi];  
 
-% Old version
-% HDotDes          = [ m*ddxCoMStar;
-%                    -gains.gainMomentum*H(4:end)];
-               
+else
+    
+HDotDes            = [ m*ddxCoMStar;
+                      -gains.gainMomentum*H(4:end)];
+                  
+end
+
 f_HDot             = pinvA*(HDotDes - f_grav);
     
 % Forces and torques null spaces
 Nullfc             =  eye(6*param.numConstraints)-pinvA*A;
 NullLambda         =  eye(ndof)-Pinv_JcMinvS*JcMinvS;
 
-%% Terms used for torques equation definition
-JBar             =  transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));    % multiplier of f in tau0
+%% Terms used to define the joints torques
+JBar               =  transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));    % multiplier of f in tau0
 
-Sigma            = -(Pinv_JcMinvS*JcMinvJct + NullLambda*JBar);
-SigmaNA          =  Sigma*Nullfc;
+Sigma              = -(Pinv_JcMinvS*JcMinvJct + NullLambda*JBar);
+SigmaNA            =  Sigma*Nullfc;
 
-% New postural gains
-% GainCorr_imp   = gains.GainDamp;
-% GainCorr_damp  = gains.GainImp;
-% 
-% impedances = eye(ndof);
-% dampings   = eye(ndof);
+if param.use_Orientation == 1
+    
+% new postural task
+impedances = gains.impedances;
+dampings   = gains.dampings;
 
-% Old version for postural gains
-% GainCorr_imp    = eye(ndof);
-% GainCorr_damp   = eye(ndof);
+GainCorr_imp  = gains.GainCorr_imp;
+GainCorr_damp = gains.GainCorr_damp;
 
-Mbar            = M(7:end,7:end)-M(7:end,1:6)/Mb*Mbj;
+else
 
-GainCorr_imp    = NullLambda/Mbar;
-GainCorr_damp   = NullLambda/Mbar;
+impedances       = diag(gains.impedances_old);
+dampings         = diag(gains.dampings_old);
 
-impedances      = diag(gains.impedances);
-dampings        = diag(gains.dampings);
+GainCorr_imp     = eye(ndof);
+GainCorr_damp    = eye(ndof);
 
-tauModel = Pinv_JcMinvS*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
-          -impedances*GainCorr_imp*qTilde -dampings*GainCorr_damp*dqj);
+end
 
+tauModel         = Pinv_JcMinvS*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
+                  -impedances*GainCorr_imp*qTilde -dampings*GainCorr_damp*dqj);
+        
 %% Quadratic Programming solver
 f0               =  zeros(6,1);
 
@@ -203,7 +211,7 @@ else
 
 if  sum(feet_on_ground) == 2
 
-  f0    = -pinv(SigmaNA,Pinv_tol)*(tauModel+Sigma*f_HDot);
+  f0    = -pinv(SigmaNA,pinv_tol)*(tauModel+Sigma*f_HDot);
 
 end
 

@@ -11,6 +11,7 @@ function [gains, constraints, trajectory] = gainsAndConstraints_SoT(param)
 %
 %  trajectory       this structure contains all the parameters needed for
 %                   CoM trajectory definition
+%
 %% General parameters
 ndof                       = param.ndof;
 Contact_constraints        = param.numConstraints;
@@ -30,8 +31,8 @@ if Contact_constraints == 2
     
    gains.gainsPCoM               = diag([ 50  50  50]);
    gains.gainsDCoM               = 2*sqrt(gains.gainsPCoM);
-   gains.gainMomentum            = 5;
-   gains.gainPhi                 = 1;
+   gains.gainPhi                 = 5;
+   gains.gainMomentum            = 2*sqrt(gains.gainPhi);
 
 % impedances acting in the null space of the desired contact forces 
     impTorso            = [ 50  50  50
@@ -50,7 +51,7 @@ if Contact_constraints == 2
         
         trajectory.directionOfOscillation = [0;1;0];
         trajectory.referenceParams        = [0.035 0.35];     %referenceParams(1) = amplitude of ascillations in meters
-    
+
     end
     
 end
@@ -60,9 +61,9 @@ if  Contact_constraints == 1
     
     gains.gainsPCoM                 = diag([40  45 40]);
     gains.gainsDCoM                 = 2*sqrt(gains.gainsPCoM);
-    gains.gainMomentum              = 10 ;
-    gains.gainPhi                   = 1;
-
+    gains.gainPhi                   = 5;
+    gains.gainMomentum              = 2*sqrt(gains.gainPhi);
+   
 % impedances acting in the null space of the desired contact forces 
      impTorso            = [ 20   20   20
                               0    0    0]; 
@@ -91,16 +92,17 @@ end
     if (demo_movements == 1)
         
         trajectory.directionOfOscillation = [0;1;0];
-        trajectory.referenceParams        = [0.035 0.35];     %referenceParams(1) = amplitude of ascillations in meters
+        trajectory.referenceParams        = [0.05 0.3];     %referenceParams(1) = amplitude of ascillations in meters
     
     end
 
 end
 
 %% Definition of impedances and dampings vectors
-  impedances             = [impTorso(1,:),impArms(1,:),impArms(1,:),impLeftLeg(1,:),impRightLeg(1,:)];
+
+  impedances             = [impTorso(1,:),impArms(1,:),impArms(1,:),impLeftLeg(1,:),impRightLeg(1,:)]/20;
    
-  gains.dampings         = 0.5*ones(1,ndof);
+  gains.dampings         = 0.5*ones(1,ndof)/4;
 
   increasingRatesImp     = [impTorso(2,:),impArms(2,:),impArms(2,:),impLeftLeg(2,:),impRightLeg(2,:)];
 
@@ -129,63 +131,42 @@ fZmin                        = 10;
 constraints.footSize = footSize;
 
 %% Impedances correction with a nonlinear term
-gains.impedances = nonLinImp(param.qjInit,param.qj,impedances,increasingRatesImp,qTildeMax);
+gains.impedances     = nonLinImp(param.qjInit,param.qj,impedances,increasingRatesImp,qTildeMax);
 
-%% New postural gains for the new controller
-rot = param.rot;
-pos = param.pos;
-Jc0 = param.Jc0;
+%% New postural task 
 
-S               = [ zeros(6,param.ndof);
-                    eye(param.ndof,param.ndof)];
-M0              = wbm_massMatrix(rot,pos,param.qjInit);
+% old postural
+gains.impedances_old = gains.impedances;
+gains.dampings_old   = gains.dampings;
 
-JcMinv          = Jc0/M0;
-JcMinvS         = JcMinv*S;
-Pinv_JcMinvS    = pinv(JcMinvS,1e-6);
+% parameters definition
+M         = param.M0;
+Jc        = param.Jc0;
+pinv_tol  = 1e-8;
 
-Mbar            = M0(7:end,7:end)-M0(7:end,1:6)/M0(1:6,1:6)*M0(1:6,7:end);
-NullLambda      = eye(param.ndof)-Pinv_JcMinvS*JcMinvS;
+S         = [ zeros(6,ndof);
+              eye(ndof,ndof)];
 
-GainCorr       = NullLambda*Mbar;
+JcMinv         = Jc/M;
+JcMinvS        = JcMinv*S;
 
-% Correction of impedances for the new controller
-impedances_old = diag(gains.impedances);
-dampings_old   = diag(gains.dampings);
+% damped null space
+Mbar                = M(7:end,7:end)-M(7:end,1:6)/M(1:6,1:6)*M(1:6,7:end);
+reg                 = 5e-6;
+Pinv_JcMinvS_damp   = JcMinvS'/(JcMinvS*JcMinvS' + reg*eye(size(JcMinvS,1)));
+NullLambda_damp     = eye(ndof)-Pinv_JcMinvS_damp*JcMinvS;
 
-reg            = 1e-8;
+% new postural task
+impedances = diag(gains.impedances)*pinv(NullLambda_damp*Mbar,pinv_tol);
+dampings   = diag(gains.dampings)*pinv(NullLambda_damp*Mbar,pinv_tol);
 
-PinvGainCorr   = GainCorr'/(GainCorr*GainCorr' + reg*eye(size(GainCorr,1)));
+gains.impedances = impedances +0.1*eye(ndof);
+gains.dampings   = dampings   +0.1*eye(ndof);
 
-KImp       = (impedances_old*PinvGainCorr);
-KDamp      = (dampings_old*PinvGainCorr);
- 
-[~,v1,~] = svd(KImp);
-[~,v2,~] = svd(KDamp);
+gains.GainCorr_imp     = NullLambda_damp*Mbar;
+gains.GainCorr_damp    = NullLambda_damp*Mbar;
 
-dv1 = diag(v1);
-dv2 = diag(v2);
-
-toll_imp  = 0.1;
-toll_damp = 0.01;
-
-for kk = 1:param.ndof
-    
-    if dv1(kk)<toll_imp
-        
-        dv1(kk) = gains.impedances(kk);
-        
-    end
-    
-     if dv2(kk)<toll_damp
-        
-        dv2(kk) = gains.dampings(kk);
-        
-    end
-    
-end
-
-gains.GainImp  = diag(dv1)*NullLambda*Mbar;
-gains.GainDamp = diag(dv2)*NullLambda*Mbar;
+% Added for IROS
+% save('gains','gains')
 
 end

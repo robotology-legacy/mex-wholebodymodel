@@ -124,15 +124,15 @@ Mbar          = Mj;
  Mbar_inv     = Mbar'/(Mbar*Mbar' + toll*eye(size(Mbar,1)));
 
 %% Gains definition
-% gainsPCoM         = diag([50 50 50]);
-gainsPCoM         = diag([1 1 1]);
+gainsPCoM         = diag([40 45 40]);
 gainsDCoM         = sqrt(gainsPCoM);
-gainMomentum      = 1;
+gainPhi           = 5;
+gainMomentum      = 2*sqrt(gainPhi);
                        
 impTorso          = [20  20  20
                       0   0   0]; 
 
-impArms           = [ 13  13   13   5   5
+impArms           = [ 15  15   15   5   5
                        0   0    0   0   0 ];
 
 impLeftLeg        = [ 70  70  65  30  10  10
@@ -142,7 +142,7 @@ impRightLeg       = [ 20  20  20  10  10  10
                        0   0   0   0   0   0];
 
 impedances        = [impTorso(1,:),impArms(1,:),impArms(1,:),impLeftLeg(1,:),impRightLeg(1,:)]; 
-dampings          =  0.5*ones(ndof,1); 
+dampings          = 0.5*ones(ndof,1); 
 
 %% Parameters from HDotDes
 
@@ -161,18 +161,18 @@ Nu_baseFrom_dqj     = -(eye(6)/Jb)*Jj;
 %% Analytical derivative with respect of joint position
 
 xCoM_posDerivative  = JCoM_b*Nu_baseFrom_dqj + JCoM_j;
-angularOrientation  = zeros(3,ndof);
+% angularOrientation  = zeros(3,ndof);
 
 %%%% CLOSED LOOP %%%%
 
-% Jh  = (Jw_b*Nu_baseFrom_dqj + Jw_j);
-% Jhw = Jh(4:6,:);
-% 
-% angularOrientation  = -Jhw;
+Jh  = (Jw_b*Nu_baseFrom_dqj + Jw_j);
+Jhw = Jh(4:6,:);
+
+angularOrientation  = -Jhw;
 
 %%%%%%%%%%%%%%%%%%%%%
 
-HDot_posDerivative  = [-m*gainsPCoM*xCoM_posDerivative; angularOrientation];
+HDot_posDerivative  = [-m*gainsPCoM*xCoM_posDerivative; gainPhi*angularOrientation];
 
 %% Analytical derivative with respect of joint velocity
 HDot_velDerivative  = -[gainsDCoM zeros(3); zeros(3) gainMomentum*eye(3)]*(Jw_b*Nu_baseFrom_dqj + Jw_j);
@@ -186,10 +186,10 @@ B       =  pinvB2*B3;
 Nb      =  eye(ndof) - pinvB2*B2; 
 
 %% Stiffness
-KS      =  B*HDot_posDerivative + Nb*diag(impedances);
+KS      =  B*HDot_posDerivative + Nb*diag(impedances)*Nb*Mj;
 
 %% Damping
-KD      =  B*HDot_velDerivative + Nb*diag(dampings);
+KD      =  B*HDot_velDerivative + Nb*diag(dampings)*Nb*Mj;
 
 %% if you want to add Mbar:
 KS      = Mbar_inv*KS;

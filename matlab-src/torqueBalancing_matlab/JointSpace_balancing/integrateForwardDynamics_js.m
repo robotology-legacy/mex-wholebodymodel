@@ -23,7 +23,7 @@ wbm_modelInitialise('icubGazeboSim');
  params.demo_movements           =  1;                                     %either 0 or 1
  
 % balancing on two feet or one foot
- params.feet_on_ground           = [1 1];                                  %either 1 or 0
+ params.feet_on_ground           = [1 0];                                  %either 1 or 0
 
 % visualize inverse kinematics graphics
  params.visualizerIkin           =  1;                                      %either 0 or 1

@@ -67,7 +67,7 @@ zlabel('Z(m)');
 
 end
 
-%% Graphics generation
+%% Graphics generation 
 if param.visualizer_graphics == 1
     
 %  generates the parameters defined in forwardDynamics_SoT.m
@@ -78,14 +78,24 @@ tau           = zeros(param.ndof,length(t));
 error_CoM     = zeros(3,length(t));
 pos_feet      = zeros(14,length(t));
 norm_tau      = zeros(1,length(t));
-norm_ddqj     = zeros(1,length(t));
 CoP           = zeros(4,length(t));
 phi_lfoot     = zeros(3,length(t));
 phi_rfoot     = zeros(3,length(t));
 
+%Added for IROS
+xCoM          = zeros(3,length(t));
+dxCoM         = zeros(3,length(t));
+xCoMdes       = zeros(3,length(t));
+dxCoMdes      = zeros(3,length(t));
+H             = zeros(6,length(t));
+Href          = zeros(6,length(t));
+norm_qjErr    = zeros(1,length(t));
+norm_HErr     = zeros(1,length(t));
+m             = param.M0(1,1);
+
 for time=1:length(t)
     
-[~,visual]     = forwardDynamics_SoT(t(time), chi(time,:)', param);
+[~,visual]          = forwardDynamics_SoT(t(time), chi(time,:)', param);
 
 qj(:,time)          = visual.qj;
 pos_feet(:,time)    = visual.pos_feet;
@@ -95,16 +105,25 @@ tau(:,time)         = visual.tau;
 error_CoM(:,time)   = visual.error_com;
 
 % norm of joint torques and CoP
-norm_tau(time)  = norm(visual.tau);
-norm_ddqj(time) = norm(visual.ddqj);
+norm_tau(time)   = norm(visual.tau);
+
+%Added for IROS
+norm_qjErr(time) = norm(visual.qj-param.qjInit);
+norm_HErr(time)  = norm(visual.H-visual.Href);
+H(:,time)        = visual.H;
+xCoM(:,time)     = visual.xCoM;
+dxCoM(:,time)    = visual.dxCoM;
+xCoMdes(:,time)  = visual.xCoMdes;
+dxCoMdes(:,time) = visual.dxCoMdes;
+Href(:,time)     = visual.Href;
  
 CoP(1,time)    = -visual.fc(5)/visual.fc(3);
 CoP(2,time)    =  visual.fc(4)/visual.fc(3);
 
 if  param.numConstraints == 2 
     
-CoP(3,time) = -visual.fc(11)/visual.fc(9);
-CoP(4,time) =  visual.fc(10)/visual.fc(9);
+CoP(3,time)    = -visual.fc(11)/visual.fc(9);
+CoP(4,time)    =  visual.fc(10)/visual.fc(9);
 
 end
 
@@ -119,6 +138,9 @@ quat_rFoot             = visual.pos_feet(8:end);
 [~,phi_rfoot(:,time)]  = parametrization(Rot_rFoot);
 
 end
+
+%% Save datas for IROS
+% save('visualizer', 'xCoM','dxCoM','m','H','Href','norm_qjErr','norm_HErr','fc','tau','xCoMdes','dxCoMdes')
 
 %% Feet position and orientation
 for k=1:3
@@ -240,7 +262,7 @@ xlabel('s')
 ylabel('Nm')
 
 %% Joints positions
-if param.visualizer_joints == 1
+if param.visualizer_jointsPos == 1
     
 for k=1:5
   
@@ -352,15 +374,24 @@ axis([-0.1 0.1 -0.1 0.1])
 
 end
 
-%% Square norm of joints accelerations
+%% Square norm of joints positions
 figure(15)
 hold on
 grid on
-plot(t,norm_ddqj)
-% axis([0 60 0 1.5])
+plot(t,norm_qjErr)
 
 xlabel('s')
-ylabel('rad/s^2')
-title('Square norm of joints accelerations')
+ylabel('rad')
+title('Square norm of joints pos error')
+
+%% Square norm of H error
+figure(16)
+hold on
+grid on
+plot(t,norm_HErr)
+
+xlabel('s')
+ylabel('|H-H_{ref}|')
+title('Square norm of H error')
 
 end

@@ -164,7 +164,7 @@ rfoot_iniPosRot                = [xInit_rfoot; phiInit_rfoot'];
 
 % Joint space balancing controller
  tau   = JointSpaceController(param, Nu_c, M_c, g_c, CNu_c, Jc_c, dJcNu_c, gains, jointReferences);
-
+ 
 %% Real contact forces
 Jct            = transpose(Jc);
 S              = [zeros(6,ndof); eye(ndof)];
