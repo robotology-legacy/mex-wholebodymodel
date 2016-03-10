@@ -60,3 +60,13 @@ const unsigned int ModelComponent::numAltArguments()
   return(numAltArgs);
 }
 
+bool ModelComponent::reorderMatrixElements(double *sourceMatrix, double (&destinationMatrix)[9])
+{
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            destinationMatrix[i*3 + j] = sourceMatrix[i + 3*j];
+        }
+    }
+    return(true);
+}
+
