@@ -21,20 +21,20 @@ For more information please check the relative [README_SoT](matlab-src/torqueBal
 [README_Jc](matlab-src/torqueBalancing_matlab/JointSpace_balancing/README)
 
 ## Tests
-To verify regression in the code when you modify the code, some
+To verify regression in the code when the user modifies the code, some
 regression tests have been implemented in this repository.
 
 ### Run tests
 Tests use `ctest` infrastructure.
-To run the tests on this repository, after you compiled the project, just following the following steps:
+To run the tests on this repository, after compiling the project, just follows the following steps:
 
 - Move (`cd`) to the build directory
-- Run the `ctest` command. If your project supports multiples configurations (e.g. Xcode), you also have to specify the configuration with `-C`, thus for example `ctest -C Debug`.
+- Run the `ctest` command. If the project supports multiples configurations (e.g. Xcode), the user also has to specify the configuration with `-C`, thus for example `ctest -C Debug`.
 
-If you want to print out the verbose output of the tests, launch the `ctest` command by adding the `-VV` option.
+To print out the verbose output of the tests, launch the `ctest` command by adding the `-VV` option.
 
 ### Add new tests
-To add new tests, just write a script that runs your test and raise and exception
+To add new tests, just write a script that runs the test and raise and exception
 if the test fails (for example using the `assert` command or the [tests/WBAssertEqual.m](tests/wBAAssertEqual.m) function).
-Then modify the [tests/WBMTests.m](tests/WBMTests.m) file to call your testing script.
+Then modify the [tests/WBMTests.m](tests/WBMTests.m) file to call the testing script.
 

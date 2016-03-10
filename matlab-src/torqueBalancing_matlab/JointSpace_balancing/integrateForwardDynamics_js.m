@@ -8,10 +8,7 @@ clear all
 close all
 clc
 
-%% Setup path
-addpath('./../../../mex-wholebodymodel/matlab/utilities');
-addpath('./../../../mex-wholebodymodel/matlab/wrappers');
-addpath('./../../../../../build/');
+%% Setup path for inverse kinematics
 addpath('./inverseKinematics');
 
 %% Initialise the mexWholeBodyModel
@@ -22,7 +19,7 @@ wbm_modelInitialise('icubGazeboSim');
  params.demo_movements           =  1;                                     % either 0 or 1
  
 % balancing on two feet or one foot
- params.feet_on_ground           = [1 0];                                  % either 0 or 1; [left;right]
+ params.feet_on_ground           = [1 1];                                  % either 0 or 1; [left;right]
 
 % visualize inverse kinematics graphics
  params.visualizerIkin           =  0;                                     % either 0 or 1
@@ -127,7 +124,7 @@ end
  params.CoM_ini   = wbm_forwardKinematics(rot, pos, params.qjInit,'com');
  
 %% Joints limits
- jointLimits
+ [jl1,jl2]        = wbm_jointLimits();
  limits           = [jl1 jl2];
  params.limits    = limits;
 

@@ -8,12 +8,6 @@ clear all
 close all
 clc
 
-%% Setup path
-% Set the path properly depending on where are the required folders in your computer
-addpath('./../../../mex-wholebodymodel/matlab/utilities');
-addpath('./../../../mex-wholebodymodel/matlab/wrappers');
-addpath('./../../../../../build/');
-
 %% Initialize the mexWholeBodyModel
 wbm_modelInitialise('icubGazeboSim');
 
@@ -23,7 +17,7 @@ params.use_QPsolver             =  0;                                      %eith
 params.use_Orientation          =  1;                                      %either 0 or 1
  
 % balancing on two feet or one foot
-params.feet_on_ground           =  [1,0];                                  %either 0 or 1; [left,right]
+params.feet_on_ground           =  [1,1];                                  %either 0 or 1; [left,right]
 
 % allows the visualization of torques, forces and other user-defined graphics 
 params.visualizer_graphics      =  1;                                      %either 0 or 1
@@ -146,7 +140,7 @@ params.M0         = wbm_massMatrix(R_b0,x_b0,params.qjInit);
 params.Jc0        = Jc0;
 
 %% Others parameters for balancing controller
- jointLimits
+ [jl1,jl2]        = wbm_jointLimits();
  limits           = [jl1 jl2];
  params.limits    = limits;
  params.CoM_ini   = wbm_forwardKinematics('com');

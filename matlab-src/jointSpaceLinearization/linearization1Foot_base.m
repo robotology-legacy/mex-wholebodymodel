@@ -7,11 +7,7 @@ clear all
 close all
 clc
 
-%% Path and model initialization
-addpath('./../../mex-wholebodymodel/matlab/utilities');
-addpath('./../../mex-wholebodymodel/matlab/wrappers');
-addpath('./../../../../build/');
-
+%% Model initialization
 wbm_modelInitialise('icubGazeboSim');
 
 % this model is avaliable only for 1 foot on ground
