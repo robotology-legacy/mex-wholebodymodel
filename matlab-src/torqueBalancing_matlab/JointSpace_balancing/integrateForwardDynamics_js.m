@@ -26,7 +26,7 @@ wbm_modelInitialise('icubGazeboSim');
  
 % visualize state integration graphics
  params.visualizerGraphics       =  1;                                     % either 0 or 1
- params.visualizerJoints         =  0;                                     % either 0 or 1
+ params.visualizerJoints         =  1;                                     % either 0 or 1
 
 % visualize demo of robot's movements
  params.visualizerDemo           =  1;                                     % either 0 or 1

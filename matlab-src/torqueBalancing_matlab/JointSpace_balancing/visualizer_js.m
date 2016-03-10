@@ -225,7 +225,7 @@ grid on
 xlabel('s')
 ylabel('rad')
 
-name = whatname('l_arm',k);
+name = whatname('left_arm',k);
 title(name)
 legend('Real pos','Ikin pos','Desired pos')
 
@@ -237,7 +237,7 @@ grid on
 xlabel('s')
 ylabel('rad')
 
-name = whatname('r_arm',k);
+name = whatname('right_arm',k);
 title(name)
 legend('Real pos','Ikin pos','Desired pos')
 
@@ -254,7 +254,7 @@ grid on
 xlabel('s')
 ylabel('rad')
 
-name = whatname('l_leg',k);
+name = whatname('left_leg',k);
 title(name)
 legend('Real pos','Ikin pos','Desired pos')
 
@@ -266,7 +266,7 @@ grid on
 xlabel('s')
 ylabel('rad')
 
-name = whatname('r_leg',k);
+name = whatname('right_leg',k);
 title(name)
 legend('Real pos','Ikin pos','Desired pos')
 

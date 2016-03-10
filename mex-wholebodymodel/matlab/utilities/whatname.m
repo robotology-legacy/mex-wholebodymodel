@@ -25,7 +25,7 @@ end
 end
 
 %% Rigth arm graphics
-a2 = strcmp(name_group,'r_arm');
+a2 = strcmp(name_group,'right_arm');
 
 if a2 == 1
     
@@ -54,7 +54,7 @@ if a2 == 1
 end
         
 %% Left arm graphics
-a3 = strcmp(name_group,'l_arm');
+a3 = strcmp(name_group,'left_arm');
 
 if a3 == 1
     
@@ -83,7 +83,7 @@ if a3 == 1
 end
 
 %% Left leg graphics
-a4 = strcmp(name_group,'l_leg');
+a4 = strcmp(name_group,'left_leg');
 
 if a4 == 1
     
@@ -117,7 +117,7 @@ if a4 == 1
 end
 
 %% Rigth leg graphics
-a5 = strcmp(name_group,'r_leg');
+a5 = strcmp(name_group,'right_leg');
 
 if a5 == 1
     
