@@ -12,28 +12,27 @@ clc
 addpath('./../../../mex-wholebodymodel/matlab/utilities');
 addpath('./../../../mex-wholebodymodel/matlab/wrappers');
 addpath('./../../../../../build/');
-addpath('./ikin_functions');
-addpath('./centroidalTransf_functions');
+addpath('./inverseKinematics');
 
 %% Initialise the mexWholeBodyModel
 wbm_modelInitialise('icubGazeboSim');
 
 %% Setup robot parameters
 % CoM follows a desired trajectory
- params.demo_movements           =  1;                                     %either 0 or 1
+ params.demo_movements           =  1;                                     % either 0 or 1
  
 % balancing on two feet or one foot
- params.feet_on_ground           = [1 0];                                  %either 1 or 0
+ params.feet_on_ground           = [1 0];                                  % either 0 or 1; [left;right]
 
 % visualize inverse kinematics graphics
- params.visualizerIkin           =  1;                                      %either 0 or 1
+ params.visualizerIkin           =  0;                                     % either 0 or 1
  
 % visualize state integration graphics
- params.visualizerGraphics       =  1;                                      %either 0 or 1
- params.visualizerJoints         =  1;                                      %either 0 or 1
+ params.visualizerGraphics       =  1;                                     % either 0 or 1
+ params.visualizerJoints         =  0;                                     % either 0 or 1
 
 % visualize demo of robot's movements
- params.visualizerDemo           =  1;                                      %either 0 or 1
+ params.visualizerDemo           =  1;                                     % either 0 or 1
 
 %% Com trajectory reference
 % if demo_movements = 1, these parameters define the desired CoM trajectory
@@ -56,30 +55,30 @@ end
 % this is assuming a 25DoF iCub
  params.ndof         = 25;
 
-% initial joints position (deg)                 
- params.leftArmInit  = [ -20   30  0.0  45   0.0]';          
- params.rightArmInit = [ -20   30  0.0  45   0.0]';
- params.torsoInit    = [ -10.0   0.0    0.0]';
+% initial conditions                  
+params.leftArmInit  = [ -20   30  0.0  45   0.0]';          
+params.rightArmInit = [ -20   30  0.0  45   0.0]'; 
+params.torsoInit    = [ -10.0   0.0    0.0]';
  
- if     sum(params.feet_on_ground) == 2
+if     params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 1
      
-% initial conditions for balancing on two feet  
- params.leftLegInit  = [  25.5   0.0   0.0  -18.5  -5.5  -0.0]';
- params.rightLegInit = [  25.5   0.0   0.0  -18.5  -5.5  -0.0]';
+% initial conditions for balancing on two feet 
+ params.leftLegInit  = [  25.5   0.1   0.0  -18.5  -5.5  -0.1]';
+ params.rightLegInit = [  25.5   0.1   0.0  -18.5  -5.5  -0.1]';
 
- elseif params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 0
-      
+elseif   params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 0
+     
 % initial conditions for the robot standing on the left foot
  params.leftLegInit  = [  25.5   15.0   0.0  -18.5  -5.5  -0.1]';
  params.rightLegInit = [  25.5   5.0    0.0  -40    -5.5  -0.1]'; 
  
- elseif params.feet_on_ground(1) == 0 && params.feet_on_ground(2) == 1
-      
-% initial conditions for the robot standing on the left foot
- params.rightLegInit  = [  25.5   15.0   0.0  -18.5  -5.5  -0.1]';
- params.leftLegInit   = [  25.5   5.0    0.0  -40    -5.5  -0.1]'; 
-
- end
+elseif   params.feet_on_ground(1) == 0 && params.feet_on_ground(2) == 1
+  
+% initial conditions for the robot standing on the right foot
+ params.leftLegInit  = [  25.5   5.0    0.0  -40    -5.5  -0.1]';
+ params.rightLegInit = [  25.5   15.0   0.0  -18.5  -5.5  -0.1]';
+   
+end
  
  params.qjInit  = [params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit]*(pi/180);
  params.dqjInit = zeros(params.ndof,1);
@@ -92,7 +91,7 @@ end
 wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit]);
 
 % fixing the world reference frame w.r.t. the foot on ground
-if params.feet_on_ground(2) == 0
+if params.feet_on_ground(1) == 0
     
 [rot,pos]   = wbm_getWorldFrameFromFixedLink('r_sole',params.qjInit);
 
@@ -116,7 +115,7 @@ if     sum(params.feet_on_ground) == 2
  
   elseif params.feet_on_ground(1) == 0 && params.feet_on_ground(2) == 1
 
- params.constraintLinkNames      = {'l_sole'}; 
+ params.constraintLinkNames      = {'r_sole'}; 
        
 end
 
@@ -125,7 +124,6 @@ end
 %% Feet initial position and orientation and CoM initial position                               
  params.lfoot_ini = wbm_forwardKinematics(rot, pos, params.qjInit,'l_sole');
  params.rfoot_ini = wbm_forwardKinematics(rot, pos, params.qjInit,'r_sole');
- 
  params.CoM_ini   = wbm_forwardKinematics(rot, pos, params.qjInit,'com');
  
 %% Joints limits
@@ -158,8 +156,8 @@ for ii=1:params.numConstraints
 
 end
 
-JCoM_ikin_tot  =  wbm_jacobian(rot, pos, params.qjInit,'com');
-JCoM_ikin      =  JCoM_ikin_tot(1:3,:);
+JCoM_ikin      =  wbm_jacobian(rot, pos, params.qjInit,'com');
+JCoM_ikin_lin  =  JCoM_ikin(1:3,:);
 
 %% Desired state velocity
 % higher priority: feet position and orientation
@@ -168,8 +166,8 @@ feetPosAndOrient   = zeros(6*params.numConstraints,1);
 Nullfeet           = eye(params.ndof+6) - pinvJc_ikin*Jc_ikin;
 
 % lower priority: CoM position
-JCoM_low           = JCoM_ikin*Nullfeet;
-CoMPos             = desired_x_dx_ddx_CoM(:,2) - JCoM_ikin*pinvJc_ikin*feetPosAndOrient;
+JCoM_low           = JCoM_ikin_lin*Nullfeet;
+CoMPos             = desired_x_dx_ddx_CoM(:,2) - JCoM_ikin_lin*pinvJc_ikin*feetPosAndOrient;
 
 % desired state velocity
 Nu_ikin0           = pinv(JCoM_low, PINV_TOL)*CoMPos;    
@@ -190,7 +188,7 @@ params.tEnd          = 10;
 params.euler_step    = 0.01; 
 
 % waitbar 
-params.wait          = waitbar(0,'Inverse kinematics integration in process...');
+params.wait          = waitbar(0,'Inverse kinematics integration in progress...');
  
 [params.t_kin, params.joints_traj] = ikin_integrator(params);
 
@@ -203,8 +201,18 @@ ikin_graphics(params);
 %% Setup state integration
 % ode tolerances
  params.sim_step = 0.01;
- options         = odeset('RelTol',1e-5,'AbsTol',1e-5);
- params.wait     = waitbar(0,'State integration in process...');
+ 
+ if params.demo_movements == 0 
+
+  options = odeset('RelTol',1e-3,'AbsTol', 1e-4);
+
+else
+
+  options = odeset('RelTol',1e-5,'AbsTol',1e-5);
+
+ end
+ 
+ params.wait     = waitbar(0,'State integration in progress...');
 
 % function that will be integrated
  forwardDynFunc  = @(t,chi)forwardDynamics_js(t,chi,params);

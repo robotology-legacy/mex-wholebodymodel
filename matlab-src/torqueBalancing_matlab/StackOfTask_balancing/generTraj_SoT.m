@@ -20,14 +20,10 @@ end
 
  freq    = trajectory.referenceParams(2);
  
-% Smoothing the initial input to avoid high response at time 0
- T          = 0.25;
- smooth     = 1-exp(-t/T);
- 
 % Desired trajectory
- xCoMDes    =  xCoM_0 + smooth*Ampl*sin(2*pi*freq*t)*trajectory.directionOfOscillation;
- dxCoMDes   =  smooth*Ampl*2*pi*freq*cos(2*pi*freq*t)*trajectory.directionOfOscillation;
- ddxCoMDes  = -smooth*Ampl*(2*pi*freq)^2*sin(2*pi*freq*t)*trajectory.directionOfOscillation;
+ xCoMDes    =  xCoM_0 + Ampl*sin(2*pi*freq*t)*trajectory.directionOfOscillation;
+ dxCoMDes   =           Ampl*2*pi*freq*cos(2*pi*freq*t)*trajectory.directionOfOscillation;
+ ddxCoMDes  =          -Ampl*(2*pi*freq)^2*sin(2*pi*freq*t)*trajectory.directionOfOscillation;
 
  desired_x_dx_ddx_CoM = [xCoMDes dxCoMDes ddxCoMDes];
  

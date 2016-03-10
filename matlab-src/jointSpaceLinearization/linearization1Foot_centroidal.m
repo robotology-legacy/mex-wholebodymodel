@@ -1,15 +1,17 @@
-%% linearizeJointAcc
+%% linearization1Foot_centroidal
 %  linearizes the joint space equations of motion of robot iCub when it's
 %  controlled with "stack of task" control approach. This version is for
-%  the robot balancing on one foot. 
+%  the robot balancing on one foot, and the equations of motion are espressed 
+%  in centroidal coordinates.
+%
 clear all
 close all
 clc
 
 %% Path and model initialization
-addpath('./../../../../mex-wholebodymodel/matlab/utilities');
-addpath('./../../../../mex-wholebodymodel/matlab/wrappers');
-addpath('./../../../../../../build/');
+addpath('./../../mex-wholebodymodel/matlab/utilities');
+addpath('./../../mex-wholebodymodel/matlab/wrappers');
+addpath('./../../../../build/');
 
 wbm_modelInitialise('icubGazeboSim');
 
@@ -65,8 +67,8 @@ M            = wbm_massMatrix(Rb,position,qj);
 JCoM_total   = wbm_jacobian(Rb, position, qj, 'com');
 
 % momentum jacobian
-Jw_b       = zeros(6,6);
-Jw_j       = zeros(6,ndof);
+Jw_b         = zeros(6,6);
+Jw_j         = zeros(6,ndof);
 
 for ii = 1:6
     
@@ -81,16 +83,16 @@ end
 
 for ii = 1:ndof
 
-dqj         = zeros(ndof,1);
-dqj(ii)     = 1;
+dqj          = zeros(ndof,1);
+dqj(ii)      = 1;
 
-H           = wbm_centroidalMomentum(Rb, position, qj, dqj, zeros(6,1));
+H            = wbm_centroidalMomentum(Rb, position, qj, dqj, zeros(6,1));
 
-Jw_j(:,ii)  = H;
+Jw_j(:,ii)   = H;
 
 end
 
-Jw          =  [Jw_b Jw_j];
+Jw           =  [Jw_b Jw_j];
 
 % constant values
 m            = M(1,1);
@@ -100,7 +102,7 @@ CoM          = wbm_forwardKinematics(Rb,position,qj,'com');
 xCoM         = CoM(1:3);
 
 %% Centroidal conversion
-[Tr, dT] = centroidalTransformationT_TDot(xCoM,position,zeros(3,1),zeros(3,1),M);
+[Tr, dT]           = centroidalTransformationT_TDot(xCoM,position,zeros(3,1),zeros(3,1),M);
 [M_c,~,~,Jc_c,~,~] = fromFloatingToCentroidalDynamics(M, h, g, Jc, zeros(6,1), zeros(ndof+6,1), Tr, dT);
 [~,~,~,Jw_c,~,~]   = fromFloatingToCentroidalDynamics(M, h, g, Jw, zeros(6,1), zeros(ndof+6,1), Tr, dT);
 [~,~,~,JCoM_c,~,~] = fromFloatingToCentroidalDynamics(M, h, g, JCoM_total, zeros(6,1), zeros(ndof+6,1), Tr, dT);
@@ -122,6 +124,14 @@ Mbar          = Mj;
 
 %Mbar_inv     = eye(ndof)/Mj;
  Mbar_inv     = Mbar'/(Mbar*Mbar' + toll*eye(size(Mbar,1)));
+
+%% Other terms 
+B2      =  Jj*Mbar_inv;
+B3      =  Jb/Mb;
+pinvB2  =  pinv(B2,toll);
+
+B       =  pinvB2*B3;
+Nb      =  eye(ndof) - pinvB2*B2; 
 
 %% Gains definition
 gainsPCoM         = diag([40 45 40]);
@@ -161,99 +171,35 @@ Nu_baseFrom_dqj     = -(eye(6)/Jb)*Jj;
 %% Analytical derivative with respect of joint position
 
 xCoM_posDerivative  = JCoM_b*Nu_baseFrom_dqj + JCoM_j;
+
+%%%% CENTROIDAL ORIENTATION %%%%
+
+% open loop
 % angularOrientation  = zeros(3,ndof);
+% Kimp                = diag(impedances); 
+% Kdamp               = diag(dampings);
 
-%%%% CLOSED LOOP %%%%
+% closed loop and new postural task
+angularOrientation  = -(Jw_b(4:6,:)*Nu_baseFrom_dqj+Jw_j(4:6,:));
+Kimp                =  diag(impedances)*Nb*Mbar; 
+Kdamp               =  diag(dampings)*Nb*Mbar;
 
-Jh  = (Jw_b*Nu_baseFrom_dqj + Jw_j);
-Jhw = Jh(4:6,:);
-
-angularOrientation  = -Jhw;
-
-%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 HDot_posDerivative  = [-m*gainsPCoM*xCoM_posDerivative; gainPhi*angularOrientation];
 
 %% Analytical derivative with respect of joint velocity
 HDot_velDerivative  = -[gainsDCoM zeros(3); zeros(3) gainMomentum*eye(3)]*(Jw_b*Nu_baseFrom_dqj + Jw_j);
- 
-%% Other terms 
-B2      =  Jj*Mbar_inv;
-B3      =  Jb/Mb;
-pinvB2  =  pinv(B2,toll);
-
-B       =  pinvB2*B3;
-Nb      =  eye(ndof) - pinvB2*B2; 
 
 %% Stiffness
-KS      =  B*HDot_posDerivative + Nb*diag(impedances)*Nb*Mj;
+KS      =  Mbar_inv*(B*HDot_posDerivative + Nb*Kimp);
 
 %% Damping
-KD      =  B*HDot_velDerivative + Nb*diag(dampings)*Nb*Mj;
-
-%% if you want to add Mbar:
-KS      = Mbar_inv*KS;
-KD      = Mbar_inv*KD;
-
-%% Stability verify and visualization
-% symmetrized stiffness matrix
-KS_sym     = (KS+transpose(KS))/2;
-eig_KS_sym =  eig(KS_sym);
-flag       =  0;
-
-for ii = 1:length(eig_KS_sym)
-    
-    if eig_KS_sym(ii) <= 0
-        
-    flag = 1;
-        
-    end
-    
-end
-
-if flag == 1
-    
-  disp('the stiffness matrix is NOT positive definite')
-        
-else
-        
-  disp('the stiffness matrix is positive definite')
-        
-end      
-
-% symmetrized damping matrix
-KD_sym     = (KD+transpose(KD))/2;
-eig_KD_sym =  eig(KD_sym);
-flag       =  0;
-
-for ii = 1:length(eig_KD_sym)
-    
-    if eig_KD_sym(ii) <= 0
-        
-    flag = 1;
-     
-    end
-    
-end
-
-if flag == 1
-  
- disp('the damping matrix is NOT positive definite')
-        
-else
-        
- disp('the damping matrix is positive definite')
-        
-end      
-
-% eigenvalues visualization
-% disp('eigenvalues: KSsym, KDsym, KS, KD')
-% disp([eig_KS_sym eig_KD_sym eig(KS) eig(KD)])
+KD      =  Mbar_inv*(B*HDot_velDerivative + Nb*Kdamp);
 
 %% State matrix verification
-A_state = [zeros(ndof)  eye(ndof);
+A_state = [zeros(ndof) eye(ndof);
              -KS          -KD];
 
 disp('eigenvalues of the state matrix')
 disp(eig(A_state))
-

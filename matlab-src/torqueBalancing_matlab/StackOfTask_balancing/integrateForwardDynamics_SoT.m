@@ -14,7 +14,7 @@ addpath('./../../../mex-wholebodymodel/matlab/utilities');
 addpath('./../../../mex-wholebodymodel/matlab/wrappers');
 addpath('./../../../../../build/');
 
-%% Initialise the mexWholeBodyModel
+%% Initialize the mexWholeBodyModel
 wbm_modelInitialise('icubGazeboSim');
 
 %% Setup params for balancing controller
@@ -23,12 +23,12 @@ params.use_QPsolver             =  0;                                      %eith
 params.use_Orientation          =  1;                                      %either 0 or 1
  
 % balancing on two feet or one foot
-params.feet_on_ground           =  [1,0];                                  %either 0 or 1
+params.feet_on_ground           =  [1,1];                                  %either 0 or 1; [left,right]
 
 % allows the visualization of torques, forces and other user-defined graphics 
 params.visualizer_graphics      =  1;                                      %either 0 or 1
 params.visualizer_demo          =  1;                                      %either 0 or 1
-params.visualizer_jointsPos     =  1;                                      %either 0 or 1; only if visualizer_graphics = 1
+params.visualizer_jointsPos     =  0;                                      %either 0 or 1; only if visualizer_graphics = 1
  
 %% Setup general params
 % this is assuming a 25DoF iCub
@@ -165,14 +165,13 @@ params.Jc0        = Jc0;
  forwardDynFunc  = @(t,chi)forwardDynamics_SoT(t,chi,params);
     
 %% Integrate forward dynamics
-if params.demo_movements == 0 || params.numConstraints == 1
+if params.demo_movements == 0 
 
-% options = odeset('RelTol',1e-3,'AbsTol', 1e-4);
-  options = odeset('RelTol',1e-5,'AbsTol', 1e-5);
+  options = odeset('RelTol',1e-3,'AbsTol', 1e-4);
 
 else
 
-  options = odeset('RelTol',1e-5,'AbsTol',1e-5);
+  options = odeset('RelTol',1e-6,'AbsTol',1e-6);
 
 end   
 

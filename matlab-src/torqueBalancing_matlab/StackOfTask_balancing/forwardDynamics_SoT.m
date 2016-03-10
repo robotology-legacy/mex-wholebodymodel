@@ -25,6 +25,10 @@ function [dchi,visual_param]=forwardDynamics_SoT(t,chi,param)
 % position and orientation
 x_b  = chi(1:3,:); 
 qt_b = chi(4:7,:);
+
+% normalize quaternions to avoid numerical errors
+qt_b = qt_b/norm(qt_b);
+
 qj   = chi(8:ndof+7,:);
 
 % linear and angular velocity
@@ -166,15 +170,8 @@ dchi    = [dx;dNu];
 %% Visualization 
 % These are the variables that can be plotted by the visualizer.m
 % function
-
-% Added for IROS
- visual_param.xCoM      =  xCoM;
- visual_param.dxCoM     =  J_CoM(1:3,:)*Nu;
- visual_param.xCoMdes   =  desired_x_dx_ddx_CoM(:,1);
- visual_param.dxCoMdes  =  desired_x_dx_ddx_CoM(:,2);
  visual_param.Href      =  [M(1,1)*desired_x_dx_ddx_CoM(:,2);zeros(3,1)];
  visual_param.H         =  H;
- 
  visual_param.pos_feet  =  [l_sole;r_sole];
  visual_param.fc        =  fc;
  visual_param.tau       =  tau;

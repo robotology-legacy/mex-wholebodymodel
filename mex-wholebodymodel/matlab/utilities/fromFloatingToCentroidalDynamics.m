@@ -20,9 +20,9 @@ M_c(4:6,1:3)   = zeros(3);
 Nu_c         = T*Nu;
 gravAcc      = norm(invTt*g)/M(1,1);
 
-e3          = zeros(ndof+6,1);
-e3(3)       = 1;
-g_c         = M(1,1)*gravAcc*e3;
+e3           = zeros(ndof+6,1);
+e3(3)        = 1;
+g_c          = M(1,1)*gravAcc*e3;
 
 %coriolis terms
 CNu           = h - g;
@@ -42,7 +42,7 @@ C_cNu_c       = [ zeros(3,1);
 %new dT*Nu computation for Jacobian
 dTNu          = M_c\(CNu-C_cNu_c);  
 
-Jc_c           = Jc*invT;
+Jc_c          = Jc*invT;
 dJcNu_c       = dJcNu - Jc*invT*dTNu;
 
 end

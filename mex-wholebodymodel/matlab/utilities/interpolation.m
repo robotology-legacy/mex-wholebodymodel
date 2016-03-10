@@ -7,7 +7,7 @@ function  [jointReferences, errorCoM] = interpolation(t,params,xCoM)
 %                   position, velocity and acceleration;
 %
 %  errorCoM         [3x1] which is the CoM position error
-
+%
 %% Trajectory interpolation 
 time = params.t_kin;
 

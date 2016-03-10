@@ -5,7 +5,7 @@ function gains = gainsAndConstraints_js (param)
 %  The output is:
 %
 %  gains            this is a structure which contains both CoM and joints gains
-
+%
 %% Setup parameters
 feet_on_ground   = param.feet_on_ground;
 ndof             = param.ndof;
@@ -35,11 +35,23 @@ if  sum(feet_on_ground) == 1
       impArms             = [ 13  13   13   5   13
                                0    0    0   0   0 ];
 
-      impLeftLeg          = [ 70   70   65  30  10  10
-                               0    0    0   0   0   0]; 
+if param.feet_on_ground(1) == 1
+    
+     impLeftLeg          = [ 70   70  65  30  10  10
+                              0    0   0   0   0   0]; 
 
-      impRightLeg         = [ 20   20  20  10  10  10
-                               0    0   0   0   0   0];
+     impRightLeg         = [ 20   20  20  10  10  10
+                              0    0   0   0   0   0];
+    
+else
+   
+     impRightLeg         = [ 70   70  65  30  10  10
+                              0    0   0   0   0   0]; 
+
+     impLeftLeg          = [ 20   20  20  10  10  10
+                              0    0   0   0   0   0];
+
+end
 end
 
 %% Dampings and impedances

@@ -31,12 +31,23 @@ function [] = visualizer_js(t,chi,params)
         params.plot_objs{ii} = plot3(0,0,0,'.');
         axis([-0.5 0.5 -0.42 0.58 0 1]);
         hold on;
-        patch([-0.45 -0.45 0.45 0.45],[-0.37 0.53 0.53 -0.37],[0 0 0 0],[0.6 0.6 0.8]);
+        
+        if params.feet_on_ground(2) == 0 || sum(params.feet_on_ground) == 2
+            
+          patch([-0.45 -0.45 0.45 0.45],[-0.53 0.37 0.37 -0.53],[0 0 0 0],[0.6 0.6 0.8]);
+            
+        else
+            
+          patch([-0.45 -0.45 0.45 0.45],[-0.37 0.53 0.53 -0.37],[0 0 0 0],[0.6 0.6 0.8]);
+          
+        end
+        
         set(gca,'Color',[0.8 0.8 0.8]);
         set(gca,'XColor',[0.8 0.8 0.8]);
         set(gca,'YColor',[0.8 0.8 0.8]);
         set(gca,'ZColor',[0.8 0.8 0.8]);
         set(gca,'xdir','reverse')
+        set(gca,'ydir','reverse')
         set(gca, 'drawmode', 'fast');
         params.draw_init = 1;
         rotate3d(gca,'on');
@@ -48,12 +59,11 @@ function [] = visualizer_js(t,chi,params)
  axes(params.plot_main(1))
 
 % base link trajectory
-
  x_b   = chi(:,1:3);
  qt_b  = chi(:,4:7);
  qj    = chi(:,8:ndof+7);
 
- visualizeForwardDynamics([x_b,qt_b,qj],t,params);
+ visualizeForwardDynamics([x_b,qt_b,qj],params);
 
 % plot root link position
  figure(8)

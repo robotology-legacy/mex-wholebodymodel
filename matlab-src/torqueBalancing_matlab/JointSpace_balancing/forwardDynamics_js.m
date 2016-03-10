@@ -27,6 +27,10 @@ ndof  = param.ndof;
 % position
 x_b   = chi(1:3,:); 
 qt_b  = chi(4:7,:);
+
+% normalize quaternions to avoid numerical errors
+qt_b  = qt_b/norm(qt_b);
+
 qj    = chi(8:ndof+7,:);
 
 % velocity

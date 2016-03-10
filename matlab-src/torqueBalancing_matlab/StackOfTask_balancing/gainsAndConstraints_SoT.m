@@ -29,23 +29,23 @@ qTildeMax                             = 20*pi/180;
 %% Pameters for 2 feet on the ground
 if Contact_constraints == 2
     
-   gains.gainsPCoM               = diag([ 50  50  50]);
+   gains.gainsPCoM               = diag([ 40  40  40]);
    gains.gainsDCoM               = 2*sqrt(gains.gainsPCoM);
    gains.gainPhi                 = 5;
    gains.gainMomentum            = 2*sqrt(gains.gainPhi);
 
 % impedances acting in the null space of the desired contact forces 
-    impTorso            = [ 50  50  50
+    impTorso            = [ 40  40  40
                              0   0   0]; 
                            
-    impArms             = [ 10  10  10  10  5  
+    impArms             = [ 10  10  10   5  5  
                              0   0   0   0  0];
                         
-    impLeftLeg          = [ 35  50   10  30   5  10
-                             0   0   0    0   0   0]; 
+    impLeftLeg          = [ 35  40   10  30   5  10
+                             0   0    0   0   0   0]; 
 
-    impRightLeg         = [35  50    10  30   5  10
-                            0   0    0    0   0   0]; 
+    impRightLeg         = [35  40   10  30   5  10
+                            0   0    0   0   0   0]; 
                         
     if (demo_movements == 1)
         
@@ -92,7 +92,7 @@ end
     if (demo_movements == 1)
         
         trajectory.directionOfOscillation = [0;1;0];
-        trajectory.referenceParams        = [0.05 0.3];     %referenceParams(1) = amplitude of ascillations in meters
+        trajectory.referenceParams        = [0.025 0.25];     %referenceParams(1) = amplitude of ascillations in meters
     
     end
 
@@ -100,9 +100,9 @@ end
 
 %% Definition of impedances and dampings vectors
 
-  impedances             = [impTorso(1,:),impArms(1,:),impArms(1,:),impLeftLeg(1,:),impRightLeg(1,:)]/20;
+  impedances             = [impTorso(1,:),impArms(1,:),impArms(1,:),impLeftLeg(1,:),impRightLeg(1,:)];
    
-  gains.dampings         = 0.5*ones(1,ndof)/4;
+  gains.dampings         = 0.5*ones(1,ndof);
 
   increasingRatesImp     = [impTorso(2,:),impArms(2,:),impArms(2,:),impLeftLeg(2,:),impRightLeg(2,:)];
 
@@ -147,8 +147,8 @@ pinv_tol  = 1e-8;
 S         = [ zeros(6,ndof);
               eye(ndof,ndof)];
 
-JcMinv         = Jc/M;
-JcMinvS        = JcMinv*S;
+JcMinv    = Jc/M;
+JcMinvS   = JcMinv*S;
 
 % damped null space
 Mbar                = M(7:end,7:end)-M(7:end,1:6)/M(1:6,1:6)*M(1:6,7:end);
@@ -165,8 +165,5 @@ gains.dampings   = dampings   +0.1*eye(ndof);
 
 gains.GainCorr_imp     = NullLambda_damp*Mbar;
 gains.GainCorr_damp    = NullLambda_damp*Mbar;
-
-% Added for IROS
-% save('gains','gains')
 
 end

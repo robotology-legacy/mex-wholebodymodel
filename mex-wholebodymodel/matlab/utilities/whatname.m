@@ -156,7 +156,7 @@ atot = a1+a2+a3+a4+a5;
 
 if atot ==0
     
-    error('name mismatch')
+    error('The name required as a title for some joints-related graphics does not match any known joints name')
     
 end
 

@@ -27,11 +27,22 @@ for ii=1:4
         param.plot_objs{ii} = plot3(0,0,0,'.');
         axis([-0.5 0.5 -0.42 0.58 0 1]);
         hold on
-        patch([-0.45 -0.45 0.45 0.45],[-0.37 0.53 0.53 -0.37],[0 0 0 0],[0.6 0.6 0.8]);
+        
+       if param.feet_on_ground(2) == 0 || sum(param.feet_on_ground) == 2
+            
+          patch([-0.45 -0.45 0.45 0.45],[-0.53 0.37 0.37 -0.53],[0 0 0 0],[0.6 0.6 0.8]);
+            
+        else
+            
+          patch([-0.45 -0.45 0.45 0.45],[-0.37 0.53 0.53 -0.37],[0 0 0 0],[0.6 0.6 0.8]);
+          
+        end
+
         set(gca,'Color',[0.8 0.8 0.8]);
         set(gca,'XColor',[0.8 0.8 0.8]);
         set(gca,'YColor',[0.8 0.8 0.8]);
         set(gca,'ZColor',[0.8 0.8 0.8]);
+        set(gca,'ydir','reverse')
         set(gca,'xdir','reverse')
         set(gca, 'drawmode', 'fast');
         param.draw_init = 1;
@@ -48,7 +59,7 @@ x_b   = chi(:,1:3);
 qt_b  = chi(:,4:7);
 qj    = chi(:,8:ndof+7);
 
-visualizeForwardDynamics([x_b,qt_b,qj],t,param);
+visualizeForwardDynamics([x_b,qt_b,qj],param)
 
 %% Plot base link position
 figure(2)
@@ -81,17 +92,10 @@ norm_tau      = zeros(1,length(t));
 CoP           = zeros(4,length(t));
 phi_lfoot     = zeros(3,length(t));
 phi_rfoot     = zeros(3,length(t));
-
-%Added for IROS
-xCoM          = zeros(3,length(t));
-dxCoM         = zeros(3,length(t));
-xCoMdes       = zeros(3,length(t));
-dxCoMdes      = zeros(3,length(t));
 H             = zeros(6,length(t));
 Href          = zeros(6,length(t));
 norm_qjErr    = zeros(1,length(t));
 norm_HErr     = zeros(1,length(t));
-m             = param.M0(1,1);
 
 for time=1:length(t)
     
@@ -103,27 +107,21 @@ fc(:,time)          = visual.fc;
 f0(:,time)          = visual.f0;
 tau(:,time)         = visual.tau;
 error_CoM(:,time)   = visual.error_com;
+H(:,time)           = visual.H;
+Href(:,time)        = visual.Href;
 
-% norm of joint torques and CoP
+% square norms
 norm_tau(time)   = norm(visual.tau);
-
-%Added for IROS
 norm_qjErr(time) = norm(visual.qj-param.qjInit);
 norm_HErr(time)  = norm(visual.H-visual.Href);
-H(:,time)        = visual.H;
-xCoM(:,time)     = visual.xCoM;
-dxCoM(:,time)    = visual.dxCoM;
-xCoMdes(:,time)  = visual.xCoMdes;
-dxCoMdes(:,time) = visual.dxCoMdes;
-Href(:,time)     = visual.Href;
  
-CoP(1,time)    = -visual.fc(5)/visual.fc(3);
-CoP(2,time)    =  visual.fc(4)/visual.fc(3);
+CoP(1,time)      = -visual.fc(5)/visual.fc(3);
+CoP(2,time)      =  visual.fc(4)/visual.fc(3);
 
 if  param.numConstraints == 2 
     
-CoP(3,time)    = -visual.fc(11)/visual.fc(9);
-CoP(4,time)    =  visual.fc(10)/visual.fc(9);
+CoP(3,time)      = -visual.fc(11)/visual.fc(9);
+CoP(4,time)      =  visual.fc(10)/visual.fc(9);
 
 end
 
@@ -138,9 +136,6 @@ quat_rFoot             = visual.pos_feet(8:end);
 [~,phi_rfoot(:,time)]  = parametrization(Rot_rFoot);
 
 end
-
-%% Save datas for IROS
-% save('visualizer', 'xCoM','dxCoM','m','H','Href','norm_qjErr','norm_HErr','fc','tau','xCoMdes','dxCoMdes')
 
 %% Feet position and orientation
 for k=1:3
@@ -332,45 +327,47 @@ end
 end
 
 %% CoP at feet 
-if param.numConstraints == 1
+for k=1:2
+
+if sum(param.feet_on_ground) == 2
+
+figure(18)
+subplot(1,2,1)
+plot(CoP(1,:),CoP(2,:))
+hold on
+grid on 
+subplot(1,2,1)
+plot(CoP(1,1),CoP(2,1),'or')
+title('Left foot CoP')
+xlabel('Y direction (m)')
+ylabel('X direction (m)')
+axis([-0.1 0.1 -0.1 0.1])
+
+figure(18)
+subplot(1,2,2)
+plot(CoP(3,:),CoP(4,:))
+hold on
+grid on
+subplot(1,2,2)
+plot(CoP(3,1),CoP(4,1),'or')
+title('Right foot CoP')
+xlabel('Y direction (m)')
+ylabel('X direction (m)')
+axis([-0.1 0.1 -0.1 0.1])
+
+else
     
-figure(14)
+figure(18)
 plot(CoP(1,:),CoP(2,:))
 hold on
 grid on
 plot(CoP(1,1),CoP(2,1),'or')
 title('Foot CoP')
-xlabel('X direction (m)')
-ylabel('Y direction (m)')
+xlabel('Y direction (m)')
+ylabel('X direction (m)')
 axis([-0.1 0.1 -0.1 0.1])
 
 end
-
-if param.numConstraints == 2 
-
-figure(14)
-subplot(1,2,1)
-plot(CoP(1,:),CoP(2,:))
-hold on
-grid on
-plot(CoP(1,1),CoP(2,1),'or')
-
-title('Left foot CoP')
-xlabel('X direction (m)')
-ylabel('Y direction (m)')
-axis([-0.1 0.1 -0.1 0.1])
-
-figure(14)
-subplot(1,2,2)
-plot(CoP(3,:),CoP(4,:))
-hold on
-grid on
-plot(CoP(3,1),CoP(4,1),'or')
-
-title('Right foot CoP')
-xlabel('X direction (m)')
-ylabel('Y direction (m)')
-axis([-0.1 0.1 -0.1 0.1])
 
 end
 

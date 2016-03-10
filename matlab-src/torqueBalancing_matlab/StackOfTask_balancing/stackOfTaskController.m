@@ -15,9 +15,9 @@ function [tau,errorCoM,f0] = stackOfTaskController(param, constraints, feet, gai
 %                          forces and moments
 %
 %% Variables and tolerances definition
- pinv_tol        = 1e-8;
- regHessiansQP   = 5e-2;
-%reg             = 0.01;
+ pinv_tol          = 1e-8;
+ regHessiansQP     = 5e-2;
+%reg               = 0.01;
 
 feet_on_ground     = param.feet_on_ground;
 ndof               = param.ndof;
@@ -27,22 +27,22 @@ ConstraintsMatrix  = constraints.ConstraintsMatrix;
 bVectorConstraints = constraints.bVectorConstraints ;
 footSize           = constraints.footSize;
 
-e1              = [1;0;0];
-e2              = [0;1;0];
-e3              = [0;0;1];
+e1                 = [1;0;0];
+e2                 = [0;1;0];
+e3                 = [0;0;1];
 
-gravAcc         = 9.81;
+gravAcc            = 9.81;
 
-m               = M(1,1);
-Mb              = M(1:6,1:6);
-Mbj             = M(1:6,7:end);
+m                  = M(1,1);
+Mb                 = M(1:6,1:6);
+Mbj                = M(1:6,7:end);
 
-S               = [ zeros(6,ndof);
-                    eye(ndof,ndof)];
+S                  = [ zeros(6,ndof);
+                       eye(ndof,ndof)];
 
-f_grav          = [ zeros(2,1);
-                   -m*gravAcc;
-                    zeros(3,1)];
+f_grav             = [ zeros(2,1);
+                      -m*gravAcc;
+                       zeros(3,1)];
   
 % Feet position and rotation matrix
 [pos_rightFoot,rotMatRightFoot] = frame2posrot(feet.r_sole);
@@ -94,7 +94,7 @@ end
 
 %% Newton-Euler equations of motion at CoM
 
-% Closing the loop on angular momentum integral
+% Closing the loop on centroidal orientation
 Kphi               = gains.gainPhi;
 qTilde             = param.qj-param.qjInit;
 deltaPhi           = param.linAngInt*qTilde;
@@ -125,9 +125,9 @@ SigmaNA            =  Sigma*Nullfc;
 
 if param.use_Orientation == 1
     
-% new postural task
-impedances = gains.impedances;
-dampings   = gains.dampings;
+% new postural gains
+impedances    = gains.impedances;
+dampings      = gains.dampings;
 
 GainCorr_imp  = gains.GainCorr_imp;
 GainCorr_damp = gains.GainCorr_damp;

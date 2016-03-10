@@ -1,14 +1,10 @@
-%% Cleanup and docking figures
-
-% clear all
-% close all
-% clc
-
+%% plot_set
+% This function is to set the figures options for controllers as the user desires.
+%
+%% Setup figure parameters
 set(0,'DefaultFigureWindowStyle','Docked');
 
 %commandwindow
-
-%% Setup figure parameters
 
 %% AXES
 

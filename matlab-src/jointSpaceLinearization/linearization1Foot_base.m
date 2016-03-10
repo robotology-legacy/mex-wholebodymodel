@@ -1,15 +1,16 @@
-%% linearizeJointAcc
+%% linearization1Foot_base
 %  linearizes the joint space equations of motion of robot iCub when it's
 %  controlled with "stack of task" control approach. This version is for
-%  the robot balancing on one foot. 
+%  the robot balancing on one foot.
+%
 clear all
 close all
 clc
 
 %% Path and model initialization
-addpath('./../../../../mex-wholebodymodel/matlab/utilities');
-addpath('./../../../../mex-wholebodymodel/matlab/wrappers');
-addpath('./../../../../../../build/');
+addpath('./../../mex-wholebodymodel/matlab/utilities');
+addpath('./../../mex-wholebodymodel/matlab/wrappers');
+addpath('./../../../../build/');
 
 wbm_modelInitialise('icubGazeboSim');
 
@@ -87,6 +88,14 @@ Jj           = Jc(1:6,7:end);
 Mbar         = Mj - Mjb/Mb*Mbj;
 Mbar_inv     = Mbar'/(Mbar*Mbar' + toll*eye(size(Mbar,1)));
 
+%% Other terms 
+B2      =  (Jj - Jb/Mb*Mbj)*Mbar_inv;
+B3      =  Jb/Mb*transpose(Jb)*invA;
+pinvB2  =  pinv(B2,toll);
+
+B       =  pinvB2*B3;
+Nb      =  eye(ndof) - pinvB2*B2; 
+
 %% Gains definition
 gainsPCoM         = diag([40 45 40]);
 gainsDCoM         = sqrt(gainsPCoM);
@@ -148,13 +157,20 @@ Nu_baseFrom_dqj  = -(eye(6)/Jb)*Jj;
 
 %% Analytical derivative with respect of joint position
 xCoM_posDerivative  = JCoM_b*Nu_baseFrom_dqj + JCoM_j;
+
+%%%% CENTROIDAL ORIENTATION %%%%
+
+% open loop
 % angularOrientation  = zeros(3,ndof);
+% Kimp                = diag(impedances); 
+% Kdamp               = diag(dampings);
 
-%%%% CLOSED LOOP %%%%
-
+% closed loop and new postural task
 angularOrientation  = -(Jw_b*Nu_baseFrom_dqj + Jw_j);
+Kimp                =  diag(impedances)*Nb*Mbar; 
+Kdamp               =  diag(dampings)*Nb*Mbar;
 
-%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 HDot_posDerivative = [-m*gainsPCoM*xCoM_posDerivative; gainPhi*angularOrientation];
 
@@ -164,78 +180,11 @@ Hw_velDerivative    = Jw_b*Nu_baseFrom_dqj + Jw_j;
 
 HDot_velDerivative  = [-m*gainsDCoM*dxCoM_velDerivative; -gainMomentum*Hw_velDerivative];
  
-%% Other terms 
-B2      =  (Jj - Jb/Mb*Mbj)*Mbar_inv;
-B3      =  Jb/Mb*transpose(Jb)*invA;
-pinvB2  =  pinv(B2,toll);
-
-B       =  pinvB2*B3;
-Nb      =  eye(ndof) - pinvB2*B2; 
-
 %% Stiffness
-KS      =  B*HDot_posDerivative + Nb*diag(impedances)*Nb*Mbar;
+KS      =  Mbar_inv*(B*HDot_posDerivative + Nb*Kimp);
 
 %% Damping
-KD      =  B*HDot_velDerivative + Nb*diag(dampings)*Nb*Mbar;
-
-%% if you want to add Mbar:
-KS      = Mbar_inv*KS;
-KD      = Mbar_inv*KD;
-
-%% Stability verify and visualization
-% symmetrized stiffness matrix
-KS_sym     = (KS+transpose(KS))/2;
-eig_KS_sym =  eig(KS_sym);
-flag       =  0;
-
-for ii = 1:length(eig_KS_sym)
-    
-    if eig_KS_sym(ii) <= 0
-        
-    flag = 1;
-        
-    end
-    
-end
-
-if flag == 1
-    
-  disp('the stiffness matrix is NOT positive definite')
-        
-else
-        
-  disp('the stiffness matrix is positive definite')
-        
-end      
-
-% symmetrized damping matrix
-KD_sym     = (KD+transpose(KD))/2;
-eig_KD_sym =  eig(KD_sym);
-flag       =  0;
-
-for ii = 1:length(eig_KD_sym)
-    
-    if eig_KD_sym(ii) <= 0
-        
-    flag = 1;
-     
-    end
-    
-end
-
-if flag == 1
-  
- disp('the damping matrix is NOT positive definite')
-        
-else
-        
- disp('the damping matrix is positive definite')
-        
-end      
-
-% eigenvalues visualization
-% disp('eigenvalues: KSsym, KDsym, KS, KD')
-% disp([eig_KS_sym eig_KD_sym eig(KS) eig(KD)])
+KD      =  Mbar_inv*(B*HDot_velDerivative + Nb*Kdamp);
 
 %% State matrix verification
 A_state = [zeros(ndof) eye(ndof);
