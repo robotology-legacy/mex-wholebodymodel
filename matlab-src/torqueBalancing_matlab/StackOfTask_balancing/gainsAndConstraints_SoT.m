@@ -92,7 +92,7 @@ end
     if (demo_movements == 1)
         
         trajectory.directionOfOscillation = [0;1;0];
-        trajectory.referenceParams        = [0.025 0.25];     %referenceParams(1) = amplitude of ascillations in meters
+        trajectory.referenceParams        = [0.005 0.25];     %referenceParams(1) = amplitude of ascillations in meters
     
     end
 

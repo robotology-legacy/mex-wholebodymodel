@@ -26,7 +26,7 @@ wbm_modelInitialise('icubGazeboSim');
  
 % visualize state integration graphics
  params.visualizerGraphics       =  1;                                     % either 0 or 1
- params.visualizerJoints         =  1;                                     % either 0 or 1
+ params.visualizerJoints         =  0;                                     % either 0 or 1
 
 % visualize demo of robot's movements
  params.visualizerDemo           =  1;                                     % either 0 or 1
@@ -44,7 +44,7 @@ elseif  sum(params.feet_on_ground) == 1
     
 params.noOscillationTime   =  0;
 params.direction           = [0;1;0];
-params.reference           = [0.015 0.15];  
+params.reference           = [0.005 0.15];  
 
 end
 
