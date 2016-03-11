@@ -19,12 +19,12 @@ a rigid body is available at [examples/rigidBodyDynamics.m](examples/rigidBodyDy
 In [matlab-src/torqueBalancing_matlab](matlab-src/torqueBalancing_matlab/) the user can find two different
 simulations of whole-body controller implemented using the mex-wholebodymodel interface. One uses the Stack of task approach while 
 the other is a Joint Space controller. 
-For more information please check the relative [README_SoT](matlab-src/torqueBalancing_matlab/StackOfTask_balancing/README) and
-[README_Jc](matlab-src/torqueBalancing_matlab/JointSpace_balancing/README)
+For more information please check the relative [README_SoT](matlab-src/torqueBalancing_matlab/StackOfTask_balancing/) and
+[README_Jc](matlab-src/torqueBalancing_matlab/JointSpace_balancing/)
 
 ### Joint space linearization
 In [matlab-src/jointSpaceLinearization](matlab-src/jointSpaceLinearization/) there is a program which linearize the joint space of the system, when balancing 
-on 1 foot, controlled with 'Stack of Task' approach. For further informations check the relative [README](matlab-src/jointSpaceLinearization/README).
+on 1 foot, controlled with 'Stack of Task' approach. For further informations check the relative [README](matlab-src/jointSpaceLinearization/).
 
 ## Mex-wholebodymodel
 
@@ -45,6 +45,6 @@ To print out the verbose output of the tests, launch the `ctest` command by addi
 
 ### Add new tests
 To add new tests, just write a script that runs the test and raise and exception
-if the test fails (for example using the `assert` command or the [tests/WBAssertEqual.m](tests/wBAAssertEqual.m) function).
+if the test fails (for example using the `assert` command or the [tests/WBAssertEqual.m](tests/WBMAssertEqual.m) function).
 Then modify the [tests/WBMTests.m](tests/WBMTests.m) file to call the testing script.
 
