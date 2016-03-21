@@ -144,7 +144,7 @@ end
 
 tauModel         = Pinv_JcMinvS*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
                   -impedances*GainCorr_imp*qTilde -dampings*GainCorr_damp*dqj);
-        
+
 %% Quadratic Programming solver
 f0               =  zeros(6,1);
 
