@@ -31,8 +31,8 @@ classdef WBM < WBM.WBMBase
                 % a chosen fixed link (the first entry of the constraint list):
                 v_b = vertcat(obj.mwbm_config.initStateParams.dx_b, ...
                               obj.mwbm_config.initStateParams.omega_b);
-                obj.setWorldFrame2FixedLink(obj.mwbm_config.cstrLinkNames{1}, obj.mwbm_config.initStateParams.q_j, ...
-                                            obj.mwbm_config.initStateParams.dq_j, v_b, obj.mwbm_params.g_wf);
+                obj.setWorldFrame2FixedLink(obj.mwbm_config.initStateParams.q_j, obj.mwbm_config.initStateParams.dq_j, ...
+                                            v_b, obj.mwbm_params.g_wf, obj.mwbm_config.cstrLinkNames{1});
             end
             % retrieve and update the initial rototranslation (VQS-Transf.) of the robot base (world frame) ...
             obj.updateInitRotoTranslation();
@@ -48,7 +48,7 @@ classdef WBM < WBM.WBMBase
             delete@WBM.WBMBase(obj);
         end
 
-        function setWorldFrame2FixedLink(obj, urdf_link_name, q_j, dq_j, v_b, g_wf)
+        function setWorldFrame2FixedLink(obj, q_j, dq_j, v_b, g_wf, urdf_link_name)
             if exist('urdf_link_name', 'var')
                 % replace the (old) default link with a new link ...
                 obj.urdfLinkName = urdf_link_name;
@@ -81,7 +81,7 @@ classdef WBM < WBM.WBMBase
 
         [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
 
-        % [] = visualizeForwardDynamics(obj, x_out, tspan, sim_config)
+        [] = visualizeForwardDynamics(obj, x_out, tspan, sim_config, vis_speed)
 
         [] = setupSimulation(~, sim_config)
 

@@ -98,12 +98,11 @@ end
 % it = 1;
 % while (it < 10)
     % setup the window and plot parameters for the WBM-simulator:
-    sim_config = genericSimConfig;
-    sim_config.main_title = 'iCub-Simulator:';
+    sim_config = setupSimConfig_iCub();
     wbm_iCub.setupSimulation(sim_config);
 
     x_out = wbm_iCub.getPositionsData(chi);
-    %wbm_iCub.visualizeForwardDynamics(x_out, t, sim_config); % not implemented yet ...
+    wbm_iCub.visualizeForwardDynamics(x_out, t, sim_config);
     %it = it + 1;
 % end
 

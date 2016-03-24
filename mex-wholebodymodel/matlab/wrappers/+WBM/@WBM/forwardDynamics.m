@@ -1,10 +1,10 @@
 function [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
-    ndof = obj.iwbm_config.ndof;
-    nCstrs = obj.iwbm_config.nCstrs;
-    dampCoeff = obj.iwbm_config.dampCoeff;
+    ndof = obj.mwbm_config.ndof;
+    nCstrs = obj.mwbm_config.nCstrs;
+    dampCoeff = obj.nwbm_config.dampCoeff;
 
     % get the state parameters from the current state vector "stvChi" ...
-    stp = WBM.fastGetStateParams(stvChi, obj.iwbm_config.stvLen, ndof);
+    stp = WBM.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, ndof);
 
     omega_w = stp.omega_b;
     %v_bw = [stp.dx_b; omega_w]; % slow ...
@@ -30,8 +30,8 @@ function [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
     Jc = zeros(m,n);
     dJcDq = zeros(m,1);
     for i = 1:nCstrs
-        Jc(6*i-5:6*i,1:n)  = obj.jacobian(obj.iwbm_config.cstrLinkNames{i}); % 6*(i-1)+1 == 6*i-5
-        dJcDq(6*i-5:6*i,1) = obj.dJdq(obj.iwbm_config.cstrLinkNames{i});
+        Jc(6*i-5:6*i,1:n)  = obj.jacobian(obj.mwbm_config.cstrLinkNames{i}); % 6*(i-1)+1 == 6*i-5
+        dJcDq(6*i-5:6*i,1) = obj.dJdq(obj.mwbm_config.cstrLinkNames{i});
     end
 
     % get the current control torque vector ...

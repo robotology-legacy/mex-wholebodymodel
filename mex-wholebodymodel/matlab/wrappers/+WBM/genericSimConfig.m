@@ -1,10 +1,12 @@
 classdef genericSimConfig < WBM.absSimConfig
     properties
+        robot_body@WBM.wbmSimBody
         main_title@char = '';
         hFigure_main
-        hAxes@double   vector = zeros(1,4);
-        plot_objs@cell vector = cell(1,4);
+        hAxes@double    vector = zeros(1,4);
+        plot_objs@cell  vector = cell(1,4);
     end
+
     properties(Constant)
         MAIN_POS@double    vector = [50 400 600 650];
         AXES_POS@double    matrix = [0.51 0.20 0.45 0.40;
@@ -17,5 +19,17 @@ classdef genericSimConfig < WBM.absSimConfig
                                      -0.37 0.53 0.53 -0.37;
                                      0 0 0 0];
         PATCH_COLOR@double vector = [0.6 0.6 0.8];
+    end
+
+    methods
+        function obj = genericSimConfig(robot_sim_body, main_title)
+            if (nargin ~= 2)
+                error('genericSimConfig::genericSimConfig: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+
+            obj.robot_body = robot_sim_body;
+            obj.main_title = main_title;
+        end
+
     end
 end

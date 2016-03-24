@@ -199,7 +199,7 @@ classdef WBMBase < handle
             end
         end
 
-        function wf_vqT_rlnk = forwardKinematics(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j)
+        function wf_vqT_lnkfr = forwardKinematics(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j)
             if ~exist('urdf_link_name', 'var')
                 urdf_link_name = obj.mwbm_params.urdfLinkName; % default ...
             end
@@ -207,9 +207,9 @@ classdef WBMBase < handle
             switch nargin
                 case {4, 5}
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
-                    wf_vqT_rlnk = wholeBodyModel('forward-kinematics', wf_R_rlnk_arr, wf_p_rootLnk, q_j, urdf_link_name);
+                    wf_vqT_lnkfr = wholeBodyModel('forward-kinematics', wf_R_rlnk_arr, wf_p_rootLnk, q_j, urdf_link_name);
                 case {1, 2}
-                    wf_vqT_rlnk = wholeBodyModel('forward-kinematics', urdf_link_name);
+                    wf_vqT_lnkfr = wholeBodyModel('forward-kinematics', urdf_link_name);
                 otherwise
                     error('WBMBase::forwardKinematics: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
