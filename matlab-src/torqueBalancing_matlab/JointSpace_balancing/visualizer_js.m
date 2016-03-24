@@ -55,7 +55,7 @@ figure_main     = figure('Name', 'iCub Simulator', 'NumberTitle', 'off',...
 
  end 
 
- visualizeForwardDynamics2(robotConfiguration_t,params);
+ visualizeForwardDynamics(robotConfiguration_t,params);
 
 % plot root link position
  x_b = chi(:,1:3);
