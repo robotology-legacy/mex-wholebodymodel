@@ -50,6 +50,7 @@ public:
 
 protected:
 
+
   ModelComponent(const unsigned int, const unsigned int, const unsigned int);
 
 /* Internal function used to reorder double * matrix
@@ -58,10 +59,12 @@ protected:
  */
   bool reorderMatrixElements(double *sourceMatrix, double (&destinationMatrix)[9]) ;
   
+
   const unsigned int numArgs;
   const unsigned int numRets;
   const unsigned int numAltArgs;
   wbi::iWholeBodyModel *robotModel;
+
 
   Eigen::Matrix4d H_w2b;
   wbi::Frame world_H_rootLink;

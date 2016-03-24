@@ -57,4 +57,6 @@ add_subdirectory(mex-wholebodymodel)
 # Enable testing and generate test target
 include(CTest)
 enable_testing()
+
 add_subdirectory(tests)
+
