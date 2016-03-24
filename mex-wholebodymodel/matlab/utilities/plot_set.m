@@ -2,7 +2,7 @@
 % This function is to set the figures options for controllers as the user desires.
 %
 %% Setup figure parameters
-set(0,'DefaultFigureWindowStyle','Docked');
+% set(0,'DefaultFigureWindowStyle','Docked');
 
 %commandwindow
 
