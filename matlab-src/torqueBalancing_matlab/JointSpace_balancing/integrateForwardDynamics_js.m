@@ -182,6 +182,7 @@ params.tEnd          = 10;
  
 %% Inverse kinematics integrator
 % integration step for inverse kinematics integrator
+plot_set
 params.euler_step    = 0.01; 
 
 % waitbar 
@@ -192,7 +193,6 @@ params.wait          = waitbar(0,'Inverse kinematics integration in progress...'
 delete(params.wait)       
  
 % inverse kinematics visualization
-plot_set
 ikin_graphics(params);
 
 %% Setup state integration

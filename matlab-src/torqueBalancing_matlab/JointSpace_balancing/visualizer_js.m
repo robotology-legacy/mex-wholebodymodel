@@ -7,65 +7,61 @@ function [] = visualizer_js(t,chi,params)
 %  integrateForwardDynamics.m
 
 %% Robot demo
- ndof  = params.ndof;
+ndof  = params.ndof;
  
- if params.visualizerDemo == 1
+if params.visualizerDemo == 1
      
- figure_main = figure('Name', 'iCub Simulator', 'NumberTitle', 'off',...
-                      'Position', [50,400,600,650]);
-    
+BackGroundColor = [0 0 0];
+GridColor       = [1 1 1];
+figure_main     = figure('Name', 'iCub Simulator', 'NumberTitle', 'off',...
+                         'Position', [500,800,1200,650],'Color',BackGroundColor);
+                     
+%sizeFig        = [10 26 800 600];
+ sizeFig        = get(0, 'MonitorPositions');
+ sizeFig        = 2*sizeFig/3;
+ sizeFig(1:2)   = sizeFig(3:4)/10 ;
+ 
+ set(gcf, 'position', sizeFig);
+ 
  params.figure_main = figure_main;
+ 
  set(figure_main, 'MenuBar', 'none', 'BackingStore', 'off');
  set(figure_main, 'BackingStore', 'off');
- 
- params.plot_main = zeros(1,4);
-    
- plot_pos = [0.51,0.20,0.45,0.40;
-             0.01,0.20,0.45,0.40;
-             0.51,0.62,0.45,0.40;
-             0.01,0.62,0.45,0.40];
 
-  for ii=1:4
+ params.plot_main   = zeros(1,4);
     
+ plot_pos           = [0.51,0.05,0.45,1;
+                       0.01,0.05,0.45,1];
+
+  for ii=1:2
+      
         params.plot_main(ii) = subplot('Position', plot_pos(ii,:));
         params.plot_objs{ii} = plot3(0,0,0,'.');
-        axis([-0.5 0.5 -0.42 0.58 0 1]);
         hold on;
-        
-        if params.feet_on_ground(2) == 0 || sum(params.feet_on_ground) == 2
-            
-          patch([-0.45 -0.45 0.45 0.45],[-0.53 0.37 0.37 -0.53],[0 0 0 0],[0.6 0.6 0.8]);
-            
-        else
-            
-          patch([-0.45 -0.45 0.45 0.45],[-0.37 0.53 0.53 -0.37],[0 0 0 0],[0.6 0.6 0.8]);
-          
-        end
-        
-        set(gca,'Color',[0.8 0.8 0.8]);
-        set(gca,'XColor',[0.8 0.8 0.8]);
-        set(gca,'YColor',[0.8 0.8 0.8]);
-        set(gca,'ZColor',[0.8 0.8 0.8]);
-        set(gca,'xdir','reverse')
-        set(gca,'ydir','reverse')
-        set(gca, 'drawmode', 'fast');
-        params.draw_init = 1;
-        rotate3d(gca,'on');
-
-        figure(figure_main);
-        
+        set(gca,'Color',BackGroundColor,'Xcolor',GridColor,'Ycolor',GridColor,'Zcolor',GridColor);
+        view([45 25 25])      
   end
     
- axes(params.plot_main(1))
+ axes(params.plot_main(1));
 
-% base link trajectory
- x_b   = chi(:,1:3);
- qt_b  = chi(:,4:7);
- qj    = chi(:,8:ndof+7);
+%root link trajectory
+ params.demux.baseOrientationType = 1;
+ robotConfiguration_t             = zeros(size(chi(:,1:8+params.ndof-1))); 
 
- visualizeForwardDynamics([x_b,qt_b,qj],params);
+ for i = 1:length(t)
+    
+     [basePosei,jointAnglesi,~,~] = stateDemux(chi(i,:),params);
+     robotConfiguration_t(i,:)    = [basePosei(1:3,4)',basePosei(:,1)',jointAnglesi];
+
+ end 
+
+ visualizeForwardDynamics(robotConfiguration_t,params);
 
 % plot root link position
+ x_b = chi(:,1:3);
+
+ set(0,'DefaultFigureWindowStyle','Docked');
+ 
  figure(8)
  plot3(x_b(1:end,1),x_b(1:end,2),x_b(1:end,3));
  hold on
@@ -337,6 +333,8 @@ end
 end
 
 end
+
+set(0,'DefaultFigureWindowStyle','Normal');
  
 end
 
