@@ -6,7 +6,7 @@ function [] = visualizer_SoT(t,chi,param)
 %% Demo generation
 ndof = param.ndof;
 
-if param.visualizerDemo == 1
+if param.visualizer_demo == 1
      
 BackGroundColor = [0 0 0];
 GridColor       = [1 1 1];

@@ -22,7 +22,7 @@ wbm_modelInitialise('icubGazeboSim');
  params.feet_on_ground           = [1 1];                                  % either 0 or 1; [left;right]
 
 % visualize inverse kinematics graphics
- params.visualizerIkin           =  0;                                     % either 0 or 1
+ params.visualizerIkin           =  1;                                     % either 0 or 1
  
 % visualize state integration graphics
  params.visualizerGraphics       =  1;                                     % either 0 or 1

@@ -1,4 +1,4 @@
-function visualizeForwardDynamics(xout,params,jetsIntensities)
+function visualizeForwardDynamics2(xout,params,jetsIntensities)
 %% visualize_forwardDyn 
 %   Visualize the simulation results obtained from integration 
 %   of the forward dynamics of the iCub. 
@@ -378,7 +378,7 @@ for jj=1:n_plot
            
                 
     if num_gigure == 1
-                    
+
         kin_tmp = kin(ii,:,jj); 
           
     else
@@ -392,6 +392,7 @@ for jj=1:n_plot
     x(jj) = Ptemp(1);
     y(jj) = Ptemp(2);
     z(jj) = Ptemp(3);
+    
     set(pos(jj),xaxis,x(jj),yaxis,y(jj),zaxis,z(jj));  
  
 end
@@ -441,7 +442,8 @@ end
            
     end
            
-%% UPDATE FEET 
+%% UPDATE FEET
+
 % right foot
 jj = n_lin+1; 
             
@@ -492,7 +494,7 @@ xyzpatch.vertices = [xyzpairs(7,2)+qq1(1)      , xyzpairs(7,4)+qq1(2) , xyzpairs
 set(lnkpatch(jj),'vertices',xyzpatch.vertices);
 
 % store axes objects to a vector
-params.plot_objs{num_gigure}=[lnkpatch;lin;pos];%;plot_traj]; 
+params.plot_objs{num_gigure} = [lnkpatch;lin;pos];%;plot_traj]; 
 
 drawnow;
 
@@ -508,11 +510,11 @@ else
                 vis_speed = vis_speed+1;
                 
 end
-
-                ii = ii+vis_speed;
-                
+               
         end
-        
+           
+ii = ii+vis_speed;
+         
     end
-    
+       
 end
