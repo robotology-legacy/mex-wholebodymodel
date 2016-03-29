@@ -81,8 +81,8 @@ qt_b    = basePose(4:7,:);
 dx_b    = baseVelocity(1:3,:);
 omega_W = baseVelocity(4:6,:);
   
-    x = [x_b qt_b qj];
-    v = [dx_b omega_W dqj ];
+    x = [x_b' qt_b' qj'];
+    v = [dx_b' omega_W' dqj' ];
     kinEnergy = zeros(length(t),1);
     chiDot = zeros(length(t),size(chi,2));
     hOut = zeros(length(t),ndof+6);

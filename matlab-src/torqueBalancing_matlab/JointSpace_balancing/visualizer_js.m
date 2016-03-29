@@ -50,7 +50,7 @@ figure_main     = figure('Name', 'iCub Simulator', 'NumberTitle', 'off',...
 
  for i = 1:length(t)
     
-     [basePosei,jointAnglesi,~,~] = stateDemux(chi(i,:)',param);
+     [basePosei,jointAnglesi,~,~] = stateDemux(chi(i,:)',params);
      robotConfiguration_t(i,:)    = [basePosei(1:3)',basePosei(4:7)',jointAnglesi'];
 
  end
