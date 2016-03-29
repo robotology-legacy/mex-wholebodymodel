@@ -1,4 +1,4 @@
-function visualizeForwardDynamics2(xout,params,jetsIntensities)
+function visualizeForwardDynamics(xout,params,jetsIntensities)
 %% visualize_forwardDyn 
 %   Visualize the simulation results obtained from integration 
 %   of the forward dynamics of the iCub. 

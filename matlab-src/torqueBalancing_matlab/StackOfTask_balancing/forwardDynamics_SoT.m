@@ -22,19 +22,20 @@ function [dchi,visual_param]=forwardDynamics_SoT(t,chi,param)
 % disp(t)
 
 %% Extraction of state
+param.demux.baseOrientationType = 1;  % sets the base orientation in stateDemux.m as positions + quaternions (1) or transformation matrix (0)
+[basePose,qj,baseVelocity,dqj]  = stateDemux(chi,param);
+
 % position and orientation
-x_b  = chi(1:3,:); 
-qt_b = chi(4:7,:);
+x_b     = basePose(1:3,:);
 
 % normalize quaternions to avoid numerical errors
 % qt_b = qt_b/norm(qt_b);
 
-qj   = chi(8:ndof+7,:);
+qt_b    = basePose(4:7,:);
 
 % linear and angular velocity
-dx_b    = chi(ndof+8:ndof+10,:);
-omega_w = chi(ndof+11:ndof+13,:);
-dqj     = chi(ndof+14:2*ndof+13,:);
+dx_b    = baseVelocity(1:3,:);
+omega_w = baseVelocity(4:6,:);
 
 Nu      = [dx_b;omega_w;dqj];
 

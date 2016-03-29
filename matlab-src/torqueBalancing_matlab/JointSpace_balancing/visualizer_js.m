@@ -16,10 +16,10 @@ GridColor       = [1 1 1];
 figure_main     = figure('Name', 'iCub Simulator', 'NumberTitle', 'off',...
                          'Position', [500,800,1200,650],'Color',BackGroundColor);
                      
-%sizeFig        = [10 26 800 600];
- sizeFig        = get(0, 'MonitorPositions');
- sizeFig        = 2*sizeFig/3;
- sizeFig(1:2)   = sizeFig(3:4)/10 ;
+  sizeFig        = [10 26 800 600];
+% sizeFig        = get(0, 'MonitorPositions');
+% sizeFig        = 2*sizeFig/3;
+% sizeFig(1:2)   = sizeFig(3:4)/10 ;
  
  set(gcf, 'position', sizeFig);
  
@@ -50,10 +50,10 @@ figure_main     = figure('Name', 'iCub Simulator', 'NumberTitle', 'off',...
 
  for i = 1:length(t)
     
-     [basePosei,jointAnglesi,~,~] = stateDemux(chi(i,:),params);
-     robotConfiguration_t(i,:)    = [basePosei(1:3,4)',basePosei(:,1)',jointAnglesi];
+     [basePosei,jointAnglesi,~,~] = stateDemux(chi(i,:)',param);
+     robotConfiguration_t(i,:)    = [basePosei(1:3)',basePosei(4:7)',jointAnglesi'];
 
- end 
+ end
 
  visualizeForwardDynamics(robotConfiguration_t,params);
 
