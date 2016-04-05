@@ -1,10 +1,10 @@
 function [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
     ndof = obj.mwbm_config.ndof;
     nCstrs = obj.mwbm_config.nCstrs;
-    dampCoeff = obj.nwbm_config.dampCoeff;
+    dampCoeff = obj.mwbm_config.dampCoeff;
 
     % get the state parameters from the current state vector "stvChi" ...
-    stp = WBM.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, ndof);
+    stp = WBM.utilities.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, ndof);
 
     omega_w = stp.omega_b;
     %v_bw = [stp.dx_b; omega_w]; % slow ...

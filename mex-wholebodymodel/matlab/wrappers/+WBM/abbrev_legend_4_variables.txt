@@ -1,74 +1,80 @@
 Legend of abbreviations and acronyms which are used for the variable names:
 
-    H       ... homogenous transformation (matrix)
-    R       ... rotation (matrix)
-    T       ... transformation (matrix)
-    arr     ... array
-    b       ... base
-    bf      ... base frame
-    cf      ... correction factor(s)
-    config  ... configuration
-    cstr    ... constraint
-    ctrl    ... control
-    d...    ... derivative (dot) of a variable, like dv of v (= v_dot), etc.
-    dim     ... dimension
-    dp      ... data point
-    ds      ... dimensions
-    dstv    ... derivative of state vector
-    fb      ... floating base
-    fix     ... fixed
-    fk      ... forward kinematic
-    g       ... gravity acceleration (vector)
-    h...    ... "handle" to an object, e.g. hFig = handle to the figure object
-    h_c     ... centroidal momentum (vector)
-    idx     ... index(es)
-    j       ... joint
-    jpos    ... joint position(s)
-    ker     ... kernel (null space)
-    ln      ... line
-    lnk     ... link
-    lnkfr   ... link frame (frame to a specified link in the current joint of the robot)
-    m...    ... "member", 'm' declares that this variable is a private member variable, e.g. "mwbm", "mstv", etc.
-    mult    ... multiplier(s)
-    ndof    ... number degrees of freedom
-    noi     ... number of iterations
-    nw      ... new world
-    ofs     ... offset(s)
-    on      ... orthonormal
-    onb     ... orthonormal basis
-    op      ... operator
-    or      ... orientation
-    ow      ... old world
-    p       ... position OR translation (vector)
-    params  ... parameters
-    pos     ... position(s)
-    q_j     ... joint angle(s)
-    qt, q   ... quaternion
-    quat    ... quaternion
-    r       ... root
-    ref     ... reference
-    ridx    ... row index(es)
-    rlnk    ... root link OR reference link
-    sc      ... scalar OR scaled
-    sf      ... scale factor(s)
-    st      ... state
-    stm     ... state matrix
-    str     ... string
-    stv     ... state vector
-    stvqT   ... state vector-quaternion transformation [VQS-Transformation of the current state vector] (vector) (*)
-    tr      ... translation(s)
-    trans   ... translation(s)
-    trqs    ... torques
-    v       ... vector
-    vel     ... velocit(y/ies)
-    vpos    ... vector position [translation] (vector)
-    vqT     ... vector-quaternion transformation [VQS-Transformation] (vector) (*)
-    vtr     ... vector translation (vector)
-    vtx     ... vert(ex/ices)
-    w       ... world
-    wbm     ... whole body model
-    wf      ... world frame
-    wf_T_b  ... transformation FROM the 'base' TO the 'world frame'
+    H        ...  homogenous transformation (matrix)
+    R        ...  rotation (matrix)
+    T        ...  transformation (matrix)
+    arr      ...  array
+    b        ...  base
+    bf       ...  base frame
+    config   ...  configuration
+    cstr     ...  constraint
+    ctrl     ...  control
+    d...     ...  derivative (dot) of a variable, like dv of v (= v_dot), etc.
+    df, dflt ...  default
+    dim      ...  dimension
+    dp       ...  data point
+    ds       ...  dimensions
+    dstv     ...  derivative of state vector
+    fb       ...  floating base
+    fix      ...  fixed
+    fk       ...  forward kinematic(s)
+    g        ...  gravity acceleration (vector)
+    h...     ...  "handle" to an object, e.g. hFig = handle to the figure object
+    h_c      ...  centroidal momentum (vector)
+    hgt      ...  height
+    idx      ...  index(es)
+    jnt      ...  joint
+    jpos     ...  joint position(s)
+    ker      ...  kernel (null space)
+    len      ...  length
+    ln       ...  line
+    lnk      ...  link
+    lnkfr    ...  link frame (frame to a specified link in the current joint of the robot)
+    m...     ...  "member", 'm' declares that this variable is a private member variable, e.g. "mwbm", "mstv", etc.
+    mult     ...  multiplier(s)
+    ndof     ...  number degrees of freedom
+    noi      ...  number of iterations
+    nw       ...  new world
+    ofs      ...  offset(s)
+    on       ...  orthonormal
+    onb      ...  orthonormal basis
+    op       ...  operator
+    or       ...  orientation
+    ow       ...  old world
+    p        ...  position OR translation (vector)
+    params   ...  parameters
+    pos      ...  position(s)
+    prop     ...  propert(y/ies)
+    q_j      ...  joint angle(s)
+    qt, q    ...  quaternion
+    quat     ...  quaternion
+    r        ...  root
+    ref      ...  reference
+    ridx     ...  row index(es)
+    rlnk     ...  root link OR reference link
+    rpts     ...  repeats
+    sc       ...  scalar OR scaled
+    sf       ...  scale factor(s)
+    st       ...  state
+    stm      ...  state matrix
+    str      ...  string
+    stv      ...  state vector
+    stvqT    ...  state vector-quaternion transformation [VQS-Transformation of the current state vector] (vector) (*)
+    sz       ...  size
+    tr       ...  translation(s)
+    trans    ...  translation(s)
+    trqs     ...  torques
+    v        ...  vector
+    vel      ...  velocit(y/ies)
+    vpos     ...  vector position [translation] (vector)
+    vqT      ...  vector-quaternion transformation [VQS-Transformation] (vector) (*)
+    vtr      ...  vector translation (vector)
+    vtx      ...  vert(ex/ices)
+    w        ...  world
+    wbm      ...  whole body model
+    wf       ...  world frame
+    wf_T_b   ...  transformation FROM the 'base' TO the 'world frame'
+    wid      ...  width
 
 
 

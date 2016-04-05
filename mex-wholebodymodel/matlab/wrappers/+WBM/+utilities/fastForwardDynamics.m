@@ -4,7 +4,7 @@ function [dstvChi, h] = fastForwardDynamics(t, stvChi, ctrlTrqs, wbm_config)
     dampCoeff = wbm_config.dampCoeff;
 
     % get the state parameters from the current state vector "stvChi" ...
-    stp = WBM.fastGetStateParams(stvChi, wbm_config.stvLen, ndof);
+    stp = WBM.utilities.fastGetStateParams(stvChi, wbm_config.stvLen, ndof);
 
     omega_w = stp.omega_b;
     v_bw = vertcat(stp.dx_b, omega_w);

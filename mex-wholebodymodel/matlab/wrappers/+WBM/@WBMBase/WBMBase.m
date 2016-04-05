@@ -5,7 +5,7 @@ classdef WBMBase < handle
         wf_R_rootLnk@double matrix
         wf_p_rootLnk@double vector
         g_wf@double         vector
-        wbm_params@WBM.wbmBaseModelParams
+        robot_model@WBM.wbmBaseModelParams
     end
 
     properties(Access = protected)
@@ -284,8 +284,8 @@ classdef WBMBase < handle
             obj.mwbm_params.g_wf = g;
         end
 
-        function wbm_params = get.wbm_params(obj)
-            wbm_params = obj.mwbm_params;
+        function robot_model = get.robot_model(obj)
+            robot_model = obj.mwbm_params;
         end
 
         function dispWBMParams(obj, prec)

@@ -4,7 +4,7 @@ classdef WBM < WBM.WBMBase
         stvLen@uint16     scalar
         vqTInit@double    vector
         stvqT@double      vector
-        wbm_config@WBM.wbmBaseRobotConfig
+        robot_config@WBM.wbmBaseRobotConfig
         robot_body@WBM.wbmBody
     end
 
@@ -81,17 +81,19 @@ classdef WBM < WBM.WBMBase
 
         [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
 
-        [] = visualizeForwardDynamics(obj, x_out, tspan, sim_config, vis_speed)
+        [] = visualizeForwardDynamics(obj, x_out, tspan, sim_config, sim_tstep, vis_speed)
 
-        [] = setupSimulation(~, sim_config)
+        sim_config = setupSimulation(~, sim_config)
 
-        % function simulateResults(obj, x_out, tspan, sim_config, noi)
+        function showForwardDynResults(obj, x_out, tspan, sim_config, sim_tstep, nRpts, vis_speed)
+            if ~exist('vis_speed', 'var')
+                vis_speed = 1.0; % default value ... 
+            end
 
-        % end
-
-        % function plotSimulationResults(obj, @simFunc, x_out, tspan, sim_config) % ??
-
-        % end
+            for i = 1:nRpts
+                obj.visualizeForwardDynamics(x_out, tspan, sim_config, sim_tstep, vis_speed);
+            end
+        end
 
         function [chn_q, chn_dq] = getStateChains(obj, chain_names, q_j, dq_j)
             switch nargin
@@ -178,12 +180,12 @@ classdef WBM < WBM.WBMBase
         end
 
         function stParams = getStateParams(obj, stvChi)
-            if ~iscolumn(stvChi)
+            len = obj.mwbm_config.stvLen;
+            if ( ~iscolumn(stvChi) || (size(stvChi,1) ~= len) )
                error('WBM::getStateParams: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
             ndof     = obj.mwbm_config.ndof;
-            len      = obj.mwbm_config.stvLen;
             stParams = WBM.wbmStateParams;
 
             % get the base/joint positions and the base orientation ...
@@ -218,7 +220,7 @@ classdef WBM < WBM.WBMBase
         end
 
         function stvPos = getPositions(obj, stvChi)
-            if ~iscolumn(stvChi)
+            if ( ~iscolumn(stvChi) || (size(stvChi,1) ~= obj.mwbm_config.stvLen) )
                error('WBM::getPositions: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
@@ -229,10 +231,8 @@ classdef WBM < WBM.WBMBase
         end
 
         function stmPos = getPositionsData(obj, chi)
-            len = obj.mwbm_config.stvLen;
-
             [m, n] = size(chi);
-            if (n ~= len)
+            if (n ~= obj.mwbm_config.stvLen)
                 error('WBM::getPositionsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
@@ -241,7 +241,7 @@ classdef WBM < WBM.WBMBase
         end
 
         function stvVel = getVelocities(obj, stvChi)
-            if ~iscolumn(stvChi)
+            if ( ~iscolumn(stvChi) || (size(stvChi,1) ~= obj.mwbm_config.stvLen) )
                error('WBM::getVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
@@ -252,10 +252,8 @@ classdef WBM < WBM.WBMBase
         end
 
         function stmVel = getVelocitiesData(obj, chi)
-            len = obj.mwbm_config.stvLen;
-
             [m, n] = size(chi);
-            if (n ~= len)
+            if (n ~= obj.mwbm_config.stvLen)
                 error('WBM::getVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
@@ -264,7 +262,7 @@ classdef WBM < WBM.WBMBase
         end
 
         function stvVelb = getBaseVelocities(obj, stvChi)
-            if ~iscolumn(stvChi)
+            if ( ~iscolumn(stvChi) || (size(stvChi,1) ~= obj.mwbm_config.stvLen) )
                error('WBM::getBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
@@ -274,10 +272,8 @@ classdef WBM < WBM.WBMBase
         end
 
         function stmVelb = getBaseVelocitiesData(obj, chi)
-            len = obj.mwbm_config.stvLen;
-
             [m, n] = size(chi);
-            if (n ~= len)
+            if (n ~= obj.mwbm_config.stvLen)
                 error('WBM::getBaseVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
@@ -322,8 +318,8 @@ classdef WBM < WBM.WBMBase
             [stvqT,~,~,~] = obj.getState();
         end
 
-        function wbm_config = get.wbm_config(obj)
-            wbm_config = obj.mwbm_config;
+        function robot_config = get.robot_config(obj)
+            robot_config = obj.mwbm_config;
         end
 
         function robot_body = get.robot_body(obj)
@@ -357,7 +353,7 @@ classdef WBM < WBM.WBMBase
                                 obj.mwbm_config.ndof, obj.mwbm_config.nCstrs, ...
                                 strLnkNamesLst, obj.mwbm_config.dampCoeff, ...
                                 strInitState);
-           disp(strConfig);
+            disp(strConfig);
         end
 
     end
