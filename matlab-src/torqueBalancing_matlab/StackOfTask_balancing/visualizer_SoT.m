@@ -4,71 +4,69 @@ function [] = visualizer_SoT(t,chi,param)
 %  CoM error. It can also generate a demo of the robot's movements.
 
 %% Demo generation
-ndof  = param.ndof;
+ndof = param.ndof;
 
 if param.visualizer_demo == 1
-    
-figure_main = figure('Name', 'iCub Simulator', 'NumberTitle', 'off', 'Position', [50,400,600,650]);
-    
-param.figure_main = figure_main;
-set(figure_main, 'MenuBar', 'none', 'BackingStore', 'off');
-set(figure_main, 'BackingStore', 'off');
+     
+BackGroundColor = [0 0 0];
+GridColor       = [1 1 1];
+figure_main     = figure('Name', 'iCub Simulator', 'NumberTitle', 'off',...
+                         'Position', [500,800,1200,650],'Color',BackGroundColor);
+                     
+  sizeFig        = [10 26 800 600];
+% sizeFig        = get(0, 'MonitorPositions');
+% sizeFig        = 2*sizeFig/3;
+% sizeFig(1:2)   = sizeFig(3:4)/10 ;
  
-param.plot_main = zeros(1,4);
-    
-plot_pos = [0.51,0.20,0.45,0.40;
-            0.01,0.20,0.45,0.40;
-            0.51,0.62,0.45,0.40;
-            0.01,0.62,0.45,0.40];
+ set(gcf, 'position', sizeFig);
+ 
+ param.figure_main = figure_main;
+ 
+ set(figure_main, 'MenuBar', 'none', 'BackingStore', 'off');
+ set(figure_main, 'BackingStore', 'off');
 
-for ii=1:4
+ param.plot_main   = zeros(1,4);
     
+ plot_pos           = [0.51,0.05,0.45,1;
+                       0.01,0.05,0.45,1];
+
+  for ii=1:2
+      
         param.plot_main(ii) = subplot('Position', plot_pos(ii,:));
         param.plot_objs{ii} = plot3(0,0,0,'.');
-        axis([-0.5 0.5 -0.42 0.58 0 1]);
-        hold on
+        hold on;
+        set(gca,'Color',BackGroundColor,'Xcolor',GridColor,'Ycolor',GridColor,'Zcolor',GridColor);
+        view([45 25 25])
         
-       if param.feet_on_ground(2) == 0 || sum(param.feet_on_ground) == 2
-            
-          patch([-0.45 -0.45 0.45 0.45],[-0.53 0.37 0.37 -0.53],[0 0 0 0],[0.6 0.6 0.8]);
-            
-        else
-            
-          patch([-0.45 -0.45 0.45 0.45],[-0.37 0.53 0.53 -0.37],[0 0 0 0],[0.6 0.6 0.8]);
-          
-        end
-
-        set(gca,'Color',[0.8 0.8 0.8]);
-        set(gca,'XColor',[0.8 0.8 0.8]);
-        set(gca,'YColor',[0.8 0.8 0.8]);
-        set(gca,'ZColor',[0.8 0.8 0.8]);
-        set(gca,'ydir','reverse')
-        set(gca,'xdir','reverse')
-        set(gca, 'drawmode', 'fast');
-        param.draw_init = 1;
-        rotate3d(gca,'on');
-
-        figure(figure_main);
-        
-end
+  end
     
-axes(param.plot_main(1))
+ axes(param.plot_main(1));
 
-% CoM trajectory
-x_b   = chi(:,1:3);
-qt_b  = chi(:,4:7);
-qj    = chi(:,8:ndof+7);
+% root link trajectory
+ param.demux.baseOrientationType  = 1;
+ robotConfiguration_t             = zeros(size(chi(:,1:8+param.ndof-1))); 
 
-visualizeForwardDynamics([x_b,qt_b,qj],param)
+ for i = 1:length(t)
+    
+     [basePosei,jointAnglesi,~,~] = stateDemux(chi(i,:)',param);
+     robotConfiguration_t(i,:)    = [basePosei(1:3)',basePosei(4:7)',jointAnglesi'];
+
+ end 
+
+ visualizeForwardDynamics(robotConfiguration_t,param);
 
 %% Plot base link position
+set(0,'DefaultFigureWindowStyle','Docked');
+
+x_b  = chi(:,1:3);
+
 figure(2)
 plot3(x_b(:,1),x_b(:,2),x_b(:,3));
 hold on
 plot3(x_b(1,1),x_b(1,2),x_b(1,3),'ro');
 grid on;
 title('Root link position')
- 
+
  axis square;
 %axis equal
     
@@ -390,5 +388,7 @@ plot(t,norm_HErr)
 xlabel('s')
 ylabel('|H-H_{ref}|')
 title('Square norm of H error')
+
+set(0,'DefaultFigureWindowStyle','Normal');
 
 end

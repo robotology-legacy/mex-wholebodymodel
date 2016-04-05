@@ -23,14 +23,20 @@ function [ dchi , h , g,fc, kinEnergy ] = forwardDynamics_zeroExternalForces( t,
 %% extraction of state
 ndof = param.ndof;
 
-x_b = chi(1:3,:);
-qt_b = chi(4:7,:);
-qj = chi(8:ndof+7,:);
-%x = [x_b;qt_b;qj];
+param.demux.baseOrientationType = 1;  % sets the base orientation in stateDemux.m as positions + quaternions (1) or transformation matrix (0)
+[basePose,qj,baseVelocity,dqj]  = stateDemux(chi,param);
 
-dx_b = chi(ndof+8:ndof+10,:);
-omega_W = chi(ndof+11:ndof+13,:);
-dqj = chi(ndof+14:2*ndof+13,:);
+% position and orientation
+x_b     = basePose(1:3,:);
+
+% normalize quaternions to avoid numerical errors
+% qt_b = qt_b/norm(qt_b);
+
+qt_b    = basePose(4:7,:);
+
+% linear and angular velocity
+dx_b    = baseVelocity(1:3,:);
+omega_W = baseVelocity(4:6,:);
 
 v = [dx_b;omega_W;dqj];
 

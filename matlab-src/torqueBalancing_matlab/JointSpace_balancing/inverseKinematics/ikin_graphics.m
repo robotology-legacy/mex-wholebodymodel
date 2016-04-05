@@ -6,6 +6,8 @@ function [] = ikin_graphics(params)
 % Feet position and orientation error
 
 %% parameters definition
+set(0,'DefaultFigureWindowStyle','Docked');
+
 t        = params.t_kin;
 traj     = params.joints_traj.traj;
 delta    = params.joints_traj.delta;
@@ -117,5 +119,7 @@ end
 end    
 
 end
+
+set(0,'DefaultFigureWindowStyle','Normal');
 
 end
