@@ -79,19 +79,44 @@ classdef WBM < WBM.WBMBase
             obj.mwbm_config.initStateParams.qt_b = vqT_init(4:7,1); % orientation (quaternion)
         end
 
+        function wf_vqT_lnkfr = computeFKRotoTranslation(obj, urdf_link_name, q_j, vqT, g_wf)
+            % calculate the forward kinematic roto-translation of a specified joint or link:
+            switch nargin
+                case {4, 5}
+                    % convert the state of the base into the roto-translation form ...
+                    [p_b, R_b] = WBM.utilities.frame2posRotm(vqT);
+                    % set the world frame to the base ...
+                    if ~exist('g_wf', 'var')
+                        % use the default gravity vector ...
+                        obj.setWorldFrame(R_b, p_b);
+                    else
+                        % use the specified gravity vector...
+                        obj.setWorldFrame(R_b, p_b, g_wf);
+                    end
+                    % compute the forward kinematics of the specified link or joint ...
+                    wf_vqT_lnkfr = obj.forwardKinematics(urdf_link_name, R_b, p_b, q_j);
+                otherwise
+                    error('WBM::computeFKRotoTranslation: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+        end
+
         [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
 
-        [] = visualizeForwardDynamics(obj, x_out, tspan, sim_config, sim_tstep, vis_speed)
+        [] = visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
 
         sim_config = setupSimulation(~, sim_config)
 
-        function showForwardDynResults(obj, x_out, tspan, sim_config, sim_tstep, nRpts, vis_speed)
-            if ~exist('vis_speed', 'var')
-                vis_speed = 1.0; % default value ... 
+        function showForwardDynResults(obj, x_out, sim_config, sim_tstep, nRpts, vis_ctrl)
+            if ~exist('vis_ctrl', 'var')
+                % use the default ctrl-values ...
+                for i = 1:nRpts
+                    obj.visualizeForwardDynamics(x_out, sim_config, sim_tstep);
+                end
+                return
             end
-
+            % else ...
             for i = 1:nRpts
-                obj.visualizeForwardDynamics(x_out, tspan, sim_config, sim_tstep, vis_speed);
+                obj.visualizeForwardDynamics(x_out, sim_config, sim_tstep, vis_ctrl);
             end
         end
 

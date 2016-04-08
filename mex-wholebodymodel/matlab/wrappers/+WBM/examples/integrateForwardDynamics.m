@@ -37,7 +37,7 @@ ctrlTrqs.tau = @(t)zeros(size(g_init(7:len)));
 %  form chi' = f(t,chi) and returns a vector of rates of change (vector of derivatives)
 %  that will be integrated by the solver.
 fwdDynFunc = @(t, chi)WBM.utilities.fastForwardDynamics(t, chi, ctrlTrqs, wbm_iCub.robot_config);
-%fwdDynFunc = @(t, chi)wbm_iCub.forwardDynamics(t, chi, ctrlTrqs);
+%fwdDynFunc = @(t, chi)wbm_iCub.forwardDynamics(t, chi, ctrlTrqs); % optional
 
 % specifying the time interval of the integration ...
 sim_time.start = 0.0;
@@ -63,13 +63,13 @@ sim_config = initSimConfig_iCub();
 sim_config = wbm_iCub.setupSimulation(sim_config);
 x_out = wbm_iCub.getPositionsData(chi);
 % show and repeat the simulation 10 times ...
-nRpts = 10;
-wbm_iCub.showForwardDynResults(x_out, t, sim_config, sim_time.step, nRpts);
+nRpts = 6;
+wbm_iCub.showForwardDynResults(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:
 stPData = wbm_iCub.getStateParamsData(chi);
 
-figure;
+figure('Name', 'iCub - CoM-trajectory:', 'NumberTitle', 'off');
 
 plot3(stPData.x_b(1:nRes,1), stPData.x_b(1:nRes,2), stPData.x_b(1:nRes,3), 'Color', 'b');
 hold on;

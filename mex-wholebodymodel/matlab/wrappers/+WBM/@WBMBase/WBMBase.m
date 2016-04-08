@@ -75,13 +75,20 @@ classdef WBMBase < handle
             wholeBodyModel('model-initialise-urdf', obj.mwbm_params.urdfRobot);
         end
 
-        function setWorldFrame(~, wf_R_rootLnk, wf_p_rootLnk, g_wf)
-            if (nargin ~= 4)
-                error('WBMBase::setWorldFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
+        function setWorldFrame(obj, wf_R_rootLnk, wf_p_rootLnk, g_wf)
+            switch nargin
+                case {3, 4}
+                    if ~exist('g_wf', 'var')
+                        % use the default gravity vector ...
+                        g_wf = obj.mwbm_params.g_wf;
+                    end
+
+                    % reshape the matrix into an 1-column array ...
+                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
+                    wholeBodyModel('set-world-frame', wf_R_rlnk_arr, wf_p_rootLnk, g_wf);
+                otherwise
+                    error('WBMBase::setWorldFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            % reshape the matrix into an 1-column array ...
-            wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
-            wholeBodyModel('set-world-frame', wf_R_rlnk_arr, wf_p_rootLnk, g_wf);
         end
 
         function updateWorldFrame(obj, wf_R_rootLnk, wf_p_rootLnk, g_wf)
@@ -90,10 +97,12 @@ classdef WBMBase < handle
             end
 
             if (nargin == 4)
+                % replace the old default parameters with the new values ...
                 obj.mwbm_params.wf_R_rootLnk = wf_R_rootLnk;
                 obj.mwbm_params.wf_p_rootLnk = wf_p_rootLnk;
                 obj.mwbm_params.g_wf         = g_wf;
             end
+            % update the world frame with the new default parameters ...
             obj.setWorldFrame(obj.mwbm_params.wf_R_rootLnk, obj.mwbm_params.wf_p_rootLnk, ...
                               obj.mwbm_params.g_wf);
         end

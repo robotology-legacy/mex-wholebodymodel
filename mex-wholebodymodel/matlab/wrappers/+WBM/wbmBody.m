@@ -15,16 +15,16 @@ classdef wbmBody
     		%% Chains:
     		% verify the input types ...
     		if ( ~iscell(chain_names) || ~ismatrix(chain_pos) )
-    			error('wbmBody::wbmBody: %s', WBM.wbmErrMsg.WRONG_DATA_TYPE);		    			
+    			error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);		    			
     		end
     		% check the dimensions ...
     		[nrows, ncols] = size(chain_pos);
     		if (ncols ~= 2)
-    			error('wbmBody::wbmBody: %s', WBM.wbmErrMsg.WRONG_MAT_DIM);		
+    			error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);		
     		end
 
     		if (size(chain_names,1) ~= nrows)
-    			error('wbmBody::wbmBody: %s', WBM.wbmErrMsg.DIM_MISMATCH);
+    			error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
     		end
     		% store the chain data into the cell array ...
     		obj.nChains = nrows;
@@ -34,12 +34,12 @@ classdef wbmBody
 			if (nargin == 4)
 				% check input types ...
 				if ( ~iscell(joint_names) || ~isvector(joint_idx) )
-					error('wbmBody::wbmBody: %s', WBM.wbmErrMsg.WRONG_DATA_TYPE);		    			
+					error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);		    			
 				end
 				% check dimensions ...
 				len = size(joint_names,1);
 				if (len ~= size(joint_idx,1))
-					error('wbmBody::wbmBody: %s', WBM.wbmErrMsg.DIM_MISMATCH);
+					error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
 				end
 				% store the joint data ...
 				obj.nJoints = len;

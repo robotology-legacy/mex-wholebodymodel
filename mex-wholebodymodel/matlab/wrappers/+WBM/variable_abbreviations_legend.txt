@@ -11,7 +11,6 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ctrl     ...  control
     d...     ...  derivative (dot) of a variable, like dv of v (= v_dot), etc.
     df, dflt ...  default
-    dim      ...  dimension
     dp       ...  data point
     ds       ...  dimensions
     dstv     ...  derivative of state vector
@@ -35,6 +34,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ndof     ...  number degrees of freedom
     noi      ...  number of iterations
     nw       ...  new world
+    o        ...  orthogonal
     ofs      ...  offset(s)
     on       ...  orthonormal
     onb      ...  orthonormal basis
@@ -55,12 +55,13 @@ Legend of abbreviations and acronyms which are used for the variable names:
     rpts     ...  repeats
     sc       ...  scalar OR scaled
     sf       ...  scale factor(s)
+    shp      ...  shape
     st       ...  state
     stm      ...  state matrix
     str      ...  string
     stv      ...  state vector
     stvqT    ...  state vector-quaternion transformation [VQS-Transformation of the current state vector] (vector) (*)
-    sz       ...  size
+    sz       ...  size(s)
     tr       ...  translation(s)
     trans    ...  translation(s)
     trqs     ...  torques
