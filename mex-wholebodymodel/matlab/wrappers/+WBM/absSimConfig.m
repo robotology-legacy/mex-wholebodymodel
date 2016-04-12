@@ -9,7 +9,8 @@ classdef (Abstract) absSimConfig
     end
 
     properties(Abstract)
-        %robot_body@WBM.wbmSimBody
+        robot_body@WBM.wbmSimBody
+        
         hMainFigure
         main_title@char
         main_pos@double     vector

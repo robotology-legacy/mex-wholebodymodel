@@ -79,7 +79,7 @@ classdef WBM < WBM.WBMBase
             obj.mwbm_config.initStateParams.qt_b = vqT_init(4:7,1); % orientation (quaternion)
         end
 
-        function wf_vqT_lnkfr = computeFKRotoTranslation(obj, urdf_link_name, q_j, vqT, g_wf)
+        function wf_vqT_lnkfr = computeFKinRotoTranslation(obj, urdf_link_name, q_j, vqT, g_wf)
             % calculate the forward kinematic roto-translation of a specified joint or link:
             switch nargin
                 case {4, 5}
@@ -96,17 +96,17 @@ classdef WBM < WBM.WBMBase
                     % compute the forward kinematics of the specified link or joint ...
                     wf_vqT_lnkfr = obj.forwardKinematics(urdf_link_name, R_b, p_b, q_j);
                 otherwise
-                    error('WBM::computeFKRotoTranslation: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                    error('WBM::computeFKinRotoTranslation: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
         end
 
         [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
 
-        [] = visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
-
         sim_config = setupSimulation(~, sim_config)
 
-        function showForwardDynResults(obj, x_out, sim_config, sim_tstep, nRpts, vis_ctrl)
+        [] = visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
+
+        function simulateForwardDynamics(obj, x_out, sim_config, sim_tstep, nRpts, vis_ctrl)
             if ~exist('vis_ctrl', 'var')
                 % use the default ctrl-values ...
                 for i = 1:nRpts
@@ -286,17 +286,17 @@ classdef WBM < WBM.WBMBase
             stmVel = chi(1:m,cutp:len); % m -by- [dx_b, omega_b, dq_j]
         end
 
-        function stvVelb = getBaseVelocities(obj, stvChi)
+        function stvBsVel = getBaseVelocities(obj, stvChi)
             if ( ~iscolumn(stvChi) || (size(stvChi,1) ~= obj.mwbm_config.stvLen) )
                error('WBM::getBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
             cutp1 = obj.mwbm_config.ndof + 8;
             cutp2 = obj.mwbm_config.ndof + 13;
-            stvVelb = stvChi(cutp1:cutp2,1); % [dx_b; omega_b]
+            stvBsVel = stvChi(cutp1:cutp2,1); % [dx_b; omega_b]
         end
 
-        function stmVelb = getBaseVelocitiesData(obj, chi)
+        function stmBsVel = getBaseVelocitiesData(obj, chi)
             [m, n] = size(chi);
             if (n ~= obj.mwbm_config.stvLen)
                 error('WBM::getBaseVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
@@ -304,7 +304,7 @@ classdef WBM < WBM.WBMBase
 
             cutp1 = obj.mwbm_config.ndof + 8;
             cutp2 = obj.mwbm_config.ndof + 13;
-            stmVelb = chi(1:m,cutp1:cutp2); % m -by- [dx_b, omega_b]
+            stmBsVel = chi(1:m,cutp1:cutp2); % m -by- [dx_b, omega_b]
         end
 
         function vqT = getRotoTranslation(~, stParams)

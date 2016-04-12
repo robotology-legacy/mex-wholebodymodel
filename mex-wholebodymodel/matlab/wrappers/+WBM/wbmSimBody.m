@@ -11,9 +11,19 @@ classdef wbmSimBody < handle
         foot_shape_ds@double matrix
     end
 
+    properties
+        draw_prop@WBM.wbmDrawProp
+    end
+
+    properties(SetAccess = private, GetAccess = public)
+        joint_names@cell     vector
+        joint_pair_idx@uint8 matrix
+        nJoints@uint8        scalar = 0;
+        nLinks@uint8         scalar = 0;
+        nFeets@uint8         scalar = 0;
+    end
+
     properties(Access = private)
-        % mShape_geom.size_sf@double       matrix
-        % mShape_geom.faces@uint8          matrix
         mShape_geom = struct( 'size_sf',  [], ...
                               'faces',    [] );  
 
@@ -21,24 +31,7 @@ classdef wbmSimBody < handle
                               'base_sz',  struct( 'width',  0, ...
                                                   'height', 0 ), ...
                               'shape_ds', [] );
-        % mFoot_geom.joints@uint8          vector
-        % mFoot_geom.base_sz.width@double  scalar
-        % mFoot_geom.base_sz.height@double scalar
-        % mFoot_geom.facess@uint8          matrix
-        % mFoot_geom.shape_ds@double       matrix
     end
-
-    properties(SetAccess = private, GetAccess = public)
-        joint_names@cell 	 vector
-        joint_pair_idx@uint8 matrix
-        nJoints@uint8        scalar = 0;
-        nLinks@uint8         scalar = 0;
-        nFeets@uint8 		 scalar = 0;
-    end
-
-    properties
-        draw_prop@WBM.wbmDrawProp
-	end
 
     methods
         function obj = wbmSimBody(robot_joint_names, joint_pair_idx, draw_prop)
@@ -65,24 +58,24 @@ classdef wbmSimBody < handle
             % initialize the draw properties for the body of the animated robot ...
             obj.draw_prop = WBM.wbmDrawProp;
             if ~exist('draw_prop', 'var')
-            	% use default values ...
-				obj.draw_prop.joints.marker     = '.';
-				obj.draw_prop.joints.marker_sz  = 9;
-				obj.draw_prop.joints.color      = 'blue';
+                % use default values ...
+                obj.draw_prop.joints.marker     = '.';
+                obj.draw_prop.joints.marker_sz  = 9;
+                obj.draw_prop.joints.color      = 'blue';
 
-				obj.draw_prop.links.line_width  = 1.6;
-				obj.draw_prop.links.color       = 'black';
-				
+                obj.draw_prop.links.line_width  = 1.6;
+                obj.draw_prop.links.color       = 'black';
+                
                 obj.draw_prop.com.marker        = '*';
                 obj.draw_prop.com.marker_sz     = 4;
-				obj.draw_prop.com.color         = 'red';
+                obj.draw_prop.com.color         = 'red';
 
                 obj.draw_prop.shape.line_width  = 0.4;
                 obj.draw_prop.shape.edge_color  = 'black';
-				obj.draw_prop.shape.face_color  = 'black';
+                obj.draw_prop.shape.face_color  = 'black';
                 obj.draw_prop.shape.face_alpha  = 0.2;
 
-				obj.draw_prop.ground_color      = [201 220 222] ./ 255; % hex: #c9dcde
+                obj.draw_prop.ground_color      = [201 220 222] ./ 255; % hex: #c9dcde
                 return
             end
             % else ...
@@ -125,9 +118,9 @@ classdef wbmSimBody < handle
             obj.mShape_geom.size_sf = size_sf;
         end
 
-    	function shape_size_sf = get.shape_size_sf(obj)
-    		shape_size_sf = obj.mShape_geom.size_sf;
-    	end
+        function shape_size_sf = get.shape_size_sf(obj)
+            shape_size_sf = obj.mShape_geom.size_sf;
+        end
 
         function set.shape_faces(obj, shape_faces)
             [m,n] = size(shape_faces);
@@ -137,9 +130,9 @@ classdef wbmSimBody < handle
             obj.mShape_geom.faces = shape_faces;
         end
 
-    	function shape_faces = get.shape_faces(obj)
-    		shape_faces = obj.mShape_geom.faces;
-    	end
+        function shape_faces = get.shape_faces(obj)
+            shape_faces = obj.mShape_geom.faces;
+        end
 
         function set.foot_geom(obj, foot_geom)
             if ~isstruct(foot_geom)
@@ -154,17 +147,17 @@ classdef wbmSimBody < handle
             foot_geom = obj.mFoot_geom;
         end
 
-    	function set.foot_joints(obj, foot_jnts)
-    		if ~isvector(foot_jnts)
+        function set.foot_joints(obj, foot_jnts)
+            if ~isvector(foot_jnts)
                 error('wbmSimBody::set.foot_joints: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
-    		end
-    		obj.mFoot_geom.joints = foot_jnts;
+            end
+            obj.mFoot_geom.joints = foot_jnts;
             obj.nFeets = length(obj.mFoot_geom.joints);
-    	end
+        end
 
-    	function foot_jnts = get.foot_joints(obj)
-    		foot_jnts = obj.mFoot_geom.joints;
-    	end
+        function foot_jnts = get.foot_joints(obj)
+            foot_jnts = obj.mFoot_geom.joints;
+        end
 
         function set.foot_base_sz(obj, base_sz)
             if isstruct(base_sz)
@@ -190,9 +183,9 @@ classdef wbmSimBody < handle
             obj.mFoot_geom.shape_ds = foot_ds;
         end
 
-    	function foot_shape_ds = get.foot_shape_ds(obj)
-    		foot_shape_ds = obj.mFoot_geom.shape_ds;
-    	end
+        function foot_shape_ds = get.foot_shape_ds(obj)
+            foot_shape_ds = obj.mFoot_geom.shape_ds;
+        end
 
-	end
+    end
 end

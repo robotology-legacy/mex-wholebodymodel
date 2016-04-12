@@ -6,6 +6,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     arr      ...  array
     b        ...  base
     bf       ...  base frame
+    cols     ...  columns
     config   ...  configuration
     cstr     ...  constraint
     ctrl     ...  control
@@ -49,6 +50,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     qt, q    ...  quaternion
     quat     ...  quaternion
     r        ...  root
+    rax      ...  rotation axis
     ref      ...  reference
     ridx     ...  row index(es)
     rlnk     ...  root link OR reference link

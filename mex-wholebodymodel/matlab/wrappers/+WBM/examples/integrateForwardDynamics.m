@@ -64,7 +64,7 @@ sim_config = wbm_iCub.setupSimulation(sim_config);
 x_out = wbm_iCub.getPositionsData(chi);
 % show and repeat the simulation 10 times ...
 nRpts = 6;
-wbm_iCub.showForwardDynResults(x_out, sim_config, sim_time.step, nRpts);
+wbm_iCub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:
 stPData = wbm_iCub.getStateParamsData(chi);

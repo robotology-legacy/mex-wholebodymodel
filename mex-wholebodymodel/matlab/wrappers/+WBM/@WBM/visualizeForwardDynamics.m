@@ -58,7 +58,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
         vqT = squeeze(vqT_b(i,1:7)');
 
         for j = 2:nJnts
-            fwd_kin.vqT(i,1:7,j) = obj.computeFKRotoTranslation(sim_config.robot_body.joint_names{j,1}, q, vqT);
+            fwd_kin.vqT(i,1:7,j) = obj.computeFKinRotoTranslation(sim_config.robot_body.joint_names{j,1}, q, vqT);
         end
     end
 
@@ -81,7 +81,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     end
 
     for i = 1:nJnts-1
-        [fwd_kin.vJntPos(i,1:3), fwd_kin.hJnt_dp(1,i)] = plotFKJointPos((fwd_kin.vqT(1,1:7,i))', plot_prop);
+        [fwd_kin.vJntPos(i,1:3), fwd_kin.hJnt_dp(1,i)] = plotFKinJointPos((fwd_kin.vqT(1,1:7,i))', plot_prop);
     end
     % draw the position of the center of mass (CoM):
     plot_prop = sim_config.robot_body.draw_prop.com;    
@@ -89,7 +89,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
         plot_prop.marker = 'none';
         plot_prop.color  = 'none';
     end
-    [fwd_kin.vJntPos(nJnts,1:3), fwd_kin.hJnt_dp(1,nJnts)] = plotFKJointPos((fwd_kin.vqT(1,1:7,nJnts))', plot_prop);
+    [fwd_kin.vJntPos(nJnts,1:3), fwd_kin.hJnt_dp(1,nJnts)] = plotFKinJointPos((fwd_kin.vqT(1,1:7,nJnts))', plot_prop);
     hSimRobot(1:nGObjs,1) = fwd_kin.hJnt_dp(1,1:nJnts); % store the graphics objects ...
     
     % create a position parameter matrix from the defined joint pairs (links) to describe a full
@@ -159,7 +159,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
 
         % update the forward kinematic translations (positions) ...
         new_fk_pos = (squeeze(fwd_kin.vqT(t,1:7,1:nJnts)))';
-        [fwd_kin.vJntPos, fwd_kin.hJnt_dp] = updateFKJointPositions(fwd_kin.vJntPos, fwd_kin.hJnt_dp, new_fk_pos, nJnts);
+        [fwd_kin.vJntPos, fwd_kin.hJnt_dp] = updateFKinJointPositions(fwd_kin.vJntPos, fwd_kin.hJnt_dp, new_fk_pos, nJnts);
         hSimRobot(1:nJnts,1) = fwd_kin.hJnt_dp(1,1:nJnts);
 
         % update the position parameter matrix for the links of the robot ...
@@ -223,7 +223,7 @@ function initMainFigure(sim_config)
     end
 end
 
-function [jntPos, hJnt_dp] = plotFKJointPos(fk_vqT, plot_prop)
+function [jntPos, hJnt_dp] = plotFKinJointPos(fk_vqT, plot_prop)
     % get the new position (translation) of the computed forward kinematics ...
     p = fk_vqT(1:3,1);
     jntPos = p';
@@ -232,7 +232,7 @@ function [jntPos, hJnt_dp] = plotFKJointPos(fk_vqT, plot_prop)
                     'MarkerSize', plot_prop.marker_sz, 'MarkerEdgeColor', plot_prop.color);
 end
 
-function [vJntPos, hJnt_dp] = updateFKJointPositions(vJntPos, hJnt_dp, fk_vqT, nJnts)
+function [vJntPos, hJnt_dp] = updateFKinJointPositions(vJntPos, hJnt_dp, fk_vqT, nJnts)
     % update the forward kinematic translations (positions) ...
     for i = 1:nJnts
         % get the translation (position) of the current instance ...
