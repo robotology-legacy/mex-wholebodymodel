@@ -12,13 +12,13 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     elseif isstruct(vis_ctrl)
         vis_speed = vis_ctrl.vis_speed;
     else
-        error('WBM::visualizeForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);        
+        error('WBM::visualizeForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
 
     % check the dimension and get the number of instances of the simulation result ...
     ndof = obj.mwbm_config.ndof;
     vlen = ndof + 7;
-    [nRes, len] = size(x_out); 
+    [nRes, len] = size(x_out);
     if (len ~= vlen)
         error('WBM::visualizeForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
     end
@@ -27,7 +27,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     % "x_out" of the integration part of the forward dynamics function:
     vqT_b = x_out(1:nRes,1:7);
     q_j = x_out(1:nRes,8:vlen);
-                      
+
     v_b = vertcat(obj.mwbm_config.initStateParams.dx_b, obj.mwbm_config.initStateParams.omega_b);
 
     obj.setWorldFrame2FixedLink(obj.mwbm_config.initStateParams.q_j, obj.mwbm_config.initStateParams.dq_j, ...
@@ -84,14 +84,14 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
         [fwd_kin.vJntPos(i,1:3), fwd_kin.hJnt_dp(1,i)] = plotFKinJointPos((fwd_kin.vqT(1,1:7,i))', plot_prop);
     end
     % draw the position of the center of mass (CoM):
-    plot_prop = sim_config.robot_body.draw_prop.com;    
+    plot_prop = sim_config.robot_body.draw_prop.com;
     if ~vis_ctrl.drawCom
         plot_prop.marker = 'none';
         plot_prop.color  = 'none';
     end
     [fwd_kin.vJntPos(nJnts,1:3), fwd_kin.hJnt_dp(1,nJnts)] = plotFKinJointPos((fwd_kin.vqT(1,1:7,nJnts))', plot_prop);
     hSimRobot(1:nGObjs,1) = fwd_kin.hJnt_dp(1,1:nJnts); % store the graphics objects ...
-    
+
     % create a position parameter matrix from the defined joint pairs (links) to describe a full
     % configuration of the robot's skeleton:
     fwd_kin.jnt_pair_pos = getLinkPositions(fwd_kin.vJntPos, sim_config.robot_body.joint_pair_idx, nLnks);
@@ -117,7 +117,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
         body.hShape = createRobotBody(nLnks, fwd_kin.jnt_pair_pos, nFeets, foot_geom, shape_geom, shp_draw_prop);
 
         nShpElem = nLnks + nFeets;
-        idx3     = nGObjs + 1; 
+        idx3     = nGObjs + 1;
         nGObjs   = nGObjs + nShpElem; % update obj-number ...
         hSimRobot(idx3:nGObjs,1) = body.hShape(1,1:nShpElem); % store the g-objects ...
     end
@@ -127,20 +127,20 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
         for i = 1:4
             delete(sim_config.plot_objs{1,i});
         end
-    end        
-    
+    end
+
     % put all graphics objects into the axes of the first subplot of the frame (left bottom):
     % (the simulated robot will be shown in perspective view)
     sim_config.plot_objs{1,1} = hSimRobot(1:nGObjs,1);
-    
+
     % copy all objects to the other axes with different views:
     % view top:
-    set(sim_config.hMainFigure, 'CurrentAxes', sim_config.hAxes(1,2));    
+    set(sim_config.hMainFigure, 'CurrentAxes', sim_config.hAxes(1,2));
     sim_config.plot_objs{1,2} = copyobj(sim_config.plot_objs{1,1}, sim_config.hAxes(1,2));
     view(-90,90); % change the viewpoint (azimuth, elevation)
     % view side:
     set(sim_config.hMainFigure, 'CurrentAxes', sim_config.hAxes(1,3));
-    sim_config.plot_objs{1,3} = copyobj(sim_config.plot_objs{1,1}, sim_config.hAxes(1,3));    
+    sim_config.plot_objs{1,3} = copyobj(sim_config.plot_objs{1,1}, sim_config.hAxes(1,3));
     view(0,1);
     % view front:
     set(sim_config.hMainFigure, 'CurrentAxes', sim_config.hAxes(1,4));
@@ -149,10 +149,10 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     % set back the current axes handle to the first subplot ...
     set(sim_config.hMainFigure, 'CurrentAxes', sim_config.hAxes(1,1));
 
-    drawnow; % draw all plots of the initial robot body in the main figure ... 
+    drawnow; % draw all plots of the initial robot body in the main figure ...
 
     %% Update the graphic objects of the robot:
-    
+
     t = 2;
     while (t <= nRes) % the visualization instance ...
         tic; % visualization step timer start (needed for adapting the visualization speed)
@@ -263,8 +263,8 @@ function shape_vtx = getLnkShapeVertices(jnt_pair_pos, size_sf)
     lnk_vec = horzcat( jnt_pair_pos(1,2) - jnt_pair_pos(1,1), ...
                        jnt_pair_pos(1,4) - jnt_pair_pos(1,3), ...
                        jnt_pair_pos(1,6) - jnt_pair_pos(1,5) );
-    %                                 y2                  y1  
-    %                                 z2                  z1  
+    %                                 y2                  y1
+    %                                 z2                  z1
 
     % calculate the orthonormal basis for the null space (kernel) of "lnk_vec" ...
     onb_lnk = null(lnk_vec); % orthonormal vectors to the link
@@ -301,7 +301,7 @@ function lnk_shape = createLinkShape(jnt_pair_pos, size_sf, faces, draw_prop)
 end
 
 function lnk_shape = updateLinkShapePos(lnk_shape, jnt_pair_pos, size_sf)
-    % compute the new vertex positions for the box shape of the current link ... 
+    % compute the new vertex positions for the box shape of the current link ...
     new_vtx_pos = getLnkShapeVertices(jnt_pair_pos, size_sf);
     % update the position of the shape ...
     set(lnk_shape, 'Vertices', new_vtx_pos);
@@ -341,14 +341,14 @@ function foot_shp = createFootShape(jnt_pair_pos, base_sz, foot_ds, faces, draw_
 end
 
 function foot_shp = updateFootPos(foot_shp, jnt_pair_pos, base_sz, foot_ds)
-    % compute the new vertex positions for the shape of the foot ... 
+    % compute the new vertex positions for the shape of the foot ...
     new_vtx_pos = getFootShapeVertices(jnt_pair_pos, base_sz, foot_ds);
     % update the position of the foot ...
     set(foot_shp, 'Vertices', new_vtx_pos);
 end
 
 function hLnk_lns = createRobotSkeleton(nLnks, jnt_pair_pos, draw_prop)
-    % draw the lines (edges) that are depicting the links to form the 
+    % draw the lines (edges) that are depicting the links to form the
     % kinematic chain, the skeleton of the robot:
     hLnk_lns   = gobjects(1,nLnks);
     for i = 1:nLnks
@@ -362,7 +362,7 @@ end
 function hRobotShape = createRobotBody(nLnks, jnt_pair_pos, nFeets, foot_geom, shape_geom, draw_prop)
     % draw the box shapes (hull) for the corresponding links of the robot:
     hRobotShape = zeros(1,nLnks+nFeets);
-    for i = 1:nLnks        
+    for i = 1:nLnks
         % create the shape of the link, which is around the link line ...
         hRobotShape(1,i) = createLinkShape(jnt_pair_pos(i,1:6), shape_geom.size_sf(i,1:2), shape_geom.faces, draw_prop);
     end
@@ -379,7 +379,7 @@ function hLnk_lns = updateRobotSkeleton(hLnk_lns, nLnks, new_jnt_pair_pos)
     % update the link positions of the robot's skeleton:
     for i = 1:nLnks
         % remove the old point positions ...
-        clearpoints(hLnk_lns(1,i)); 
+        clearpoints(hLnk_lns(1,i));
         % update the link positions ...
         %                               new pos. (x1,x2),        new pos. (y1,y2),        new pos. (z1,z2)
         addpoints(hLnk_lns(1,i), new_jnt_pair_pos(i,1:2), new_jnt_pair_pos(i,3:4), new_jnt_pair_pos(i,5:6));

@@ -6,6 +6,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     arr      ...  array
     b        ...  base
     bf       ...  base frame
+    bgn      ...  begin
     cols     ...  columns
     config   ...  configuration
     cstr     ...  constraint

@@ -22,11 +22,11 @@ build/
 # Simulink Code Generation
 slprj/
 
-# Matlab binary .mat files 
+# Matlab binary .mat files
 *.mat
 
 # Matlab figures
-*.fig 
+*.fig
 
 ## Sublime Text: ------------------------------------
 ##
@@ -34,9 +34,3 @@ slprj/
 ##---------------------------------------------------
 *.sublime-project
 *.sublime-workspace
-
-## User specific files: -----------------------------
-##
-##---------------------------------------------------
-speed_test.m
-

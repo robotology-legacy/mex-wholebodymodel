@@ -23,8 +23,8 @@ tic;
 wbm_iCub = WBM(iCub_model, iCub_config);
 initTime = toc();
 
-fprintf('Initialization time : %e secs\n', initTime);
-fprintf('Num Trials : %d\nStarting Trial...\n', noi);
+fprintf('Initialization time: %e secs\n', initTime);
+fprintf('Num of Trials: %d\nStarting Trial...\n', noi);
 
 R = iCub_model.wf_R_rootLnk;
 g = iCub_model.g_wf;
@@ -64,8 +64,8 @@ end
 totTime = toc();
 
 %% Output the first time-benchmark result:
-fprintf('Normal-Mode Trial Total Time : %f secs\n', totTime);
-fprintf('Normal-Mode Trial Average Time : %e secs\n', totTime/noi);
+fprintf('Normal-Mode Trial Total Time: %f secs\n', totTime);
+fprintf('Normal-Mode Trial Average Time: %e secs\n', totTime/noi);
 
 clearvars; % clear all variables from the workspace ...
 
@@ -89,7 +89,7 @@ tic;
 wbm_iCub = WBM(iCub_model, iCub_config);
 initTime = toc();
 
-fprintf('Initialization time : %e secs\nStarting Trial...\n', initTime);
+fprintf('Initialization time: %e secs\nStarting Trial...\n', initTime);
 
 R = iCub_model.wf_R_rootLnk;
 g = iCub_model.g_wf;
@@ -130,5 +130,5 @@ end
 totTime = toc();
 
 %% Output the result of the second time-benchmark:
-fprintf('Optimized-Mode Trial Total Time : %f secs\n', totTime);
-fprintf('Optimized-Mode Trial Average Time : %e secs\n', totTime/noi);
+fprintf('Optimized-Mode Trial Total Time: %f secs\n', totTime);
+fprintf('Optimized-Mode Trial Average Time: %e secs\n', totTime/noi);

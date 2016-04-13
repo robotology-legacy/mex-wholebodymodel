@@ -25,7 +25,7 @@ classdef wbmSimBody < handle
 
     properties(Access = private)
         mShape_geom = struct( 'size_sf',  [], ...
-                              'faces',    [] );  
+                              'faces',    [] );
 
         mFoot_geom  = struct( 'joints',   [], ...
                               'base_sz',  struct( 'width',  0, ...
@@ -42,7 +42,7 @@ classdef wbmSimBody < handle
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             if ~iscolumn(robot_joint_names)
-                error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);     
+                error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
             obj.joint_names = robot_joint_names;
@@ -51,7 +51,7 @@ classdef wbmSimBody < handle
 
             [m,n] = size(joint_pair_idx);
             if ( (m ~= obj.nLinks) || (n ~= 6) )
-                error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);     
+                error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
             obj.joint_pair_idx = joint_pair_idx;
 
@@ -65,7 +65,7 @@ classdef wbmSimBody < handle
 
                 obj.draw_prop.links.line_width  = 1.6;
                 obj.draw_prop.links.color       = 'black';
-                
+
                 obj.draw_prop.com.marker        = '*';
                 obj.draw_prop.com.marker_sz     = 4;
                 obj.draw_prop.com.color         = 'red';
@@ -95,12 +95,12 @@ classdef wbmSimBody < handle
             obj.draw_prop.shape.face_color  = draw_prop.shape.face_color;
             obj.draw_prop.shape.face_alpha  = draw_prop.shape.face_alpha;
 
-            obj.draw_prop.ground_color      = draw_prop.ground_color;                    
+            obj.draw_prop.ground_color      = draw_prop.ground_color;
         end
 
         function set.shape_geom(obj, shape_geom)
             if ~isstruct(shape_geom)
-                error('wbmSimBody::set.shape_geom: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);                
+                error('wbmSimBody::set.shape_geom: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             obj.shape_size_sf = shape_geom.size_sf;
             obj.shape_faces   = shape_geom.faces;
@@ -136,7 +136,7 @@ classdef wbmSimBody < handle
 
         function set.foot_geom(obj, foot_geom)
             if ~isstruct(foot_geom)
-                error('wbmSimBody::set.foot_geom: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);                
+                error('wbmSimBody::set.foot_geom: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             obj.foot_joints   = foot_geom.joints;
             obj.foot_base_sz  = foot_geom.base_sz;

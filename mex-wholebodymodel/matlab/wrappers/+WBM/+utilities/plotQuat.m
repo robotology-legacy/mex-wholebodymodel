@@ -1,12 +1,12 @@
 function plotQuat(vqT, twait)
     if ~exist('twait', 'var')
         % use the default time duration of waiting (in seconds) ...
-        twait = 0.0005;  
+        twait = 0.0005;
     end
 
     if ~ismatrix(vqT)
         error('plotQuat: %s', WBM.wbmErrMsg.WRONG_DATA_TYPE);
-    end        
+    end
     % the matrix-dimension must be of m-by-7:
     [nRows,nCols] = size(vqT);
     if (nCols ~= 7)
@@ -42,7 +42,7 @@ function plotQuat(vqT, twait)
     axis( repmat([-2 2], 1, 3) );
 
     hold on;
-    
+
     xlabel('pos_x');
     ylabel('pos_y');
     zlabel('pos_z');
@@ -53,7 +53,7 @@ function plotQuat(vqT, twait)
     strTitle = 'Quaternion (#%d)';
     title(sprintf(strTitle, 1));
 
-    % 3D-position of the first quaternion ... 
+    % 3D-position of the first quaternion ...
     hPos3D = plot3(pos_x(1,1), pos_y(1,1), pos_z(1,1), 'Marker', 'o', 'MarkerEdgeColor', 'black');
     if verLessThan('matlab', '8.4.0')
         % Matlab <= R2014a:
@@ -73,7 +73,7 @@ function plotQuat(vqT, twait)
                                 horzcat(pos_z(1,1), pos_z(1,1)+R(3,3)), 'LineWidth', lin_width, 'Color', 'blue');
 
         pause; % stop the execution and wait for the user to press any key ...
-    
+
         % draw the orientation axes (xyz-axes) of all remaining quaternions in the array list ...
         for i = 2:nRows
             title(sprintf(strTitle, i));
@@ -121,7 +121,7 @@ function plotQuat(vqT, twait)
             cidx = cidx - 1;
 
             set(hPos3D, 'XData', pos_x(i,1), 'YData', pos_y(i,1), 'ZData', pos_z(i,1));
-            
+
             R = vrrotvec2mat( horzcat(rax_x(i,1), rax_y(i,1), rax_z(i,1), angle(i,1)) );
 
             set(hLin_orX, 'XData', horzcat(pos_x(i,1), pos_x(i,1)+R(1,1)), 'YData', horzcat(pos_y(i,1), pos_y(i,1)+R(2,1)), ...
