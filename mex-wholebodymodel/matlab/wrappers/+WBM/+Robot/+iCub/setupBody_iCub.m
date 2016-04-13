@@ -1,7 +1,7 @@
 function icub_body = setupBody_iCub()
 
     chain_names = {'ROBOT_TORSO'; 'ROBOT_LEFT_ARM'; 'ROBOT_RIGHT_ARM'; 'ROBOT_LEFT_LEG'; 'ROBOT_RIGHT_LEG'};
-    %                                                                                                                 joint idx:
+    %                                                                                                                 joint-idx:
     %                                                                                                                  bgn  end
     robot_torso_joints     = {'torso_yaw'; 'torso_roll'; 'torso_pitch'};                                             %   1..3,
     robot_left_arm_joints  = {'l_shoulder_pitch'; 'l_shoulder_roll'; 'l_shoulder_yaw'; 'l_elbow'; 'l_wrist_prosup'}; %   4..8,
