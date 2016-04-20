@@ -279,6 +279,10 @@ classdef WBMBase < handle
             obj.mwbm_params.wf_R_rootLnk = wf_R_rlnk;
         end
 
+        function wf_R_rlnk = get.wf_R_rootLnk(obj)
+            wf_R_rlnk = obj.mwbm_params.wf_R_rootLnk;
+        end
+
         function set.wf_p_rootLnk(obj, wf_p_rlnk)
             if (size(wf_p_rlnk,1) ~= 3)
                 error('WBMBase::set.wf_p_rootLnk: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
@@ -286,11 +290,19 @@ classdef WBMBase < handle
             obj.mwbm_params.wf_p_rootLnk = wf_p_rlnk;
         end
 
+        function wf_p_rlnk = get.wf_p_rootLnk(obj)
+            wf_p_rlnk = obj.mwbm_params.wf_p_rootLnk;
+        end
+
         function set.g_wf(obj, g)
             if (size(g,1) ~= 3)
                 error('WBMBase::set.g_wf: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
             obj.mwbm_params.g_wf = g;
+        end
+
+        function g_wf = get.g_wf(obj)
+            g_wf = obj.mwbm_params.g_wf;
         end
 
         function robot_model = get.robot_model(obj)

@@ -8,7 +8,7 @@ classdef wbmBody
 
     methods
         function obj = wbmBody(chain_names, chain_idx, joint_names, joint_idx)
-            if ( (nargin ~= 2) && (nargin ~= 4) )
+            if (nargin ~= 4)
                 error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
 
@@ -31,20 +31,18 @@ classdef wbmBody
             obj.chains  = horzcat(chain_names, num2cell(chain_idx));
 
             %% Joints:
-            if (nargin == 4)
-                % check input types ...
-                if ( ~iscell(joint_names) || ~isvector(joint_idx) )
-                    error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
-                end
-                % check dimensions ...
-                nJnts = size(joint_names,1);
-                if (nJnts ~= size(joint_idx,1))
-                    error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
-                end
-                % store the joint data ...
-                obj.nJoints = nJnts;
-                obj.joints  = horzcat(joint_names, num2cell(joint_idx));
+            % check input types ...
+            if ( ~iscell(joint_names) || ~isvector(joint_idx) )
+                error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
+            % check dimensions ...
+            nJnts = size(joint_names,1);
+            if (nJnts ~= size(joint_idx,1))
+                error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
+            end
+            % store the joint data ...
+            obj.nJoints = nJnts;
+            obj.joints  = horzcat(joint_names, num2cell(joint_idx));
         end
 
         function chn_tbl = getChainTable(obj)

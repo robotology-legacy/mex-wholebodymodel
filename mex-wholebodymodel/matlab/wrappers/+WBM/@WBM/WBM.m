@@ -130,6 +130,10 @@ classdef WBM < WBM.WBMBase
                     if isempty(chain_names)
                         error('WBM::getStateChains: %s', WBM.wbmErrorMsg.EMPTY_CELL_ARR);
                     end
+                    % check if the body components are defined ...
+                    if isempty(obj.mwbm_config.body)
+                        error('WBM::getStateChains: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
+                    end
 
                     if ( ~exist('q_j', 'var') && ~exist('dq_j', 'var') )
                         [~,q_j,~,dq_j] = obj.getState(); % get the current state values ...
@@ -166,6 +170,10 @@ classdef WBM < WBM.WBMBase
                 case {2, 4}
                     if isempty(joint_names)
                         error('WBM::getStateJointNames: %s', WBM.wbmErrorMsg.EMPTY_CELL_ARR);
+                    end
+                    % check if the body parts are defined ...
+                    if isempty(obj.mwbm_config.body)
+                        error('WBM::getStateJointNames: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
                     end
 
                     if ( ~exist('q_j', 'var') && ~exist('dq_j', 'var') )
@@ -408,7 +416,9 @@ classdef WBM < WBM.WBMBase
             obj.mwbm_config.cstrLinkNames = robot_config.cstrLinkNames;
             obj.mwbm_config.nCstrs        = robot_config.nCstrs;
             obj.mwbm_config.dampCoeff     = robot_config.dampCoeff;
-            obj.mwbm_config.body          = robot_config.body;
+            if ~isempty(robot_config.body)
+                obj.mwbm_config.body = robot_config.body;
+            end
 
             if isempty(robot_config.initStateParams)
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);

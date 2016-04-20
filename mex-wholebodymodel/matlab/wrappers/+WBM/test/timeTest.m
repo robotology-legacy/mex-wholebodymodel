@@ -5,29 +5,29 @@ import WBM.utilities.*
 
 %% First initialization of the WBM:
 % base model:
-iCub_model = wbmBaseModelParams;
-iCub_model.urdfRobot = 'icubGazeboSim';
-iCub_model.wf_R_rootLnk = eye(3,3);
-iCub_model.g_wf         = [0; 0; -9.81];
+icub_model = wbmBaseModelParams;
+icub_model.urdfRobot = 'icubGazeboSim';
+icub_model.wf_R_rootLnk = eye(3,3);
+icub_model.g_wf         = [0; 0; -9.81];
 % base robot config:
-iCub_config = wbmHumanoidConfig;
-iCub_config.ndof          = 25;
-iCub_config.nCstrs        = 2;
-iCub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
+icub_config = wbmHumanoidConfig;
+icub_config.ndof          = 25;
+icub_config.nCstrs        = 2;
+icub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
 
 noi = 1000;
 
 fprintf('Starting normal mode trial\n--------------------------\n');
 
 tic;
-wbm_iCub = WBM(iCub_model, iCub_config);
+wbm_icub = WBM(icub_model, icub_config);
 initTime = toc();
 
 fprintf('Initialization time: %e secs\n', initTime);
 fprintf('Num of Trials: %d\nStarting Trial...\n', noi);
 
-R = iCub_model.wf_R_rootLnk;
-g = iCub_model.g_wf;
+R = icub_model.wf_R_rootLnk;
+g = icub_model.g_wf;
 
 tic;
 for i = 1:noi
@@ -38,28 +38,28 @@ for i = 1:noi
     % set the translation to the WF with some random values ...
     p    = rand(3,1);
 
-    wbm_iCub.setWorldFrame(R, p, g);
+    wbm_icub.setWorldFrame(R, p, g);
 
     % calculate some mex-WholeBodyModel (WBM) components:
-    M      = wbm_iCub.massMatrix(R, p, q_j);
+    M      = wbm_icub.massMatrix(R, p, q_j);
 
-    h_c    = wbm_iCub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
-    h_c    = wbm_iCub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
-    h_c    = wbm_iCub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
+    h_c    = wbm_icub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
+    h_c    = wbm_icub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
+    h_c    = wbm_icub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
 
-    tau_c  = wbm_iCub.coriolisCentrifugalForces(R, p, q_j, dq_j, v_b);
-    tau_c  = wbm_iCub.coriolisCentrifugalForces(R, p, q_j, dq_j, v_b);
+    tau_c  = wbm_icub.coriolisCentrifugalForces(R, p, q_j, dq_j, v_b);
+    tau_c  = wbm_icub.coriolisCentrifugalForces(R, p, q_j, dq_j, v_b);
 
-    tau_g  = wbm_iCub.gravityForces(R, p, q_j);
-    tau_g  = wbm_iCub.gravityForces(R, p, q_j);
+    tau_g  = wbm_icub.gravityForces(R, p, q_j);
+    tau_g  = wbm_icub.gravityForces(R, p, q_j);
 
-    dJdq_1 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{1}, R, p, q_j, dq_j, v_b);
-    dJdq_2 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{2}, R, p, q_j, dq_j, v_b);
+    dJdq_1 = wbm_icub.dJdq(icub_config.cstrLinkNames{1}, R, p, q_j, dq_j, v_b);
+    dJdq_2 = wbm_icub.dJdq(icub_config.cstrLinkNames{2}, R, p, q_j, dq_j, v_b);
 
-    J      = wbm_iCub.jacobian(iCub_config.cstrLinkNames{1}, R, p, q_j);
-    J      = wbm_iCub.jacobian(iCub_config.cstrLinkNames{2}, R, p, q_j);
-    J      = wbm_iCub.jacobian(iCub_config.cstrLinkNames{1}, R, p, q_j);
-    J      = wbm_iCub.jacobian(iCub_config.cstrLinkNames{2}, R, p, q_j);
+    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{1}, R, p, q_j);
+    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{2}, R, p, q_j);
+    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{1}, R, p, q_j);
+    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{2}, R, p, q_j);
 end
 totTime = toc();
 
@@ -73,26 +73,26 @@ clearvars; % clear all variables from the workspace ...
 fprintf('\n\nStarting optimized mode trial\n-----------------------------\n');
 
 % base model:
-iCub_model = wbmBaseModelParams;
-iCub_model.urdfRobot = 'icubGazeboSim';
-iCub_model.wf_R_rootLnk = eye(3,3);
-iCub_model.g_wf         = [0; 0; 9.81];
+icub_model = wbmBaseModelParams;
+icub_model.urdfRobot = 'icubGazeboSim';
+icub_model.wf_R_rootLnk = eye(3,3);
+icub_model.g_wf         = [0; 0; 9.81];
 % base robot config:
-iCub_config = wbmHumanoidConfig;
-iCub_config.ndof          = 25;
-iCub_config.nCstrs        = 2;
-iCub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
+icub_config = wbmHumanoidConfig;
+icub_config.ndof          = 25;
+icub_config.nCstrs        = 2;
+icub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
 
 noi = 1000;
 
 tic;
-wbm_iCub = WBM(iCub_model, iCub_config);
+wbm_icub = WBM(icub_model, icub_config);
 initTime = toc();
 
 fprintf('Initialization time: %e secs\nStarting Trial...\n', initTime);
 
-R = iCub_model.wf_R_rootLnk;
-g = iCub_model.g_wf;
+R = icub_model.wf_R_rootLnk;
+g = icub_model.g_wf;
 
 tic;
 for i = 1:noi
@@ -103,29 +103,29 @@ for i = 1:noi
     % fill the translation to the WF with random values ...
     p    = rand(3,1);
 
-    wbm_iCub.setState(q_j, dq_j, v_b);
-    wbm_iCub.setWorldFrame(R, p, g);
+    wbm_icub.setState(q_j, dq_j, v_b);
+    wbm_icub.setWorldFrame(R, p, g);
 
     % call some mex-WBM functions ...
-    M      = wbm_iCub.massMatrix();
+    M      = wbm_icub.massMatrix();
 
-    h_c    = wbm_iCub.generalizedBiasForces();
-    h_c    = wbm_iCub.generalizedBiasForces();
-    h_c    = wbm_iCub.generalizedBiasForces();
+    h_c    = wbm_icub.generalizedBiasForces();
+    h_c    = wbm_icub.generalizedBiasForces();
+    h_c    = wbm_icub.generalizedBiasForces();
 
-    tau_c  = wbm_iCub.coriolisCentrifugalForces();
-    tau_c  = wbm_iCub.coriolisCentrifugalForces();
+    tau_c  = wbm_icub.coriolisCentrifugalForces();
+    tau_c  = wbm_icub.coriolisCentrifugalForces();
 
-    tau_g  = wbm_iCub.gravityForces();
-    tau_g  = wbm_iCub.gravityForces();
+    tau_g  = wbm_icub.gravityForces();
+    tau_g  = wbm_icub.gravityForces();
 
-    dJdq_1 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{1});
-    dJdq_2 = wbm_iCub.dJdq(iCub_config.cstrLinkNames{2});
+    dJdq_1 = wbm_icub.dJdq(icub_config.cstrLinkNames{1});
+    dJdq_2 = wbm_icub.dJdq(icub_config.cstrLinkNames{2});
 
-    J      = wbm_iCub.jacobian(iCub_config.cstrLinkNames{1});
-    J      = wbm_iCub.jacobian(iCub_config.cstrLinkNames{2});
-    J      = wbm_iCub.jacobian(iCub_config.cstrLinkNames{1});
-    J      = wbm_iCub.jacobian(iCub_config.cstrLinkNames{2});
+    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{1});
+    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{2});
+    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{1});
+    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{2});
 end
 totTime = toc();
 
