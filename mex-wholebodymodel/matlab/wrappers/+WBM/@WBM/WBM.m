@@ -23,6 +23,10 @@ classdef WBM < WBM.WBMBase
             end
             if ~exist('wf2FixLnk', 'var')
                 wf2FixLnk = false; % default value ...
+            else
+                if ~islogical(wf2FixLnk)
+                    error('WBM::WBM: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+                end
             end
 
             obj.initConfig(robot_config);

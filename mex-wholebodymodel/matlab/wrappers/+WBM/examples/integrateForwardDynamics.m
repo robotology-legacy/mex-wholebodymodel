@@ -5,7 +5,8 @@ import WBM.Robot.iCub.*
 
 
 %% Initialization of the WBM for the iCub-Robot:
-wbm_iCub = initRobot_iCub();
+wf2FixLnk = true; % set the world frame to a fixed link
+wbm_iCub = initRobot_iCub(wf2FixLnk);
 iCub_model = wbm_iCub.robot_model;
 iCub_config = wbm_iCub.robot_config;
 
@@ -45,7 +46,7 @@ sim_time.end   = 2.0; %1.5;
 sim_time.step  = 0.01;
 tspan = sim_time.start:sim_time.step:sim_time.end;
 
-disp('Start the numerical integration:');
+disp('Start the numerical integration...');
 
 ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);           % setup the error tolerances ...
 [t, chi]    = ode15s(fwdDynFunc, tspan, chi_init, ode_options); % ODE-Solver

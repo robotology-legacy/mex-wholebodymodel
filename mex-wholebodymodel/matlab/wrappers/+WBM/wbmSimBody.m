@@ -12,7 +12,7 @@ classdef wbmSimBody < handle
     end
 
     properties
-        draw_prop@WBM.wbmDrawProp
+        draw_prop@WBM.wbmRobotDrawProp
     end
 
     properties(SetAccess = private, GetAccess = public)
@@ -34,7 +34,7 @@ classdef wbmSimBody < handle
     end
 
     methods
-        function obj = wbmSimBody(robot_joint_names, joint_pair_idx, draw_prop)
+        function obj = wbmSimBody(robot_joint_names, joint_pair_idx, robot_draw_prop)
             if ( (nargin < 2) || (nargin > 3) )
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -56,9 +56,9 @@ classdef wbmSimBody < handle
             obj.joint_pair_idx = joint_pair_idx;
 
             % initialize the draw properties for the body of the animated robot ...
-            obj.draw_prop = WBM.wbmDrawProp;
-            if ~exist('draw_prop', 'var')
+            if ~exist('robot_draw_prop', 'var')
                 % use default values ...
+                obj.draw_prop = WBM.wbmRobotDrawProp;
                 obj.draw_prop.joints.marker     = '.';
                 obj.draw_prop.joints.marker_sz  = 9;
                 obj.draw_prop.joints.color      = 'blue';
@@ -74,28 +74,10 @@ classdef wbmSimBody < handle
                 obj.draw_prop.shape.edge_color  = 'black';
                 obj.draw_prop.shape.face_color  = 'black';
                 obj.draw_prop.shape.face_alpha  = 0.2;
-
-                obj.draw_prop.ground_color      = [201 220 222] ./ 255; % hex: #c9dcde
                 return
             end
             % else ...
-            obj.draw_prop.joints.marker     = draw_prop.joint.marker;
-            obj.draw_prop.joints.marker_sz  = draw_prop.joint.marker_sz;
-            obj.draw_prop.joints.color      = draw_prop.joint.color;
-
-            obj.draw_prop.links.line_width  = draw_prop.link.line_width;
-            obj.draw_prop.links.color       = draw_prop.link.color;
-
-            obj.draw_prop.com.marker        = draw_prop.com.marker;
-            obj.draw_prop.com.marker_sz     = draw_prop.com.marker_sz;
-            obj.draw_prop.com.color         = draw_prop.com.color;
-
-            obj.draw_prop.shape.line_width  = draw_prop.shape.line_width;
-            obj.draw_prop.shape.edge_color  = draw_prop.shape.edge_color;
-            obj.draw_prop.shape.face_color  = draw_prop.shape.face_color;
-            obj.draw_prop.shape.face_alpha  = draw_prop.shape.face_alpha;
-
-            obj.draw_prop.ground_color      = draw_prop.ground_color;
+            obj.draw_prop = robot_draw_prop;
         end
 
         function set.shape_geom(obj, shape_geom)

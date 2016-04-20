@@ -1,4 +1,4 @@
-function wbm_icub = initRobot_iCub()
+function wbm_icub = initRobot_iCub(wf2FixLnk)
     %% Base model parameters:
     icub_model = WBM.wbmBaseModelParams;
     icub_model.urdfRobot    = 'icubGazeboSim';
@@ -31,6 +31,11 @@ function wbm_icub = initRobot_iCub()
     icub_config.initStateParams.dq_j    = zeros(icub_config.ndof,1);
 
     %% Initialize the mex-WholeBodyModel for the iCub-Robot:
-    wf2FixLnk = true;
+    if ~exist('wf2FixLnk', 'var')
+        % by default: the world frame will be NOT set to a fixed link ...
+        wbm_icub = WBM.WBM(icub_model, icub_config);
+        return
+    end
+    % else, user specific ...
     wbm_icub = WBM.WBM(icub_model, icub_config, wf2FixLnk);
 end

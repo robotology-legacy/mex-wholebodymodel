@@ -4,9 +4,19 @@ function sim_config = setupSimulation(~, sim_config)
         error('WBM::setupSimulation: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
 
+    if ~isempty(sim_config.hMainFigure)
+        clf(sim_config.hMainFigure); % clear the figure window ...
+    end
+
     % init the main figure window for the simulation:
     sim_config.hMainFigure = figure('Name', sim_config.main_title, 'Position', sim_config.main_pos);
     set(sim_config.hMainFigure, 'NumberTitle', 'off', 'MenuBar', 'none', 'BackingStore', 'off');
+
+    if ~strcmp(sim_config.environment.background_color_opt, 'white')
+        % change the color option of the axis background, axis lines and labels, and the figure background ...
+        colordef(sim_config.hMainFigure, sim_config.environment.background_color_opt);
+    end % else, use the default system colors ...
+
     % setup the rendering method of the current figure handle:
     d = opengl('data');
     if ~d.Software
@@ -44,12 +54,12 @@ function sim_config = setupSimulation(~, sim_config)
             set(gca, 'DrawMode', 'fast');
         end
         % enable mouse-base rotation on all axes ...
-        rotate3d(gca, 'on'); 
-        
+        rotate3d(gca, 'on');
+
         hold on; % retain plots in the current axes ...
         % draw the colored rectangle ...
-        fill3(sim_config.ground_shape(1,1:4), sim_config.ground_shape(2,1:4), ...
-              sim_config.ground_shape(3,1:4), sim_config.ground_color);
+        fill3(sim_config.environment.ground_shape(1,1:4), sim_config.environment.ground_shape(2,1:4), ...
+              sim_config.environment.ground_shape(3,1:4), sim_config.environment.ground_color);
         % draw the origin point of the axis onto the rectangle ...
         sim_config.plot_objs{1,i} = plot3(0, 0, 0, 'Marker', '.', 'MarkerSize', 4, 'MarkerEdgeColor', 'k');
     end

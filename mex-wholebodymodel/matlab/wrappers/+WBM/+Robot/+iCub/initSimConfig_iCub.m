@@ -68,13 +68,13 @@ function sim_config = initSimConfig_iCub()
     % List with additional size values to define the foot dimensions:
     %                       x:     y:  z:
     %                      len    wid hgt
-    foot_geom.shape_ds = [-0.002   0   0; % back up
+    foot_geom.shape_ds = [-0.002   0   0; % up back
                           -0.002   0   0;
-                          -0.01    0   0; % back bottom (back length)
+                          -0.01    0   0; % bottom back (back length)
                           -0.01    0   0;
-                           0.025   0   0; % front up
+                           0.025   0   0; % up front
                            0.025   0   0;
-                           0.11    0   0; % front bottom (front length)
+                           0.11    0   0; % bottom front (front length)
                            0.11    0   0];
 
     % Create the body model of the animated robot in the simulation:
@@ -84,13 +84,27 @@ function sim_config = initSimConfig_iCub()
     sim_body.shape_geom = shape_geom;
     sim_body.foot_geom  = foot_geom;
 
-    % Draw properties for the body of the robot and the ground floor:
+    % Draw properties for the body of the simulated robot:
     sim_body.draw_prop.joints.color     = WBM.wbmColor.orange;
     sim_body.draw_prop.links.color      = 'black';
     sim_body.draw_prop.shape.face_color = WBM.wbmColor.royalblue4;
     sim_body.draw_prop.shape.edge_color = WBM.wbmColor.royalblue4;
-    sim_body.draw_prop.ground_color     = WBM.wbmColor.papayawhip;
 
     % Create the configuration object for the WBM-Simulator:
-    sim_config = WBM.genericSimConfig(sim_body, 'iCub-Simulator:');
+    sim_config = WBM.genericSimConfig('iCub-Simulator:', sim_body);
+
+    % Environment settings for the animated scene:
+    sim_config.environment.origin_pt_size = 4.5;
+    % Light scene:
+    sim_config.environment.ground_color   = WBM.wbmColor.papayawhip;
+
+    % Dark scene (optional):
+    %sim_config.robot_body.draw_prop.links.color      = WBM.wbmColor.seashell4;
+    %sim_config.robot_body.draw_prop.shape.edge_color = WBM.wbmColor.steelblue;
+    %sim_config.robot_body.draw_prop.shape.face_color = WBM.wbmColor.steelblue;
+
+    %sim_config.environment.background_color_opt = 'black';
+    %sim_config.environment.ground_color         = WBM.wbmColor.snow;
+    %sim_config.environment.ground_edge_color    = 'none';
+    %sim_config.environment.origin_pt_color      = WBM.wbmColor.violetred;
 end

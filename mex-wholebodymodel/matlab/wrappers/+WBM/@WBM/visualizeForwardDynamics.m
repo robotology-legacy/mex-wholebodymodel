@@ -65,7 +65,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     %% Initial plot of the animation environment:
 
     % reset all subplots in the main figure and reinitialize them with a new ground floor ...
-    initMainFigure(sim_config);
+    initSimEnvironment(sim_config);
 
     %% Initial plot of the robot in base position:
 
@@ -206,7 +206,7 @@ end
 
 %% GRAPHIC FUNCTIONS:
 
-function initMainFigure(sim_config)
+function initSimEnvironment(sim_config)
     % clear and reset the subplots of the main figure in the reverse order ...
     for i = 4:-1:1
         % set the axes of the current subplot in the main figure ...
@@ -214,10 +214,12 @@ function initMainFigure(sim_config)
         cla; % delete all graphics objects from the current axes
         axis off;
         % redraw the ground (rectangle) with a new color ...
-        fill3(sim_config.ground_shape(1,1:4), sim_config.ground_shape(2,1:4), ...
-              sim_config.ground_shape(3,1:4), sim_config.robot_body.draw_prop.ground_color);
+        fill3(sim_config.environment.ground_shape(1,1:4), sim_config.environment.ground_shape(2,1:4), ...
+              sim_config.environment.ground_shape(3,1:4), sim_config.environment.ground_color, ...
+              'EdgeColor', sim_config.environment.ground_edge_color);
         % draw the origin point of the axis onto the ground ...
-        plot3(0, 0, 0, 'Marker', '.', 'MarkerSize', 3.5, 'MarkerEdgeColor', 'k');
+        plot3(0, 0, 0, 'Marker', '.', 'MarkerSize', sim_config.environment.origin_pt_size, ...
+              'MarkerEdgeColor', sim_config.environment.origin_pt_color);
 
         drawnow; % update and draw the current subplot in the main figure
     end

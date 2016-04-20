@@ -10,7 +10,8 @@ classdef (Abstract) absSimConfig
 
     properties(Abstract)
         robot_body@WBM.wbmSimBody
-        
+        environment@WBM.wbmSimEnvironment
+
         hMainFigure
         main_title@char
         main_pos@double     vector
@@ -21,11 +22,5 @@ classdef (Abstract) absSimConfig
         axis_limits@double  vector
 
         plot_objs@cell      vector
-        ground_shape@double matrix
-        ground_color@double vector
-    end    
-
-    % methods(Abstract)
-    %     obj = absSimConfig(main_title, robot_joint_names)
-    % end
+    end
 end
