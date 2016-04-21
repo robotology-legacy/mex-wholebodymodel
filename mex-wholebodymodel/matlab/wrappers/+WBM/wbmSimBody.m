@@ -16,7 +16,7 @@ classdef wbmSimBody < handle
     end
 
     properties(SetAccess = private, GetAccess = public)
-        joint_names@cell     vector
+        joint_lnk_names@cell vector
         joint_pair_idx@uint8 matrix
         nJoints@uint8        scalar = 0;
         nLinks@uint8         scalar = 0;
@@ -34,19 +34,19 @@ classdef wbmSimBody < handle
     end
 
     methods
-        function obj = wbmSimBody(robot_joint_names, joint_pair_idx, robot_draw_prop)
+        function obj = wbmSimBody(joint_lnk_names, joint_pair_idx, draw_prop)
             if ( (nargin < 2) || (nargin > 3) )
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            if ( ~iscell(robot_joint_names) || ~ismatrix(joint_pair_idx) )
+            if ( ~iscell(joint_lnk_names) || ~ismatrix(joint_pair_idx) )
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            if ~iscolumn(robot_joint_names)
+            if ~iscolumn(joint_lnk_names)
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
-            obj.joint_names = robot_joint_names;
-            obj.nJoints = size(obj.joint_names,1);
+            obj.joint_lnk_names = joint_lnk_names;
+            obj.nJoints = size(obj.joint_lnk_names,1);
             obj.nLinks  = obj.nJoints - 2; % a tree has n-1 edges (links) + without 'CoM' ...
 
             [m,n] = size(joint_pair_idx);
@@ -56,7 +56,7 @@ classdef wbmSimBody < handle
             obj.joint_pair_idx = joint_pair_idx;
 
             % initialize the draw properties for the body of the animated robot ...
-            if ~exist('robot_draw_prop', 'var')
+            if ~exist('draw_prop', 'var')
                 % use default values ...
                 obj.draw_prop = WBM.wbmRobotDrawProp;
                 obj.draw_prop.joints.marker     = '.';
@@ -77,7 +77,7 @@ classdef wbmSimBody < handle
                 return
             end
             % else ...
-            obj.draw_prop = robot_draw_prop;
+            obj.draw_prop = draw_prop;
         end
 
         function set.shape_geom(obj, shape_geom)

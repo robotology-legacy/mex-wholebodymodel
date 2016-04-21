@@ -1,13 +1,22 @@
 function sim_config = initSimConfig_iCub()
-    % List of joint names for constructing the iCub-Robot in the visualizer:
-    %                                                                 idx:
-    joint_names = { 'root_link'; ...                                %  1,
-                    'r_hip_1'; 'r_lower_leg'; 'r_sole'; ...         %  2,  3,  4,
-                    'l_hip_1'; 'l_lower_leg'; 'l_sole'; ...         %  5,  6,  7,
-                    'neck_1'; ...                                   %  8,
-                    'r_shoulder_1'; 'r_elbow_1'; 'r_gripper'; ...   %  9, 10, 11,
-                    'l_shoulder_1'; 'l_elbow_1'; 'l_gripper'; ...   % 12, 13, 14,
-                    'com' };                                        % 15
+    % List of link names that are deduced from their 'parent joints' in the iCub-Robot model
+    % with the exception of the first and the last links, the 'root_link' and the 'com',
+    % they don't have any parent joints.
+    % The link names 'r_gripper' and 'l_gripper' are aliases for the 'r_hand_dh_frame' and
+    % 'l_hand_dh_frame', where the link frame origin is placed to axis of their parent joints.
+    % The link names are describing the "virtual joints" that are used to construct the model
+    % of the iCub-Robot in the visualizer.
+    % The link and frame names are defined in the iCub Model Naming Convention:
+    %    <http://wiki.icub.org/wiki/ICub_Model_naming_conventions>
+    %
+    %                                                                     idx:        | parent joint:
+    joint_lnk_names = { 'root_link'; ...                                %  1,         | --,
+                        'r_hip_1'; 'r_lower_leg'; 'r_sole'; ...         %  2,  3,  4, | r_hip_pitch, r_knee, r_foot --> r_foot_ft_sensor,
+                        'l_hip_1'; 'l_lower_leg'; 'l_sole'; ...         %  5,  6,  7, | l_hip_pitch, l_knee, l_foot --> l_foot_ft_sensor,
+                        'neck_1'; ...                                   %  8,         | neck_pitch,
+                        'r_shoulder_1'; 'r_elbow_1'; 'r_gripper'; ...   %  9, 10, 11, | r_shoulder_pitch, r_elbow, r_hand_dh_frame --> r_wrist_yaw,
+                        'l_shoulder_1'; 'l_elbow_1'; 'l_gripper'; ...   % 12, 13, 14, | l_shoulder_pitch, l_elbow, l_hand_dh_frame --> l_wrist_yaw,
+                        'com' };                                        % 15          | --
 
     % Set of joint-pair indexes to describe the configuration of the iCub-robot's
     % skeleton. Each pair of joints is connected with a rigid link (edge) to form
@@ -78,7 +87,7 @@ function sim_config = initSimConfig_iCub()
                            0.11    0   0];
 
     % Create the body model of the animated robot in the simulation:
-    sim_body = WBM.wbmSimBody(joint_names, joint_pair_idx);
+    sim_body = WBM.wbmSimBody(joint_lnk_names, joint_pair_idx);
 
     % Geometry properties for the shape of the robot's body:
     sim_body.shape_geom = shape_geom;

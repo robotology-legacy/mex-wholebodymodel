@@ -58,7 +58,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
         vqT = squeeze(vqT_b(i,1:7)');
 
         for j = 2:nJnts
-            fwd_kin.vqT(i,1:7,j) = obj.computeFKinRotoTranslation(sim_config.robot_body.joint_names{j,1}, q, vqT);
+            fwd_kin.vqT(i,1:7,j) = obj.computeFKinRotoTranslation(sim_config.robot_body.joint_lnk_names{j,1}, q, vqT);
         end
     end
 
