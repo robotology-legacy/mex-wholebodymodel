@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-PROJECT(wholeBodyModel)
+PROJECT(mexWholeBodyModel)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -17,7 +17,7 @@ find_package(Matlab REQUIRED
 if(NOT Matlab_FOUND)
     message(FATAL_ERROR "Matlab not found")
 endif()
-find_package(YCM                   REQUIRED)
+find_package(YCM                    REQUIRED)
 find_package(ICUB                   REQUIRED)
 find_package(Eigen3                 REQUIRED)
 find_package(TinyXML                REQUIRED)
