@@ -84,7 +84,7 @@ else
  
  disp('Joint limits reached at time:')    
  disp(t)
- error('Joint limits reached '); 
+%  error('Joint limits reached '); 
 
 end
 

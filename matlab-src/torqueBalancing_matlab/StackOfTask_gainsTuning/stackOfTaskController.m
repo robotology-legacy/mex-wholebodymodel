@@ -101,8 +101,12 @@ deltaPhi           = param.linAngInt*qTilde;
 
 if param.use_Orientation == 1
     
-HDotDes            = [ m*ddxCoMStar;
-                      -gains.gainMomentum*H(4:end)-Kphi*deltaPhi]; 
+% HDotDes            = [ m*ddxCoMStar;
+%                       -gains.gainMomentum*H(4:end)-Kphi*deltaPhi]; 
+%%%
+load('gains_opt.mat')
+HDotDes       = [m*desired_x_dx_ddx_CoM(:,3);zeros(3,1)] -gains_opt.Kpx*[m*(xCoM-desired_x_dx_ddx_CoM(:,1));deltaPhi]...
+               -gains_opt.Kdx*[m*(dxCoM-desired_x_dx_ddx_CoM(:,2));H(4:end)];
 
 else
     
@@ -126,8 +130,10 @@ SigmaNA            =  Sigma*Nullfc;
 if param.use_Orientation == 1
     
 % new postural gains
-impedances    = gains.impedances;
-dampings      = gains.dampings;
+% impedances    = gains.impedances;
+% dampings      = gains.dampings;
+impedances  = gains_opt.Kpn;
+dampings    = gains_opt.Kdn;
 
 GainCorr_imp  = gains.GainCorr_imp;
 GainCorr_damp = gains.GainCorr_damp;
