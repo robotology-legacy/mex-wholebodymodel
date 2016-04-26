@@ -40,19 +40,18 @@ classdef genericSimConfig < WBM.absSimConfig
             obj.main_title = main_title;
             obj.robot_body = robot_sim_body;
 
-            if ~exist('env_settings', 'var')
-                % set the default values ...
-                obj.environment = WBM.wbmSimEnvironment;
-                obj.environment.background_color_opt = 'white';
-                obj.environment.ground_shape         = WBM.genericSimConfig.DF_GROUND_SHAPE;
-                obj.environment.ground_color         = WBM.genericSimConfig.DF_GROUND_COLOR;
-                obj.environment.ground_edge_color    = 'black';
-                obj.environment.origin_pt_color      = 'black';
-                obj.environment.origin_pt_size       = 3.5;
+            if exist('env_settings', 'var')
+                obj.environment = env_settings;
                 return
             end
-            % else ...
-            obj.environment = env_settings;
+            % else, use the default environment settings ...
+            obj.environment = WBM.wbmSimEnvironment;
+            obj.environment.background_color_opt = 'white';
+            obj.environment.ground_shape         = WBM.genericSimConfig.DF_GROUND_SHAPE;
+            obj.environment.ground_color         = WBM.genericSimConfig.DF_GROUND_COLOR;
+            obj.environment.ground_edge_color    = 'black';
+            obj.environment.origin_pt_color      = 'black';
+            obj.environment.origin_pt_size       = 3.5;
         end
 
     end

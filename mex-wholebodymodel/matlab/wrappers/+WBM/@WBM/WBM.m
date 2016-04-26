@@ -124,6 +124,16 @@ classdef WBM < WBM.WBMBase
             end
         end
 
+        function stFltb = getFloatingBaseState(obj)
+            stFltb = WBM.wbmFltgBaseState;
+            [vqT_b,~,v_b,~] = obj.getState();
+            [p_b, R_b]      = WBM.utilities.frame2posRotm(vqT_b);
+
+            stFltb.wf_R_b = R_b; % orientation of the base (in axis-angle representation)
+            stFltb.wf_p_b = p_b; % cartesian position of the base
+            stFltb.wf_v_b = v_b; % cartesian velocity and the rotational velocity of the base
+        end
+
         function [chn_q, chn_dq] = getStateChains(obj, chain_names, q_j, dq_j)
             switch nargin
                 case {2, 4}
@@ -317,6 +327,15 @@ classdef WBM < WBM.WBMBase
             cutp1 = obj.mwbm_config.ndof + 8;
             cutp2 = obj.mwbm_config.ndof + 13;
             stmBsVel = chi(1:m,cutp1:cutp2); % m -by- [dx_b, omega_b]
+        end
+
+        function [dx_b, omega_b] = getBaseVelocitiesParams(obj, v_b)
+            if ( ~iscolumn(v_b) || (size(v_b,1) ~= 6) )
+               error('WBM::getBaseVelocitiesParams: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+            end
+
+            dx_b    = v_b(1:3,1);
+            omega_b = v_b(4:6,1);
         end
 
         function vqT = getRotoTranslation(~, stParams)

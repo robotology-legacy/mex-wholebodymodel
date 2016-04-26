@@ -1,4 +1,8 @@
-function sim_config = initSimConfig_iCub()
+function sim_config = initSimConfig_iCub(scn_mode)
+    if ~exist('scn_mode', 'var')
+        scn_mode = 'LightScn'; % default scene for the simulation.
+    end
+
     % List of link and frame names that are deduced from their 'parent joints' of the
     % iCub-Robot model with the exception of the first and the last link, the 'root_link'
     % and the 'com', they don't have any parent joints.
@@ -93,31 +97,42 @@ function sim_config = initSimConfig_iCub()
     % Create the body model of the animated robot in the simulation:
     sim_body = WBM.wbmSimBody(joint_lnk_names, joint_pair_idx);
 
-    % Geometry properties for the shape of the robot's body:
+    % Geometry properties for the shape of the robot body:
     sim_body.shape_geom = shape_geom;
     sim_body.foot_geom  = foot_geom;
 
-    % Draw properties for the body of the simulated robot:
-    sim_body.draw_prop.joints.color     = WBM.wbmColor.orange;
-    sim_body.draw_prop.links.color      = 'black';
-    sim_body.draw_prop.shape.face_color = WBM.wbmColor.royalblue4;
-    sim_body.draw_prop.shape.edge_color = WBM.wbmColor.royalblue4;
+    % Draw properties for the robot body and environment settings for the animated scene:
+    sim_body.draw_prop.joints.color = WBM.wbmColor.orange;
+
+    env_settings = WBM.wbmSimEnvironment;
+    env_settings.ground_shape   = WBM.genericSimConfig.DF_GROUND_SHAPE;
+    env_settings.origin_pt_size = 4.5;
+
+    switch scn_mode
+        case 'LightScn'
+            % draw settings for the light scene ...
+            sim_body.draw_prop.links.color      = 'black';
+            sim_body.draw_prop.shape.face_color = WBM.wbmColor.royalblue4;
+            sim_body.draw_prop.shape.edge_color = WBM.wbmColor.royalblue4;
+
+            env_settings.background_color_opt   = 'white';
+            env_settings.ground_color           = WBM.wbmColor.papayawhip;
+            env_settings.ground_edge_color      = 'black';
+            env_settings.origin_pt_color        = 'black';
+        case 'DarkScn'
+            % draw settings for the dark scene ...
+            sim_body.draw_prop.links.color      = WBM.wbmColor.seashell4;
+            sim_body.draw_prop.shape.edge_color = WBM.wbmColor.steelblue;
+            sim_body.draw_prop.shape.face_color = WBM.wbmColor.steelblue;
+
+            env_settings.background_color_opt = 'black';
+            env_settings.ground_color         = WBM.wbmColor.snow;
+            env_settings.ground_edge_color    = 'none';
+            env_settings.origin_pt_color      = WBM.wbmColor.violetred;
+        otherwise
+            error('initSimConfig_iCub: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+    end
 
     % Create the configuration object for the WBM-Simulator:
-    sim_config = WBM.genericSimConfig('iCub-Simulator:', sim_body);
-
-    % Environment settings for the animated scene:
-    sim_config.environment.origin_pt_size = 4.5;
-    % Light scene:
-    sim_config.environment.ground_color   = WBM.wbmColor.papayawhip;
-
-    % Dark scene (optional):
-    %sim_config.robot_body.draw_prop.links.color      = WBM.wbmColor.seashell4;
-    %sim_config.robot_body.draw_prop.shape.edge_color = WBM.wbmColor.steelblue;
-    %sim_config.robot_body.draw_prop.shape.face_color = WBM.wbmColor.steelblue;
-
-    %sim_config.environment.background_color_opt = 'black';
-    %sim_config.environment.ground_color         = WBM.wbmColor.snow;
-    %sim_config.environment.ground_edge_color    = 'none';
-    %sim_config.environment.origin_pt_color      = WBM.wbmColor.violetred;
+    sim_config = WBM.genericSimConfig('iCub-Simulator:', sim_body, env_settings);
 end

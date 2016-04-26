@@ -60,7 +60,8 @@ fprintf('Number of integration results: %d\n', nRes);
 %% iCub-Simulator:
 
 % setup the window and plot parameters for the WBM-simulator:
-sim_config = initSimConfig_iCub();
+sim_config = initSimConfig_iCub();           % shows the simulation with a light scene as default ...
+%sim_config = initSimConfig_iCub('DarkScn'); % optional, shows the simulation with a dark scene ...
 sim_config = wbm_icub.setupSimulation(sim_config);
 x_out = wbm_icub.getPositionsData(chi);
 % show and repeat the simulation 10 times ...

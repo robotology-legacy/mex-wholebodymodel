@@ -56,28 +56,27 @@ classdef wbmSimBody < handle
             obj.joint_pair_idx = joint_pair_idx;
 
             % initialize the draw properties for the body of the animated robot ...
-            if ~exist('draw_prop', 'var')
-                % use default values ...
-                obj.draw_prop = WBM.wbmRobotDrawProp;
-                obj.draw_prop.joints.marker     = '.';
-                obj.draw_prop.joints.marker_sz  = 9;
-                obj.draw_prop.joints.color      = 'blue';
-
-                obj.draw_prop.links.line_width  = 1.6;
-                obj.draw_prop.links.color       = 'black';
-
-                obj.draw_prop.com.marker        = '*';
-                obj.draw_prop.com.marker_sz     = 4;
-                obj.draw_prop.com.color         = 'red';
-
-                obj.draw_prop.shape.line_width  = 0.4;
-                obj.draw_prop.shape.edge_color  = 'black';
-                obj.draw_prop.shape.face_color  = 'black';
-                obj.draw_prop.shape.face_alpha  = 0.2;
+            if exist('draw_prop', 'var')
+                obj.draw_prop = draw_prop;
                 return
             end
-            % else ...
-            obj.draw_prop = draw_prop;
+            % else, use the default draw values ...
+            obj.draw_prop = WBM.wbmRobotDrawProp;
+            obj.draw_prop.joints.marker     = '.';
+            obj.draw_prop.joints.marker_sz  = 9;
+            obj.draw_prop.joints.color      = 'blue';
+
+            obj.draw_prop.links.line_width  = 1.6;
+            obj.draw_prop.links.color       = 'black';
+
+            obj.draw_prop.com.marker        = '*';
+            obj.draw_prop.com.marker_sz     = 4;
+            obj.draw_prop.com.color         = 'red';
+
+            obj.draw_prop.shape.line_width  = 0.4;
+            obj.draw_prop.shape.edge_color  = 'black';
+            obj.draw_prop.shape.face_color  = 'black';
+            obj.draw_prop.shape.face_alpha  = 0.2;
         end
 
         function set.shape_geom(obj, shape_geom)
