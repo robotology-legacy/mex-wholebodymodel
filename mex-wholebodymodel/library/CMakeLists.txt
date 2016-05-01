@@ -8,6 +8,7 @@ set(SOURCES src/componentmanager.cpp
             src/modelcorioliscentrifugalforces.cpp
             src/modelgravityforces.cpp
             src/modelgetstate.cpp
+            src/modelgetfloatingbasestate.cpp
             src/modelinitialise.cpp
             src/modelinitialiseurdf.cpp
             src/modeljacobian.cpp
@@ -29,6 +30,7 @@ set(HEADERS include/componentmanager.h
             include/modelcorioliscentrifugalforces.h
             include/modelgravityforces.h
             include/modelgetstate.h
+            include/modelgetfloatingbasestate.h
             include/modelinitialise.h
             include/modelinitialiseurdf.h
             include/modeljacobian.h

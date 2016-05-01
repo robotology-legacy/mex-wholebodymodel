@@ -34,6 +34,7 @@
 #include "modelmassmatrix.h"
 #include "modelupdatestate.h"
 #include "modelgetstate.h"
+#include "modelgetfloatingbasestate.h"
 #include "modelgeneralisedbiasforces.h"
 #include "modelcorioliscentrifugalforces.h"
 #include "modelgravityforces.h"
@@ -82,6 +83,7 @@ ComponentManager::ComponentManager(std::string robotName)
   componentList["jacobian"] = modelJacobian;
   componentList["update-state"] = modelUpdateState;
   componentList["get-state"] = modelGetState;
+  componentList["get-floating-base-state"] = modelGetFloatingBaseState;
   componentList["model-initialise"] = modelInitialise;
   componentList["model-initialise-urdf"] = modelInitialiseURDF;
   componentList["forward-kinematics"] = modelForwardKinematics;
@@ -95,11 +97,11 @@ void ComponentManager::cleanup()
 #ifdef DEBUG
   mexPrintf("ComponentManager destructed\n");
 #endif
-
   ModelJointLimits::deleteInstance();
   ModelMassMatrix::deleteInstance();
   ModelUpdateState::deleteInstance();
   ModelGetState::deleteInstance();
+  ModelGetFloatingBaseState::deleteInstance();
   ModelGeneralisedBiasForces::deleteInstance();
   ModelCoriolisCentrifugalForces::deleteInstance();
   ModelGravityForces::deleteInstance();
@@ -124,6 +126,7 @@ void ComponentManager::initialise(std::string robotName)
   modelState = ModelState::getInstance(robotName);
   modelUpdateState = ModelUpdateState::getInstance();
   modelGetState = ModelGetState::getInstance();
+  modelGetFloatingBaseState = ModelGetFloatingBaseState::getInstance();
   modelJointLimits = ModelJointLimits::getInstance();
   modelMassMatrix = ModelMassMatrix::getInstance();
   modelGeneralisedBiasForces = ModelGeneralisedBiasForces::getInstance();
@@ -143,13 +146,13 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
 {
   bool returnVal = false;
   ModelComponent *activeComponent;
-  char* str;
+  char *str;
 
 #ifdef DEBUG
   mexPrintf("Trying to parseMexArguments\n");
 #endif
 
-  str=mxArrayToString(prhs[0]);
+  str = mxArrayToString(prhs[0]);
 
 #ifdef DEBUG
   mexPrintf("Searching for the component '%s', of size  %d\n",str,sizeof(str));
@@ -160,13 +163,13 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Requested component not found. Please request a valid component");
   }
-  
+
   activeComponent = search->second;
-  if(nlhs!=(int)activeComponent->numReturns())
+  if(nlhs != (int)activeComponent->numReturns())
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Error in number of returned parameters in requested component, check docs");
   }
-  
+
   if(nrhs != (int)(1+activeComponent->numArguments()) && nrhs != (int)(1+activeComponent->numAltArguments()))
   {
      mexPrintf("Requested component uses  uses %d arguments and returns %d items",activeComponent->numArguments(),activeComponent->numReturns());
@@ -181,9 +184,9 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, 
   }
   else
   {
-    activeComponent->compute( nrhs, prhs);
+    activeComponent->compute(nrhs, prhs);
     returnVal = true;
   }
 
-  return(returnVal);
+  return returnVal;
 }

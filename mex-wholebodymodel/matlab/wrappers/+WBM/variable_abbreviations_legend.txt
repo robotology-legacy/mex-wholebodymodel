@@ -67,6 +67,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     shp       ...  shape
     st        ...  state
     stm       ...  state matrix
+    stp       ...  state parameter
     str       ...  string
     stv       ...  state vector
     stvqT     ...  state vector-quaternion transformation [VQS-Transformation of the current state vector] (vector) (*)

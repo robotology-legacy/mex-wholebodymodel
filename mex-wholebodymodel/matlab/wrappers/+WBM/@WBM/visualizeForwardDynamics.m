@@ -48,7 +48,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     % joint pair (link) translations (xyz-positions):
     fwd_kin.jnt_pair_pos = zeros(nLnks,6);
     % forward kin. roto-translation (in VQS-form):
-    fwd_kin_vqT = zeros(nRes,7,nJnts);
+    fwd_kin.vqT = zeros(nRes,7,nJnts);
 
     % calculate the forward kinematic roto-translation of each joint in the
     % joint name list of the robot:

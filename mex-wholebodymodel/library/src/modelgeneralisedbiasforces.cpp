@@ -21,7 +21,7 @@
 
 //library includes
 #include <wbi/iWholeBodyModel.h>
-// #include <wbiIcub/icubWholeBodyModel.h>
+//#include <wbiIcub/icubWholeBodyModel.h>
 #include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 //local includes
@@ -129,7 +129,7 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
   {
      tempP[i] = p_temp[i];
   }
-  
+
   reorderMatrixElements(R_temp, tempR);
   wbi::Rotation tempRot(tempR);
   wbi::Frame tempFrame(tempRot, tempP);

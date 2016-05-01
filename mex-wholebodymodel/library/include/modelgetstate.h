@@ -45,7 +45,7 @@ public:
   static void deleteInstance();
 
   virtual bool allocateReturnSpace(int, mxArray*[]);
-//   virtual bool display(int, const mxArray *[]);
+  //virtual bool display(int, const mxArray *[]);
   virtual bool compute(int, const mxArray *[]);
   virtual bool computeFast(int, const mxArray *[]);
 
@@ -54,9 +54,9 @@ private:
   ModelGetState();
   static ModelGetState *modelGetState;
 
-  /*wbi::Frame rootRotoTrans;
-  wbi::Rotation rootRoto;
-  */double rootQuaternion[4];
+  //wbi::Frame rootRotoTrans;
+  //wbi::Rotation rootRoto;
+  double rootQuaternion[4];
 
   double* wTb;//[7];
   double* qj;//[MEX_WBMODEL_MAX_NUM_JOINTS];

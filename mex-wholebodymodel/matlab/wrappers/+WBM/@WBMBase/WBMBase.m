@@ -145,6 +145,15 @@ classdef WBMBase < handle
             [q_j, vqT_b, dq_j, v_b] = wholeBodyModel('get-state');
         end
 
+        function stFltb = getFloatingBaseState(obj)
+            stFltb = WBM.wbmFltgBaseState;
+            [R_b, p_b, v_b] = wholeBodyModel('get-floating-base-state');
+
+            stFltb.wf_R_b = R_b; % orientation of the base (in axis-angle representation)
+            stFltb.wf_p_b = p_b; % cartesian position of the base
+            stFltb.wf_v_b = v_b; % cartesian velocity and the rotational velocity of the base
+        end
+
         function M = massMatrix(~, wf_R_rootLnk, wf_p_rootLnk, q_j)
             switch nargin
                 case 4

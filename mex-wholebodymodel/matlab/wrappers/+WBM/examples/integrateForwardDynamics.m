@@ -69,13 +69,13 @@ nRpts = 6;
 wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:
-stPData = wbm_icub.getStateParamsData(chi);
+stpData = wbm_icub.getStateParamsData(chi);
 
 figure('Name', 'iCub - CoM-trajectory:', 'NumberTitle', 'off');
 
-plot3(stPData.x_b(1:nRes,1), stPData.x_b(1:nRes,2), stPData.x_b(1:nRes,3), 'Color', 'b');
+plot3(stpData.x_b(1:nRes,1), stpData.x_b(1:nRes,2), stpData.x_b(1:nRes,3), 'Color', 'b');
 hold on;
-plot3(stPData.x_b(1,1), stPData.x_b(1,2), stPData.x_b(1,3), 'Marker', 'o', 'MarkerEdgeColor', 'r');
+plot3(stpData.x_b(1,1), stpData.x_b(1,2), stpData.x_b(1,3), 'Marker', 'o', 'MarkerEdgeColor', 'r');
 
 grid on;
 axis square;

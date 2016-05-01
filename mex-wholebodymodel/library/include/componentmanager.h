@@ -33,6 +33,7 @@ namespace mexWBIComponent{
   class ModelJointLimits;
   class ModelUpdateState;
   class ModelGetState;
+  class ModelGetFloatingBaseState;
   class ModelGeneralisedBiasForces;
   class ModelCoriolisCentrifugalForces;
   class ModelGravityForces;
@@ -78,6 +79,7 @@ namespace mexWBIComponent
     ModelMassMatrix *modelMassMatrix;
     ModelUpdateState *modelUpdateState;
     ModelGetState *modelGetState;
+    ModelGetFloatingBaseState *modelGetFloatingBaseState;
     ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
     ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
     ModelGravityForces *modelGravityForces;

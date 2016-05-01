@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Authors: Naveen Kuppuswamy, Martin Neururer
- * email: martin.kuppuswamy@iit.it, martin.neururer@gmail.com
+ * Copyright (C) 2016 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Authors: Martin Neururer
+ * email: martin.neururer@gmail.com, gabriele.nava@iit.it
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -26,32 +26,32 @@ namespace mexWBIComponent
 {
   class ModelCoriolisCentrifugalForces : public ModelComponent
   {
-  public:
-    static ModelCoriolisCentrifugalForces* getInstance();
+    public:
+      static ModelCoriolisCentrifugalForces* getInstance();
 
-    /**
-     * Delete the (static) instance of this component,
-     * and set the instance pointer to NULL.
-     */
-    static void deleteInstance();
+      /**
+       * Delete the (static) instance of this component,
+       * and set the instance pointer to NULL.
+       */
+      static void deleteInstance();
 
-    virtual bool allocateReturnSpace(int, mxArray*[]);
-    virtual bool compute(int, const mxArray *[]);
-    virtual bool computeFast(int, const mxArray *[]);
+      virtual bool allocateReturnSpace(int, mxArray**);
+      virtual bool compute(int, const mxArray**);
+      virtual bool computeFast(int, const mxArray**);
 
-    //virtual bool display(int, const mxArray *[]);
-    virtual ~ModelCoriolisCentrifugalForces();
+      //virtual bool display(int, const mxArray *[]);
+      virtual ~ModelCoriolisCentrifugalForces();
 
-  private:
-    ModelCoriolisCentrifugalForces();
-    static ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
-    bool processArguments(int, const mxArray *[]);
+    private:
+      ModelCoriolisCentrifugalForces();
+      static ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
+      bool processArguments(int, const mxArray**);
 
-    double *qj;
-    double *qjDot;
-    double *vb;
-    double *h;
-    static double g_0[3];
+      double *qj;
+      double *qjDot;
+      double *vb;
+      double *h;
+      static double g_0[3];
   };
 
 }

@@ -4,8 +4,13 @@ classdef WBM < WBM.WBMBase
         stvLen@uint16     scalar
         vqTInit@double    vector
         stvqT@double      vector
+        robot_init_state@WBM.wbmStateParams
         robot_config@WBM.wbmBaseRobotConfig
         robot_body@WBM.wbmBody
+    end
+
+    properties(Constant)
+        MAX_NUM_JOINTS = 35;
     end
 
     properties(Access = protected)
@@ -122,16 +127,6 @@ classdef WBM < WBM.WBMBase
             for i = 1:nRpts
                 obj.visualizeForwardDynamics(x_out, sim_config, sim_tstep, vis_ctrl);
             end
-        end
-
-        function stFltb = getFloatingBaseState(obj)
-            stFltb = WBM.wbmFltgBaseState;
-            [vqT_b,~,v_b,~] = obj.getState();
-            [p_b, R_b]      = WBM.utilities.frame2posRotm(vqT_b);
-
-            stFltb.wf_R_b = R_b; % orientation of the base (in axis-angle representation)
-            stFltb.wf_p_b = p_b; % cartesian position of the base
-            stFltb.wf_v_b = v_b; % cartesian velocity and the rotational velocity of the base
         end
 
         function [chn_q, chn_dq] = getStateChains(obj, chain_names, q_j, dq_j)
@@ -329,7 +324,7 @@ classdef WBM < WBM.WBMBase
             stmBsVel = chi(1:m,cutp1:cutp2); % m -by- [dx_b, omega_b]
         end
 
-        function [dx_b, omega_b] = getBaseVelocitiesParams(obj, v_b)
+        function [dx_b, omega_b] = getBaseVelocitiesParams(~, v_b)
             if ( ~iscolumn(v_b) || (size(v_b,1) ~= 6) )
                error('WBM::getBaseVelocitiesParams: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
@@ -372,6 +367,18 @@ classdef WBM < WBM.WBMBase
 
         function stvqT = get.stvqT(obj)
             [stvqT,~,~,~] = obj.getState();
+        end
+
+        function set.robot_init_state(obj, stInit)
+            if ~obj.checkInitStateDimensions(stInit)
+                error('WBM::set.robot_init_state: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
+            end
+
+            obj.mwbm_config.initStateParams = stInit;
+        end
+
+        function stInit = get.robot_init_state(obj)
+            stInit = obj.mwbm_config.initStateParams;
         end
 
         function robot_config = get.robot_config(obj)
@@ -421,33 +428,36 @@ classdef WBM < WBM.WBMBase
             if ~isa(robot_config, 'WBM.wbmBaseRobotConfig')
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            obj.mwbm_config = WBM.wbmBaseRobotConfig;
-
+            % further error checks ...
             if (robot_config.ndof == 0)
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.VALUE_IS_ZERO);
             end
-            obj.mwbm_config.ndof          = robot_config.ndof;
-            obj.mwbm_config.stvLen        = 2*obj.mwbm_config.ndof + 13;
-
+            if (robot_config.ndof > obj.MAX_NUM_OF_JOINTS)
+                error('WBM::initWBM: %s', WBM.wbmErrorMsg.MAX_NUM_LIMIT);
+            end
             if (length(robot_config.cstrLinkNames) ~= robot_config.nCstrs)
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
             end
+            if isempty(robot_config.initStateParams)
+                error('WBM::initWBM: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
+            end
+
+            obj.mwbm_config = WBM.wbmBaseRobotConfig;
+            obj.mwbm_config.ndof          = robot_config.ndof;
+            obj.mwbm_config.stvLen        = 2*obj.mwbm_config.ndof + 13;
+
             obj.mwbm_config.cstrLinkNames = robot_config.cstrLinkNames;
             obj.mwbm_config.nCstrs        = robot_config.nCstrs;
             obj.mwbm_config.dampCoeff     = robot_config.dampCoeff;
+
             if ~isempty(robot_config.body)
                 obj.mwbm_config.body = robot_config.body;
             end
 
-            if isempty(robot_config.initStateParams)
-                error('WBM::initWBM: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
-            end
-            % if 'initStateParams' is not empty, check the dimensions ...
-            stInit = robot_config.initStateParams;
-            len = size(stInit.x_b,1) + size(stInit.qt_b,1) + size(stInit.q_j,1) + ...
-                  size(stInit.dx_b,1) + size(stInit.omega_b,1) + size(stInit.dq_j,1);
-            if ( (len ~= 0) && (len ~= obj.mwbm_config.stvLen) )
-                if (len ~= (obj.mwbm_config.stvLen - 7)) % length without x_b & qt_b (they will be updated afterwards)
+            % check all parameter dimensions in "initStateParams", summed size
+            % is either: 0 (= empty), 'stvLen' or 'stvLen-7' ...
+            if ~WBM.utilities.isStateEmpty(robot_config.initStateParams)
+                if ~obj.checkInitStateDimensions(robot_config.initStateParams)
                     error('WBM::initWBM: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
                 end
             end
@@ -462,6 +472,19 @@ classdef WBM < WBM.WBMBase
             % get the joint values of the index list ...
             jnt_q(1:len,1)  = q_j(joint_idx,1);  % angle
             jnt_dq(1:len,1) = dq_j(joint_idx,1); % velocity
+        end
+
+        function result = checkInitStateDimensions(obj, stInit)
+            len = size(stInit.x_b,1) + size(stInit.qt_b,1) + size(stInit.q_j,1) + ...
+                  size(stInit.dx_b,1) + size(stInit.omega_b,1) + size(stInit.dq_j,1);
+
+            if (len ~= obj.mwbm_config.stvLen) % allowed length: 'stvLen' or 'stvLen-7'
+                if (len ~= (obj.mwbm_config.stvLen - 7)) % length without x_b & qt_b (they will be updated afterwards)
+                    result = false;
+                    return
+                end
+            end
+            result = true;
         end
 
     end

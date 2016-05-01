@@ -21,7 +21,6 @@
 
 //library includes
 #include <wbi/iWholeBodyModel.h>
-//#include <wbiIcub/icubWholeBodyModel.h>
 #include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 //local includes
@@ -29,7 +28,7 @@
 
 using namespace mexWBIComponent;
 
-ModelCoriolisCentrifugalForces * ModelCoriolisCentrifugalForces::modelCoriolisCentrifugalForces;
+ModelCoriolisCentrifugalForces *ModelCoriolisCentrifugalForces::modelCoriolisCentrifugalForces;
 double ModelCoriolisCentrifugalForces::g_0[3] = {0.0f, 0.0f, 0.0f};
 
 ModelCoriolisCentrifugalForces::ModelCoriolisCentrifugalForces() : ModelComponent(5,0,1)
@@ -43,7 +42,7 @@ ModelCoriolisCentrifugalForces::~ModelCoriolisCentrifugalForces()
 {
 }
 
-ModelCoriolisCentrifugalForces * ModelCoriolisCentrifugalForces::getInstance()
+ModelCoriolisCentrifugalForces* ModelCoriolisCentrifugalForces::getInstance()
 {
   if(modelCoriolisCentrifugalForces == NULL)
   {
@@ -57,7 +56,7 @@ void ModelCoriolisCentrifugalForces::deleteInstance()
   deleteObject(&modelCoriolisCentrifugalForces);
 }
 
-bool ModelCoriolisCentrifugalForces::allocateReturnSpace(int nlhs, mxArray* plhs[])
+bool ModelCoriolisCentrifugalForces::allocateReturnSpace(int nlhs, mxArray **plhs)
 {
 #ifdef DEBUG
   mexPrintf("Trying to allocateReturnSpace in ModelCoriolisCentrifugalForces\n");
@@ -66,19 +65,19 @@ bool ModelCoriolisCentrifugalForces::allocateReturnSpace(int nlhs, mxArray* plhs
 
   plhs[0] =  mxCreateNumericMatrix(numDof+6, 1, mxDOUBLE_CLASS, mxREAL);
   h = mxGetPr(plhs[0]);
-  return(true);
+  return true;
 }
 
-bool ModelCoriolisCentrifugalForces::compute(int nrhs, const mxArray* prhs[])
+bool ModelCoriolisCentrifugalForces::compute(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
   mexPrintf("Trying to compute Coriolis with centrifugal forces\n");
 #endif
   processArguments(nrhs,prhs);
-  return(true);
+  return true;
 }
 
-bool ModelCoriolisCentrifugalForces::computeFast(int nrhs, const mxArray* prhs[])
+bool ModelCoriolisCentrifugalForces::computeFast(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
   mexPrintf("Trying to fast compute Coriolis with centrifugal forces\n");
@@ -91,14 +90,14 @@ bool ModelCoriolisCentrifugalForces::computeFast(int nrhs, const mxArray* prhs[]
   world_H_rootLink = modelState->getRootWorldRotoTranslation();
   vb = modelState->vb();
 
-  if(!robotModel->computeGeneralizedBiasForces(qj,world_H_rootLink,qjDot,vb,g_0,h))
+  if( !robotModel->computeGeneralizedBiasForces(qj, world_H_rootLink, qjDot, vb, g_0, h) )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeGeneralizedBiasForces call");
   }
-  return(true);
+  return true;
 }
 
-bool ModelCoriolisCentrifugalForces::processArguments(int nrhs, const mxArray* prhs[])
+bool ModelCoriolisCentrifugalForces::processArguments(int nrhs, const mxArray **prhs)
 {
   size_t numDof = modelState->dof();
 
@@ -108,30 +107,28 @@ bool ModelCoriolisCentrifugalForces::processArguments(int nrhs, const mxArray* p
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state argument dimensions in ModelCoriolisCentrifugalForces call");
   }
-  double *R_temp,*p_temp;
-  R_temp = (double *)mxGetPr(prhs[1]);
-  p_temp = (double *)mxGetPr(prhs[2]);
+  double *R_temp, *p_temp;
+  R_temp = (double*)mxGetPr(prhs[1]);
+  p_temp = (double*)mxGetPr(prhs[2]);
 
-  double tempR[9],tempP[3];
-  for(int i = 0;i<3;i++)
-  {
-    tempP[i] = p_temp[i];
-  }
-  
+  double tempR[9], tempP[3];
+  memcpy(tempP, p_temp, 3*sizeof(double));
+
   reorderMatrixElements(R_temp, tempR);
   wbi::Rotation tempRot(tempR);
   wbi::Frame tempFrame(tempRot, tempP);
   robotModel = modelState->robotModel();
+
   qj = mxGetPr(prhs[3]);
   qjDot = mxGetPr(prhs[4]);
   vb = mxGetPr(prhs[5]);
 
 #ifdef DEBUG
-  mexPrintf("qj received \n");
+  mexPrintf("qj received\n");
 
-  for(size_t i = 0; i< numDof;i++)
+  for(size_t i=0; i < numDof; i++)
   {
-    mexPrintf(" %f",qj[i]);
+    mexPrintf(" %f", *(qj + i));
   }
 #endif
 
@@ -139,11 +136,10 @@ bool ModelCoriolisCentrifugalForces::processArguments(int nrhs, const mxArray* p
 
   if(h != NULL)
   {
-    if(!robotModel->computeGeneralizedBiasForces(qj,world_H_rootLink,qjDot,vb,g_0,h))
+    if( !robotModel->computeGeneralizedBiasForces(qj, world_H_rootLink, qjDot, vb, g_0, h) )
     {
       mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeGeneralizedBiasForces call");
     }
   }
-
   return true;
 }
