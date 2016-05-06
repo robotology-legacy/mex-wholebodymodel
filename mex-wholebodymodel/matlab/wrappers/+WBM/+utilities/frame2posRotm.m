@@ -1,6 +1,6 @@
 function [pos, rotm] = frame2posRotm(vqT)
     if (length(vqT) ~= 7)
-        error('frame2posRotm: %s', WBM.wbmErrMsg.WRONG_VEC_SIZE);
+        error('frame2posRotm: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
     end
 
     pos  = vqT(1:3);

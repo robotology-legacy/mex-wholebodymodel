@@ -7,8 +7,7 @@ function [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
     stp = WBM.utilities.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, ndof);
 
     omega_w = stp.omega_b;
-    %v_bw = [stp.dx_b; omega_w]; % slow ...
-    v_bw = vertcat(stp.dx_b, omega_w); % faster ...
+    v_bw = vertcat(stp.dx_b, omega_w);
     %v = [stp.dx_b; omega_w; stp.dq_j];
 
     % mex-WBM calls:
@@ -30,7 +29,7 @@ function [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
     Jc = zeros(m,n);
     dJcDq = zeros(m,1);
     for i = 1:nCstrs
-        Jc(6*i-5:6*i,1:n)  = obj.jacobian(obj.mwbm_config.cstrLinkNames{i}); % 6*(i-1)+1 == 6*i-5
+        Jc(6*i-5:6*i,1:n)  = obj.jacobian(obj.mwbm_config.cstrLinkNames{i}); % 6*(i-1)+1 = 6*i-5
         dJcDq(6*i-5:6*i,1) = obj.dJdq(obj.mwbm_config.cstrLinkNames{i});
     end
 
@@ -48,10 +47,9 @@ function [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
     % obtain angular velocity in body frame omega_b. This is then used in the
     % quaternion derivative computation:
     omega_b = R_b * omega_w;
-    dqt_b = WBM.utilities.quatDerivative(stp.qt_b, omega_b);
+    dqt_b = WBM.utilities.dQuat(stp.qt_b, omega_b);
 
-    %dx = [stp.dx_b; dqt_b; stp.dq_j]; % slow ...
-    dx = vertcat(stp.dx_b, dqt_b, stp.dq_j); % faster ...
+    dx = vertcat(stp.dx_b, dqt_b, stp.dq_j);
     dv = M \ (Jc'*f_c + vertcat(zeros(6,1), tau+tauDamp) - h);
     dstvChi = vertcat(dx, dv);
     %kinEnergy = 0.5*v'*M*v;

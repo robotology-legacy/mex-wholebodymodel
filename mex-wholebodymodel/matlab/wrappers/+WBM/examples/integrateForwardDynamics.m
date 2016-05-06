@@ -15,8 +15,7 @@ icub_config = wbm_icub.robot_config;
 %  forward dynamics in state-space form. The state-space form reduces, through variable
 %  substitution, the inhomogeneous second-order ODE to a first-order ODE.
 %  For further details see:
-%    "Rigid Body Dynamics Algorithms" of Roy Featherstone,
-%    chapter 3, pages 40-42, formula (3.8).
+%    Rigid Body Dynamics Algorithms, Roy Featherstone, springer, 2008, chapter 3, pp. 40-42, formula (3.8).
 chi_init = wbm_icub.stvChiInit;
 
 %% Control torques:
@@ -29,7 +28,8 @@ vqT_init = wbm_icub.vqTInit;
 g_init = wbm_icub.generalizedBiasForces(R_b, p_b, icub_config.initStateParams.q_j, ...
                                         zeros(icub_config.ndof,1), zeros(6,1));
 len = size(g_init,1);
-
+% minimalistic data structure for the control torques (further parameters for
+% different computations can be added to this structure) ...
 ctrlTrqs.tau = @(t)zeros(size(g_init(7:len)));
 
 %% ODE-Solver:

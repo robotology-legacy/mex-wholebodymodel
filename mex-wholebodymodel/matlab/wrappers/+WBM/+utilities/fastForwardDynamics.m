@@ -47,7 +47,7 @@ function [dstvChi, h] = fastForwardDynamics(t, stvChi, ctrlTrqs, wbm_config)
     % obtain angular velocity in body frame omega_b. This is then used in the
     % quaternion derivative computation:
     omega_b = R_b * omega_w;
-    dqt_b = WBM.utilities.quatDerivative(stp.qt_b, omega_b);
+    dqt_b = WBM.utilities.dQuat(stp.qt_b, omega_b);
 
     dx = vertcat(stp.dx_b, dqt_b, stp.dq_j);
     dv = M \ (Jc'*f_c + vertcat(zeros(6,1), tau+tauDamp) - h);

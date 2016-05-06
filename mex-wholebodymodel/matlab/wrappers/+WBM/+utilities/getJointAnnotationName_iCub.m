@@ -1,4 +1,4 @@
-function jnt_name = getJointNameAnnotation_iCub(lnk_name_group, idx)
+function jnt_name = getJointAnnotationName_iCub(lnk_name_group, idx)
     switch lnk_name_group
         case 'torso'
             switch idx
@@ -9,7 +9,7 @@ function jnt_name = getJointNameAnnotation_iCub(lnk_name_group, idx)
                 case 3
                     jnt_name = 'torso yaw';
                 otherwise
-                    error('getJointNameAnnotation_iCub:%s: %s', lnk_name_group, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
+                    error('getJointAnnotationName_iCub:%s: %s', lnk_name_group, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
             end
         case 'right_arm'
             switch idx
@@ -24,7 +24,7 @@ function jnt_name = getJointNameAnnotation_iCub(lnk_name_group, idx)
                 case 5
                     jnt_name = 'r. wrist prosup';
                 otherwise
-                    error('getJointNameAnnotation_iCub:%s: %s', lnk_name_group, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
+                    error('getJointAnnotationName_iCub:%s: %s', lnk_name_group, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
             end
         case 'left_arm'
             switch idx
@@ -39,7 +39,7 @@ function jnt_name = getJointNameAnnotation_iCub(lnk_name_group, idx)
                 case 5
                     jnt_name = 'l. wrist prosup';
                 otherwise
-                    error('getJointNameAnnotation_iCub:%s: %s', lnk_name_group, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
+                    error('getJointAnnotationName_iCub:%s: %s', lnk_name_group, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
             end
         case 'right_leg'
             switch idx
@@ -56,7 +56,7 @@ function jnt_name = getJointNameAnnotation_iCub(lnk_name_group, idx)
                 case 6
                     jnt_name = 'r. ankle roll';
                 otherwise
-                    error('getJointNameAnnotation_iCub:%s: %s', lnk_name_group, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
+                    error('getJointAnnotationName_iCub:%s: %s', lnk_name_group, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
             end
         case 'left_leg'
             switch idx
@@ -73,10 +73,9 @@ function jnt_name = getJointNameAnnotation_iCub(lnk_name_group, idx)
                 case 6
                     jnt_name = 'l. ankle roll';
                 otherwise
-                    error('getJointNameAnnotation_iCub:%s: %s', lnk_name_group, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
+                    error('getJointAnnotationName_iCub:%s: %s', lnk_name_group, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
             end
         otherwise
-            error('getJointNameAnnotation_iCub: %s', WBM.wbmErrorMsg.UNKNOWN_LNK_NAME);
-        end
+            error('getJointAnnotationName_iCub: %s', WBM.wbmErrorMsg.UNKNOWN_LNK_NAME);
     end
 end

@@ -9,6 +9,7 @@ classdef wbmErrorMsg
         IDX_OUT_OF_BOUNDS = 'Index value out of bounds!';
         MAX_NUM_LIMIT     = 'Value exceeds the maximum number!'
         STRING_MISMATCH   = 'Mismatching string!';
+        UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';
         UNKNOWN_EXC       = 'Unknown exception!';
         UNKNOWN_LNK_NAME  = 'Unknown link name!';
         VALUE_IS_ZERO     = 'The value is zero!';

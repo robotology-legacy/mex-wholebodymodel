@@ -145,7 +145,7 @@ classdef WBMBase < handle
             [q_j, vqT_b, dq_j, v_b] = wholeBodyModel('get-state');
         end
 
-        function stFltb = getFloatingBaseState(obj)
+        function stFltb = getFloatingBaseState(~)
             stFltb = WBM.wbmFltgBaseState;
             [R_b, p_b, v_b] = wholeBodyModel('get-floating-base-state');
 

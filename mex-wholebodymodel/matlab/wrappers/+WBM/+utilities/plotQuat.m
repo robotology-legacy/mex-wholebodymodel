@@ -5,12 +5,12 @@ function plotQuat(vqT, twait)
     end
 
     if ~ismatrix(vqT)
-        error('plotQuat: %s', WBM.wbmErrMsg.WRONG_DATA_TYPE);
+        error('plotQuat: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
     % the matrix-dimension must be of m-by-7:
     [nRows,nCols] = size(vqT);
     if (nCols ~= 7)
-        error('plotQuat: %s', WBM.wbmErrMsg.WRONG_MAT_DIM);
+        error('plotQuat: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
     end
     lin_width = 1;
     mkr_size  = 8.5;

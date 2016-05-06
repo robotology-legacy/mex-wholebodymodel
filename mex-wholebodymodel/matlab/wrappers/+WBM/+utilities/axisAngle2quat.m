@@ -1,6 +1,6 @@
 function quat = axisAngle2quat(axang)
     if (size(axang,1) ~= 4)
-        error('axisAngle2quat: %s', WBM.wbmErrMsg.WRONG_VEC_DIM);
+        error('axisAngle2quat: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
 
     q = zeros(4,1);
@@ -8,7 +8,7 @@ function quat = axisAngle2quat(axang)
     sAngle = sin(theta_half);
     % the direct assignment is much faster than an array-concatenation ...
     q(1,1) = cos(theta_half);
-    q(2,1) = axang(1,1) * sAngle;        
+    q(2,1) = axang(1,1) * sAngle;
     q(3,1) = axang(2,1) * sAngle;
     q(4,1) = axang(3,1) * sAngle;
 

@@ -432,7 +432,7 @@ classdef WBM < WBM.WBMBase
             if (robot_config.ndof == 0)
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.VALUE_IS_ZERO);
             end
-            if (robot_config.ndof > obj.MAX_NUM_OF_JOINTS)
+            if (robot_config.ndof > obj.MAX_NUM_JOINTS)
                 error('WBM::initWBM: %s', WBM.wbmErrorMsg.MAX_NUM_LIMIT);
             end
             if (length(robot_config.cstrLinkNames) ~= robot_config.nCstrs)
