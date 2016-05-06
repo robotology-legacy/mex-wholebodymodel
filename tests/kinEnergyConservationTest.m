@@ -65,7 +65,7 @@ function [] = kinEnergyConservationTest( params )
 
     %% plot results
     ndof = params.ndof;
-    
+
 params.demux.baseOrientationType = 1;  % sets the base orientation in stateDemux.m as positions + quaternions (1) or transformation matrix (0)
 [basePose,qj,baseVelocity,dqj]   = stateDemux(chi,params);
 
@@ -80,7 +80,7 @@ qt_b    = basePose(4:7,:);
 % linear and angular velocity
 dx_b    = baseVelocity(1:3,:);
 omega_W = baseVelocity(4:6,:);
-  
+
     x = [x_b' qt_b' qj'];
     v = [dx_b' omega_W' dqj' ];
     kinEnergy = zeros(length(t),1);
@@ -95,15 +95,19 @@ omega_W = baseVelocity(4:6,:);
         [chiDot(tCnt,:),hOut(tCnt,:),gOut(tCnt,:),~,kinEnergy(tCnt) ] = forwardDynamics_kinEnergyTest(t(tCnt,:),chi(tCnt,:)',params);
     end
 
-    if( params.plot )
-        figure
-        plot(t,kinEnergy,'b');
-        hold on;
-        %plot(t,kinEnergy2,'r');
-        xlabel('Time t(sec)');
-        ylabel(' (J)');
-        title(['Kinetic Energy for ',robotDisplayName]);
-    end
+    % Matlab R2014b and newer do not longer support the figure function under the "-nojvm" startup option.
+    % For more information, see "Changes to -nojvm Startup Option" in the MATLAB Release Notes,
+    % <http://www.mathworks.com/help/matlab/release-notes.html#btsurqv-6>.
+    %
+    % if( params.plot )
+    %     figure
+    %     plot(t,kinEnergy,'b');
+    %     hold on;
+    %     %plot(t,kinEnergy2,'r');
+    %     xlabel('Time t(sec)');
+    %     ylabel(' (J)');
+    %     title(['Kinetic Energy for ',robotDisplayName]);
+    % end
 
     kinEnergyMaxErrRel = max(abs(kinEnergy-kinEnergy(1)))/kinEnergy(1);
 
@@ -118,62 +122,62 @@ omega_W = baseVelocity(4:6,:);
 %     xlabel('Time t(sec)');
 %     ylabel('dqj (rad/sec)');
 %     title('Joint velocities ');
-% 
+%
 %     figure;
 %     plot(t,dx_b);
 %     xlabel('Time t(sec)');
 %     ylabel('(m/sec)');
 %     title('Floating Base translation velocities');
-% 
-% 
+%
+%
 %     figure;
 %     plot(t,omega_W);
 %     xlabel('Time t(sec)');
 %     ylabel(' (m/sec)');
 %     title('Floating Base rotational velocities');
-% 
+%
 %     ddx_b = chiDot(:,1:3);
 %     domega_b = chiDot(:,4:6);
 %     ddqj = chiDot(:,7:7+ndof);
-% 
+%
 %     figure;
 %     plot(t,ddqj);
 %     xlabel('Time t(sec)');
 %     ylabel('(rad/sec^2)');
 %     title('Joint accelerations ');
-% 
+%
 %     figure;
 %     plot(t,ddx_b);
 %     xlabel('Time t(sec)');
 %     ylabel('(m/sec^2)');
 %     title(' Floating Base translation acceleration ');
-% 
+%
 %     figure;
 %     plot(t,domega_b);
 %     xlabel('Time t(sec)');
 %     ylabel('(m/sec^2)');
 %     title('Floating Base angular acceleration');
-% 
+%
 %     figure;
 %     plot(t,gOut);
 %     xlabel('Time t(sec)');
 %     ylabel('mixed units');
 %     title('g');
-% 
+%
 %     figure;
 %     plot(t,hOut);
 %     xlabel('Time t(sec)');
 %     ylabel('mixed units');
 %     title('h');
-% 
+%
 %     figure(1);
-% 
+%
 %     figure;
 %     plot(t,fc);
 %     xlabel('Time t(sec)');
 %     ylabel('mixed units');
 %     title('fc');
-% 
+%
 %     plot3(x_b(:,1),x_b(:,2),x_b(:,3));hold on;
 %     plot3(x_b(1,1),x_b(1,2),x_b(1,3),'ro');
 %     grid on;
