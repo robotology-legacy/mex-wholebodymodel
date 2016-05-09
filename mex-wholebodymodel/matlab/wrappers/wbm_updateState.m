@@ -14,7 +14,7 @@ function []  = wbm_updateState( varargin )
 
     switch(nargin)
         case 3
-            wholeBodyModel('update-state',varargin{1}, varargin{2}, varargin{3});
+            mexWholeBodyModel('update-state',varargin{1}, varargin{2}, varargin{3});
         otherwise
              disp('updateState : Incorrect number of arguments, check docs'); 
     end

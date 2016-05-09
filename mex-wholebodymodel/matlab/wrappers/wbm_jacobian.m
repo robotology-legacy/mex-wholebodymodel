@@ -16,9 +16,9 @@ function [ J ] = wbm_jacobian( varargin )
 
     switch(nargin)
         case 1 
-            J = wholeBodyModel('jacobian',varargin{1});
+            J = mexWholeBodyModel('jacobian',varargin{1});
         case 4
-            J = wholeBodyModel('jacobian',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4});
+            J = mexWholeBodyModel('jacobian',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4});
         otherwise
             disp('jacobian : Incorrect number of arguments, check docs');
     end

@@ -9,7 +9,7 @@ function [  ] = wbm_modelInitialiseFromURDF( varargin )
 
     switch(nargin)
         case 1
-            wholeBodyModel('model-initialise-urdf',varargin{1});
+            mexWholeBodyModel('model-initialise-urdf',varargin{1});
         otherwise
             disp('modelInitialiseFromURDF : Incorrect number of arguments, check docs');
     end
