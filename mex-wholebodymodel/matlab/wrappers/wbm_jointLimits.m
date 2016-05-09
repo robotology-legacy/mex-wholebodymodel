@@ -12,7 +12,7 @@ function [jl_lower,jl_upper]  = wbm_jointLimits( varargin )
 
     switch(nargin)
         case 0
-            [jl_lower,jl_upper]  = wholeBodyModel('joint-limits');
+            [jl_lower,jl_upper]  = mexWholeBodyModel('joint-limits');
         otherwise
              disp('jointLimits : Incorrect number of arguments, check docs'); 
     end

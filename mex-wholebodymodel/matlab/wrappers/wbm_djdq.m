@@ -16,9 +16,9 @@ function [ dJdq ] = wbm_djdq( varargin )
 
     switch(nargin)
         case 1 
-            dJdq = wholeBodyModel('djdq',varargin{1}); 
+            dJdq = mexWholeBodyModel('djdq',varargin{1}); 
         case 6  
-            dJdq = wholeBodyModel('djdq',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4},varargin{5},varargin{6});
+            dJdq = mexWholeBodyModel('djdq',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4},varargin{5},varargin{6});
         otherwise
             disp('djdq : Incorrect number of arguments, check docs');        
     end

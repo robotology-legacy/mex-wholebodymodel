@@ -10,24 +10,23 @@ function [basePose,jointAngles,baseVelocity,jointsVelocity] = stateDemux(state,p
 
     
     nDof            = param.ndof;
-    I_p_b           = state(1:3);               
-    Q_b             = state(4:7)';
-    jointAngles     = state(8:8+nDof-1);
-    baseVelocity    = state(8+nDof:13+nDof)';
-    jointsVelocity  = state(14+nDof:13+2*nDof)';
-
-    basePose        = zeros(4);
+    I_p_b           = state(1:3,:);               
+    Q_b             = state(4:7,:);
+    jointAngles     = state(8:8+nDof-1,:);
+    baseVelocity    = state(8+nDof:13+nDof,:);
+    jointsVelocity  = state(14+nDof:13+2*nDof,:);
     
-    if      param.demux.baseOrientationType == 0
+    
+    if      param.demux.baseOrientationType == 0 
         
-
-        I_R_b       = quaternion2dcm(Q_b);
-        basePose    = [I_R_b,I_p_b';zeros(1,3),1];
+        % transformation matrix
+        I_R_b       = quaternion2dcm(Q_b(:,1));
+        basePose    = [I_R_b,I_p_b(:,1);zeros(1,3),1];
         
      elseif param.demux.baseOrientationType == 1
-         
-        basePose(1:3,4)  = I_p_b;
-        basePose(:,1)    = Q_b;
+        
+        % position + quaternions
+        basePose    = [I_p_b; Q_b]; 
         
     end
 

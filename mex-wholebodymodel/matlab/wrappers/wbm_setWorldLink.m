@@ -19,9 +19,9 @@ function []  = wbm_setWorldLink( varargin )
 
     switch(nargin)
         case 2
-            wholeBodyModel('set-world-link',reshape(varargin{1},[],1), varargin{2});
+            mexWholeBodyModel('set-world-link',reshape(varargin{1},[],1), varargin{2});
         case 4
-            wholeBodyModel('set-world-link',varargin{1}, reshape(varargin{2},[],1), varargin{3}, varargin{4});
+            mexWholeBodyModel('set-world-link',varargin{1}, reshape(varargin{2},[],1), varargin{3}, varargin{4});
         otherwise
              disp('setWorldLink : Incorrect number of arguments, check docs'); 
     end

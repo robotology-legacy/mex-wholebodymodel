@@ -16,9 +16,9 @@
 
     switch(nargin)
         case 1
-            p = wholeBodyModel('forward-kinematics',varargin{1});
+            p = mexWholeBodyModel('forward-kinematics',varargin{1});
         case 4
-            p = wholeBodyModel('forward-kinematics',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4});
+            p = mexWholeBodyModel('forward-kinematics',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4});
         otherwise
             disp('forwardKinematics : Incorrect number of arguments, check docs');        
     end

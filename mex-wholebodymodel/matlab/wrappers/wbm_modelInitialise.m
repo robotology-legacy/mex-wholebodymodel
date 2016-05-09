@@ -11,9 +11,9 @@ function [  ] = wbm_modelInitialise( varargin )
 
     switch(nargin)
         case 0 
-            wholeBodyModel('model-initialise');
+            mexWholeBodyModel('model-initialise');
         case 1
-            wholeBodyModel('model-initialise',varargin{1});
+            mexWholeBodyModel('model-initialise',varargin{1});
         otherwise
             disp('modelInitialise : Incorrect number of arguments, check docs');
     end

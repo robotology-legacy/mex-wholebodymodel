@@ -27,6 +27,8 @@
 #include <wbi/wbiUtil.h>
 #include <wbi/iWholeBodyModel.h>
 
+#include <Eigen/Dense>
+
 //local includes
 #include "mexwholebodymodelsettings.h"
 
