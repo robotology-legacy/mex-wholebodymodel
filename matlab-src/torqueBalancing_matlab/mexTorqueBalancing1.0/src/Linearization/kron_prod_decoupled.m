@@ -1,12 +1,14 @@
 %% kron_prod_decoupled
-%
-% This function implements a gains optimization for both the high level
+% this function implements a gains optimization for both the high level
 % task gains and the low level task gains.
+%
+% Author : Gabriele Nava (gabriele.nava@iit.it)
+% Genova, May 2016
 %
 function [Kx,Kn] = kron_prod_decoupled(Ax,Bx,An,Bn,Kdesired,param)
 
 ndof  = param.ndof;
-toll  = param.toll;
+%toll = param.toll;
 damp  = param.damp;
 
 %% Decoupling between CoM position and angular momentum integral
@@ -94,8 +96,8 @@ kdes = Kdesired(:);
 
 % linear problem
 Mtot      = [MxCoMPos_symm MxOri_symm Mn_symm];
-pinvMtot  = pinv(Mtot, toll);
-%pinvMtot = Mtot'/(Mtot*Mtot' + damp*eye(size(Mtot,1)));
+%pinvMtot = pinv(Mtot, toll);
+pinvMtot  = Mtot'/(Mtot*Mtot' + damp*eye(size(Mtot,1)));
 
 kxn       = pinvMtot*kdes;
 

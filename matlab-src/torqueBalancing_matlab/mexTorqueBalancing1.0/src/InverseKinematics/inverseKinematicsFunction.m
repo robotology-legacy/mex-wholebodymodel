@@ -194,7 +194,8 @@ dChiIkin         = [NuBaseIkin(1:3); dquatBase; dqj; dNuFirstTask];
 ObtainedCoMTrajectory             = [xCoM(1:3); JCoM*Nu; (JCoM*dNuFirstTask+dJCoMNu)];
 DesiredCoMTrajectory              = [desired_x_dx_ddx_CoM(:,1); desired_x_dx_ddx_CoM(:,2); desired_x_dx_ddx_CoM(:,3)];
 visualizeIkinParam.CoMTrajectory  = [DesiredCoMTrajectory; ObtainedCoMTrajectory];
-% CoM and feet position error 
-visualizeIkinParam.CoM_Feet_Error = [deltaPosCoM; deltaPosFeet];
+% momentum and feet position error 
+deltaMomentum                     = [params.MInit(1,1)*(JCoM*Nu-desired_x_dx_ddx_CoM(:,2)); Jh*Nu];
+visualizeIkinParam.H_Feet_Error   = [deltaMomentum; deltaPosFeet];
 
 end

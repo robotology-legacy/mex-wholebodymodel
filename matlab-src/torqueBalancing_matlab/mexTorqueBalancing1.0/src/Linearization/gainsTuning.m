@@ -1,17 +1,18 @@
-%% gainsScheduling
-%
-% Current procedure used to generate the desired gains for the linearized
+%% gainsTuning
+% current procedure used to generate the desired gains for the linearized
 % system
 %
-function [Kpx,Kdx,Kpn,Kdn,KSn,KDn] = gainsScheduling(Mbar_inv,B,m,xCoM_posDerivative,angularOrientation,Nb,Mbar,dxCoM_velDerivative,...
-                                                     Hw_velDerivative,gainsInit,ndof,toll,damp)
+% Author : Gabriele Nava (gabriele.nava@iit.it)
+% Genova, May 2016
+%
+function [Kpx,Kdx,Kpn,Kdn,KSn,KDn] = gainsTuning(Mbar_inv,B,m,xCoM_posDerivative,angularOrientation,Nb,Mbar,dxCoM_velDerivative,...
+                                                 Hw_velDerivative,gainsInit,ndof,toll,damp)
 % isolate the gains: stiffness
 Ap_cartesian_tot = Mbar_inv*B;
 Bp_cartesian_tot = [-m*xCoM_posDerivative; angularOrientation];
 
 Ap_null_tot      = Mbar_inv*Nb;
 Bp_null_tot      = Nb*Mbar;
-% Bp_null_tot      = gainsInit.posturalCorr;
 
 % isolate the gains: damping
 Ad_cartesian_tot = Mbar_inv*B;
@@ -19,7 +20,6 @@ Bd_cartesian_tot = [-m*dxCoM_velDerivative; -Hw_velDerivative];
 
 Ad_null_tot      = Mbar_inv*Nb;
 Bd_null_tot      = Nb*Mbar;
-% Bd_null_tot     = gainsInit.posturalCorr;
 
 % Define the desired KS,KD
 KSdes            = gainsInit.KSdes;
@@ -31,9 +31,6 @@ KronParam.toll = toll;
 KronParam.damp = damp;
 
 %% GENERATE THE GAINS BY MEANS OF THE KRONECHER PRODUCT
-% [Kpx,Kpn] = kron_prod(Ap_cartesian_tot,Bp_cartesian_tot,Ap_null_tot,Bp_null_tot,KSdes,KronParam);
-% [Kdx,Kdn] = kron_prod(Ad_cartesian_tot,Bd_cartesian_tot,Ad_null_tot,Bd_null_tot,KDdes,KronParam);
-
 [Kpx,Kpn] = kron_prod_decoupled(Ap_cartesian_tot,Bp_cartesian_tot,Ap_null_tot,Bp_null_tot,KSdes,KronParam);
 [Kdx,Kdn] = kron_prod_decoupled(Ad_cartesian_tot,Bd_cartesian_tot,Ad_null_tot,Bd_null_tot,KDdes,KronParam);
 

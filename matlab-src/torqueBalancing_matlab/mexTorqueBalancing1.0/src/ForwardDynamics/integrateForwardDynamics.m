@@ -12,9 +12,24 @@
 % Genova, May 2016
 %
 function [] = integrateForwardDynamics(params)
-%% Initial joints position and velocities; initial base velocity
+%% Initial parameters setup
 params.SoTController      = strcmp(params.BalancingController,'StackOfTask');
 params.JSController       = strcmp(params.BalancingController,'JointSpace');
+
+if params.JSController == 1
+    
+params.linearize_for_stability_analysis     = 0;                       
+params.linearize_for_gains_tuning           = 0;                           
+params.use_QPsolver                         = 0;                           
+params.jointRef_with_ikin                   = 1;
+end
+
+if params.visualize_stability_analysis_plot  == 1 
+    
+params.jointRef_with_ikin                   = 1;
+end
+    
+%% Initial joints position and velocities; initial base velocity
 params.qjInit             = [params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit]*(pi/180);
 params.dqjInit            = zeros(params.ndof,1);
 params.VelBaseInit        = zeros(3,1);
@@ -39,7 +54,7 @@ wbm_setWorldFrame(params.RotBaseInit,params.PosBaseInit,[0 0 -9.81]')
 %% Contact constraints         
 if       params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 1
  
-% contact constraints for 2 feet on ground
+% contact constraints for two feet on ground
  params.constraintLinkNames      = {'l_sole','r_sole'}; 
 
 elseif   params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 0
@@ -58,7 +73,7 @@ params.numConstraints            = length(params.constraintLinkNames);
 %% Initial parameters definition
 % tolerances for pseudoinverse and Qp solver
 params.pinv_tol      = 1e-8;
-params.pinv_damp     = 1e-6;
+params.pinv_damp     = 5e-7;
 params.reg_HessianQP = 1e-3;
 
 % mass matrix, constraints Jacobian and CoM Jacobian
@@ -90,8 +105,9 @@ JhJointInit(:,ii)   = wbm_centroidalMomentum(params.RotBaseInit, params.PosBaseI
 end
 
 params.JhInit       =  [JhBaseInit JhJointInit];     
+
 % the centroidal momentum jacobian is reduced to eliminate the base velocity. This
-% is used to compute che approximation of the angular momentum integral
+% is then used to compute che approximation of the angular momentum integral
 params.JhReduced    =  JhJointInit -JhBaseInit*(eye(6)/params.JcInit(1:6,1:6))*params.JcInit(1:6,7:end);
 
 % Forward kinematics and joints limits
@@ -105,7 +121,7 @@ params.limits                 = [jl1 jl2];
 [gainsInit, params.constraints, params.trajectory] = gainsAndConstraints(params);
 
 %% Joints references definition
-if params.jointRef_with_ikin == 1 || params.JSController == 1
+if params.jointRef_with_ikin == 1
     
 [params.ikin,params.chiInit] = initInverseKin(params);
 else
@@ -137,12 +153,9 @@ forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,params);
 
 if params.integrateWithFixedStep == 1
    
-[t,chi]         = euleroForward(forwardDynFunc,params.chiInit,params.tEnd,params.tStart,params.sim_step);
-    
-else
-    
+[t,chi]         = euleroForward(forwardDynFunc,params.chiInit,params.tEnd,params.tStart,params.sim_step);   
+else    
 [t,chi]         = ode15s(forwardDynFunc,params.tStart:params.sim_step:params.tEnd,params.chiInit,params.options);
-
 end
 
 delete(params.wait)       
@@ -151,7 +164,6 @@ delete(params.wait)
 if params.visualize_robot_demo == 1
     
 visualize_demo(t,chi,params)
-
 end
 
 if params.visualize_integration_plot == 1 || params.visualize_gains_tuning_plot == 1 || params.visualize_stability_analysis_plot == 1
@@ -161,7 +173,6 @@ params.wait     = waitbar(0,'Generating the plots...');
 visualizer_main(t,chi,params)
 
 delete(params.wait)
-
 end
 
 end

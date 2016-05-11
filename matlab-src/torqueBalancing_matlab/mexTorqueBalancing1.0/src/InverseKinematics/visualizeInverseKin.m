@@ -12,16 +12,15 @@ function [] = visualizeInverseKin(params,ikinParam)
 set(0,'DefaultFigureWindowStyle','Docked');
 t                 = ikinParam.t;
 CoMTrajectory     = ikinParam.CoMTrajectory;
-CoM_Feet_Error    = ikinParam.CoM_Feet_Error;
+H_Feet_Error      = ikinParam.H_Feet_Error;
 
 %% CoM trajectory error
 title_graphics  = {'X direction' 'Y direction' 'Z direction'};
-title2          = {'Error on desired x CoM trajectory' 'Error on desired y CoM trajectory' 'Error on desired z CoM trajectory'};
 
 for k = 1:3
 % desired and obtained trajectory at CoM
 % position
-figure(32)
+figure(1)
 subplot(3,1,k)
 plot(t,CoMTrajectory(k,:),'b')
 hold on
@@ -34,7 +33,7 @@ title(title_graphics(k))
 legend('desired CoM pos','obtained CoM pos')
 
 % velocity
-figure(33)
+figure(2)
 subplot(3,1,k)
 plot(t,CoMTrajectory(k+3,:),'b')
 hold on
@@ -47,7 +46,7 @@ title(title_graphics(k))
 legend('desired CoM vel','obtained CoM vel')
 
 % acceleration
-figure(34)
+figure(3)
 subplot(3,1,k)
 plot(t,CoMTrajectory(k+6,:),'b')
 hold on
@@ -58,17 +57,29 @@ xlabel('s')
 ylabel('m/s^2')
 title(title_graphics(k))
 legend('desired CoM acc','obtained CoM acc')
+end
 
-% error on desired CoM trajectory
-figure(35)
-subplot(3,1,k)
-plot(t,CoM_Feet_Error(k,:),'b')
+% error on desired momentum trajectory
+figure(4)
+subplot(2,1,1)
+plot(t,H_Feet_Error(1,:),'b')
 hold on
 grid on
-title(title2(k))
+plot(t,H_Feet_Error(2,:),'r')
+plot(t,H_Feet_Error(3,:),'k')
+title('Errors on desired linear momentum')
 xlabel('s')
-ylabel('m')
-end
+ylabel('H_L-H_L^d')
+
+subplot(2,1,2)
+plot(t,H_Feet_Error(4,:),'b')
+hold on
+grid on
+plot(t,H_Feet_Error(5,:),'r')
+plot(t,H_Feet_Error(6,:),'k')
+title('Errors on desired angular momentum')
+xlabel('s')
+ylabel('H_w-H_w^d')
 
 %% error on desired feet pos and orient
 tit3 = {'Error on desired left foot pos along x axis','Error on desired left foot pos along y axis','Error on desired left foot pos along z axis',...
@@ -82,9 +93,9 @@ if     params.numConstraints == 1
     
 for k=1:6
 
-figure(36)
+figure(5)
 subplot(3,2,k)
-plot(t,CoM_Feet_Error(k,:))
+plot(t,H_Feet_Error(k,:))
 grid on
 title(tit3(k))
 xlabel('s')
@@ -95,17 +106,17 @@ elseif params.numConstraints  == 2
 
 for k=1:6
 
-figure(36)
+figure(5)
 subplot(3,2,k)
-plot(t,CoM_Feet_Error(k,:))
+plot(t,H_Feet_Error(k,:))
 grid on
 title(tit3(k))
 xlabel('s')
 ylabel(tit4(k))
 
-figure(37)
+figure(6)
 subplot(3,2,k)
-plot(t,CoM_Feet_Error(k+6,:))
+plot(t,H_Feet_Error(k+6,:))
 grid on
 title(tit3(k+6))
 xlabel('s')

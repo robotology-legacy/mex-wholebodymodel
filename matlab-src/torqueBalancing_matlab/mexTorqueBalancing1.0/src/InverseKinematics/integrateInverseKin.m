@@ -20,7 +20,7 @@ ndof   = params.ndof;
 [dChiInit, visualizeIkinParam] = inverseKinematicsFunction(t(1), ChiInit, params);
 
 % initial condition for errors visualization
-ErrorsInit       = visualizeIkinParam.CoM_Feet_Error;
+ErrorsInit       = visualizeIkinParam.H_Feet_Error;
 CoMTrajInit      = visualizeIkinParam.CoMTrajectory;
 
 %% Setup integration
@@ -40,15 +40,15 @@ ddqj(:,1)   = dChiInit(14+ndof:end);
 
 if params.numConstraints == 2
 
-CoM_Feet_Error        = zeros(15,dimTime);
+H_Feet_Error        = zeros(18,dimTime);
 
 elseif params.numConstraints == 1
 
-CoM_Feet_Error        = zeros(9,dimTime);
+H_Feet_Error        = zeros(12,dimTime);
 end
    
 CoMTrajectory         = zeros(18,dimTime);
-CoM_Feet_Error(:,1)   = ErrorsInit;
+H_Feet_Error(:,1)     = ErrorsInit;
 CoMTrajectory(:,1)    = CoMTrajInit;
 
 %% Euler forward integrator
@@ -65,7 +65,7 @@ for kk = 2:dimTime
  ddqj(:,kk)     = dChi(14+ndof:end);
 
 % errors visualization
- CoM_Feet_Error(:,kk)  = visualizeIkinParam.CoM_Feet_Error;
+ H_Feet_Error(:,kk)    = visualizeIkinParam.H_Feet_Error;
  CoMTrajectory(:,kk)   = visualizeIkinParam.CoMTrajectory;
 end
 
@@ -76,7 +76,7 @@ ikinParam.ddqj       = ddqj;
 ikinParam.t          = t;
 
 %% Parameters for visualization
-ikinParam.CoM_Feet_Error  = CoM_Feet_Error;
+ikinParam.H_Feet_Error    = H_Feet_Error;
 ikinParam.CoMTrajectory   = CoMTrajectory;
 
 end

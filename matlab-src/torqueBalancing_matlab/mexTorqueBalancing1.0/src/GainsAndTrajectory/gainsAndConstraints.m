@@ -80,7 +80,7 @@ end
 
 %% Definition of the impedances and dampings vectors 
 gains.impedances    = [impTorso,impArms,impArms,impLeftLeg,impRightLeg];
-gains.dampings      = sqrt(gains.impedances);
+gains.dampings      = 2*sqrt(gains.impedances);
 
 if (size(gains.impedances,2) ~= ndof)
     
@@ -132,12 +132,5 @@ gains.dampings         = dampings   + 0.1.*eye(ndof);
 % this is the term added to the postural task to assure the dynamics to be
 % asymptotically stable
 gains.posturalCorr     = NullLambda_damp*Mbar;
-
-%% If for some reason you want to bypass the new postural definition, comment out
-%% the lines above and uncomment these lines; remember to modify also
-%% the linearization functions.
-% gains.impedances       = diag(gains.impedances);
-% gains.dampings         = diag(gains.dampings);
-% gains.posturalCorr     = eye(ndof);
 
 end

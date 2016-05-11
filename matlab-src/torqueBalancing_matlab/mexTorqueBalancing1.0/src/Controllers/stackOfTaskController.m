@@ -211,26 +211,7 @@ CbNu         = CNu(1:6);
 NullB2       = eye(ndof) - pinvB2*B2;
 
 u0           = -Mbar*ddqjRef+ impedances*posturalCorr*qjTilde +dampings*posturalCorr*dqjTilde;
-JCoM         = dynamics.JCoM;
-JCoMBase     = JCoM(1:3,1:6);
-JCoMJoint    = JCoM(1:3,7:end);
 
-Nu_baseFrom_dqj  =  -(eye(6)/JcBase)*JcJoint;
-Jh               = dynamics.Jh;
-JhApprox         = Jh(4:6,1:6)*Nu_baseFrom_dqj + Jh(4:6,7:end);
-JCoMApprox       = JCoMBase*Nu_baseFrom_dqj + JCoMJoint;
-
-if params.jointRef_with_ikin == 1
-
-
-HDotDes2         =  accDesired + velDesired + posDesired;
-else
-    
-velDesired2      = -VelGainsMom*[m.*JCoMApprox*dqjTilde; JhApprox*qjTilde];
-posDesired2      = -PosGainsMom*[m.*JCoMApprox*qjTilde; deltaPhi];
-HDotDes2         =  accDesired + velDesired2 + posDesired2;   
-end
-
-ddqjNonLin       = -Mbar_inv*(pinvB2*(B3*(HDotDes2-CbNu)+dJcNu) + NullB2*u0);
+ddqjNonLin   = -Mbar_inv*(pinvB2*(B3*(HDotDes-CbNu)+dJcNu) + NullB2*u0);
 
 end
