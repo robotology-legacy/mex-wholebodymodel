@@ -197,5 +197,33 @@ KD      =  Mbar_inv*(B*HDot_velDerivative + Nb*Kdamp);
 A_state = [zeros(ndof) eye(ndof);
              -KS          -KD];
 
-disp('eigenvalues of the state matrix')
-disp(eig(A_state))
+% disp('eigenvalues of the state matrix')
+% disp(eig(A_state))
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% kronecher
+Lambda     = Jj*Mbar_inv;
+pinvLambda = pinv(Lambda,toll);
+NullLambda = eye(ndof)-pinvLambda*Lambda;
+Ax         = Mbar_inv*pinvLambda*Jb/Mb;
+Bx         = Mb/Jb*Lambda*Mbar;
+An         = Mbar_inv*NullLambda;
+Bn         = NullLambda*Mbar;
+param.ndof = ndof;
+param.toll = 1e-8;
+param.damp = 1e-8;
+KSdesired  = eye(ndof);%diag(impedances);
+KDdesired  =  diag(impedances);
+
+[Kpx,Kpn] = kron_prod(Ax,Bx,An,Bn,KSdesired,param);
+[Kdx,Kdn] = kron_prod(Ax,Bx,An,Bn,KDdesired,param);
+
+KSnew  = Ax*Kpx*Bx + An*Kpn*Bn;
+KDnew  = Ax*Kdx*Bx + An*Kdn*Bn;
+
+A_stateNew = [zeros(ndof) eye(ndof);
+                -KSnew     -KDnew];
+
+disp(eig(A_stateNew))
+
+

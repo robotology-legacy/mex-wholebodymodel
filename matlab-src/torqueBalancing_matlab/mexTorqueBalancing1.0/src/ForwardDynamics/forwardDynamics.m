@@ -120,27 +120,6 @@ elseif params.feet_on_ground(1) == 1 && params.feet_on_ground(2) == 1
                         (PoseRFoot-PoseInitRfoot)];    
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% centroidal momentum jacobian
-JhBase          = zeros(6,6);
-JhJoint         = zeros(6,params.ndof);
-
-for ii = 1:6
-    
-NuBase              = zeros(6,1);
-NuBase(ii)          = 1;
-JhBase(:,ii)    = wbm_centroidalMomentum(RotBase, PosBase, qj, zeros(params.ndof,1), NuBase);
-end
-
-for ii = 1:params.ndof
-
-dqj_Jh              = zeros(params.ndof,1);
-dqj_Jh(ii)          = 1;
-JhJoint(:,ii)   = wbm_centroidalMomentum(RotBase, PosBase, qj, dqj_Jh, zeros(6,1));
-end
-
-dynamics.Jh       =  [JhBase JhJoint];     
-%%%%%%%%%%%%%%%%%
 %% Centroidal transformation (for joint space controller only)
 if params.JSController == 1
 % transformation matrix for centroidal
@@ -176,7 +155,7 @@ errorCoM                           = xCoM-trajectory.desired_x_dx_ddx_CoM(:,1);
 if params.jointRef_with_ikin == 1 || params.JSController == 1
 % ikin trajectory interpolation
 ikin                               = params.ikin;
-trajectory.JointReferences         = interpolateIkin(t,ikin,params);
+trajectory.JointReferences         = interpolateIkin(t,ikin);
 else
 trajectory.JointReferences.ddqjRef = zeros(ndof,1);
 trajectory.JointReferences.dqjRef  = zeros(ndof,1);

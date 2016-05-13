@@ -1,4 +1,4 @@
-%% OneFootLinearization
+%% TwoFeetLinearization
 % linearizes the joint space equations of motion of robot iCub when it's
 % controlled with "stack of task" control approach. This version is for
 % the robot balancing on one foot.
@@ -13,7 +13,7 @@
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
-function [Linearization, NewGains] = OneFootLinearization(params,gainsInit)    
+function [Linearization, NewGains] = TwoFeetLinearization(params,gainsInit)    
 %% Setup all the parameters
 toll           = params.pinv_tol;
 damp           = params.pinv_damp;
@@ -24,29 +24,30 @@ Jc             = params.JcInit;
 % mass matrix
 M              = params.MInit;
 % matrix A at CoM
-if     feet_on_ground(1) == 1 && feet_on_ground(2) == 0
-    
-x_sole   = params.PoseLFootQuatInit ;
+x_lsole         = params.PoseLFootQuatInit;
+x_rsole         = params.PoseRFootQuatInit;
+CoM             = params.CoMInit;
+xCoM            = CoM(1:3);
+pos_leftFoot    = x_lsole(1:3);
+pos_rightFoot   = x_rsole(1:3);
+Pr              = pos_rightFoot - xCoM;  
+Pl              = pos_leftFoot  - xCoM;
 
-elseif feet_on_ground(2) == 1 && feet_on_ground(1) == 0
-    
-x_sole   = params.PoseRFootQuatInit ;
-end
+AL = [ eye(3),  zeros(3);
+       skew(Pl),  eye(3)];
+AR = [ eye(3),  zeros(3);
+       skew(Pr),  eye(3) ];
+   
+A  = [AL, AR];
 
-CoM          = params.CoMInit;
-posFoot      = x_sole(1:3);
-xCoM         = CoM(1:3);
-r            = posFoot-xCoM;
-A            = [eye(3)   zeros(3);
-                 skew(r)  eye(3) ];
 m            = M(1,1);
-invA         = eye(6)/A;
+pinvA        = pinv(A,toll);
 Mb           = M(1:6,1:6);
 Mbj          = M(1:6,7:end);
 Mjb          = M(7:end,1:6);
 Mj           = M(7:end,7:end);
-Jb           = Jc(1:6,1:6);
-Jj           = Jc(1:6,7:end);
+Jb           = Jc(:,1:6);
+Jj           = Jc(:,7:end);
 Mbar         = Mj - Mjb/Mb*Mbj;
 
 % Mbar_inv   = Mbar'/(Mbar*Mbar' + damp*eye(size(Mbar,1)));
@@ -54,7 +55,7 @@ Mbar_inv     = eye(ndof)/Mbar;
 
 %% Terms that compose the linearized joint space dynamics
 Lambda             =  (Jj - Jb/Mb*Mbj)*Mbar_inv;
-MultFirstTask      =  Jb/Mb*transpose(Jb)*invA;
+MultFirstTask      =  Jb/Mb*transpose(Jb)*pinvA;
 pinvLambda         =  pinv(Lambda,toll);
 FirstTask          =  pinvLambda*MultFirstTask;
 NullLambda         =  eye(ndof) - pinvLambda*Lambda; 

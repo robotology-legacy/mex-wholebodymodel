@@ -40,7 +40,7 @@ params.visualize_gains_tuning_plot          = 1;                           %eith
 % inverse kinematics solver will be used, too. This is because it is necessary 
 % for the joints references to be always consistent with respect to the first
 % task trajectory, otherwise the linearization fails.
-params.visualize_stability_analysis_plot    = 0;                           %either 0 or 1; available only if linearize_for_gains_tuning        = 1 
+params.visualize_stability_analysis_plot    = 1;                           %either 0 or 1; available only if linearize_for_gains_tuning        = 1 
                                                                            %                              or linearize_for_stability_analysis  = 1                                    
 %% Integration time [s]
 params.tStart                               = 0;   

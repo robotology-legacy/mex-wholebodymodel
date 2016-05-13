@@ -62,6 +62,6 @@ delete(params.wait)
 %% Visualize the results of the inverse kinematics
 if params.visualize_ikin_results == 1
 
-visualizeInverseKin(params,ikinParam);
+visInverseKin(params,ikinParam);
 end
 

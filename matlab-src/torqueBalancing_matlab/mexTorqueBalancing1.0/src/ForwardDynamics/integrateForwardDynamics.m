@@ -73,7 +73,7 @@ params.numConstraints            = length(params.constraintLinkNames);
 %% Initial parameters definition
 % tolerances for pseudoinverse and Qp solver
 params.pinv_tol      = 1e-8;
-params.pinv_damp     = 5e-7;
+params.pinv_damp     = 5e-6;
 params.reg_HessianQP = 1e-3;
 
 % mass matrix, constraints Jacobian and CoM Jacobian
@@ -163,14 +163,14 @@ delete(params.wait)
 %% Visualize forward dynamics integration
 if params.visualize_robot_demo == 1
     
-visualize_demo(t,chi,params)
+visDemo(t,chi,params)
 end
 
 if params.visualize_integration_plot == 1 || params.visualize_gains_tuning_plot == 1 || params.visualize_stability_analysis_plot == 1
 
 params.wait     = waitbar(0,'Generating the plots...');
 
-visualizer_main(t,chi,params)
+visMain(t,chi,params)
 
 delete(params.wait)
 end

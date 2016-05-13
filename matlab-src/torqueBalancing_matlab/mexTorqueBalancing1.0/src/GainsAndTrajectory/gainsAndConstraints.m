@@ -51,9 +51,9 @@ end
 %% Parameters for 1 foot on the ground
 if  sum(params.feet_on_ground) == 1
  
-    gains.gainsPCoM                 = diag([40 45 40]);
+    gains.gainsPCoM                 = diag([70 70 65]);
     gains.gainsDCoM                 = 2*sqrt(gains.gainsPCoM);
-    gains.gainsPAngMom              = diag([5 5 5]);
+    gains.gainsPAngMom              = diag([30 10 10]);
     gains.gainsDAngMom              = 2*sqrt(gains.gainsPAngMom);
    
 % impedances acting in the null space of the desired contact forces 

@@ -1,8 +1,10 @@
-%% visualize_demo
+%% visDemo
+% visualize a demo of the robot's movements.
 %
-%  It generates a demo of the robot's movements.
+% Author : Gabriele Nava (gabriele.nava@iit.it)
+% Genova, May 2016
 %
-function [] = visualize_demo(t,chi,params)
+function [] = visDemo(t,chi,params)
 %% Demo generation
 BackGroundColor = [0 0 0];
 GridColor       = [1 1 1];

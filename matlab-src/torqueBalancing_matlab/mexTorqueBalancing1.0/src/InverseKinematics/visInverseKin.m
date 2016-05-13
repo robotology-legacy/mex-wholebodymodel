@@ -1,4 +1,4 @@
-%% visualizeInverseKin
+%% visInverseKin
 % visualizes the results of the inverse kinematic integration. In
 % particular, the first and second task are considered: it will be
 % evaluated if the joints references allow to reach the first and second
@@ -7,7 +7,7 @@
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
-function [] = visualizeInverseKin(params,ikinParam)
+function [] = visInverseKin(params,ikinParam)
 
 set(0,'DefaultFigureWindowStyle','Docked');
 t                 = ikinParam.t;

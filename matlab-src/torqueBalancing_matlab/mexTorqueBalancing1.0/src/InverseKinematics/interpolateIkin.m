@@ -1,12 +1,16 @@
 %% interpolateIkin
+% interpolates the trajectory obtained with inverse kinematic integrator
+% to fit the step of state integrator. 
+% 
+% Output:
 %
-%  Interpolates the trajectory obtained with inverse kinematic integrator
-%  to fit the step of state integrator. 
-%  The outputs are:
-%  jointReferences  which is a structure containing the desired joint
-%                   position, velocity and acceleration;
+% jointReferences   is a structure containing the desired joint
+%                   position, velocity and acceleration
 %
-function  jointReferences = interpolateIkin(t,ikin,params)
+% Author : Gabriele Nava (gabriele.nava@iit.it)
+% Genova, May 2016
+%
+function  jointReferences = interpolateIkin(t,ikin)
 
 %% Trajectory interpolation 
 time = ikin.t;
@@ -46,5 +50,4 @@ else
 
 end
   
-
 end

@@ -2,6 +2,9 @@
 %
 % simple fixed step integrator
 %
+% Author : Gabriele Nava (gabriele.nava@iit.it)
+% Genova, May 2016
+%
 function [t,chi] = euleroForward(func,chiInit,tmax,tmin,tstep)
 
 %Euler forward integrator of the robot state

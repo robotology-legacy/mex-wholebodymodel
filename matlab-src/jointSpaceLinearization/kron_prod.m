@@ -1,11 +1,11 @@
-%% kron_prod_decoupled
+%% kron_prod
 % this function implements a gains optimization for both the high level
 % task gains and the low level task gains.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
-function [Kx,Kn] = kron_prod_decoupled(Ax,Bx,An,Bn,Kdesired,param)
+function [Kx,Kn] = kron_prod(Ax,Bx,An,Bn,Kdesired,param)
 
 ndof  = param.ndof;
 %toll = param.toll;

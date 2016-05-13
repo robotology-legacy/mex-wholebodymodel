@@ -3,6 +3,9 @@
 %  The output is the vector of desired torques at joints 
 %  tau_js [ndofx1]
 %
+% Author : Gabriele Nava (gabriele.nava@iit.it)
+% Genova, May 2016
+%
 function  [tau,f0,ddqjNonLin] = JointSpaceController(params, dynamics, gains, JointReferences)
 
 %% Parameters definition

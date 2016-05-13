@@ -1,12 +1,13 @@
 %% generTraj
-%
-% Generates a desired trajectory for robot's global CoM. It can be applied
+% generates a desired trajectory for robot's global CoM. It can be applied
 % in every direction (X,Y,Z)
 % Output:
 % 
 % desired_x_dx_ddx_CoM [3x3]    it is a matrix wich contains the desired
 %                               CoM position, velocity and acceleration
 %
+% Author : Gabriele Nava (gabriele.nava@iit.it)
+% Genova, May 2016
 %
 function  desired_x_dx_ddx_CoM = generTraj(xCoM_0,t,trajectory)
 %% Trajectory generator

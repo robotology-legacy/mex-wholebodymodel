@@ -116,7 +116,6 @@ pinvLambda      = pinv(Lambda,pinv_tol);
 %% Newton-Euler equations of motion at CoM
 % closing the loop on angular momentum integral; desired centroidal
 % momentum dynamics
-%deltaPhi          = params.JhReduced(4:end,:)*(qj-params.qjInit);
 deltaPhi           = params.JhReduced(4:end,:)*qjTilde;
 accDesired         = [m.*x_dx_ddx_CoMDes(:,3); zeros(3,1)];
 velDesired         = -VelGainsMom*[m.*(dxCoM-x_dx_ddx_CoMDes(:,2)); H(4:end)];
@@ -131,7 +130,6 @@ NullLambda         = eye(ndof)-pinvLambda*Lambda;
 %% Separate the terms which contains the contact forces into the control torque equation
 Sigma              = -(pinvLambda*JcMinvJct + NullLambda*JBar);
 SigmaNA            =  Sigma*Nullfc;
-
 tauModel           = pinvLambda*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
                      + Mj*ddqjRef -impedances*posturalCorr*qjTilde -dampings*posturalCorr*dqjTilde);
         
@@ -209,7 +207,6 @@ B3           = JcBase/Mb*transpose(JcBase)*pinvA;
 pinvB2       = pinv(B2,pinv_tol);
 CbNu         = CNu(1:6);
 NullB2       = eye(ndof) - pinvB2*B2;
-
 u0           = -Mbar*ddqjRef+ impedances*posturalCorr*qjTilde +dampings*posturalCorr*dqjTilde;
 
 ddqjNonLin   = -Mbar_inv*(pinvB2*(B3*(HDotDes-CbNu)+dJcNu) + NullB2*u0);
