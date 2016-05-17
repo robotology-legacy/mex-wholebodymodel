@@ -25,34 +25,38 @@ params.BalancingController                  = 'StackOfTask';               %eith
 
 %% Linearized system analysis and gain tuning and QP solver. Both these tools
 %% are available only for the 'Stack of Task' controller
+params.use_QPsolver                         = 0;                           %either 0 or 1
 params.linearize_for_stability_analysis     = 1;                           %either 0 or 1
 params.linearize_for_gains_tuning           = 1;                           %either 0 or 1
-params.use_QPsolver                         = 0;                           %either 0 or 1
+
+% if params.linearize_for_gains_tuning = 1, choose between two different
+% optimization algorithms: either the nonlinear least squares, 'lsq' or the
+% vectorization using Kronecher product, 'kronecher'
+params.optimization_algorithm               = 'lsq'; 
 
 %% Visualization setup 
-params.visualize_robot_demo                 = 1;                           %either 0 or 1
-params.visualize_integration_plot           = 1;                           %either 0 or 1
-params.visualize_joints_position            = 0;                           %either 0 or 1; available only if visualize_integration_plot        = 1
-params.visualize_joints_error               = 0;                           %either 0 or 1; available only if visualize_integration_plot        = 1
-params.visualize_gains_tuning_plot          = 1;                           %either 0 or 1; available only if linearize_for_gains_tuning        = 1
+params.visualize_robot_simulator            = 1;                           %either 0 or 1
+params.visualize_integration_results        = 1;                           %either 0 or 1
+params.visualize_joints_dynamics            = 1;                           %either 0 or 1
+params.visualize_gains_tuning_results       = 1;                           %either 0 or 1; available only if linearize_for_gains_tuning        = 1
 
 % if the visualization of the stability analysis results is activated, the 
 % inverse kinematics solver will be used, too. This is because it is necessary 
 % for the joints references to be always consistent with respect to the first
 % task trajectory, otherwise the linearization fails.
-params.visualize_stability_analysis_plot    = 1;                           %either 0 or 1; available only if linearize_for_gains_tuning        = 1 
+params.visualize_stability_analysis_results  = 1;                          %either 0 or 1; available only if linearize_for_gains_tuning        = 1 
                                                                            %                              or linearize_for_stability_analysis  = 1                                    
 %% Integration time [s]
-params.tStart                               = 0;   
-params.tEnd                                 = 10;   
-params.sim_step                             = 0.01;
+params.tStart                                = 0;   
+params.tEnd                                  = 10;   
+params.sim_step                              = 0.01;
 
 %% Allow the joints references generation using inverse kinematics
 % it will be automatically activated if the "Joint Space" controller is used, 
 % or if the visualization of stability analysis results is active,too.
-params.jointRef_with_ikin                   = 1;                           %either 0 or 1
-params.visualize_ikin_results               = 1;                           %either 0 or 1  
-params.ikin_integration_step                = 0.01; 
+params.jointRef_with_ikin                    = 1;                           %either 0 or 1
+params.visualize_ikin_results                = 1;                           %either 0 or 1  
+params.ikin_integration_step                 = 0.01; 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 % If the robot is not moving, i.e. params.demo_movements = 0, the integration 

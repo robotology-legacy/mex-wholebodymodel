@@ -1,14 +1,12 @@
-%% JointspaceController
-%  computes the desired control torques at joints using a simple joint space controller.
-%  The output is the vector of desired torques at joints 
-%  tau_js [ndofx1]
+function  [tau,f0,ddqjNonLin] = JointSpaceController(params, dynamics, gains, JointReferences)
+%JOINTSPACECONTROLLER
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
-function  [tau,f0,ddqjNonLin] = JointSpaceController(params, dynamics, gains, JointReferences)
 
-%% Parameters definition
+% ------------Initialization----------------
+% general parameters
 %reg             = params.pinv_tol;
 damp             = params.pinv_damp; 
 ndof             = params.ndof;
@@ -62,7 +60,6 @@ elseif  sum(feet_on_ground) == 2
 %pinvTauMatrix_js  = pinv(TauMatrix_js,PINV_TOL);
 
  tau               = pinvTauMatrix_js*(CNu_js + g_js + Nu_js + Mj*ddqjRef -impedances*qjTilde -dampings*dqjTilde);
-
 end
 
 f0          = zeros(6*params.numConstraints,1);

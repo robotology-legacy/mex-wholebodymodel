@@ -209,14 +209,21 @@ Ax         = Mbar_inv*pinvLambda*Jb/Mb;
 Bx         = Mb/Jb*Lambda*Mbar;
 An         = Mbar_inv*NullLambda;
 Bn         = NullLambda*Mbar;
+
 param.ndof = ndof;
 param.toll = 1e-8;
 param.damp = 1e-8;
-KSdesired  = eye(ndof);%diag(impedances);
-KDdesired  =  diag(impedances);
+param.gainsPCoM = gainsPCoM;
+param.impedances = impedances;
+param.gainPhi  = gainPhi;
 
-[Kpx,Kpn] = kron_prod(Ax,Bx,An,Bn,KSdesired,param);
-[Kdx,Kdn] = kron_prod(Ax,Bx,An,Bn,KDdesired,param);
+KSdesired  = diag(impedances);
+KDdesired  = 2*sqrt(diag(impedances));
+% 
+% [Kpx,Kpn] = kron_prod(Ax,Bx,An,Bn,KSdesired,param);
+% [Kdx,Kdn] = kron_prod(Ax,Bx,An,Bn,KDdesired,param);
+[Kpx,Kpn] = leastSquareConstr(Ax,Bx,An,Bn,KSdesired,param);
+[Kdx,Kdn] = leastSquareConstr(Ax,Bx,An,Bn,KDdesired,param);
 
 KSnew  = Ax*Kpx*Bx + An*Kpn*Bn;
 KDnew  = Ax*Kdx*Bx + An*Kdn*Bn;

@@ -58,8 +58,8 @@ pos_leftFoot          = [x_lfoot; phi_lfoot.'];
 pos_rightFoot         = [x_rfoot; phi_rfoot.'];
 
 % initial feet position and orientation
-lfoot_ini             = param.lfoot_ini;
-rfoot_ini             = param.rfoot_ini;
+lfoot_ini             = param.PoseLFootQuatInit ;
+rfoot_ini             = param.PoseRFootQuatInit ;
 
 [xInit_rfoot,RbInit_rfoot]    = frame2posrot(rfoot_ini);
 [xInit_lfoot,RbInit_lfoot]    = frame2posrot(lfoot_ini);

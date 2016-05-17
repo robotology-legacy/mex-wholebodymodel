@@ -1,26 +1,11 @@
-%% stackOfTaskController
-% computes the joints torques that generate a desired set of contact forces
-% and moments.
-% This is done by means of the "Stack of Task" control approach. 
-% If QP_SOLVER is selected, a quadratic programming is used to calculate the 
-% null space of desired contact forces which minimize the norm of joint torques.     
-% The output are:
-%
-% tau   [nDof x 1]        which is the vector of control torques at joints;
-%
-% errorCoM [3 x 1]        which is the CoM position error with respect of the
-%                         desired CoM trajectory;
-%
-% f0 [6*contraints x 1]   which is the vector in the null space of contact
-%                         forces and moments
-%
-% ddqjNonLin [nDof x 1]   is the theoretical nonlinear joints acceleration, for
-%                         the comparison of nonLinear joints dynamics with the linear one
+function [tau,f0,ddqjNonLin] = stackOfTaskController(params, constraints, gains, trajectory, dynamics)
+%STACKOFTASKCONTROLLER 
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
-function [tau,f0,ddqjNonLin] = stackOfTaskController(params, constraints, gains, trajectory, dynamics)
+
+% ------------Initialization----------------
 % general parameters
 pinv_tol            = params.pinv_tol;
 regHessianQP        = params.reg_HessianQP;
@@ -116,7 +101,7 @@ pinvLambda      = pinv(Lambda,pinv_tol);
 %% Newton-Euler equations of motion at CoM
 % closing the loop on angular momentum integral; desired centroidal
 % momentum dynamics
-deltaPhi           = params.JhReduced(4:end,:)*qjTilde;
+deltaPhi           = params.JhReduced(4:end,:)*(qj-params.qjInit);
 accDesired         = [m.*x_dx_ddx_CoMDes(:,3); zeros(3,1)];
 velDesired         = -VelGainsMom*[m.*(dxCoM-x_dx_ddx_CoMDes(:,2)); H(4:end)];
 posDesired         = -PosGainsMom*[m.*(xCoM-x_dx_ddx_CoMDes(:,1)); deltaPhi];
@@ -130,7 +115,7 @@ NullLambda         = eye(ndof)-pinvLambda*Lambda;
 %% Separate the terms which contains the contact forces into the control torque equation
 Sigma              = -(pinvLambda*JcMinvJct + NullLambda*JBar);
 SigmaNA            =  Sigma*Nullfc;
-tauModel           = pinvLambda*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
+tauModel           =   pinvLambda*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
                      + Mj*ddqjRef -impedances*posturalCorr*qjTilde -dampings*posturalCorr*dqjTilde);
         
 %% Quadratic Programming solver
@@ -199,16 +184,16 @@ fcDes        = fc_HDot + Nullfc*f0;
 tau          = tauModel + Sigma*fcDes;
 
 %% Desired nonLinear joints accelerations for the linearized system analysis
-Mbar         = Mj - Mjb/Mb*Mbj;
-Mbar_inv     = eye(ndof)/Mbar;
-%Mbar_inv    = Mbar'/(Mbar*Mbar' + pinv_damp*eye(size(Mbar,1)));
-B2           = (JcJoint - JcBase/Mb*Mbj)*Mbar_inv;
-B3           = JcBase/Mb*transpose(JcBase)*pinvA;
-pinvB2       = pinv(B2,pinv_tol);
-CbNu         = CNu(1:6);
-NullB2       = eye(ndof) - pinvB2*B2;
-u0           = -Mbar*ddqjRef+ impedances*posturalCorr*qjTilde +dampings*posturalCorr*dqjTilde;
+Mbar           = Mj - Mjb/Mb*Mbj;
+MbarInv        = eye(ndof)/Mbar;
+%Mbar_inv      = Mbar'/(Mbar*Mbar' + pinv_damp*eye(size(Mbar,1)));
+LambdaLin      = (JcJoint - JcBase/Mb*Mbj)*MbarInv;
+MultFirstTask  = JcBase/Mb*transpose(JcBase)*pinvA;
+pinvLambdaLin  = pinv(LambdaLin,pinv_tol);
+CbNu           = CNu(1:6);
+NullLambda     = eye(ndof) - pinvLambdaLin*LambdaLin;
+Postural       = -Mbar*ddqjRef+ impedances*posturalCorr*qjTilde +dampings*posturalCorr*dqjTilde;
 
-ddqjNonLin   = -Mbar_inv*(pinvB2*(B3*(HDotDes-CbNu)+dJcNu) + NullB2*u0);
+ddqjNonLin     = -MbarInv*(pinvLambdaLin*(MultFirstTask*(HDotDes-CbNu)+dJcNu) + NullLambda*Postural);
 
 end

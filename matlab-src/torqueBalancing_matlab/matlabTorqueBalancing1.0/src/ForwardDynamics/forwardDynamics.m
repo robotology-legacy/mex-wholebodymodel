@@ -1,26 +1,31 @@
-%% forwardDynamics
-% this is the function that will be integrated in the forward dynamics integrator.
-% It calculates the forward dynamics of the model loaded in the wholeBodyInterface
-% from the URDF description. The dynamic model is described as an explicit ordinary 
-% differential equation of the form:
+function [dchi,visualParam] = forwardDynamics(t,chi,params)
+%FORWARDDYNAMICS this is the function that will be integrated in the forward 
+%                dynamics integrator. It calculates the forward dynamics of 
+%                the model loaded in the wholeBodyInterface from the URDF 
+%                description. The dynamic model is described as an explicit
+%                ordinary differential equation of the form:
 %
-%              dchi = forwardDynamics(t,chi)
+%                dchi = forwardDynamics(t,chi)
 %
-% where chi is the variable to be integrated. For a floating base
-% articulated chain, the variable chi contains the following
-% subvariables:
+%                where chi is the variable to be integrated. For a floating 
+%                base articulated chain, the variable chi contains the following
+%                subvariables:
 %
-% PosBase:         the cartesian position of the base (R^3)
-% quatBase:        the quaternion describing the orientation of the base (global parametrization of SO(3))
-% qj:              the joint positions (R^ndof)
-% VelBase:         the cartesian velocity of the base (R^3)
-% omegaBaseWorld:  the velocity describing the orientation of the base (SO(3))
-% dqj:             the joint velocities (R^ndof)
+% PosBase        the cartesian position of the base (R^3)
+% quatBase       the quaternion describing the orientation of the base (global parametrization of SO(3))
+% qj             the joint positions (R^ndof)
+% VelBase        the cartesian velocity of the base (R^3)
+% omegaBaseWorld the velocity describing the orientation of the base (SO(3))
+% dqj            the joint velocities (R^ndof)
+%
+%                the input structure params is a structure containing all
+%                the utility parameters, while the output  visualParam is a
+%                structure contianing the parameters for visualization.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
-%
-function [dchi,visualParam] = forwardDynamics(t,chi,params)
+
+% ------------Initialization----------------
 % general parameters; sets the base orientation in stateDemux.m 
 % as positions + quaternions (1) or transformation matrix (0)
 waitbar(t/params.tEnd,params.wait)
@@ -53,8 +58,7 @@ dJcNu                            = zeros(6*params.numConstraints,1);
 for i=1:params.numConstraints
     
     Jc(6*(i-1)+1:6*i,:)          = wbm_jacobian(RotBase,PosBase,qj,params.constraintLinkNames{i});
-    dJcNu(6*(i-1)+1:6*i,:)       = wbm_djdq(RotBase,PosBase,qj,dqj,[VelBase;omegaBaseWorld],params.constraintLinkNames{i});
-    
+    dJcNu(6*(i-1)+1:6*i,:)       = wbm_djdq(RotBase,PosBase,qj,dqj,[VelBase;omegaBaseWorld],params.constraintLinkNames{i});    
 end
 
 % forward kinematics: feet pose, CoM position and velocity
@@ -82,8 +86,8 @@ end
 
 %% Feet corrections to avoid numerical integration errors
 % feet correction gains
-K_corr_pos                       = 2.5;
-K_corr_vel                       = 2*sqrt(K_corr_pos);
+KCorrPos                         = 2.5;
+KCorrVel                         = 2*sqrt(KCorrPos);
 
 % feet current position and orientation (rotation matrix)
 [posLfoot,RotBaseLfoot]          = frame2posrot(PoseLFootQuat);
@@ -122,18 +126,15 @@ end
 
 %% Centroidal transformation (for joint space controller only)
 if params.JSController == 1
-% transformation matrix for centroidal
+% transformation matrix for centroidal; conversion to the centroidal frame of reference
 [T,dT]                     = centroidalTransformationT_TDot(xCoM,PosBase,dxCoM,VelBase,M);
-% conversion to the centroidal frame of reference
 [M, CNu, g, Jc, dJcNu, Nu] = fromFloatingToCentroidalDynamics(M, h, g, Jc, dJcNu, Nu, T, dT);
 end
 
-%% Gains, constraints and trajectory variables
+%% CONTROLLERS SETUP
 gains                              = params.gains;
 constraints                        = params.constraints;
 trajectory                         = params.trajectory;
-
-% parameters for the balancing controller
 dynamics.LFootPose                 = PoseLFootQuat;
 dynamics.RFootPose                 = PoseRFootQuat;
 dynamics.M                         = M;
@@ -150,19 +151,18 @@ dynamics.Jc                        = Jc;
 
 % CoM trajectory generator
 trajectory.desired_x_dx_ddx_CoM    = generTraj(params.CoMInit(1:3),t,trajectory);
-errorCoM                           = xCoM-trajectory.desired_x_dx_ddx_CoM(:,1);
 
-if params.jointRef_with_ikin == 1 || params.JSController == 1
+if params.jointRef_with_ikin == 1
 % ikin trajectory interpolation
 ikin                               = params.ikin;
-trajectory.JointReferences         = interpolateIkin(t,ikin);
+trajectory.JointReferences         = interpInverseKin(t,ikin);
 else
 trajectory.JointReferences.ddqjRef = zeros(ndof,1);
 trajectory.JointReferences.dqjRef  = zeros(ndof,1);
 trajectory.JointReferences.qjRef   = params.qjInit;
 end
 
-%% Balancing controller
+%% Balancing controllers
 if params.SoTController    == 1
 
 [tau,f0,ddqjNonLin] = stackOfTaskController(params, constraints, gains, trajectory, dynamics);    
@@ -177,13 +177,12 @@ S               = [ zeros(6,ndof);
                     eye(ndof,ndof)];                
 JcMinv          = Jc/M;
 JcMinvS         = JcMinv*S;
-fc              = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*tau -dJcNu -K_corr_vel.*Jc*Nu -K_corr_pos.*DeltaPoseFeet);
+fc              = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*tau -dJcNu -KCorrVel.*Jc*Nu -KCorrPos.*DeltaPoseFeet);
 
 %% State derivative computation
 % Need to calculate the quaternions derivative
 omegaWorldBase = transpose(RotBase)*omegaBaseWorld;                               
 dquatBase      = quaternionDerivative(omegaWorldBase,quatBase);       
-
 NuQuat         = [VelBase;dquatBase;dqj];
 dNu            = M\(Jc'*fc + [zeros(6,1); tau]-h);
 
@@ -196,13 +195,12 @@ dchi           = [NuQuat;dNu];
  visualParam.ddqjNonLin = ddqjNonLin;
  visualParam.dqj        = dqj;
  visualParam.JointRef   = trajectory.JointReferences;
- visualParam.Href       = [M(1,1)*trajectory.desired_x_dx_ddx_CoM(:,2);zeros(3,1)];
+ visualParam.HRef       = [M(1,1)*trajectory.desired_x_dx_ddx_CoM(:,2);zeros(3,1)];
  visualParam.H          = H;
- visualParam.pos_feet   = [PoseLFootQuat;PoseRFootQuat];
+ visualParam.poseFeet   = [PoseLFootQuat;PoseRFootQuat];
  visualParam.fc         = fc;
  visualParam.tau        = tau;
  visualParam.qj         = qj;
- visualParam.error_com  = errorCoM;
  visualParam.f0         = f0;
  visualParam.xCoM       = xCoM;
 

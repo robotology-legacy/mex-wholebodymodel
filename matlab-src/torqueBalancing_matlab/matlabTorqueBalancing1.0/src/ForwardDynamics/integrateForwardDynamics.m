@@ -1,18 +1,25 @@
-%% integrateForwardDynamics
-% Defines the  initial conditions for integrating the forward dynamics of the robot 
-% iCub in matlab.
-% The robot state can be integrated both using a variable step integrator,
-% Ode15s, or a fixed step integrator, Euler forward. 
-% The initial state is also used to compute the linearized joints accelerations
-% for gains tuning and stability analysis purpose.
-% The joints references can optionally be calculated using an inverse
-% kinematics algorithm.
+function [] = integrateForwardDynamics(params)
+%INTEGRATEFORWARDDYNAMICS setup the integration of the forward dynamics of
+%                         the robot iCub in MATLAB.
+%   [] = INTEGRATEFORWARDDYNAMICS(params) takes as input the structure
+%   params containing all the utility parameres. It has no output. The 
+%   forward dynamics integration will be performed following the options the 
+%   user specified in the initialization file.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
-function [] = integrateForwardDynamics(params)
-%% Initial parameters setup
+
+% ------------Initialization----------------
+% initial parameters setup
+% call the script which contains all the options for the visualization
+plot_set
+params.ContFig            = 1;
+% tolerances for pseudoinverse and Qp solver
+params.pinv_tol           = 1e-8;
+params.pinv_damp          = 5e-6;
+params.reg_HessianQP      = 1e-3;
+% options correction
 params.SoTController      = strcmp(params.BalancingController,'StackOfTask');
 params.JSController       = strcmp(params.BalancingController,'JointSpace');
 
@@ -24,11 +31,18 @@ params.use_QPsolver                         = 0;
 params.jointRef_with_ikin                   = 1;
 end
 
-if params.visualize_stability_analysis_plot  == 1 
+params.linearization = 0;
+
+if params.linearize_for_gains_tuning == 1 || params.linearize_for_stability_analysis == 1
+    
+    params.linearization = 1;    
+end
+
+if  params.linearization == 1 && params.visualize_stability_analysis_results  == 1
     
 params.jointRef_with_ikin                   = 1;
 end
-    
+
 %% Initial joints position and velocities; initial base velocity
 params.qjInit             = [params.torsoInit;params.leftArmInit;params.rightArmInit;params.leftLegInit;params.rightLegInit]*(pi/180);
 params.dqjInit            = zeros(params.ndof,1);
@@ -71,11 +85,6 @@ end
 params.numConstraints            = length(params.constraintLinkNames);
    
 %% Initial parameters definition
-% tolerances for pseudoinverse and Qp solver
-params.pinv_tol      = 1e-8;
-params.pinv_damp     = 5e-6;
-params.reg_HessianQP = 1e-3;
-
 % mass matrix, constraints Jacobian and CoM Jacobian
 params.MInit         = wbm_massMatrix(params.RotBaseInit,params.PosBaseInit,params.qjInit);
 params.JCoMInit      = wbm_jacobian(params.RotBaseInit,params.PosBaseInit,params.qjInit,'com');
@@ -87,28 +96,28 @@ params.JcInit(6*(i-1)+1:6*i,:) = wbm_jacobian(params.RotBaseInit,params.PosBaseI
 end
 
 % centroidal momentum jacobian
-JhBaseInit          = zeros(6,6);
-JhJointInit         = zeros(6,params.ndof);
+JhBaseInit            = zeros(6,6);
+JhJointInit           = zeros(6,params.ndof);
 
 for ii = 1:6
     
-NuBase              = zeros(6,1);
-NuBase(ii)          = 1;
-JhBaseInit(:,ii)    = wbm_centroidalMomentum(params.RotBaseInit, params.PosBaseInit, params.qjInit, zeros(params.ndof,1), NuBase);
+NuBaseJh              = zeros(6,1);
+NuBaseJh(ii)          = 1;
+JhBaseInit(:,ii)      = wbm_centroidalMomentum(params.RotBaseInit, params.PosBaseInit, params.qjInit, zeros(params.ndof,1), NuBaseJh);
 end
 
 for ii = 1:params.ndof
 
-dqj_Jh              = zeros(params.ndof,1);
-dqj_Jh(ii)          = 1;
-JhJointInit(:,ii)   = wbm_centroidalMomentum(params.RotBaseInit, params.PosBaseInit, params.qjInit, dqj_Jh, zeros(6,1));
+dqjJh                = zeros(params.ndof,1);
+dqjJh(ii)            = 1;
+JhJointInit(:,ii)    = wbm_centroidalMomentum(params.RotBaseInit, params.PosBaseInit, params.qjInit, dqjJh, zeros(6,1));
 end
 
-params.JhInit       =  [JhBaseInit JhJointInit];     
+params.JhInit        =  [JhBaseInit JhJointInit];     
 
 % the centroidal momentum jacobian is reduced to eliminate the base velocity. This
 % is then used to compute che approximation of the angular momentum integral
-params.JhReduced    =  JhJointInit -JhBaseInit*(eye(6)/params.JcInit(1:6,1:6))*params.JcInit(1:6,7:end);
+params.JhReduced     =  JhJointInit -JhBaseInit*(eye(6)/params.JcInit(1:6,1:6))*params.JcInit(1:6,7:end);
 
 % Forward kinematics and joints limits
 params.CoMInit                = wbm_forwardKinematics('com');
@@ -120,12 +129,12 @@ params.limits                 = [jl1 jl2];
 %% Initial gains (no tuning), constraints for QP and CoM trajectory definition
 [gainsInit, params.constraints, params.trajectory] = gainsAndConstraints(params);
 
-%% Joints references definition
+%% Joints references definition using inverse kinematics
 if params.jointRef_with_ikin == 1
     
-[params.ikin,params.chiInit] = initInverseKin(params);
+[params.ikin,params.chiInit,params.ContFig] = initInverseKin(params);
 else
-params.chiInit               = [params.BasePoseInit; params.qjInit; params.VelBaseInit; params.omegaWorldBaseInit; params.dqjInit];    
+params.chiInit  =  [params.BasePoseInit; params.qjInit; params.VelBaseInit; params.omegaWorldBaseInit; params.dqjInit];    
 end
 
 %% State linearization around the initial joint position
@@ -146,32 +155,31 @@ else
  params.gains.PosGainsMom   = [gainsInit.gainsPCoM zeros(3); zeros(3) gainsInit.gainsPAngMom];
 end
 
-%% Integrate the forward dynamics
-plot_set
-params.wait     = waitbar(0,'State integration in progress...');
-forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,params);
+%% Integrate the forward dynamics of the robot
+params.wait      = waitbar(0,'State integration in progress...');
+forwardDynFunc   = @(t,chi)forwardDynamics(t,chi,params);
 
 if params.integrateWithFixedStep == 1
    
-[t,chi]         = euleroForward(forwardDynFunc,params.chiInit,params.tEnd,params.tStart,params.sim_step);   
+[t,chi]         = integrateForwardDynEulero(forwardDynFunc,params.chiInit,params.tEnd,params.tStart,params.sim_step);   
 else    
 [t,chi]         = ode15s(forwardDynFunc,params.tStart:params.sim_step:params.tEnd,params.chiInit,params.options);
 end
 
 delete(params.wait)       
  
-%% Visualize forward dynamics integration
-if params.visualize_robot_demo == 1
+%% Visualize forward dynamics integration results
+
+if params.visualize_robot_simulator == 1
     
-visDemo(t,chi,params)
+params.ContFig = visDemo(t,chi,params);
 end
 
-if params.visualize_integration_plot == 1 || params.visualize_gains_tuning_plot == 1 || params.visualize_stability_analysis_plot == 1
+if params.visualize_integration_results == 1  || params.visualize_joints_dynamics == 1 &&  params.linearization == 1 ||...
+   params.visualize_gains_tuning_results == 1 || params.visualize_stability_analysis_results == 1
 
-params.wait     = waitbar(0,'Generating the plots...');
-
-visMain(t,chi,params)
-
+params.wait = waitbar(0,'Generating the plots...');
+visMain(t,chi,params);
 delete(params.wait)
 end
 
