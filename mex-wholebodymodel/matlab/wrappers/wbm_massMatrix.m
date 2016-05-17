@@ -15,9 +15,9 @@ function [ M ] = wbm_massMatrix( varargin )
 
     switch(nargin)
         case 0 
-            M = wholeBodyModel('mass-matrix');
+            M = mexWholeBodyModel('mass-matrix');
         case 3
-            M = wholeBodyModel('mass-matrix',reshape(varargin{1},[],1), varargin{2}, varargin{3});
+            M = mexWholeBodyModel('mass-matrix',reshape(varargin{1},[],1), varargin{2}, varargin{3});
         otherwise
             disp('massMatrix : Incorrect number of arguments, check docs');
     end

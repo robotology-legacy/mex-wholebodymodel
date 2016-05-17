@@ -16,9 +16,9 @@ function [ Cqv ] = wbm_generalisedBiasForces( varargin )
 
     switch(nargin)
         case 0 
-            Cqv = wholeBodyModel('generalised-forces');
+            Cqv = mexWholeBodyModel('generalised-forces');
         case 5
-            Cqv = wholeBodyModel('generalised-forces',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4},varargin{5});
+            Cqv = mexWholeBodyModel('generalised-forces',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4},varargin{5});
         otherwise
             disp('generalisedBiasForces : Incorrect number of arguments, check docs');
     end       
