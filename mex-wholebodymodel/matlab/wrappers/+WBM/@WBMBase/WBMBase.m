@@ -133,8 +133,7 @@ classdef WBMBase < handle
             if (nargin ~= 4)
                 error('WBMBase::setState: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            %if ( (length(q_j) ~= length(dq_j)) || ...
-            %     (length(v_b) ~= 6) )
+            %if ( (size(q_j,1) ~= size(dq_j,1)) || (size(v_b,1) ~= 6) )
             %    error('WBMBase::setState: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
             %end
 
@@ -345,7 +344,7 @@ classdef WBMBase < handle
             obj.mwbm_params = WBM.wbmBaseModelParams;
             obj.mwbm_params.urdfLinkName = model_params.urdfLinkName;
 
-            % Initialize the mex-mexWholeBodyModel for a floating base robot,
+            % Initialize the mex-WholeBodyModel for a floating base robot,
             % using Unified Robot Description Format (URDF):
             if isempty(model_params.urdfRobot)
                 % Optimized mode:
