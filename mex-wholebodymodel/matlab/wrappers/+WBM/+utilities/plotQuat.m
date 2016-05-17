@@ -28,14 +28,14 @@ function plotQuat(vqT, twait)
 
     %% Orientations:
     % convert the quaternions into axis-angle rotations:
-    angle = acos(vqT(1:nRows,4))*2; % compute the axis-angle ...
-    % compute the rotation axis ...
+    ang_t = acos(vqT(1:nRows,4))*2; % compute the axis-angle theta ...
+    % compute the rotation axis elements ...
     rax_x = vqT(1:nRows,5)./sqrt(1 - vqT(1:nRows,4).*vqT(1:nRows,4));
     rax_y = vqT(1:nRows,6)./sqrt(1 - vqT(1:nRows,4).*vqT(1:nRows,4));
     rax_z = vqT(1:nRows,7)./sqrt(1 - vqT(1:nRows,4).*vqT(1:nRows,4));
     % convert the axis-angle rotation of the 1st quaternion element
     % into a rotation matrix representation:
-    R = vrrotvec2mat( horzcat(rax_x(1,1), rax_y(1,1), rax_z(1,1), angle(1,1)) );
+    R = WBM.utilities.axang2rotm( vertcat(rax_x(1,1), rax_y(1,1), rax_z(1,1), ang_t(1,1)) );
 
     %% Plot the orientation axes (xyz-axes) of all quaternions:
 
@@ -85,7 +85,7 @@ function plotQuat(vqT, twait)
             % set the 3D-position of the new quaternion ...
             set(hPos3D, 'XData', pos_x(i,1), 'YData', pos_y(i,1), 'ZData', pos_z(i,1));
             % calculate the rotation matrix (orientation) from the axis-angle representation of the new quaternion ...
-            R = vrrotvec2mat( horzcat(rax_x(i,1), rax_y(i,1), rax_z(i,1), angle(i,1)) );
+            R = WBM.utilities.axang2rotm( vertcat(rax_x(i,1), rax_y(i,1), rax_z(i,1), ang_t(i,1)) );
 
             % remove the old orientation axes from the previous quaternion ...
             clearpoints(hLin_orX);
@@ -122,7 +122,7 @@ function plotQuat(vqT, twait)
 
             set(hPos3D, 'XData', pos_x(i,1), 'YData', pos_y(i,1), 'ZData', pos_z(i,1));
 
-            R = vrrotvec2mat( horzcat(rax_x(i,1), rax_y(i,1), rax_z(i,1), angle(i,1)) );
+            R = WBM.utilities.axang2rotm( vertcat(rax_x(i,1), rax_y(i,1), rax_z(i,1), ang_t(i,1)) );
 
             set(hLin_orX, 'XData', horzcat(pos_x(i,1), pos_x(i,1)+R(1,1)), 'YData', horzcat(pos_y(i,1), pos_y(i,1)+R(2,1)), ...
                           'ZData', horzcat(pos_z(i,1), pos_z(i,1)+R(3,1)), 'EraseMode', 'normal', ...

@@ -5,8 +5,8 @@ function dquat = dQuat(quat, omega)
     K = 1;
 
     % Create the conjugate product matrix "Omega" of the angular velocity omega:
-    % Note: Further details about the product matrix (operator) Omega
-    % can be taken from
+    % Further details about the product matrix (operator) Omega can be taken from:
+    %
     %       [1] CONTRIBUTIONS TO THE AUTOMATIC CONTROL OF AERIAL VEHICLES, Minh Duc HUA, PhD-Thesis, 2009, p. 101,
     %               <https://www-sop.inria.fr/act_recherche/formulaire/uploads/phd-425.pdf>
     %       [2] The Vectorial Parameterization of Rotation, Olivier A. Bauchau & Lorenzo Trainelli, Nonlinear Dynamics, 2003,
@@ -15,7 +15,7 @@ function dquat = dQuat(quat, omega)
     %               <http://www.iri.upc.edu/people/jsola/JoanSola/objectes/notes/kinematics.pdf>
     Omega_op = zeros(4,4);
     Omega_op(1,2:4)   = -omega';
-    Omega_op(2:4,1)   = omega;
+    Omega_op(2:4,1)   =  omega;
     Omega_op(2:4,2:4) = -skew(omega); % (skew-symmetric) cross product matrix
 
     % This calculation of the quaternion derivative has additionally a

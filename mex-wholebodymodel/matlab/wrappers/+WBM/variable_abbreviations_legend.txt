@@ -72,7 +72,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     stv       ...  state vector
     stvqT     ...  state vector-quaternion transformation [VQS-Transformation of the current state vector] (vector) (*)
     sz        ...  size(s)
-    tr        ...  translation(s)
+    tr        ...  translation(s) OR trace
     trans     ...  translation(s)
     trqs      ...  torques
     v         ...  vector

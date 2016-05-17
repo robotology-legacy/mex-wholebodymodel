@@ -9,10 +9,10 @@ function B = eul2angVelTF(eul, sequence)
     end
     B = zeros(3,3);
 
-    s_2 = sin(eul(2)); % sin(theta_y)
-    c_2 = cos(eul(2)); % cos(theta_y)
-    s_3 = sin(eul(3)); % sin(theta_x) or sin(theta_z2)
-    c_3 = cos(eul(3)); % cos(theta_x) or cos(theta_z2)
+    s_2 = sin(eul(2,1)); % sin(theta_y)
+    c_2 = cos(eul(2,1)); % cos(theta_y)
+    s_3 = sin(eul(3,1)); % sin(theta_x) or sin(theta_z2)
+    c_3 = cos(eul(3,1)); % cos(theta_x) or cos(theta_z2)
 
     %% Body angle velocity transformations:
     %  They relating the time derivative of the Euler angle vector Theta to
@@ -32,30 +32,22 @@ function B = eul2angVelTF(eul, sequence)
             %                |-s_2        0     1|
             % B(Theta_321) = | c_2*s_3    c_3   0|
             %                | c_2*c_3   -s_3   0|
-
             B(1,1) = -s_2;
-            %B(1,2) = 0;
-            B(1,3) = 1;
-            B(2,1) = c_2*s_3;
-            B(2,2) = c_3;
-            %B(2,3) = 0;
-            B(3,1) = c_2*c_3;
+            B(1,3) =  1;
+            B(2,1) =  c_2*s_3;
+            B(2,2) =  c_3;
+            B(3,1) =  c_2*c_3;
             B(3,2) = -s_3;
-            %B(3,3) = 0;
         case 'ZYZ'
             %                |-s_2*c_3   s_3   0|
             % B(Theta_323) = | s_2*s_3   c_3   0|
             %                | c_2       0     1|
-
             B(1,1) = -s_2*c_3;
-            B(1,2) = s_3;
-            %B(1,3) = 0;
-            B(2,1) = s_2*s_3;
-            B(2,2) = c_3;
-            %B(2,3) = 0;
-            B(3,1) = c_2;
-            %B(3,2) = 0;
-            B(3,3) = 1;
+            B(1,2) =  s_3;
+            B(2,1) =  s_2*s_3;
+            B(2,2) =  c_3;
+            B(3,1) =  c_2;
+            B(3,3) =  1;
         otherwise
             error('eul2angVelTF: %s', WBM.wbmErrorMsg.UNKNOWN_AXIS_SEQ);
     end

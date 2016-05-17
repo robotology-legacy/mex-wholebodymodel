@@ -282,7 +282,7 @@ classdef WBMBase < handle
         end
 
         function set.wf_R_rootLnk(obj, wf_R_rlnk)
-            if ~isequal(size(wf_R_rlnk), [3,3])
+            if ( (size(wf_R_rlnk,1) ~= 3) || (size(wf_R_rlnk,2) ~= 3) )
                 error('WBMBase::set.wf_R_rootLnk: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
             obj.mwbm_params.wf_R_rootLnk = wf_R_rlnk;

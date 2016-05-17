@@ -1,9 +1,11 @@
 function R_y = roty(ang)
-    R_y = zeros(3,3);
+    R_y = eye(3,3);
 
-    R_y(2,2) =  1;
-    R_y(1,1) =  cos(ang);
-    R_y(1,3) =  sin(ang);
-    R_y(3,1) = -sin(ang);
-    R_y(3,3) =  cos(ang);
+    sa = sin(ang);
+    ca = cos(ang);
+
+    R_y(1,1) =  ca;
+    R_y(1,3) =  sa;
+    R_y(3,1) = -sa;
+    R_y(3,3) =  ca;
 end

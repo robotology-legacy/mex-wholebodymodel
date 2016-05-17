@@ -8,7 +8,7 @@ classdef wbmErrorMsg
         FILE_NOT_EXIST    = 'File not exist on given path!';
         IDX_OUT_OF_BOUNDS = 'Index value out of bounds!';
         MAX_NUM_LIMIT     = 'Value exceeds the maximum number!'
-        STRING_MISMATCH   = 'Mismatching string!';
+        STRING_MISMATCH   = 'String mismatch!';
         UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';
         UNKNOWN_EXC       = 'Unknown exception!';
         UNKNOWN_LNK_NAME  = 'Unknown link name!';

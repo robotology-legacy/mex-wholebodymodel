@@ -9,10 +9,10 @@ function B_inv = eul2angRateTF(eul, sequence)
     end
     B_inv = zeros(3,3);
 
-    s_2 = sin(eul(2)); % sin(theta_y)
-    c_2 = cos(eul(2)); % cos(theta_y)
-    s_3 = sin(eul(3)); % sin(theta_x) or sin(theta_z2)
-    c_3 = cos(eul(3)); % cos(theta_x) or cos(theta_z2)
+    s_2 = sin(eul(2,1)); % sin(theta_y)
+    c_2 = cos(eul(2,1)); % cos(theta_y)
+    s_3 = sin(eul(3,1)); % sin(theta_x) or sin(theta_z2)
+    c_3 = cos(eul(3,1)); % cos(theta_x) or cos(theta_z2)
 
     %% Euler angle rate transformation matrices:
     %  They relating the angular velocity vector w of the body to the
@@ -32,11 +32,8 @@ function B_inv = eul2angRateTF(eul, sequence)
             %                             |0     s_3           c_3|
             % B(Theta_321)^(-1) = 1/c_2 * |0     c_2*c_3  -c_2*s_3|
             %                             |c_2   s_2*s_3   s_2*c_3|
-
-            %B_inv(1,1) = 0;
             B_inv(1,2) = s_3;
             B_inv(1,3) = c_3;
-            %B_inv(2,1) = 0;
             B_inv(2,2) = c_2*c_3;
             B_inv(2,3) = -c_2*s_3;
             B_inv(3,1) = c_2;
@@ -47,13 +44,10 @@ function B_inv = eul2angRateTF(eul, sequence)
             %                             |-c_3        s_3         0|
             % B(Theta_323)^(-1) = 1/s_2 * | s_2*s_3    s_2*c_3     0|
             %                             | c_2*c_3   -c_2*s_3   s_2|
-
             B_inv(1,1) = -c_3;
             B_inv(1,2) = s_3;
-            %B_inv(1,3) = 0;
             B_inv(2,1) = s_2*s_3;
             B_inv(2,2) = s_2*c_3;
-            %B_inv(2,3) = 0;
             B_inv(3,1) = c_2*c_3;
             B_inv(3,2) = -c_2*s_3;
             B_inv(3,3) = s_2;
