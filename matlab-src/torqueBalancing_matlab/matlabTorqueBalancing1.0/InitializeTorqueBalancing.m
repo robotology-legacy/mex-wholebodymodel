@@ -20,7 +20,7 @@ clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Integration setup 
 params.demo_movements                       = 1;                           %either 0 or 1
-params.feet_on_ground                       = [1,0];                       %either 0 or 1; [left,right]
+params.feet_on_ground                       = [1,1];                       %either 0 or 1; [left,right]
 params.BalancingController                  = 'StackOfTask';               %either 'StackOfTask' or 'JointSpace'
 
 %% Linearized system analysis and gain tuning and QP solver. Both these tools
@@ -32,7 +32,7 @@ params.linearize_for_gains_tuning           = 1;                           %eith
 % if params.linearize_for_gains_tuning = 1, choose between two different
 % optimization algorithms: either the nonlinear least squares, 'lsq' or the
 % vectorization using Kronecher product, 'kronecher'
-params.optimization_algorithm               = 'lsq'; 
+params.optimization_algorithm               = 'kronecher'; 
 
 %% Visualization setup 
 params.visualize_robot_simulator            = 1;                           %either 0 or 1
@@ -55,7 +55,7 @@ params.sim_step                              = 0.01;
 % it will be automatically activated if the "Joint Space" controller is used, 
 % or if the visualization of stability analysis results is active,too.
 params.jointRef_with_ikin                    = 1;                           %either 0 or 1
-params.visualize_ikin_results                = 1;                           %either 0 or 1  
+params.visualize_ikin_results                = 0;                           %either 0 or 1  
 params.ikin_integration_step                 = 0.01; 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%

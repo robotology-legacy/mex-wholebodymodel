@@ -45,7 +45,7 @@ if sum(params.feet_on_ground) == 2
     if (params.demo_movements == 1)
         
         trajectory.directionOfOscillation = [0;1;0];
-        trajectory.referenceParams        = [0.035 0.35];     %referenceParams(1) = amplitude of ascillations in meters
+        trajectory.referenceParams        = [0.0075 0.1];     %referenceParams(1) = amplitude of ascillations in meters
     end    
 end
 

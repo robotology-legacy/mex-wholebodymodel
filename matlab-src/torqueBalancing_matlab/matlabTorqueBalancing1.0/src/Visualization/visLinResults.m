@@ -137,10 +137,10 @@ ContFig = ContFig +1;
 
 % EIGENVALUES
 figure(ContFig)
-plot(eig(AStateDes),'xb')
+plot(real(eig(AStateDes)),imag(eig(AStateDes)),'xb')
 hold on
 grid on
-plot(eig(AStateNew),'xr')
+plot(real(eig(AStateNew)),imag(eig(AStateNew)),'xr')
 title('Root Locus')
 legend('Des eigenval','Real eigenval')
 xlabel('Real')

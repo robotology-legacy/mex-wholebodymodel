@@ -3,7 +3,7 @@ function [Linearization, NewGains] = OneFootLinearization(params,gainsInit)
 %                     around an equilibrium point.
 %   ONEFOOTLINEARIZATION assumes that the robot is balancing on one foot,
 %   and the feedback controller is momentum-based. The solution is
-%   analytical, i.e. it is not necesary to compute numerical derivatives. 
+%   analytical, i.e. it is not necessary to compute numerical derivatives. 
 %     
 %   [Linearization, NewGains]=ONEFOOTLINEARIZATION(params,gainsInit)  
 %   defines the robot dynamics through the structure PARAMS, and the feedback 
@@ -84,7 +84,7 @@ if params.linearize_for_stability_analysis == 1
 AStateOld     = [zeros(ndof) eye(ndof);
                     -KS         -KD];
 
-eigAStateOld  = -real(eig(AStateOld));                
+eigAStateOld  = -real(eig(AStateOld));               
 
 toleig          = 1e-5;
 flag            = 0;
