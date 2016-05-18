@@ -4,7 +4,7 @@ function dcm = axang2rotm(axang)
     end
     dcm = zeros(3,3);
     u = axang(1:3,1); % rotation axis vector
-    u = u./norm(u);   % normalize ...
+    u = u./norm(u);   % normalize u
     % axis elements:
     u_1    = u(1,1);
     u_2    = u(2,1);

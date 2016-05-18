@@ -13,13 +13,13 @@ function quat = axang2quat(axang)
     %   [3] Geometric Tools Engine, Documentation: <http://www.geometrictools.com/Documentation/RotationIssues.pdf>, p. 8.
     %   [4] Representing Attitude: Euler Angles, Unit Quaternions, and Rotation Vectors, J. Diebel, Stanford University, 2006,
     %       <https://www.astro.rug.nl/software/kapteyn/_downloads/attitude.pdf>, p. 17, eq. (175).
-    ang   = axang(4,1)*0.5; % rotation angle theta / 2 (in radians)
-    sigma = sin(ang);
+    ang = axang(4,1)*0.5; % rotation angle theta / 2 (in radians)
+    s_a = sin(ang);
 
-    q(1,1) = cos(ang);           % scalar part
-    q(2,1) = axang(1,1) * sigma; % vector part
-    q(3,1) = axang(2,1) * sigma;
-    q(4,1) = axang(3,1) * sigma;
+    q(1,1) = cos(ang);       % scalar part
+    q(2,1) = axang(1,1)*s_a; % vector part
+    q(3,1) = axang(2,1)*s_a;
+    q(4,1) = axang(3,1)*s_a;
 
     quat = q./norm(q); % normalized (unit) quaternion
 end

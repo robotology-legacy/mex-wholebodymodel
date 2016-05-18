@@ -1,4 +1,6 @@
 function result = isRadians(x)
+    % A modified version of the function 'isradians' of Michaël Zugaro which is under GPL version 3:
+    % Source: <http://fmatoolbox.sourceforge.net/API/FMAToolbox/Helpers/isradians.html>
     result = 0;
 
     if ~isa(x, 'double')

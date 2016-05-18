@@ -7,6 +7,10 @@ function eul = quat2eul(quat, sequence)
         % use the default axis sequence ...
         sequence = 'ZYX';
     end
+
+    if (abs(quat(1,1)) > 1)
+        quat = quat./norm(quat); % normalize
+    end
     eul = zeros(3,1);
     % scalar part:
     q_0 = quat(1,1);

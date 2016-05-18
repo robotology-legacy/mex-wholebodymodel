@@ -3,6 +3,7 @@ function quat = rotm2quat(rotm)
         error('rotm2quat: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
     end
     quat = zeros(4,1);
+    epsilon = 1e-12; % min. value to treat a number as zero ...
 
     %% Compute the corresponding quaternion from a given rotation matrix R:
     % The transformation uses the computational efficient algorithm of Stanley.
@@ -18,7 +19,7 @@ function quat = rotm2quat(rotm)
     %   [3] Modelling and Control of Robot Manipulators, L. Sciavicco & B. Siciliano, 2nd Edition, Springer, 2008,
     %       p. 36, formula (2.30).
     tr = rotm(1,1) + rotm(2,2) + rotm(3,3);
-    if (tr > 0)
+    if (tr > epsilon) % if tr > 0:
             % scalar part:
             quat(1,1) = 0.5*sqrt(tr + 1);
             div = 1/(quat(1,1)*4);

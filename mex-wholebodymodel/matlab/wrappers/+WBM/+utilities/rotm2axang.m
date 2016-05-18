@@ -3,6 +3,7 @@ function axang = rotm2axang(rotm)
         error('rotm2axang: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
     end
     axang = zeros(4,1);
+    epsilon = 1e-12; % min. value to treat a number as zero ...
 
     %% Translate a given rotation matrix R into the corresponding axis-angle representation (u, theta).
     % For further details about the computation, see:
@@ -14,20 +15,13 @@ function axang = rotm2axang(rotm)
     %   [4] Introduction to Robotics: Mechanics and Control, John J. Craig, 3rd Edition, Pearson/Prentice Hall, 2005,
     %       pp. 47-48, eq. (2.81) & (2.82).
     tr = rotm(1,1) + rotm(2,2) + rotm(3,3);
-    if ( (tr ~= 3) && (tr ~= -1) ) % general case:
-        axang(4,1) = acos((tr - 1)*0.5); % rotation angle theta within the range (0, pi).
-        div = 1/(2*sin(axang(4,1)));
-        % unit vector u:
-        axang(1,1) = (rotm(3,2) - rotm(2,3))*div;
-        axang(2,1) = (rotm(1,3) - rotm(3,1))*div;
-        axang(3,1) = (rotm(2,1) - rotm(1,2))*div;
-    elseif (tr == 3) % theta = 0:
+    if (abs(tr - 3) <= epsilon) % tr = 3 --> theta = 0:
         % Null rotation --> singularity: The rotation matrix R is the identity matrix and the
         % axis of rotation u is undefined. By convention, set u to the default value (0, 0, 1)
         % according to the ISO/IEC IS 19775-1:2013 standard of the Web3D Consortium.
         % See: <http://www.web3d.org/documents/specifications/19775-1/V3.3/Part01/fieldsDef.html#SFRotationAndMFRotation>
         axang(3,1) = 1;
-    else % tr = -1 --> theta = pi:
+    elseif (abs(tr + 1) <= epsilon) % tr = -1 --> theta = pi:
         if ( (rotm(1,1) > rotm(2,2)) && (rotm(1,1) > rotm(3,3)) )
             u = vertcat(rotm(1,1)+1, rotm(1,2), rotm(1,3));
         elseif (rotm(2,2) > rotm(3,3))
@@ -37,5 +31,12 @@ function axang = rotm2axang(rotm)
         end
         axang(1:3,1) = u./norm(u); % normalize
         axang(4,1)   = pi;
+    else % general case, tr ~= 3 and tr ~= -1:
+        axang(4,1) = acos((tr - 1)*0.5); % rotation angle theta within the range (0, pi).
+        div = 1/(2*sin(axang(4,1)));
+        % unit vector u:
+        axang(1,1) = (rotm(3,2) - rotm(2,3))*div;
+        axang(2,1) = (rotm(1,3) - rotm(3,1))*div;
+        axang(3,1) = (rotm(2,1) - rotm(1,2))*div;
     end
 end
