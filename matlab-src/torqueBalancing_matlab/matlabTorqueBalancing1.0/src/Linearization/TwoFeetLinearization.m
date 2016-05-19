@@ -79,9 +79,9 @@ JBl    = Jb(1:6,:);
 JBr    = Jb(7:end,:);
 dLegs  = JR\(JBr/JBl*JL);
 
-CorrMatrix = eye(ndof);
+CorrMatrix              = eye(ndof);
 CorrMatrix(20:25,14:19) = dLegs;
-CorrMatrixT1  = [JG(1:3,:);JG(4:6,:)*CorrMatrix];
+CorrMatrixT1            = [JG(1:3,:);JG(4:6,:)*CorrMatrix];
     
 %% Stiffness matrix
 KS     = invMbar*(-pinvLambda*MultFirstTask*NewGains.PosGainsMom*CorrMatrixT1 + NullLambda*NewGains.impedances*NewGains.posturalCorr*CorrMatrix);

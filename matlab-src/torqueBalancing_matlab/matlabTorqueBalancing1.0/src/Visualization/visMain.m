@@ -23,6 +23,7 @@ set(0,'DefaultFigureWindowStyle','Docked');
 %% FORWARD DYNAMICS (basic parameters)
 % joints
 qj            = zeros(ndof,length(t));
+qjInit        = zeros(ndof,length(t));
 dqj           = zeros(ndof,length(t));
 qjRef         = zeros(ndof,length(t));
 dqjRef        = zeros(ndof,length(t));
@@ -51,6 +52,7 @@ for time = 1:length(t)
 
 % joints
 qj(:,time)          = visual.qj;
+qjInit(:,time)      = params.qjInit;
 dqj(:,time)         = visual.dqj;
 qjRef(:,time)       = visual.JointRef.qjRef;
 dqjRef(:,time)      = visual.JointRef.dqjRef;
@@ -91,9 +93,9 @@ PoseRFoot              = visual.poseFeet(8:end);
 end
 
 %% COMPOSED PARAMETERS
-HErr                = H-HRef;
-qjErr               = qj - qjRef;
-dqjErr              = dqj - dqjRef;
+HErr                   = H-HRef;
+qjErr                  = qj - qjRef;
+dqjErr                 = dqj - dqjRef;
 
 %% Basic visualization (forward dynamics integration results)
 if params.visualize_integration_results == 1

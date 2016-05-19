@@ -1,4 +1,4 @@
-%% InitializeTorqueBalancing
+%% INITIALIZETORQUEBALANCING
 % this is the initialization script for torque balancing simulations of the robot 
 % iCub using Matlab. 
 % The user can set the parameters below to generate different simulations. 
@@ -14,6 +14,8 @@
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
+
+% ------------Initialization----------------
 clear all
 close all
 clc
@@ -32,7 +34,7 @@ params.linearize_for_gains_tuning           = 1;                           %eith
 % if params.linearize_for_gains_tuning = 1, choose between two different
 % optimization algorithms: either the nonlinear least squares, 'lsq' or the
 % vectorization using Kronecher product, 'kronecher'
-params.optimization_algorithm               = 'kronecher'; 
+params.optimization_algorithm               = 'lsq'; 
 
 %% Visualization setup 
 params.visualize_robot_simulator            = 1;                           %either 0 or 1
@@ -54,8 +56,8 @@ params.sim_step                              = 0.01;
 %% Allow the joints references generation using inverse kinematics
 % it will be automatically activated if the "Joint Space" controller is used, 
 % or if the visualization of stability analysis results is active,too.
-params.jointRef_with_ikin                    = 1;                           %either 0 or 1
-params.visualize_ikin_results                = 0;                           %either 0 or 1  
+params.jointRef_with_ikin                    = 1;                          %either 0 or 1
+params.visualize_ikin_results                = 0;                          %either 0 or 1  
 params.ikin_integration_step                 = 0.01; 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%

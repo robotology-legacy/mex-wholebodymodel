@@ -32,7 +32,7 @@ waitbar(t/params.tEnd,params.wait)
 ndof                             = params.ndof;
 params.demux.baseOrientationType = 1;                           
 [basePose,qj,baseVelocity,dqj]   = stateDemux(chi,params);
-
+ 
 % base position and orientation (in quaternions) and base velocity; 
 % conversion of the base orientation into a rotation matrix; state velocity
 PosBase                          = basePose(1:3,:);
@@ -46,7 +46,10 @@ Nu                               = [VelBase;omegaBaseWorld;dqj];
  
 % Robot dynamics: mass matrix, generalized bias forces, Coriolis terms,
 % centroidal momentum, contacts and CoM jacobians, jacobians derivative
-M                                = wbm_massMatrix(RotBase,PosBase,qj); 
+M                                = wbm_massMatrix(RotBase,PosBase,qj);
+%% %%%% MASS MATRIX CORRECTION %%%% %% 
+M(7:end,7:end) = M(7:end,7:end) +params.MassCorr.*eye(ndof);
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %% 
 h                                = wbm_generalisedBiasForces(RotBase,PosBase,qj,dqj,[VelBase;omegaBaseWorld]);
 g                                = wbm_generalisedBiasForces(RotBase,PosBase,qj,zeros(ndof,1),zeros(6,1));
 CNu                              = h-g;
@@ -127,8 +130,21 @@ end
 %% Centroidal transformation (for joint space controller only)
 if params.JSController == 1
 % transformation matrix for centroidal; conversion to the centroidal frame of reference
-[T,dT]                     = centroidalTransformationT_TDot(xCoM,PosBase,dxCoM,VelBase,M);
-[M, CNu, g, Jc, dJcNu, Nu] = fromFloatingToCentroidalDynamics(M, h, g, Jc, dJcNu, Nu, T, dT);
+[T,dT]                                 = centroidalTransformationT_TDot(xCoM,PosBase,dxCoM,VelBase,M);
+[MJS, CNuJS, gJS, JcJS, dJcNuJS, NuJS] = fromFloatingToCentroidalDynamics(M, h, g, Jc, dJcNu, Nu, T, dT);
+dynamics.M                         = MJS;
+dynamics.g                         = gJS;
+dynamics.CNu                       = CNuJS;
+dynamics.dJcNu                     = dJcNuJS;
+dynamics.Nu                        = NuJS;
+dynamics.Jc                        = JcJS;
+else
+dynamics.M                         = M;
+dynamics.g                         = g;
+dynamics.CNu                       = CNu;
+dynamics.dJcNu                     = dJcNu;
+dynamics.Nu                        = Nu;
+dynamics.Jc                        = Jc;
 end
 
 %% CONTROLLERS SETUP
@@ -137,17 +153,11 @@ constraints                        = params.constraints;
 trajectory                         = params.trajectory;
 dynamics.LFootPose                 = PoseLFootQuat;
 dynamics.RFootPose                 = PoseRFootQuat;
-dynamics.M                         = M;
-dynamics.g                         = g;
-dynamics.CNu                       = CNu;
-dynamics.dJcNu                     = dJcNu;
 dynamics.H                         = H;
 dynamics.qj                        = qj;
 dynamics.xCoM                      = xCoM;
 dynamics.dxCoM                     = dxCoM;
 dynamics.JCoM                      = JCoM;
-dynamics.Nu                        = Nu;
-dynamics.Jc                        = Jc;
 
 % CoM trajectory generator
 trajectory.desired_x_dx_ddx_CoM    = generTraj(params.CoMInit(1:3),t,trajectory);
@@ -173,10 +183,10 @@ elseif params.JSController == 1
 end
 
 %% Real contact forces computation
-S               = [ zeros(6,ndof);
-                    eye(ndof,ndof)];                
-JcMinv          = Jc/M;
-JcMinvS         = JcMinv*S;
+S               = [zeros(6,ndof);
+                   eye(ndof,ndof)]; 
+JcMinv          =  Jc/M;
+JcMinvS         =  JcMinv*S;
 fc              = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*tau -dJcNu -KCorrVel.*Jc*Nu -KCorrPos.*DeltaPoseFeet);
 
 %% State derivative computation

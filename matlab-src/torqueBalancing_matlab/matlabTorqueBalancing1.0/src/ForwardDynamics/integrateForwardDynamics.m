@@ -35,12 +35,12 @@ params.linearization = 0;
 
 if params.linearize_for_gains_tuning == 1 || params.linearize_for_stability_analysis == 1
     
-    params.linearization = 1;    
+    params.linearization   = 1;    
 end
 
 if  params.linearization == 1 && params.visualize_stability_analysis_results  == 1
     
-params.jointRef_with_ikin                   = 1;
+params.jointRef_with_ikin  = 1;
 end
 
 %% Initial joints position and velocities; initial base velocity
@@ -87,6 +87,10 @@ params.numConstraints            = length(params.constraintLinkNames);
 %% Initial parameters definition
 % mass matrix, constraints Jacobian and CoM Jacobian
 params.MInit         = wbm_massMatrix(params.RotBaseInit,params.PosBaseInit,params.qjInit);
+%% %%%% MASS MATRIX CORRECTION %%%% %%
+params.MassCorr           = 0.1;
+params.MInit(7:end,7:end) = params.MInit(7:end,7:end) + params.MassCorr.*eye(params.ndof);
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %% 
 params.JCoMInit      = wbm_jacobian(params.RotBaseInit,params.PosBaseInit,params.qjInit,'com');
 params.JcInit        = zeros(6*params.numConstraints,params.ndof+6);
 
@@ -120,9 +124,9 @@ params.JhInit        =  [JhBaseInit JhJointInit];
 params.JhReduced     =  JhJointInit -JhBaseInit*(eye(6)/params.JcInit(1:6,1:6))*params.JcInit(1:6,7:end);
 
 % Forward kinematics and joints limits
-params.CoMInit                = wbm_forwardKinematics('com');
-params.PoseLFootQuatInit      = wbm_forwardKinematics('l_sole');
-params.PoseRFootQuatInit      = wbm_forwardKinematics('r_sole');
+params.CoMInit                = wbm_forwardKinematics(params.RotBaseInit, params.PosBaseInit, params.qjInit,'com');
+params.PoseLFootQuatInit      = wbm_forwardKinematics(params.RotBaseInit, params.PosBaseInit, params.qjInit,'l_sole');
+params.PoseRFootQuatInit      = wbm_forwardKinematics(params.RotBaseInit, params.PosBaseInit, params.qjInit,'r_sole');
 [jl1,jl2]                     = wbm_jointLimits();
 params.limits                 = [jl1 jl2];
 

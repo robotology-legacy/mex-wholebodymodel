@@ -25,9 +25,8 @@ if params.visualize_stability_analysis_results == 1
 if params.linearize_for_gains_tuning == 1
     
 ddqjLin = ddqjRef - params.linearization.KSn*qjErr - params.linearization.KDn*dqjErr;
-else
-    
-ddqjLin = ddqjRef - params.linearization.KS*qjErr - params.linearization.KD*dqjErr;
+else 
+ddqjLin = ddqjRef - params.linearization.KS*qjErr  - params.linearization.KD*dqjErr;
 end
 
 for k=1:5

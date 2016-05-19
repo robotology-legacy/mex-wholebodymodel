@@ -45,7 +45,7 @@ if sum(params.feet_on_ground) == 2
     if (params.demo_movements == 1)
         
         trajectory.directionOfOscillation = [0;1;0];
-        trajectory.referenceParams        = [0.0075 0.1];     %referenceParams(1) = amplitude of ascillations in meters
+        trajectory.referenceParams        = [0.015 0.1];     %referenceParams(1) = amplitude of ascillations in meters
     end    
 end
 
@@ -118,18 +118,13 @@ Mbar                = M(7:end,7:end)-M(7:end,1:6)/M(1:6,1:6)*M(1:6,7:end);
 pinvJcMinvSDamp     = JcMinvS'/(JcMinvS*JcMinvS' + params.pinv_damp*eye(size(JcMinvS,1)));
 NullLambdaDamp      = eye(ndof)-pinvJcMinvSDamp*JcMinvS;
 
-% new postural gains. They are defined to match as close as possible the
-% previous dynamics
-impedances          = diag(gains.impedances)*pinv(NullLambdaDamp*Mbar,params.pinv_tol);
-dampings            = diag(gains.dampings)*pinv(NullLambdaDamp*Mbar,params.pinv_tol);
-% add a regulation term to both the impedance and damping, to assure the matrices
-% are positive definite
-gains.impedances    = impedances + 0.1.*eye(ndof);
-gains.dampings      = dampings   + 0.1.*eye(ndof);
+gains.impedances    = diag(gains.impedances);
+gains.dampings      = diag(gains.dampings);  
 
 % this is the term added to the postural task to assure the dynamics to be
 % asymptotically stable
 gains.posturalCorr  = NullLambdaDamp*Mbar;
+
 else
 gains.impedances    = diag(gains.impedances);
 gains.dampings      = diag(gains.dampings);    

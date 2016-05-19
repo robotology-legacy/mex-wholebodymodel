@@ -1,5 +1,16 @@
 function [tau,f0,ddqjNonLin] = stackOfTaskController(params, constraints, gains, trajectory, dynamics)
-%STACKOFTASKCONTROLLER 
+%STACKOFTASKCONTROLLER is a task-based balancing controller for the humanoid
+%                     robot iCub.
+%   STACKOFTASKCONTROLLER computes the control torques at joints using a 
+%   two task-based approach. 
+%
+%   [tau,f0,ddqjNonLin] = stackOfTaskController(params, constraints, gains,
+%    trajectory, dynamics) takes as input the structure params, which contains
+%   all the utility parameters, and the structure dynamics, gains, constraints 
+%   and JointReferences which are used to compute the desired torques. The
+%   outputs are the desired control torques tau [ndof x 1], f0 [6*nconstr
+%   x1] is the vector in the nullspace of the desired contact forces while
+%   ddqjNonLin [ndof x 1] are the linear joints accelerations.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -19,19 +30,16 @@ e3                  = [0;0;1];
 gravAcc             = 9.81;
 S                   = [zeros(6,ndof);
                       eye(ndof,ndof)];
-
 % constraints
 ConstraintsMatrix   = constraints.ConstraintsMatrix;
 bVectorConstraints  = constraints.bVectorConstraints ;
 footSize            = constraints.footSize;
-
 % gains
 impedances          = gains.impedances;
 dampings            = gains.dampings;
 posturalCorr        = gains.posturalCorr;
 VelGainsMom         = gains.VelGainsMom;
 PosGainsMom         = gains.PosGainsMom;
-
 % dynamics and forward kinematics
 M                   = dynamics.M;
 g                   = dynamics.g;
@@ -55,7 +63,6 @@ x_dx_ddx_CoMDes     = trajectory.desired_x_dx_ddx_CoM;
 f_grav              = [ zeros(2,1);
                        -m*gravAcc;
                         zeros(3,1)];
-
 % Feet position and rotation matrix
 [posRFoot,RotRFoot] = frame2posrot(dynamics.RFootPose);
 [posLFoot,RotLFoot] = frame2posrot(dynamics.LFootPose);
@@ -93,7 +100,7 @@ qjTilde         = qj-qjRef;
 dqjTilde        = dqj-dqjRef;
 JcMinv          = Jc/M;
 Lambda          = JcMinv*S;
-JBar            = transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));  % multiplier of f in tau0
+JBar            = transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));   % multiplier of f in tau0
 JcMinvJct       = JcMinv*transpose(Jc);
 pinvLambda      = pinv(Lambda,pinv_tol);
 %pinvLambda     = Lambda'/(Lambda*Lambda' + pinv_damp*eye(size(Lambda,1)));
@@ -180,20 +187,20 @@ end
 end
 
 %% Joint torques and contact forces
-fcDes        = fc_HDot + Nullfc*f0;
-tau          = tauModel + Sigma*fcDes;
+fcDes         = fc_HDot + Nullfc*f0;
+tau           = tauModel + Sigma*fcDes;
 
 %% Desired nonLinear joints accelerations for the linearized system analysis
 Mbar           = Mj - Mjb/Mb*Mbj;
-MbarInv        = eye(ndof)/Mbar;
-%Mbar_inv      = Mbar'/(Mbar*Mbar' + pinv_damp*eye(size(Mbar,1)));
-LambdaLin      = (JcJoint - JcBase/Mb*Mbj)*MbarInv;
+invMbar        = eye(ndof)/Mbar;
+%invMbar       = Mbar'/(Mbar*Mbar' + pinv_damp*eye(size(Mbar,1)));
+LambdaLin      = (JcJoint - JcBase/Mb*Mbj)*invMbar;
 MultFirstTask  = JcBase/Mb*transpose(JcBase)*pinvA;
 pinvLambdaLin  = pinv(LambdaLin,pinv_tol);
 CbNu           = CNu(1:6);
 NullLambda     = eye(ndof) - pinvLambdaLin*LambdaLin;
-Postural       = -Mbar*ddqjRef+ impedances*posturalCorr*qjTilde +dampings*posturalCorr*dqjTilde;
+Postural       = -Mbar*ddqjRef +impedances*posturalCorr*qjTilde +dampings*posturalCorr*dqjTilde;
 
-ddqjNonLin     = -MbarInv*(pinvLambdaLin*(MultFirstTask*(HDotDes-CbNu)+dJcNu) + NullLambda*Postural);
+ddqjNonLin     = -invMbar*(pinvLambdaLin*(MultFirstTask*(HDotDes-CbNu)+dJcNu) + NullLambda*Postural);
 
 end
