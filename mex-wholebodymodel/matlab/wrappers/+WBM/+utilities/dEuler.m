@@ -9,5 +9,5 @@ function deul = dEuler(eul, omega, sequence)
     end
 
     B_inv = WBM.utilities.eul2angRateTF(eul, sequence);
-    deul = B_inv*omega;
+    deul  = B_inv*omega;
 end

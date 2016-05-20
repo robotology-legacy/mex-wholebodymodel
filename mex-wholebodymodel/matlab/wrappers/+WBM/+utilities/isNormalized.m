@@ -1,11 +1,13 @@
-function result = isNormalized(q)
-    if ~iscolumn(q)
+function result = isNormalized(v, epsilon)
+    if ~iscolumn(v)
         error('isNormalized: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
-    result  = false;
-    epsilon = 1e-12; % min. value to treat a number as zero ...
+    if ~exist('epsilon', 'var')
+        epsilon = 1e-12; % min. value to treat a number as zero ...
+    end
+    result = false;
 
-    if ((q'*q - 1) <= epsilon)
+    if ((v'*v - 1) <= epsilon)
         % the vector is already normalized ...
         result = true;
     end

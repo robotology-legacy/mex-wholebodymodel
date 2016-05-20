@@ -1,5 +1,5 @@
 function dquat = dQuat(quat, omega)
-    if ( (size(quat,1) ~= 4) || (size(omega,1) ~= 3) )
+    if (size(quat,1) ~= 4)
         error('dQuat: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
     k = 1; % gain (drives the norm of the quaternion to 1, ε should become nonzero)
@@ -13,9 +13,9 @@ function dquat = dQuat(quat, omega)
     %       [3] Quaternion kinematics for the error-state KF, Joan Solà, Universitat Politècnica de Catalunya, 2016,
     %           <http://www.iri.upc.edu/people/jsola/JoanSola/objectes/notes/kinematics.pdf>, p. 19, formulas (97) & (98).
     Omega_op = zeros(4,4);
+    Omega_op(2:4,2:4) = -WBM.utilities.skew(omega); % (skew-symmetric) cross product matrix
     Omega_op(1,2:4)   = -omega';
     Omega_op(2:4,1)   =  omega;
-    Omega_op(2:4,2:4) = -WBM.utilities.skew(omega); % (skew-symmetric) cross product matrix
 
     % This calculation of the quaternion derivative has additionally a
     % computational "hack" (k*ε*q) to compute the derivative in the case
@@ -25,5 +25,5 @@ function dquat = dQuat(quat, omega)
     %   <http://mathworks.com/help/aeroblks/customvariablemass6dofquaternion.html>
     %   and <https://www.physicsforums.com/threads/quaternion-derivative.706475>
     epsilon = 1 - norm(quat);
-    dquat = 0.5*(Omega_op*quat) + k*epsilon*quat;
+    dquat   = 0.5*(Omega_op*quat) + (k*epsilon)*quat;
 end

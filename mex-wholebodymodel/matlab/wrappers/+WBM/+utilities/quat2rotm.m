@@ -2,11 +2,12 @@ function dcm = quat2rotm(quat)
     if (size(quat,1) ~= 4)
         error('quat2rotm: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
-
-    if (abs(quat(1,1)) > 1)
-        quat = quat./norm(quat); % normalize
-    end
     dcm = zeros(3,3);
+
+    n2 = quat'*quat;
+    if (n2 > 1)
+        quat = quat./sqrt(n2); % normalize
+    end
     % scalar (real) part:
     q_0 = quat(1,1);
     % vector (imaginary) part:
@@ -30,8 +31,8 @@ function dcm = quat2rotm(quat)
     %       <http://soliton.ae.gatech.edu/people/obauchau/publications/Bauchau+Trainelli03.pdf>, p. 16, eq. (51).
     %   [4] Theory of Applied Robotics: Kinematics, Dynamics, and Control, Reza N. Jazar, 2nd Edition, Springer, 2010, p. 103, eq. (3.82).
     %
-    % Note: The direct assignment is computationally faster than using directly the formula above. Furtermore, if the above formula
-    %       will be used, the matrix-multiplications are causing accumulative round-off errors in the main diagonal of the DCM-matrix
+    % Note: The direct assignment is computationally faster than using directly the formula above. Furthermore, if the above formula
+    %       will be used, the matrix multiplications are causing accumulative round-off errors in the main diagonal of the DCM-matrix
     %       (around ±0.7*1e-03). To be more accurate, it is better to use the derived transformation matrix of the formula.
     dcm(1,1) = q_0*q_0 + q_1*q_1 - q_2*q_2 - q_3*q_3;
     dcm(1,2) = 2*(q_1*q_2 - q_0*q_3);

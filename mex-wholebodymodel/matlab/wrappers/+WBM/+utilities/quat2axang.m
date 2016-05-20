@@ -2,14 +2,15 @@ function axang = quat2axang(quat)
     if (size(quat,1) ~= 4)
         error('quat2axang: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
-
-    % if the scalar part s > 1, then acos and sqrt will produce errors;
-    % this can't happen when the quaternion is normalized.
-    if (abs(quat(1,1)) > 1)
-        quat = quat./norm(quat); % normalize
-    end
-    axang = zeros(4,1);
+    axang   = zeros(4,1);
     epsilon = 1e-12; % min. value to treat a number as zero ...
+
+    n2 = quat'*quat;
+    if (n2 > 1)
+        % if the quaternion is not normalized, i.e. if the scalar part q_s > 1,
+        % then acos and sqrt will produce errors ...
+        quat = quat./sqrt(n2); % normalize
+    end
 
     %% Translate the given quaternion to the axis-angle representation (u, theta):
     % For further details, see:
@@ -30,9 +31,9 @@ function axang = quat2axang(quat)
     end
     % else, the general case, if theta ~= 0 and theta ~= 2*pi:
     axang(4,1) = 2*acos(quat(1,1)); % rotation angle theta in range (0, 2*pi)
-    div = 1/sqrt(1 - quat(1,1)*quat(1,1));
+    n_inv = 1/sqrt(1 - quat(1,1)*quat(1,1));
     % unit vector u:
-    axang(1,1) = quat(2,1)*div;
-    axang(2,1) = quat(3,1)*div;
-    axang(3,1) = quat(4,1)*div;
+    axang(1,1) = quat(2,1)*n_inv;
+    axang(2,1) = quat(3,1)*n_inv;
+    axang(3,1) = quat(4,1)*n_inv;
 end

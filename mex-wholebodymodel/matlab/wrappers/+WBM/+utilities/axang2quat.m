@@ -2,7 +2,13 @@ function quat = axang2quat(axang)
     if (size(axang,1) ~= 4)
         error('axang2quat: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
-    q = zeros(4,1);
+    quat = zeros(4,1);
+    u    = axang(1:3,1); % rotation axis vector
+
+    n2 = u'*u;
+    if (n2 > 1)
+        u = u./sqrt(n2); % normalize u
+    end
 
     %% Translate the axis-angle representation (u, theta) into the corresponding quaternion:
     % For further details, see:
@@ -16,10 +22,8 @@ function quat = axang2quat(axang)
     ang = axang(4,1)*0.5; % rotation angle theta / 2 (in radians)
     s_a = sin(ang);
 
-    q(1,1) = cos(ang);       % scalar part
-    q(2,1) = axang(1,1)*s_a; % vector part
-    q(3,1) = axang(2,1)*s_a;
-    q(4,1) = axang(3,1)*s_a;
-
-    quat = q./norm(q); % normalized (unit) quaternion
+    quat(1,1) = cos(ang);   % scalar part
+    quat(2,1) = u(1,1)*s_a; % vector part
+    quat(3,1) = u(2,1)*s_a;
+    quat(4,1) = u(3,1)*s_a;
 end

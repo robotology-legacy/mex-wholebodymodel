@@ -3,8 +3,12 @@ function dcm = axang2rotm(axang)
         error('axang2rotm: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
     dcm = zeros(3,3);
-    u = axang(1:3,1); % rotation axis vector
-    u = u./norm(u);   % normalize u
+    u   = axang(1:3,1); % rotation axis vector
+
+    n2 = u'*u;
+    if (n2 > 1)
+        u = u./sqrt(n2); % normalize u
+    end
     % axis elements:
     u_1    = u(1,1);
     u_2    = u(2,1);
