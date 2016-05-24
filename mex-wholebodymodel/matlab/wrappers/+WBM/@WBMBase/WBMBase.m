@@ -188,7 +188,7 @@ classdef WBMBase < handle
             end
         end
 
-        function djdq = dJdq(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
+        function dJ = dJdq(obj, urdf_link_name, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             if ~exist('urdf_link_name', 'var')
                 urdf_link_name = obj.mwbm_params.urdfLinkName; % default ...
             end
@@ -196,9 +196,9 @@ classdef WBMBase < handle
             switch nargin
                 case {6, 7}
                     wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
-                    djdq = mexWholeBodyModel('djdq', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b, urdf_link_name);
+                    dJ = mexWholeBodyModel('djdq', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b, urdf_link_name);
                 case {1, 2}
-                    djdq = mexWholeBodyModel('djdq', urdf_link_name);
+                    dJ = mexWholeBodyModel('djdq', urdf_link_name);
                 otherwise
                     error('WBMBase::dJdq: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
