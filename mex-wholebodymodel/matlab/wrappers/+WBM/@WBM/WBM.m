@@ -100,7 +100,7 @@ classdef WBM < WBM.WBMBase
             obj.mwbm_config.initStateParams.qt_b = vqT_init(4:7,1); % orientation (quaternion)
         end
 
-        function wf_vqT_lnkfr = computeFKinRotoTranslation(obj, urdf_link_name, q_j, vqT, g_wf)
+        function wf_vqT_rlnk = computeFKinRotoTranslation(obj, urdf_link_name, q_j, vqT, g_wf)
             % calculate the forward kinematic roto-translation of a specified joint or link:
             switch nargin
                 case {4, 5}
@@ -115,7 +115,7 @@ classdef WBM < WBM.WBMBase
                         obj.setWorldFrame(R_b, p_b, g_wf);
                     end
                     % compute the forward kinematics of the specified link or joint ...
-                    wf_vqT_lnkfr = obj.forwardKinematics(urdf_link_name, R_b, p_b, q_j);
+                    wf_vqT_rlnk = obj.forwardKinematics(urdf_link_name, R_b, p_b, q_j);
                 otherwise
                     error('WBM::computeFKinRotoTranslation: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
