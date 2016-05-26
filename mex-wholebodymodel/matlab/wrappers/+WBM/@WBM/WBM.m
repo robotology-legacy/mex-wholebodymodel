@@ -9,10 +9,6 @@ classdef WBM < WBM.WBMBase
         robot_body@WBM.wbmBody
     end
 
-    properties(Constant)
-        MAX_NUM_JOINTS = 35;
-    end
-
     properties(Access = protected)
         mwbm_config@WBM.wbmBaseRobotConfig
     end
@@ -36,14 +32,11 @@ classdef WBM < WBM.WBMBase
 
             obj.initConfig(robot_config);
             if wf2FixLnk
-                % set the world frame (WF) at a given rototranslation from
-                % a chosen fixed link (the first entry of the constraint list):
-                v_b = vertcat(obj.mwbm_config.initStateParams.dx_b, ...
-                              obj.mwbm_config.initStateParams.omega_b);
-                obj.setWorldFrame2FixedLink(obj.mwbm_config.initStateParams.q_j, obj.mwbm_config.initStateParams.dq_j, ...
-                                            v_b, obj.mwbm_params.g_wf, obj.mwbm_config.cstrLinkNames{1});
+                % set the world frame (WF) at the initial roto-translation from
+                % the chosen fixed link, i.e. the first entry of the constraint list:
+                obj.setWorldFrameFromFixedLink(obj.mwbm_config.cstrLinkNames{1});
             end
-            % retrieve and update the initial rototranslation (VQS-Transf.) of the robot base (world frame) ...
+            % retrieve and update the initial roto-translation (VQS-Transf.) of the robot base (world frame) ...
             obj.updateInitRotoTranslation();
         end
 
@@ -57,29 +50,48 @@ classdef WBM < WBM.WBMBase
             delete@WBM.WBMBase(obj);
         end
 
-        function setWorldFrame2FixedLink(obj, q_j, dq_j, v_b, g_wf, urdf_link_name)
-            if exist('urdf_link_name', 'var')
-                % replace the (old) default link with a new link ...
-                obj.urdfLinkName = urdf_link_name;
-            else
-                % use the default link ...
-                urdf_link_name = obj.mwbm_params.urdfLinkName;
+        function setWorldFrameFromFixedLink(obj, urdf_link_name, q_j, dq_j, v_b, g_wf)
+            if (nargin < 6)
+                switch nargin
+                    case 5
+                        % use the default gravity vector ...
+                        g_wf = obj.mwbm_params.g_wf;
+                    case 2
+                        % use the initial state values ...
+                        v_b  = vertcat(obj.mwbm_config.initStateParams.dx_b, obj.mwbm_config.initStateParams.omega_b);
+                        q_j  = obj.mwbm_config.initStateParams.q_j;
+                        dq_j = obj.mwbm_config.initStateParams.dq_j;
+                        g_wf = obj.mwbm_params.g_wf;
+                    otherwise
+                        error('WBM::setWorldFrameFromFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                end
             end
+            obj.urdfLinkName = urdf_link_name; % replace the old default link with the new link ...
 
-            switch nargin
-                case {5, 6}
-                    obj.setState(q_j, dq_j, v_b);
-                    [w_p_b, w_R_b] = obj.getWorldFrameFromFixedLink(urdf_link_name, q_j);
-                    obj.setWorldFrame(w_R_b, w_p_b, g_wf);
-                case 2
-                    if isempty(urdf_link_name)
-                        error('WBM::setWorldFrame2FixedLink: %s', WBM.wbmErrorMsg.EMPTY_STRING);
-                    end
-                    [w_p_b, w_R_b] = obj.getWorldFrameFromFixedLink(urdf_link_name);
-                    obj.setWorldFrame(w_R_b, w_p_b, obj.mwbm_params.g_wf);
-                otherwise
-                    error('WBM::setWorldFrame2FixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            obj.setState(q_j, dq_j, v_b); % update the robot state (important for initializations) ...
+            [w_p_b, w_R_b] = obj.getWorldFrameFromFixedLink(urdf_link_name); % use optimized mode
+            obj.setWorldFrame(w_R_b, w_p_b, g_wf);
+        end
+
+        function setWorldFrameFromDfltFixedLink(obj, q_j, dq_j, v_b, g_wf)
+            if (nargin < 5)
+                switch nargin
+                    case 4
+                        % use the default gravity values ...
+                        g_wf = obj.mwbm_params.g_wf;
+                    case 1
+                        % use the initial state values ...
+                        v_b  = vertcat(obj.mwbm_config.initStateParams.dx_b, obj.mwbm_config.initStateParams.omega_b);
+                        q_j  = obj.mwbm_config.initStateParams.q_j;
+                        dq_j = obj.mwbm_config.initStateParams.dq_j;
+                        g_wf = obj.mwbm_params.g_wf;
+                    otherwise
+                        error('WBM::setWorldFrameFromDfltFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                end
             end
+            obj.setState(q_j, dq_j, v_b); % update state (for initializations, else precautionary) ...
+            [w_p_b, w_R_b] = obj.getWorldFrameFromDfltFixedLink(); % optimized mode
+            obj.setWorldFrame(w_R_b, w_p_b, g_wf);
         end
 
         function updateInitRotoTranslation(obj)
@@ -154,11 +166,11 @@ classdef WBM < WBM.WBMBase
                     if ( isempty(ridx) || (length(ridx) ~= len) )
                         error('WBM::getStateChains: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
                     end
-                    chn_q  = cell(len,1);
+                    chn_q  = cell(len,1); % chains ...
                     chn_dq = chn_q;
 
                     for i = 1:len
-                        idx = ridx(i);
+                        idx = ridx(i); % for each idx of row-idx ...
                         start_idx = obj.mwbm_config.body.chains{idx,2};
                         end_idx   = obj.mwbm_config.body.chains{idx,3};
 
@@ -454,11 +466,15 @@ classdef WBM < WBM.WBMBase
                 obj.mwbm_config.body = robot_config.body;
             end
 
-            % check all parameter dimensions in "initStateParams", summed size
-            % is either: 0 (= empty), 'stvLen' or 'stvLen-7' ...
             if ~WBM.utilities.isStateEmpty(robot_config.initStateParams)
+                % check all parameter dimensions in "initStateParams", summed size
+                % is either: 0 (= empty), 'stvLen' or 'stvLen-7' ...
                 if ~obj.checkInitStateDimensions(robot_config.initStateParams)
                     error('WBM::initWBM: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
+                end
+                % check the number of joints ...
+                if (size(robot_config.initStateParams.q_j,1) > obj.MAX_NUM_JOINTS)
+                    error('WBM::initWBM: %s', WBM.wbmErrorMsg.MAX_JOINT_LIMIT);
                 end
             end
             obj.mwbm_config.initStateParams = robot_config.initStateParams;

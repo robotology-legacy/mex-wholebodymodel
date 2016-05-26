@@ -7,7 +7,8 @@ classdef wbmErrorMsg
         EMPTY_VECTOR      = 'Empty vector(s)!';
         FILE_NOT_EXIST    = 'File not exist on given path!';
         IDX_OUT_OF_BOUNDS = 'Index value out of bounds!';
-        MAX_NUM_LIMIT     = 'Value exceeds the maximum number!'
+        MAX_JOINT_LIMIT   = 'Maximum number of joints exeeded!';
+        MAX_NUM_LIMIT     = 'Value exceeds the maximum number!';
         STRING_MISMATCH   = 'String mismatch!';
         UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';
         UNKNOWN_EXC       = 'Unknown exception!';

@@ -1,5 +1,5 @@
 function wbm_icub = initRobot_iCub(wf2FixLnk)
-    %% Base model parameters:
+    %% Base (default) model parameters:
     icub_model = WBM.wbmBaseModelParams;
     icub_model.urdfRobot    = 'icubGazeboSim';
     %icub_model.urdfLinkName = 'l_sole';

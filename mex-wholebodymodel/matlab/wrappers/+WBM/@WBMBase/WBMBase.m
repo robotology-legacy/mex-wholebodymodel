@@ -8,6 +8,10 @@ classdef WBMBase < handle
         robot_model@WBM.wbmBaseModelParams
     end
 
+    properties(Constant)
+        MAX_NUM_JOINTS = 35;
+    end
+
     properties(Access = protected)
         mwbm_params@WBM.wbmBaseModelParams
     end
@@ -48,18 +52,19 @@ classdef WBMBase < handle
             % remove all class properties from workspace (free-up memory) ...
         end
 
-        function initModel(obj, urdf_robot_name)
-            if ~exist('urdf_robot_name', 'var')
-                % Optimized mode: use the default (URDF) robot name which is
-                % defined in the environment variable YARP_ROBOT_NAME for
-                % the WB(I)-Toolbox ...
+        function initModel(obj, urdf_model_name)
+            if ~exist('urdf_model_name', 'var')
+                % Optimized mode: use the default (URDF) robot model which
+                % is defined in the environment variable YARP_ROBOT_NAME
+                % of the WB-Toolbox ...
                 obj.mwbm_params.urdfRobot = getenv('YARP_ROBOT_NAME');
                 mexWholeBodyModel('model-initialise');
                 return
             end
-            % else, use the robot name that is supported by the WB(I)-Toolbox
-            % [URDF-file(s) must exist in the directory of the WB(I)-Tbx] ...
-            obj.mwbm_params.urdfRobot = urdf_robot_name;
+            % else, use the model name of the robot that is supported by the
+            % WB-Toolbox (the URDF-file(s) must exist in the directory of
+            % the WB-Toolbox) ...
+            obj.mwbm_params.urdfRobot = urdf_model_name;
             mexWholeBodyModel('model-initialise', obj.mwbm_params.urdfRobot);
         end
 
@@ -67,7 +72,7 @@ classdef WBMBase < handle
             if ~exist('urdf_file_name', 'var')
                 error('WBMBase::initModelURDF: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            if ~exist('urdf_file_name', 'file')
+            if ~WBM.utilities.fileExist(urdf_file_name)
                 error('WBMBase::initModelURDF: %s', WBM.wbmErrorMsg.FILE_NOT_EXIST);
             end
 
@@ -92,51 +97,55 @@ classdef WBMBase < handle
         end
 
         function updateWorldFrame(obj, wf_R_rootLnk, wf_p_rootLnk, g_wf)
-            if ( (nargin > 1) && (nargin ~= 4) )
+            if (nargin == 2)
                 error('WBMBase::updateWorldFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
 
-            if (nargin == 4)
-                % replace the old default parameters with the new values ...
-                obj.mwbm_params.wf_R_rootLnk = wf_R_rootLnk;
-                obj.mwbm_params.wf_p_rootLnk = wf_p_rootLnk;
-                obj.mwbm_params.g_wf         = g_wf;
+            switch nargin
+                case 4
+                    % replace all old default parameters with the new values ...
+                    obj.mwbm_params.wf_R_rootLnk = wf_R_rootLnk;
+                    obj.mwbm_params.wf_p_rootLnk = wf_p_rootLnk;
+                    obj.mwbm_params.g_wf         = g_wf;
+                case 3
+                    % replace only the orientation and translation ...
+                    obj.mwbm_params.wf_R_rootLnk = wf_R_rootLnk;
+                    obj.mwbm_params.wf_p_rootLnk = wf_p_rootLnk;
             end
-            % update the world frame with the new default parameters ...
+            % update the world frame with the new (or changed) parameters ...
             obj.setWorldFrame(obj.mwbm_params.wf_R_rootLnk, obj.mwbm_params.wf_p_rootLnk, ...
                               obj.mwbm_params.g_wf);
         end
 
         function [w_p_b, w_R_b] = getWorldFrameFromFixedLink(obj, urdf_link_name, q_j)
+            % compute the base world frame (WF) from a given contact (constraint) link:
             switch nargin
                 case 3
-                    % use another contact (constraint) link (*)
+                    % Normal mode: compute the WF for a specific joint configuration (positions) ...
                     [w_p_b, w_R_b] = obj.computeNewWorld2Base(urdf_link_name, q_j);
                 case 2
-                    if exist('urdf_link_name', 'var')
-                        % (*) ...
-                        [w_p_b, w_R_b] = obj.computeNewWorld2Base(urdf_link_name);
-                    else
-                        % use the current (default) link name (**)
-                        [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.mwbm_params.urdfLinkName, q_j);
-                    end
-                case 1
-                    % (**) ...
-                    [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.mwbm_params.urdfLinkName);
+                    % Optimized mode: compute the WF with the current joint configuration ...
+                    [w_p_b, w_R_b] = obj.computeNewWorld2Base(urdf_link_name);
                 otherwise
-                    % should be never reached ...
                     error('WBMBase::getWorldFrameFromFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
+        end
+
+        function [w_p_b, w_R_b] = getWorldFrameFromDfltFixedLink(obj, q_j)
+            % compute the base world frame (WF) from the default contact (constraint) link:
+            if exist('q_j', 'var')
+                % Normal mode:
+                [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.mwbm_params.urdfLinkName, q_j);
+                return
+            end
+            % else, optimized mode:
+            [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.mwbm_params.urdfLinkName);
         end
 
         function setState(~, q_j, dq_j, v_b)
             if (nargin ~= 4)
                 error('WBMBase::setState: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            %if ( (size(q_j,1) ~= size(dq_j,1)) || (size(v_b,1) ~= 6) )
-            %    error('WBMBase::setState: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
-            %end
-
             mexWholeBodyModel('update-state', q_j, dq_j, v_b);
         end
 
@@ -321,13 +330,23 @@ classdef WBMBase < handle
             if ~exist('prec', 'var')
                 prec = 2;
             end
+
+            [strPath, strName, ext] = fileparts(obj.mwbm_params.urdfRobot);
+            if ~isempty(ext)
+                strURDFname = sprintf([' URDF filename:       %s\n' ...
+                                       ' path:                %s'], ...
+                                      strcat(strName, ext), strPath);
+            else
+                strURDFname = sprintf(' URDF robot model:    %s', strName);
+            end
+
             strParams = sprintf(['WBM Parameters:\n\n' ...
-                                 ' URDF robot name:     %s\n' ...
+                                 '%s\n' ...
                                  ' URDF ref. link name: %s\n\n' ...
                                  ' R (root link to world frame):  %s\n' ...
                                  ' p (root link to world frame):  %s\n' ...
                                  ' g (world frame):               %s\n'], ...
-                                obj.mwbm_params.urdfRobot, obj.mwbm_params.urdfLinkName, ...
+                                strURDFname, obj.mwbm_params.urdfLinkName, ...
                                 mat2str(obj.mwbm_params.wf_R_rootLnk, prec), ...
                                 mat2str(obj.mwbm_params.wf_p_rootLnk, prec), ...
                                 mat2str(obj.mwbm_params.g_wf, prec));
@@ -348,15 +367,16 @@ classdef WBMBase < handle
             % using Unified Robot Description Format (URDF):
             if isempty(model_params.urdfRobot)
                 % Optimized mode:
-                obj.initModel(); % use the default (URDF) robot name ...
+                obj.initModel(); % use the default (URDF) model ...
             else
                 % Normal mode:
-                if WBM.utilities.fileExist(model_params.urdfRobot)
-                    % use directly a specific URDF-file for the robot ...
+                [~,model_name, ext] = fileparts(model_params.urdfRobot);
+                if ~isempty(ext)
+                    % use directly a specific URDF-file for the robot model ...
                     obj.initModelURDF(model_params.urdfRobot);
                 else
-                    % set the robot-name which is supported by the WBI ...
-                    obj.initModel(model_params.urdfRobot);
+                    % set the model name of the robot which is supported by the WB-Toolbox ...
+                    obj.initModel(model_name);
                 end
             end
         end
@@ -383,8 +403,7 @@ classdef WBMBase < handle
             nw_H_b = ow_H_refLnk \ ow_H_b;
 
             % extract the translation and the rotation values ...
-            nw_p_b = nw_H_b(1:3,4);
-            nw_R_b = nw_H_b(1:3,1:3);
+            [nw_p_b, nw_R_b] = WBM.utilities.tform2posRotm(nw_H_b);
         end
 
     end
