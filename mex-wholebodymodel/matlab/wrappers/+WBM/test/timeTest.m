@@ -53,13 +53,14 @@ for i = 1:noi
     tau_g  = wbm_icub.gravityForces(R, p, q_j);
     tau_g  = wbm_icub.gravityForces(R, p, q_j);
 
-    dJdq_1 = wbm_icub.dJdq(icub_config.cstrLinkNames{1}, R, p, q_j, dq_j, v_b);
-    dJdq_2 = wbm_icub.dJdq(icub_config.cstrLinkNames{2}, R, p, q_j, dq_j, v_b);
+    dJdq_1 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstrLinkNames{1});
+    dJdq_2 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstrLinkNames{2});
 
-    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{1}, R, p, q_j);
-    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{2}, R, p, q_j);
-    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{1}, R, p, q_j);
-    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{2}, R, p, q_j);
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstrLinkNames{1});
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstrLinkNames{2});
+
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstrLinkNames{1});
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstrLinkNames{2});
 end
 totTime = toc();
 
@@ -124,6 +125,7 @@ for i = 1:noi
 
     J      = wbm_icub.jacobian(icub_config.cstrLinkNames{1});
     J      = wbm_icub.jacobian(icub_config.cstrLinkNames{2});
+
     J      = wbm_icub.jacobian(icub_config.cstrLinkNames{1});
     J      = wbm_icub.jacobian(icub_config.cstrLinkNames{2});
 end

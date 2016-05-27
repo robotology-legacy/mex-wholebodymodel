@@ -101,24 +101,21 @@ classdef WBM < WBM.WBMBase
         end
 
         function wf_vqT_rlnk = computeFKinRotoTranslation(obj, urdf_link_name, q_j, vqT, g_wf)
-            % calculate the forward kinematic roto-translation of a specified joint or link:
-            switch nargin
-                case {4, 5}
-                    % convert the state of the base into the roto-translation form ...
-                    [p_b, R_b] = WBM.utilities.frame2posRotm(vqT);
-                    % set the world frame to the base ...
-                    if ~exist('g_wf', 'var')
-                        % use the default gravity vector ...
-                        obj.setWorldFrame(R_b, p_b);
-                    else
-                        % use the specified gravity vector...
-                        obj.setWorldFrame(R_b, p_b, g_wf);
-                    end
-                    % compute the forward kinematics of the specified link or joint ...
-                    wf_vqT_rlnk = obj.forwardKinematics(urdf_link_name, R_b, p_b, q_j);
-                otherwise
-                    error('WBM::computeFKinRotoTranslation: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            % calculate the forward kinematic roto-translation of a specified link frame:
+            if (nargin < 4)
+                error('WBM::computeFKinRotoTranslation: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
+
+            % get the roto-translation form the base state ...
+            [p_b, R_b] = WBM.utilities.frame2posRotm(vqT);
+            % set the world frame to the base ...
+            if ~exist('g_wf', 'var')
+                obj.setWorldFrame(R_b, p_b); % use the default gravity vector ...
+            else
+                obj.setWorldFrame(R_b, p_b, g_wf);
+            end
+            % compute the forward kinematics of the link frame ...
+            wf_vqT_rlnk = obj.forwardKinematics(R_b, p_b, q_j, urdf_link_name);
         end
 
         [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
@@ -152,7 +149,7 @@ classdef WBM < WBM.WBMBase
                         error('WBM::getStateChains: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
                     end
 
-                    if ( ~exist('q_j', 'var') && ~exist('dq_j', 'var') )
+                    if (nargin == 2)
                         [~,q_j,~,dq_j] = obj.getState(); % get the current state values ...
                     end
 
@@ -193,7 +190,7 @@ classdef WBM < WBM.WBMBase
                         error('WBM::getStateJointNames: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
                     end
 
-                    if ( ~exist('q_j', 'var') && ~exist('dq_j', 'var') )
+                    if (nargin == 2)
                         [~,q_j,~,dq_j] = obj.getState(); % get the state values ...
                     end
                     len = length(joint_names);
@@ -221,7 +218,7 @@ classdef WBM < WBM.WBMBase
                         error('WBM::getStateJointIdx: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
                     end
 
-                    if ( ~exist('q_j', 'var') && ~exist('dq_j', 'var') )
+                    if (nargin == 2)
                         [~,q_j,~,dq_j] = obj.getState(); % get the values ...
                     end
                     len = length(joint_idx);

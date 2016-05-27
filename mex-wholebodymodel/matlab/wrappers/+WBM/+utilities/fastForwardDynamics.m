@@ -7,12 +7,11 @@ function [dstvChi, h] = fastForwardDynamics(t, stvChi, ctrlTrqs, wbm_config)
     stp = WBM.utilities.fastGetStateParams(stvChi, wbm_config.stvLen, ndof);
 
     omega_w = stp.omega_b;
-    v_bw = vertcat(stp.dx_b, omega_w);
+    v_b = vertcat(stp.dx_b, omega_w);
     %v = [stp.dx_b; omega_w; stp.dq_j];
 
-    % mex-WBM calls:
-    %
-    wbm_updateState(stp.q_j, stp.dq_j, v_bw);
+    % update the state for the optimized mode (precautionary) ...
+    wbm_updateState(stp.q_j, stp.dq_j, v_b);
 
     % reconstruct the rotation of the 'root link' to the 'world'
     % from the quaternion part of the transformation vector vqT_b:
@@ -37,9 +36,9 @@ function [dstvChi, h] = fastForwardDynamics(t, stvChi, ctrlTrqs, wbm_config)
     tau = ctrlTrqs.tau(t);
 
     % contact force computations:
-    JcMinv = Jc/M;
-    JcMinvJct = JcMinv * Jc';
-    tauDamp = -dampCoeff * stp.dq_j;
+    JcMinv    =  Jc / M;
+    JcMinvJct =  JcMinv * Jc';
+    tauDamp   = -dampCoeff * stp.dq_j;
     % get the contact (constraint) force ...
     f_c = JcMinvJct \ (JcMinv * (h - vertcat(zeros(6,1), tau+tauDamp)) - dJcDq);
 
@@ -47,7 +46,7 @@ function [dstvChi, h] = fastForwardDynamics(t, stvChi, ctrlTrqs, wbm_config)
     % obtain angular velocity in body frame omega_b. This is then used in the
     % quaternion derivative computation:
     omega_b = R_b * omega_w;
-    dqt_b = WBM.utilities.dQuat(stp.qt_b, omega_b);
+    dqt_b   = WBM.utilities.dQuat(stp.qt_b, omega_b);
 
     dx = vertcat(stp.dx_b, dqt_b, stp.dq_j);
     dv = M \ (Jc'*f_c + vertcat(zeros(6,1), tau+tauDamp) - h);

@@ -28,9 +28,6 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     vqT_b = x_out(1:nRes,1:7);
     q_j = x_out(1:nRes,8:vlen);
 
-    % set back the floating base position of the world frame to the initial roto-translation ...
-    %obj.setWorldFrameFromDfltFixedLink(); % do we need this here? (not really)
-
     nJnts  = sim_config.robot_body.nJoints; % number of nodes (virtual joints) to be plotted
     nLnks  = sim_config.robot_body.nLinks;  % number of edges (virtual links) to be plotted
     nFeets = sim_config.robot_body.nFeets;  % number of feets of the robot's body
