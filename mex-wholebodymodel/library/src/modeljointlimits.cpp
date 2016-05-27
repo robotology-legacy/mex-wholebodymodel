@@ -86,34 +86,15 @@ bool ModelJointLimits::compute(int nrhs, const mxArray *prhs[])
    mexPrintf("Trying to compute ModelJointLimits\n");
 #endif
   robotModel = modelState->robotModel();
-  int numDof = modelState->dof();
-
-
-  double temp1[numDof],temp2[numDof];
-  robotModel->getJointLimits(temp1,temp2);
-
-  for(int i = 0; i<numDof; i++)
-  {
-      jointLowerLimit[i] = temp1[i];
-      jointUpperLimit[i] = temp2[i];
-  }
+  robotModel->getJointLimits(jointLowerLimit,jointUpperLimit);
 
   return(true);
 }
 
 bool ModelJointLimits::computeFast(int, const mxArray*[])
 {
-  int numDof = modelState->dof();
-
-  double temp1[numDof],temp2[numDof];
   robotModel = modelState->robotModel();
-  robotModel->getJointLimits(temp1,temp2);
-
-  for(int i = 0; i<numDof; i++)
-  {
-      jointLowerLimit[i] = temp1[i];
-      jointUpperLimit[i] = temp2[i];
-  }
+  robotModel->getJointLimits(jointLowerLimit,jointUpperLimit);
 
   return(true);
 }
