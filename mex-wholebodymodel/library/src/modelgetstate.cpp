@@ -26,7 +26,6 @@
 
 // local includes
 #include "modelgetstate.h"
-#include <boost/concept_check.hpp>
 
 using namespace mexWBIComponent;
 
@@ -170,7 +169,7 @@ bool ModelGetState::computeFast(int nrhs, const mxArray* prhs[])
 
   (modelState->getRootWorldRotoTranslation()).R.getQuaternion(rootQuaternion[1], rootQuaternion[2], rootQuaternion[3], rootQuaternion[0]);
 #ifdef DEBUG
- 
+
       std::stringstream ssR;
     ssR<<"Quat : ["<<rootQuaternion[0]<<","<<rootQuaternion[1]<<","<<rootQuaternion[2]<<","<<rootQuaternion[3]<<"]\n";
     std::string sR = ssR.str();
