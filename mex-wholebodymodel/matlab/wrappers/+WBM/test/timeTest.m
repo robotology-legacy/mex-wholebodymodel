@@ -5,7 +5,7 @@ import WBM.utilities.*
 
 %% First initialization of the WBM:
 % base model:
-icub_model = wbmBaseModelParams;
+icub_model = wbmBaseRobotModel;
 icub_model.ndof         = 25;
 icub_model.urdf_robot   = 'icubGazeboSim';
 icub_model.wf_R_rootLnk = eye(3,3);
@@ -74,7 +74,7 @@ clearvars; % clear all variables from the workspace ...
 fprintf('\n\nStarting optimized mode trial\n-----------------------------\n');
 
 % base model:
-icub_model = wbmBaseModelParams;
+icub_model = wbmBaseRobotModel;
 icub_model.ndof         = 25;
 icub_model.urdf_robot   = 'icubGazeboSim';
 icub_model.wf_R_rootLnk = eye(3,3);

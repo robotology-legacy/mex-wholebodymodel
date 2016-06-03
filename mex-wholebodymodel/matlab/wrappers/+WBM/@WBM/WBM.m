@@ -464,8 +464,8 @@ classdef WBM < WBM.WBMBase
             cinit_st{4,1} = sprintf('  qt_b:     %s', mat2str(stInit.qt_b, prec));
             cinit_st{5,1} = sprintf('  dx_b:     %s', mat2str(stInit.dx_b, prec));
             cinit_st{6,1} = sprintf('  omega_b:  %s', mat2str(stInit.omega_b, prec));
-            strInitState    = sprintf('%s\n%s\n%s\n%s\n%s\n%s', cinit_st{1,1}, cinit_st{2,1}, ...
-                                      cinit_st{3,1}, cinit_st{4,1}, cinit_st{5,1}, cinit_st{6,1});
+            strInitState  = sprintf('%s\n%s\n%s\n%s\n%s\n%s', cinit_st{1,1}, cinit_st{2,1}, ...
+                                    cinit_st{3,1}, cinit_st{4,1}, cinit_st{5,1}, cinit_st{6,1});
 
             strPldTbl = sprintf('  none\n');
             if (nPlds > 0)
