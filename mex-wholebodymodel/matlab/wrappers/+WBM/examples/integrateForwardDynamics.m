@@ -5,9 +5,9 @@ import WBM.Robot.iCub.*
 
 
 %% Initialization of the WBM for the iCub-Robot:
-wf2FixLnk = true; % set the world frame to a fixed link
-wbm_icub = initRobot_iCub(wf2FixLnk);
-icub_model = wbm_icub.robot_model;
+wf2fixLnk   = true; % set the world frame to a fixed link
+wbm_icub    = initRobot_iCub(wf2fixLnk);
+icub_model  = wbm_icub.robot_model;
 icub_config = wbm_icub.robot_config;
 
 %% State variable:
@@ -23,10 +23,9 @@ chi_init = wbm_icub.stvChiInit;
 %  the ODEs to control the dynamics of the equation-system. It refers to the control
 %  torques of each time-step t and is needed to calculate the constraint forces f_c
 %  which influences the outcome of each equation, the generalized acceleration dv (q_ddot).
-vqT_init = wbm_icub.vqTInit;
-[p_b, R_b] = frame2posRotm(vqT_init);
-g_init = wbm_icub.generalizedBiasForces(R_b, p_b, icub_config.initStateParams.q_j, ...
-                                        zeros(icub_config.ndof,1), zeros(6,1));
+[p_b, R_b] = frame2posRotm(wbm_icub.vqTInit);
+g_init = wbm_icub.generalizedBiasForces(R_b, p_b, icub_config.init_state_params.q_j, ...
+                                        zeros(icub_model.ndof,1), zeros(6,1));
 len = size(g_init,1);
 % minimalistic data structure for the control torques (further parameters for
 % different computations can be added to this structure) ...
@@ -37,7 +36,8 @@ ctrlTrqs.tau = @(t)zeros(size(g_init(7:len)));
 %  of the system. It evaluates the right side of the nonlinear first-order ODEs of the
 %  form chi' = f(t,chi) and returns a vector of rates of change (vector of derivatives)
 %  that will be integrated by the solver.
-fwdDynFunc = @(t, chi)WBM.utilities.fastForwardDynamics(t, chi, ctrlTrqs, wbm_icub.robot_config);
+fwdDynFunc = @(t, chi)WBM.utilities.fastForwardDynamics(t, chi, ctrlTrqs, ...
+                                                        wbm_icub.robot_model, wbm_icub.robot_config);
 %fwdDynFunc = @(t, chi)wbm_icub.forwardDynamics(t, chi, ctrlTrqs); % optional
 
 % specifying the time interval of the integration ...

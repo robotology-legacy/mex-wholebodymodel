@@ -16,7 +16,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     end
 
     % check the dimension and get the number of instances of the simulation result ...
-    ndof = obj.mwbm_config.ndof;
+    ndof = obj.mwbm_model.ndof;
     vlen = ndof + 7;
     [nRes, len] = size(x_out);
     if (len ~= vlen)
@@ -49,8 +49,8 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     % joint name list of the robot:
     fwd_kin.vqT(1:nRes,1:7,1) = vqT_b; % use the base data instead the forward kin. of the 'root_link' ...
     for i = 1:nRes % for each result ...
-        q   = q_j(i,1:ndof)';
-        vqT = squeeze(vqT_b(i,1:7)');
+        q   = q_j(i,1:ndof).';
+        vqT = squeeze(vqT_b(i,1:7).');
 
         for j = 2:nJnts
             fwd_kin.vqT(i,1:7,j) = obj.computeFKinRotoTranslation(sim_config.robot_body.joint_lnk_names{j,1}, q, vqT);
@@ -76,7 +76,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     end
 
     for i = 1:nJnts-1
-        [fwd_kin.vJntPos(i,1:3), fwd_kin.hJnt_dp(1,i)] = plotFKinJointPos((fwd_kin.vqT(1,1:7,i))', plot_prop);
+        [fwd_kin.vJntPos(i,1:3), fwd_kin.hJnt_dp(1,i)] = plotFKinJointPos((fwd_kin.vqT(1,1:7,i)).', plot_prop);
     end
     % draw the position of the center of mass (CoM):
     plot_prop = sim_config.robot_body.draw_prop.com;
@@ -84,7 +84,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
         plot_prop.marker = 'none';
         plot_prop.color  = 'none';
     end
-    [fwd_kin.vJntPos(nJnts,1:3), fwd_kin.hJnt_dp(1,nJnts)] = plotFKinJointPos((fwd_kin.vqT(1,1:7,nJnts))', plot_prop);
+    [fwd_kin.vJntPos(nJnts,1:3), fwd_kin.hJnt_dp(1,nJnts)] = plotFKinJointPos((fwd_kin.vqT(1,1:7,nJnts)).', plot_prop);
     hSimRobot(1:nGObjs,1) = fwd_kin.hJnt_dp(1,1:nJnts); % store the graphics objects ...
 
     % create a position parameter matrix from the defined joint pairs (links) to describe a full
@@ -153,7 +153,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
         tic; % visualization step timer start (needed for adapting the visualization speed)
 
         % update the forward kinematic translations (positions) ...
-        new_fk_pos = (squeeze(fwd_kin.vqT(t,1:7,1:nJnts)))';
+        new_fk_pos = (squeeze(fwd_kin.vqT(t,1:7,1:nJnts))).';
         [fwd_kin.vJntPos, fwd_kin.hJnt_dp] = updateFKinJointPositions(fwd_kin.vJntPos, fwd_kin.hJnt_dp, new_fk_pos, nJnts);
         hSimRobot(1:nJnts,1) = fwd_kin.hJnt_dp(1,1:nJnts);
 
@@ -198,7 +198,6 @@ end
 %% END of visualizeForwardDynamics.
 
 
-
 %% GRAPHIC FUNCTIONS:
 
 function initSimEnvironment(sim_config)
@@ -222,8 +221,7 @@ end
 
 function [jntPos, hJnt_dp] = plotFKinJointPos(fk_vqT, plot_prop)
     % get the new position (translation) of the computed forward kinematics ...
-    p = fk_vqT(1:3,1);
-    jntPos = p';
+    jntPos = fk_vqT(1:3,1).';
     % create a 3D data point of the forward kin. translation ...
     hJnt_dp = plot3(jntPos(1,1), jntPos(1,2), jntPos(1,3), 'Marker', plot_prop.marker, ...
                     'MarkerSize', plot_prop.marker_sz, 'MarkerEdgeColor', plot_prop.color);
@@ -233,8 +231,7 @@ function [vJntPos, hJnt_dp] = updateFKinJointPositions(vJntPos, hJnt_dp, fk_vqT,
     % update the forward kinematic translations (positions) ...
     for i = 1:nJnts
         % get the translation (position) of the current instance ...
-        p = fk_vqT(i,1:3);
-        vJntPos(i,1:3) = p;
+        vJntPos(i,1:3) = fk_vqT(i,1:3);
         % update the position of the current 3D data-point ...
         set(hJnt_dp(1,i), 'XData', vJntPos(i,1), 'YData', vJntPos(i,2), 'ZData', vJntPos(i,3));
     end
@@ -306,15 +303,15 @@ end
 
 function foot_vtx = getFootShapeVertices(jnt_pair_pos, base_sz, foot_ds)
     % scaled orthogonal (lin. independent) vectors to the current foot joint ...
-    o_vec_1 = [0 base_sz.width              0]';
-    o_vec_2 = [0 0             base_sz.height]';
+    o_vec_1 = vertcat(0, base_sz.width, 0);
+    o_vec_2 = vertcat(0, 0, base_sz.height);
 
     % calculate the offsets in the direction orthogonal to the foot joint ...
     ofs = zeros(4,3);
-    ofs(1,1:3) = o_vec_1 + 2*o_vec_2;
+    ofs(1,1:3) =  o_vec_1 + 2*o_vec_2;
     ofs(2,1:3) = -o_vec_1 + 2*o_vec_2;
     ofs(3,1:3) = -o_vec_1 - o_vec_2;
-    ofs(4,1:3) = o_vec_1 - o_vec_2;
+    ofs(4,1:3) =  o_vec_1 - o_vec_2;
 
     % compute the vertices of each patch to form the foot shape ...
     idx = 1;

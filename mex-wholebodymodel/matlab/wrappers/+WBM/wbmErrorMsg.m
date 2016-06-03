@@ -5,10 +5,11 @@ classdef wbmErrorMsg
         EMPTY_DATA_TYPE   = 'Empty data type!';
         EMPTY_STRING      = 'Empty string!';
         EMPTY_VECTOR      = 'Empty vector(s)!';
-        FILE_NOT_EXIST    = 'File not exist on given path!';
+        FILE_NOT_EXIST    = 'File does not exist on given path!';
         IDX_OUT_OF_BOUNDS = 'Index value out of bounds!';
-        MAX_JOINT_LIMIT   = 'Maximum number of joints exeeded!';
+        MAX_JOINT_LIMIT   = 'Maximum number of joints exceeded!';
         MAX_NUM_LIMIT     = 'Value exceeds the maximum number!';
+        NOT_HOMOG_MAT     = 'Matrix is not homogeneous!';
         STRING_MISMATCH   = 'String mismatch!';
         UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';
         UNKNOWN_EXC       = 'Unknown exception!';

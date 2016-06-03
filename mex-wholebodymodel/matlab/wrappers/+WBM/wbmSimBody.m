@@ -24,10 +24,10 @@ classdef wbmSimBody < handle
     end
 
     properties(Access = private)
-        mShape_geom = struct( 'size_sf',  [], ...
+        mshape_geom = struct( 'size_sf',  [], ...
                               'faces',    [] );
 
-        mFoot_geom  = struct( 'joints',   [], ...
+        mfoot_geom  = struct( 'joints',   [], ...
                               'base_sz',  struct( 'width',  0, ...
                                                   'height', 0 ), ...
                               'shape_ds', [] );
@@ -88,7 +88,7 @@ classdef wbmSimBody < handle
         end
 
         function shape_geom = get.shape_geom(obj)
-            shape_geom = obj.mShape_geom;
+            shape_geom = obj.mshape_geom;
         end
 
         function set.shape_size_sf(obj, size_sf)
@@ -96,11 +96,11 @@ classdef wbmSimBody < handle
             if ( (m ~= obj.nLinks) || (n ~= 2) )
                 error('wbmSimBody::set.shape_size_sf: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
-            obj.mShape_geom.size_sf = size_sf;
+            obj.mshape_geom.size_sf = size_sf;
         end
 
         function shape_size_sf = get.shape_size_sf(obj)
-            shape_size_sf = obj.mShape_geom.size_sf;
+            shape_size_sf = obj.mshape_geom.size_sf;
         end
 
         function set.shape_faces(obj, shape_faces)
@@ -108,11 +108,11 @@ classdef wbmSimBody < handle
             if ( (m ~= 6) || (n ~= 4) )
                 error('wbmSimBody::set.shape_faces: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
-            obj.mShape_geom.faces = shape_faces;
+            obj.mshape_geom.faces = shape_faces;
         end
 
         function shape_faces = get.shape_faces(obj)
-            shape_faces = obj.mShape_geom.faces;
+            shape_faces = obj.mshape_geom.faces;
         end
 
         function set.foot_geom(obj, foot_geom)
@@ -125,35 +125,35 @@ classdef wbmSimBody < handle
         end
 
         function foot_geom = get.foot_geom(obj)
-            foot_geom = obj.mFoot_geom;
+            foot_geom = obj.mfoot_geom;
         end
 
         function set.foot_joints(obj, foot_jnts)
             if ~isvector(foot_jnts)
                 error('wbmSimBody::set.foot_joints: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            obj.mFoot_geom.joints = foot_jnts;
-            obj.nFeets = length(obj.mFoot_geom.joints);
+            obj.mfoot_geom.joints = foot_jnts;
+            obj.nFeets = length(obj.mfoot_geom.joints);
         end
 
         function foot_jnts = get.foot_joints(obj)
-            foot_jnts = obj.mFoot_geom.joints;
+            foot_jnts = obj.mfoot_geom.joints;
         end
 
         function set.foot_base_sz(obj, base_sz)
             if isstruct(base_sz)
-                obj.mFoot_geom.base_sz.width  = base_sz.width;
-                obj.mFoot_geom.base_sz.height = base_sz.height;
+                obj.mfoot_geom.base_sz.width  = base_sz.width;
+                obj.mfoot_geom.base_sz.height = base_sz.height;
             elseif ( isvector(base_sz) && (size(base_sz,2) == 2) )
-                obj.mFoot_geom.base_sz.width  = base_sz(1,1);
-                obj.mFoot_geom.base_sz.height = base_sz(1,2);
+                obj.mfoot_geom.base_sz.width  = base_sz(1,1);
+                obj.mfoot_geom.base_sz.height = base_sz(1,2);
             else
                 error('wbmSimBody::set.foot_base_sz: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
         end
 
         function foot_base_sz = get.foot_base_sz(obj)
-            foot_base_sz = obj.mFoot_geom.base_sz;
+            foot_base_sz = obj.mfoot_geom.base_sz;
         end
 
         function set.foot_shape_ds(obj, foot_ds)
@@ -161,11 +161,11 @@ classdef wbmSimBody < handle
             if ( (m ~= 8) || (n ~= 3) )
                 error('wbmSimBody::set.foot_shape_ds: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
-            obj.mFoot_geom.shape_ds = foot_ds;
+            obj.mfoot_geom.shape_ds = foot_ds;
         end
 
         function foot_shape_ds = get.foot_shape_ds(obj)
-            foot_shape_ds = obj.mFoot_geom.shape_ds;
+            foot_shape_ds = obj.mfoot_geom.shape_ds;
         end
 
     end

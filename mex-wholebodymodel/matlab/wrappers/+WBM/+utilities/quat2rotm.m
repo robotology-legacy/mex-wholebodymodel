@@ -4,7 +4,7 @@ function dcm = quat2rotm(quat)
     end
     dcm = zeros(3,3);
 
-    n2 = quat'*quat;
+    n2 = quat.'*quat;
     if (n2 > 1)
         quat = quat./sqrt(n2); % normalize
     end

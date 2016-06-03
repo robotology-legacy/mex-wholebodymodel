@@ -5,7 +5,7 @@ function axang = quat2axang(quat)
     axang   = zeros(4,1);
     epsilon = 1e-12; % min. value to treat a number as zero ...
 
-    n2 = quat'*quat;
+    n2 = quat.'*quat;
     if (n2 > 1)
         % if the quaternion is not normalized, i.e. if the scalar part q_s > 1,
         % then acos and sqrt will produce errors ...
@@ -22,7 +22,7 @@ function axang = quat2axang(quat)
     %   [4] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, p. 34.
     %   [5] GPGPU Programming for Games and Science, David H. Eberly, CRC Press, 2014, pp. 312-313, list. 6.37.
     q_r = quat(2:4,1);
-    if (q_r'*q_r <= epsilon) % if q_1^2 + q_2^2 + q_3^2 = 0:
+    if (q_r.'*q_r <= epsilon) % if q_1^2 + q_2^2 + q_3^2 = 0:
         % Null or full rotation, the angle is 0 (modulo 2*pi) --> singularity: The unit vector u is indeterminate.
         % By convention, set u to the default value (0, 0, 1) according to the ISO/IEC IS 19775-1:2013 standard of the Web3D Consortium.
         % See: <http://www.web3d.org/documents/specifications/19775-1/V3.3/Part01/fieldsDef.html#SFRotationAndMFRotation>

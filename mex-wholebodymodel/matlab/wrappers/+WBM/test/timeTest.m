@@ -6,14 +6,14 @@ import WBM.utilities.*
 %% First initialization of the WBM:
 % base model:
 icub_model = wbmBaseModelParams;
-icub_model.urdfRobot = 'icubGazeboSim';
+icub_model.ndof         = 25;
+icub_model.urdf_robot   = 'icubGazeboSim';
 icub_model.wf_R_rootLnk = eye(3,3);
 icub_model.g_wf         = [0; 0; -9.81];
 % base robot config:
 icub_config = wbmHumanoidConfig;
-icub_config.ndof          = 25;
-icub_config.nCstrs        = 2;
-icub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
+icub_config.nCstrs          = 2;
+icub_config.cstr_link_names = {'r_sole', 'l_gripper'};
 
 noi = 1000;
 
@@ -53,14 +53,14 @@ for i = 1:noi
     tau_g  = wbm_icub.gravityForces(R, p, q_j);
     tau_g  = wbm_icub.gravityForces(R, p, q_j);
 
-    dJdq_1 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstrLinkNames{1});
-    dJdq_2 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstrLinkNames{2});
+    dJdq_1 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstr_link_names{1});
+    dJdq_2 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstr_link_names{2});
 
-    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstrLinkNames{1});
-    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstrLinkNames{2});
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstr_link_names{1});
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstr_link_names{2});
 
-    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstrLinkNames{1});
-    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstrLinkNames{2});
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstr_link_names{1});
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstr_link_names{2});
 end
 totTime = toc();
 
@@ -75,14 +75,14 @@ fprintf('\n\nStarting optimized mode trial\n-----------------------------\n');
 
 % base model:
 icub_model = wbmBaseModelParams;
-icub_model.urdfRobot = 'icubGazeboSim';
+icub_model.ndof         = 25;
+icub_model.urdf_robot   = 'icubGazeboSim';
 icub_model.wf_R_rootLnk = eye(3,3);
 icub_model.g_wf         = [0; 0; 9.81];
 % base robot config:
 icub_config = wbmHumanoidConfig;
-icub_config.ndof          = 25;
-icub_config.nCstrs        = 2;
-icub_config.cstrLinkNames = {'r_sole', 'l_gripper'};
+icub_config.nCstrs          = 2;
+icub_config.cstr_link_names = {'r_sole', 'l_gripper'};
 
 noi = 1000;
 
@@ -120,14 +120,14 @@ for i = 1:noi
     tau_g  = wbm_icub.gravityForces();
     tau_g  = wbm_icub.gravityForces();
 
-    dJdq_1 = wbm_icub.dJdq(icub_config.cstrLinkNames{1});
-    dJdq_2 = wbm_icub.dJdq(icub_config.cstrLinkNames{2});
+    dJdq_1 = wbm_icub.dJdq(icub_config.cstr_link_names{1});
+    dJdq_2 = wbm_icub.dJdq(icub_config.cstr_link_names{2});
 
-    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{1});
-    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{2});
+    J      = wbm_icub.jacobian(icub_config.cstr_link_names{1});
+    J      = wbm_icub.jacobian(icub_config.cstr_link_names{2});
 
-    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{1});
-    J      = wbm_icub.jacobian(icub_config.cstrLinkNames{2});
+    J      = wbm_icub.jacobian(icub_config.cstr_link_names{1});
+    J      = wbm_icub.jacobian(icub_config.cstr_link_names{2});
 end
 totTime = toc();
 

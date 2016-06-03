@@ -5,7 +5,7 @@ classdef WBMBase < handle
         wf_R_rootLnk@double matrix
         wf_p_rootLnk@double vector
         g_wf@double         vector
-        robot_model@WBM.wbmBaseModelParams
+        robot_model@WBM.wbmBaseRobotModel
     end
 
     properties(Constant)
@@ -13,20 +13,20 @@ classdef WBMBase < handle
     end
 
     properties(Access = protected)
-        mwbm_params@WBM.wbmBaseModelParams
+        mwbm_model@WBM.wbmBaseRobotModel
     end
 
-    methods%(Access = public)
+    methods
         % Constructor:
-        function obj = WBMBase(model_params)
-            if ~exist('model_params', 'var')
+        function obj = WBMBase(robot_model)
+            if ~exist('robot_model', 'var')
                 error('WBMBase::WBMBase: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
 
-            obj.initWBM(model_params);
+            obj.initWBM(robot_model);
             % set the world frame (WF) to the initial parameters ...
-            obj.updateWorldFrame(model_params.wf_R_rootLnk, model_params.wf_p_rootLnk, ...
-                                 model_params.g_wf);
+            obj.updateWorldFrame(robot_model.wf_R_rootLnk, robot_model.wf_p_rootLnk, ...
+                                 robot_model.g_wf);
         end
 
         % Copy-function:
@@ -57,15 +57,15 @@ classdef WBMBase < handle
                 % Optimized mode: use the default (URDF) robot model which
                 % is defined in the environment variable YARP_ROBOT_NAME
                 % of the WB-Toolbox ...
-                obj.mwbm_params.urdfRobot = getenv('YARP_ROBOT_NAME');
+                obj.mwbm_model.urdf_robot = getenv('YARP_ROBOT_NAME');
                 mexWholeBodyModel('model-initialise');
                 return
             end
             % else, use the model name of the robot that is supported by the
             % WB-Toolbox (the URDF-file(s) must exist in the directory of
             % the WB-Toolbox) ...
-            obj.mwbm_params.urdfRobot = urdf_model_name;
-            mexWholeBodyModel('model-initialise', obj.mwbm_params.urdfRobot);
+            obj.mwbm_model.urdf_robot = urdf_model_name;
+            mexWholeBodyModel('model-initialise', obj.mwbm_model.urdf_robot);
         end
 
         function initModelURDF(obj, urdf_file_name)
@@ -76,8 +76,8 @@ classdef WBMBase < handle
                 error('WBMBase::initModelURDF: %s', WBM.wbmErrorMsg.FILE_NOT_EXIST);
             end
 
-            obj.mwbm_params.urdfRobot = urdf_file_name;
-            mexWholeBodyModel('model-initialise-urdf', obj.mwbm_params.urdfRobot);
+            obj.mwbm_model.urdf_robot = urdf_file_name;
+            mexWholeBodyModel('model-initialise-urdf', obj.mwbm_model.urdf_robot);
         end
 
         function setWorldFrame(obj, wf_R_rootLnk, wf_p_rootLnk, g_wf)
@@ -87,7 +87,7 @@ classdef WBMBase < handle
 
             if ~exist('g_wf', 'var')
                 % use the default gravity vector ...
-                g_wf = obj.mwbm_params.g_wf;
+                g_wf = obj.mwbm_model.g_wf;
             end
             wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1); % reshape the matrix into a 1-column array ...
             mexWholeBodyModel('set-world-frame', wf_R_rlnk_arr, wf_p_rootLnk, g_wf);
@@ -97,19 +97,19 @@ classdef WBMBase < handle
             switch nargin
                 case 4
                     % replace all old default parameters with the new values ...
-                    obj.mwbm_params.wf_R_rootLnk = wf_R_rootLnk;
-                    obj.mwbm_params.wf_p_rootLnk = wf_p_rootLnk;
-                    obj.mwbm_params.g_wf         = g_wf;
+                    obj.mwbm_model.wf_R_rootLnk = wf_R_rootLnk;
+                    obj.mwbm_model.wf_p_rootLnk = wf_p_rootLnk;
+                    obj.mwbm_model.g_wf         = g_wf;
                 case 3
                     % replace only the orientation and translation ...
-                    obj.mwbm_params.wf_R_rootLnk = wf_R_rootLnk;
-                    obj.mwbm_params.wf_p_rootLnk = wf_p_rootLnk;
+                    obj.mwbm_model.wf_R_rootLnk = wf_R_rootLnk;
+                    obj.mwbm_model.wf_p_rootLnk = wf_p_rootLnk;
                 case 2
                     error('WBMBase::updateWorldFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             % update the world frame with the new (or previously changed) parameters ...
-            obj.setWorldFrame(obj.mwbm_params.wf_R_rootLnk, obj.mwbm_params.wf_p_rootLnk, ...
-                              obj.mwbm_params.g_wf);
+            obj.setWorldFrame(obj.mwbm_model.wf_R_rootLnk, obj.mwbm_model.wf_p_rootLnk, ...
+                              obj.mwbm_model.g_wf);
         end
 
         function [w_p_b, w_R_b] = getWorldFrameFromFixedLink(obj, urdf_link_name, q_j)
@@ -130,11 +130,11 @@ classdef WBMBase < handle
             % compute the base world frame (WF) from the default contact (constraint) link:
             if exist('q_j', 'var')
                 % normal mode:
-                [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.mwbm_params.urdfLinkName, q_j);
+                [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.mwbm_model.urdf_link_name, q_j);
                 return
             end
             % else, optimized mode:
-            [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.mwbm_params.urdfLinkName);
+            [w_p_b, w_R_b] = obj.computeNewWorld2Base(obj.mwbm_model.urdf_link_name);
         end
 
         function setState(~, q_j, dq_j, v_b)
@@ -184,13 +184,13 @@ classdef WBMBase < handle
                     urdf_link_name = varargin{1,4};
                 case 4
                     % use the default link frame name ...
-                    urdf_link_name = obj.mwbm_params.urdfLinkName;
+                    urdf_link_name = obj.mwbm_model.urdf_link_name;
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
                     J = mexWholeBodyModel('jacobian', varargin{1,1});
                     return
                 case 1
-                    J = mexWholeBodyModel('jacobian', obj.mwbm_params.urdfLinkName);
+                    J = mexWholeBodyModel('jacobian', obj.mwbm_model.urdf_link_name);
                     return
                 otherwise
                     error('WBMBase::jacobian: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -209,13 +209,13 @@ classdef WBMBase < handle
                 case 7 % normal modes:
                     urdf_link_name = varargin{1,6};
                 case 6
-                    urdf_link_name = obj.mwbm_params.urdfLinkName; % default link name ...
+                    urdf_link_name = obj.mwbm_model.urdf_link_name; % default link name ...
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
                     dJ = mexWholeBodyModel('djdq', varargin{1,1});
                     return
                 case 1
-                    dJ = mexWholeBodyModel('djdq', obj.mwbm_params.urdfLinkName);
+                    dJ = mexWholeBodyModel('djdq', obj.mwbm_model.urdf_link_name);
                     return
                 otherwise
                     error('WBMBase::dJdq: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -246,13 +246,13 @@ classdef WBMBase < handle
                 case 5 % normal modes:
                     urdf_link_name = varargin{1,4};
                 case 4
-                    urdf_link_name = obj.mwbm_params.urdfLinkName; % default link name ...
+                    urdf_link_name = obj.mwbm_model.urdf_link_name; % default link name ...
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
                     wf_vqT_rlnk = mexWholeBodyModel('forward-kinematics', varargin{1,1});
                     return
                 case 1
-                    wf_vqT_rlnk = mexWholeBodyModel('forward-kinematics', obj.mwbm_params.urdfLinkName);
+                    wf_vqT_rlnk = mexWholeBodyModel('forward-kinematics', obj.mwbm_model.urdf_link_name);
                     return
                 otherwise
                     error('WBMBase::forwardKinematics: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -303,53 +303,76 @@ classdef WBMBase < handle
             end
         end
 
+        function tau_fr = frictionForces(obj, dq_j)
+            if ~exist('dq_j', 'var')
+                [~,~,~,dq_j] = obj.getState();
+            end
+            epsilon = 1e-12; % min. value to treat a number as zero ...
+
+            % Compute the friction forces (torques) F(dq) with a simplified model:
+            % Further details about the computation are available in:
+            %   [1] Modelling and Control of Robot Manipulators, L. Sciavicco & B. Siciliano, 2nd Edition, Springer, 2008,
+            %       p. 133 & p. 141.
+            %   [2] Introduction to Robotics: Mechanics and Control, John J. Craig, 3rd Edition, Pearson/Prentice Hall, 2005,
+            %       pp. 188-189, eq. (6.110)-(6.112).
+            %   [3] Robotics, Vision & Control: Fundamental Algorithms in Matlab, Peter I. Corke, Springer, 2011,
+            %       pp. 201-202, eq. (9.4) & (9.5).
+            if (sum(dq_j ~= 0) <= epsilon) % if dq_j = 0:
+                tau_fr = zeros(obj.mwbm_model.ndof,1);
+                return
+            end
+            tau_vf = -obj.mwbm_model.vfrict_coeff .* dq_j;       % viscous friction torques
+            tau_cf = -obj.mwbm_model.cfrict_coeff .* sign(dq_j); % Coulomb friction torques
+            tau_fr =  tau_vf + tau_cf;                            % friction torques
+        end
+
         function set.urdfLinkName(obj, new_link_name)
             if isempty(new_link_name)
                 error('WBMBase::set.urdfLinkName: %s', WBM.wbmErrorMsg.EMPTY_STRING);
             end
             % update the default link name ...
-            obj.mwbm_params.urdfLinkName = new_link_name;
+            obj.mwbm_model.urdf_link_name = new_link_name;
         end
 
         function lnk_name = get.urdfLinkName(obj)
-            lnk_name = obj.mwbm_params.urdfLinkName;
+            lnk_name = obj.mwbm_model.urdf_link_name;
         end
 
         function set.wf_R_rootLnk(obj, wf_R_rlnk)
             if ( (size(wf_R_rlnk,1) ~= 3) || (size(wf_R_rlnk,2) ~= 3) )
                 error('WBMBase::set.wf_R_rootLnk: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
-            obj.mwbm_params.wf_R_rootLnk = wf_R_rlnk;
+            obj.mwbm_model.wf_R_rootLnk = wf_R_rlnk;
         end
 
         function wf_R_rlnk = get.wf_R_rootLnk(obj)
-            wf_R_rlnk = obj.mwbm_params.wf_R_rootLnk;
+            wf_R_rlnk = obj.mwbm_model.wf_R_rootLnk;
         end
 
         function set.wf_p_rootLnk(obj, wf_p_rlnk)
             if (size(wf_p_rlnk,1) ~= 3)
                 error('WBMBase::set.wf_p_rootLnk: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
-            obj.mwbm_params.wf_p_rootLnk = wf_p_rlnk;
+            obj.mwbm_model.wf_p_rootLnk = wf_p_rlnk;
         end
 
         function wf_p_rlnk = get.wf_p_rootLnk(obj)
-            wf_p_rlnk = obj.mwbm_params.wf_p_rootLnk;
+            wf_p_rlnk = obj.mwbm_model.wf_p_rootLnk;
         end
 
         function set.g_wf(obj, g)
             if (size(g,1) ~= 3)
                 error('WBMBase::set.g_wf: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
-            obj.mwbm_params.g_wf = g;
+            obj.mwbm_model.g_wf = g;
         end
 
         function g_wf = get.g_wf(obj)
-            g_wf = obj.mwbm_params.g_wf;
+            g_wf = obj.mwbm_model.g_wf;
         end
 
         function robot_model = get.robot_model(obj)
-            robot_model = obj.mwbm_params;
+            robot_model = obj.mwbm_model;
         end
 
         function dispWBMParams(obj, prec)
@@ -357,7 +380,7 @@ classdef WBMBase < handle
                 prec = 2;
             end
 
-            [strPath, strName, ext] = fileparts(obj.mwbm_params.urdfRobot);
+            [strPath, strName, ext] = fileparts(obj.mwbm_model.urdf_robot);
             if ~isempty(ext)
                 strURDFname = sprintf([' URDF filename:       %s\n' ...
                                        ' path:                %s'], ...
@@ -366,40 +389,83 @@ classdef WBMBase < handle
                 strURDFname = sprintf(' URDF robot model:    %s', strName);
             end
 
+            if ~any(obj.mwbm_model.vfrict_coeff,1) % if vfrict_coeff = 0:
+                strFrictions = '  frictionless';
+            else
+                strFrictions = sprintf(['  viscous frictions:  %s\n' ...
+                                        '  Coulomb frictions:  %s'], ...
+                                       mat2str(obj.mwbm_model.vfrict_coeff, prec), ...
+                                       mat2str(obj.mwbm_model.cfrict_coeff, prec));
+            end
+
             strParams = sprintf(['WBM Parameters:\n\n' ...
+                                 ' #DoFs:               %d\n' ...
                                  '%s\n' ...
                                  ' URDF ref. link name: %s\n\n' ...
                                  ' R (root link to world frame):  %s\n' ...
                                  ' p (root link to world frame):  %s\n' ...
-                                 ' g (world frame):               %s\n'], ...
-                                strURDFname, obj.mwbm_params.urdfLinkName, ...
-                                mat2str(obj.mwbm_params.wf_R_rootLnk, prec), ...
-                                mat2str(obj.mwbm_params.wf_p_rootLnk, prec), ...
-                                mat2str(obj.mwbm_params.g_wf, prec));
+                                 ' g (world frame):               %s\n\n' ...
+                                 ' joint friction coefficients:\n%s\n'], ...
+                                obj.mwbm_model.ndof, strURDFname, ...
+                                obj.mwbm_model.urdf_link_name, ...
+                                mat2str(obj.mwbm_model.wf_R_rootLnk, prec), ...
+                                mat2str(obj.mwbm_model.wf_p_rootLnk, prec), ...
+                                mat2str(obj.mwbm_model.g_wf, prec), strFrictions);
             disp(strParams);
         end
 
     end
 
     methods(Access = private)
-        function initWBM(obj, model_params)
-            if ~isa(model_params, 'WBM.wbmBaseModelParams')
+        function initWBM(obj, robot_model)
+            if ~isa(robot_model, 'WBM.wbmBaseRobotModel')
                 error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            obj.mwbm_params = WBM.wbmBaseModelParams;
-            obj.mwbm_params.urdfLinkName = model_params.urdfLinkName;
+            % verify ndof ...
+            if (robot_model.ndof == 0)
+                error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.VALUE_IS_ZERO);
+            end
+            if (robot_model.ndof > obj.MAX_NUM_JOINTS)
+                error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.MAX_NUM_LIMIT);
+            end
+
+            obj.mwbm_model = WBM.wbmBaseRobotModel;
+            obj.mwbm_model.ndof           = robot_model.ndof;
+            obj.mwbm_model.urdf_link_name = robot_model.urdf_link_name;
+
+            if ~isempty(robot_model.vfrict_coeff)
+                if (size(robot_model.vfrict_coeff,1) ~= robot_model.ndof)
+                    error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                end
+
+                obj.mwbm_model.vfrict_coeff = robot_model.vfrict_coeff;
+                if ~isempty(obj.mwbm_model.cfrict_coeff)
+                    if (size(robot_model.cfrict_coeff,1) ~= robot_model.ndof)
+                        error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                    end
+
+                    obj.mwbm_model.cfrict_coeff = robot_model.cfrict_coeff;
+                else
+                    % only viscous friction: set the Coulomb friction to 0.
+                    obj.mwbm_model.cfrict_coeff = zeros(robot_model.ndof,1);
+                end
+            else
+                % frictionless model: set both coefficient vectors to 0.
+                obj.mwbm_model.vfrict_coeff = zeros(robot_model.ndof,1);
+                obj.mwbm_model.cfrict_coeff = obj.mwbm_model.vfrict_coeff;
+            end
 
             % Initialize the mex-WholeBodyModel for a floating base robot,
             % using Unified Robot Description Format (URDF):
-            if isempty(model_params.urdfRobot)
+            if isempty(robot_model.urdf_robot)
                 % optimized mode:
                 obj.initModel(); % use the default (URDF) model ...
             else
                 % normal mode:
-                [~,model_name, ext] = fileparts(model_params.urdfRobot);
+                [~,model_name, ext] = fileparts(robot_model.urdf_robot);
                 if ~isempty(ext)
                     % use directly a specific URDF-file for the robot model ...
-                    obj.initModelURDF(model_params.urdfRobot);
+                    obj.initModelURDF(robot_model.urdf_robot);
                 else
                     % set the model name of the robot which is supported by the WB-Toolbox ...
                     obj.initModel(model_name);

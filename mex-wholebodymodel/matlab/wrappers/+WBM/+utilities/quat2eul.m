@@ -9,7 +9,7 @@ function eul = quat2eul(quat, sequence)
     end
     eul = zeros(3,1);
 
-    n2 = quat'*quat;
+    n2 = quat.'*quat;
     if (n2 > 1)
         quat = quat./sqrt(n2); % normalize
     end

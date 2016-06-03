@@ -5,7 +5,7 @@ function dcm = axang2rotm(axang)
     dcm = zeros(3,3);
     u   = axang(1:3,1); % rotation axis vector
 
-    n2 = u'*u;
+    n2 = u.'*u;
     if (n2 > 1)
         u = u./sqrt(n2); % normalize u
     end

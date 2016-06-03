@@ -3,7 +3,7 @@ function quat = quatDiv(q1, q2)
         error('quatDiv: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
     quat1  = zeros(4,1);
-    n2_inv = 1/(q2'*q2);
+    n2_inv = 1/(q2.'*q2); % the .' is crucial to avoid computing the conjugate!
 
     %% Calculate the division of two quaternions q1 and q2 with q = q1/q2.
     % The division can be calculated by multiplication of the inverse.

@@ -7,6 +7,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     b         ...  base
     bf        ...  base frame
     bgn       ...  begin
+    c...      ...  cell array
     chn       ...  chain
     cols      ...  columns
     config    ...  configuration
@@ -50,6 +51,8 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ow        ...  old world
     p         ...  position OR translation (vector)
     params    ...  parameters
+    pl        ...  payload
+    plds      ...  payloads
     pos       ...  position(s)
     prop      ...  propert(y/ies)
     pt        ...  point

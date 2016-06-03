@@ -5,7 +5,7 @@ function quat = axang2quat(axang)
     quat = zeros(4,1);
     u    = axang(1:3,1); % rotation axis vector
 
-    n2 = u'*u;
+    n2 = u.'*u; % the .' is crucial to avoid computing the conjugate!
     if (n2 > 1)
         u = u./sqrt(n2); % normalize u
     end

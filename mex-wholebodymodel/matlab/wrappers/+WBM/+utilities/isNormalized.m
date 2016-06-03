@@ -7,7 +7,7 @@ function result = isNormalized(v, epsilon)
     end
     result = false;
 
-    if ((v'*v - 1) <= epsilon)
+    if ((v.'*v - 1) <= epsilon) % the .' is crucial to avoid computing the conjugate!
         % the vector is already normalized ...
         result = true;
     end
