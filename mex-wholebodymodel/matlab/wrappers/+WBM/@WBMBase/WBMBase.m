@@ -5,6 +5,7 @@ classdef WBMBase < handle
         wf_R_rootLnk@double matrix
         wf_p_rootLnk@double vector
         g_wf@double         vector
+        ndof@uint16         scalar
         robot_model@WBM.wbmBaseRobotModel
     end
 
@@ -371,11 +372,15 @@ classdef WBMBase < handle
             g_wf = obj.mwbm_model.g_wf;
         end
 
+        function ndof = get.ndof(obj)
+            ndof = obj.mwbm_model.ndof;
+        end
+
         function robot_model = get.robot_model(obj)
             robot_model = obj.mwbm_model;
         end
 
-        function dispWBMParams(obj, prec)
+        function dispModel(obj, prec)
             if ~exist('prec', 'var')
                 prec = 2;
             end

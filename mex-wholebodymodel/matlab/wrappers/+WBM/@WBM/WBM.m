@@ -4,13 +4,15 @@ classdef WBM < WBM.WBMBase
         stvLen@uint16     scalar
         vqTInit@double    vector
         stvqT@double      vector
-        robot_init_state@WBM.wbmStateParams
-        robot_config@WBM.wbmBaseRobotConfig
         robot_body@WBM.wbmBody
+        robot_config@WBM.wbmBaseRobotConfig
+        base_robot_params@WBM.wbmBaseRobotParams
+        robot_init_state@WBM.wbmStateParams
     end
 
     properties(Access = protected)
         mwbm_config@WBM.wbmBaseRobotConfig
+        mwf2fixLnk@logical scalar
     end
 
     methods
@@ -23,15 +25,13 @@ classdef WBM < WBM.WBMBase
                 error('WBM::WBM: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             if ~exist('wf2fixLnk', 'var')
-                wf2fixLnk = false; % default value ...
+                obj.mwf2fixLnk = false; % default value ...
             else
-                if ~islogical(wf2fixLnk)
-                    error('WBM::WBM: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
-                end
+                obj.mwf2fixLnk = wf2fixLnk;
             end
 
             obj.initConfig(robot_config);
-            if wf2fixLnk
+            if obj.mwf2fixLnk
                 % set the world frame (WF) at the initial roto-translation from
                 % the chosen fixed link, i.e. the first entry of the constraint list:
                 obj.setWorldFrameFromFixedLink(obj.mwbm_config.cstr_link_names{1});
@@ -427,6 +427,21 @@ classdef WBM < WBM.WBMBase
             [stvqT,~,~,~] = obj.getState();
         end
 
+        function robot_body = get.robot_body(obj)
+            robot_body = obj.mwbm_config.body;
+        end
+
+        function robot_config = get.robot_config(obj)
+            robot_config = obj.mwbm_config;
+        end
+
+        function base_params = get.base_robot_params(obj)
+            base_params = WBM.wbmBaseRobotParams;
+            base_params.robot_model  = obj.mwbm_model;
+            base_params.robot_config = obj.mwbm_config;
+            base_params.wf2fixLnk    = obj.mwf2fixLnk;
+        end
+
         function set.robot_init_state(obj, stInit)
             if ~obj.checkInitStateDimensions(stInit)
                 error('WBM::set.robot_init_state: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
@@ -439,15 +454,7 @@ classdef WBM < WBM.WBMBase
             stInit = obj.mwbm_config.init_state_params;
         end
 
-        function robot_config = get.robot_config(obj)
-            robot_config = obj.mwbm_config;
-        end
-
-        function robot_body = get.robot_body(obj)
-            robot_body = obj.mwbm_config.body;
-        end
-
-        function dispWBMConfig(obj, prec)
+        function dispConfig(obj, prec)
             if ~exist('prec', 'var')
                 prec = 2;
             end
