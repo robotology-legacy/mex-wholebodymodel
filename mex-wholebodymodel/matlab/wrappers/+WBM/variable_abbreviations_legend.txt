@@ -1,6 +1,6 @@
 Legend of abbreviations and acronyms which are used for the variable names:
 
-    H         ...  homogenous transformation (matrix)
+    H         ...  homogeneous transformation (matrix)
     R         ...  rotation (matrix)
     T         ...  transformation (matrix)
     arr       ...  array
@@ -8,6 +8,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     bf        ...  base frame
     bgn       ...  begin
     c...      ...  cell array
+    cfrict    ...  Coulomb friction
     chn       ...  chain
     chnt      ...  chain tree
     cols      ...  columns
@@ -21,20 +22,24 @@ Legend of abbreviations and acronyms which are used for the variable names:
     dstv      ...  derivative of state vector
     fb        ...  floating base
     fcn       ...  function
-    fh...     ...  function handle
+    fh...     ...  function handle OR file handle
     fix       ...  fixed
     fk        ...  forward kinematic(s)
     flt, fltg ...  floating
     fltb      ...  floating base
+    frict     ...  friction
     g         ...  gravity acceleration (vector)
     h...      ...  "handle" to an object, e.g. hFig = handle to the figure object
     h_c       ...  centroidal momentum (vector)
     hgt       ...  height
     idx       ...  index(es)
+    jl        ...  joint limit(s)
     jnt       ...  joint
     jpos      ...  joint position(s)
     ker       ...  kernel (null space)
     len       ...  length
+    ll        ...  lower limit(s)
+    lmts      ...  limits
     ln        ...  line
     lnk       ...  link
     lnkfr     ...  link frame (frame to a specified link in the current joint of the robot)
@@ -80,8 +85,10 @@ Legend of abbreviations and acronyms which are used for the variable names:
     tr        ...  translation(s) OR trace
     trans     ...  translation(s)
     trqs      ...  torques
+    ul        ...  upper limit(s)
     v         ...  vector
     vel       ...  velocit(y/ies)
+    vfrict    ...  viscous friction
     vpos      ...  vector position [translation] (vector)
     vqT       ...  vector-quaternion transformation [VQS-Transformation] (vector) (*)
     vtr       ...  vector translation (vector)

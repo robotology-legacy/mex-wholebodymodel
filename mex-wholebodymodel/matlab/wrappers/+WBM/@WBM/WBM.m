@@ -118,7 +118,24 @@ classdef WBM < WBM.WBMBase
             wf_vqT_rlnk = obj.forwardKinematics(R_b, p_b, q_j, urdf_link_name);
         end
 
-        [dstvChi, h] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
+        [dstvChi, C_qv] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
+
+        function [t, stmChi] = intForwardDynamics(obj, fhCtrlTrqs, tspan, stvChi_0, ode_opt)
+            if ~isa(fhCtrlTrqs, 'function_handle')
+                error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE)
+            end
+            if (obj.mwbm_config.nCstrs == 0)
+                error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.VALUE_IS_ZERO);
+            end
+
+            if ~exist('ode_opt', 'var')
+                % setup the default error tolerances ...
+                ode_opt = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);
+            end
+
+            fhFwdDyn    = @(t, chi)obj.forwardDynamics(t, chi, fhCtrlTrqs);
+            [t, stmChi] = ode15s(fhFwdDyn, tspan, stvChi_0, ode_opt); % ODE-Solver
+        end
 
         sim_config = setupSimulation(~, sim_config)
 
@@ -249,10 +266,10 @@ classdef WBM < WBM.WBMBase
             stParams.dq_j    = stvChi(ndof+14:len,1);
         end
 
-        function stParams = getStateParamsData(obj, chi)
+        function stParams = getStateParamsData(obj, stmChi)
             len = obj.mwbm_config.stvLen;
 
-            [m, n] = size(chi);
+            [m, n] = size(stmChi);
             if (n ~= len)
                 error('WBM::getStateParamsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
@@ -261,34 +278,33 @@ classdef WBM < WBM.WBMBase
             stParams = WBM.wbmStateParams;
 
             % extract all values ...
-            stParams.x_b  = chi(1:m,1:3);
-            stParams.qt_b = chi(1:m,4:7);
-            stParams.q_j  = chi(1:m,8:ndof+7);
+            stParams.x_b  = stmChi(1:m,1:3);
+            stParams.qt_b = stmChi(1:m,4:7);
+            stParams.q_j  = stmChi(1:m,8:ndof+7);
 
-            stParams.dx_b    = chi(1:m,ndof+8:ndof+10);
-            stParams.omega_b = chi(1:m,ndof+11:ndof+13);
-            stParams.dq_j    = chi(1:m,ndof+14:len);
+            stParams.dx_b    = stmChi(1:m,ndof+8:ndof+10);
+            stParams.omega_b = stmChi(1:m,ndof+11:ndof+13);
+            stParams.dq_j    = stmChi(1:m,ndof+14:len);
         end
 
         function stvPos = getPositions(obj, stvChi)
             if ( ~iscolumn(stvChi) || (size(stvChi,1) ~= obj.mwbm_config.stvLen) )
                error('WBM::getPositions: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
-
             % extract the base VQS-Transformation (without S)
             % and the joint positions ...
             cutp = obj.mwbm_model.ndof + 7;
             stvPos = stvChi(1:cutp,1); % [x_b; qt_b; q_j]
         end
 
-        function stmPos = getPositionsData(obj, chi)
-            [m, n] = size(chi);
+        function stmPos = getPositionsData(obj, stmChi)
+            [m, n] = size(stmChi);
             if (n ~= obj.mwbm_config.stvLen)
                 error('WBM::getPositionsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
             cutp = obj.mwbm_model.ndof + 7;
-            stmPos = chi(1:m,1:cutp); % m -by- [x_b, qt_b, q_j]
+            stmPos = stmChi(1:m,1:cutp); % m -by- [x_b, qt_b, q_j]
         end
 
         function stvVel = getVelocities(obj, stvChi)
@@ -302,14 +318,14 @@ classdef WBM < WBM.WBMBase
             stvVel = stvChi(cutp:len,1); % [dx_b; omega_b; dq_j]
         end
 
-        function stmVel = getVelocitiesData(obj, chi)
-            [m, n] = size(chi);
+        function stmVel = getVelocitiesData(obj, stmChi)
+            [m, n] = size(stmChi);
             if (n ~= obj.mwbm_config.stvLen)
                 error('WBM::getVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
             cutp = obj.mwbm_model.ndof + 8;
-            stmVel = chi(1:m,cutp:len); % m -by- [dx_b, omega_b, dq_j]
+            stmVel = stmChi(1:m,cutp:len); % m -by- [dx_b, omega_b, dq_j]
         end
 
         function stvBsVel = getBaseVelocities(obj, stvChi)
@@ -322,15 +338,15 @@ classdef WBM < WBM.WBMBase
             stvBsVel = stvChi(cutp1:cutp2,1); % [dx_b; omega_b]
         end
 
-        function stmBsVel = getBaseVelocitiesData(obj, chi)
-            [m, n] = size(chi);
+        function stmBsVel = getBaseVelocitiesData(obj, stmChi)
+            [m, n] = size(stmChi);
             if (n ~= obj.mwbm_config.stvLen)
                 error('WBM::getBaseVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
 
             cutp1 = obj.mwbm_model.ndof + 8;
             cutp2 = obj.mwbm_model.ndof + 13;
-            stmBsVel = chi(1:m,cutp1:cutp2); % m -by- [dx_b, omega_b]
+            stmBsVel = stmChi(1:m,cutp1:cutp2); % m -by- [dx_b, omega_b]
         end
 
         function [dx_b, omega_b] = getBaseVelocitiesParams(~, v_b)

@@ -14,7 +14,7 @@ classdef wbmErrorMsg
         UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';
         UNKNOWN_EXC       = 'Unknown exception!';
         UNKNOWN_LNK_NAME  = 'Unknown link name!';
-        VALUE_IS_ZERO     = 'The value is zero!';
+        VALUE_IS_ZERO     = 'The value cannot be zero!';
         WRONG_ARG         = 'Wrong number of input arguments!';
         WRONG_ARR_SIZE    = 'Wrong array size!';
         WRONG_DATA_TYPE   = 'Wrong data type!';

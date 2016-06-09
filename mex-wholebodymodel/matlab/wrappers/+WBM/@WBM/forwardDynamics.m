@@ -1,4 +1,4 @@
-function [dstvChi, C_qv] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
+function [dstvChi, C_qv] = forwardDynamics(obj, t, stvChi, fhCtrlTrqs)
     ndof   = obj.mwbm_model.ndof;
     nCstrs = obj.mwbm_config.nCstrs;
 
@@ -32,7 +32,7 @@ function [dstvChi, C_qv] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
     end
 
     % get the current control torque vector ...
-    tau = ctrlTrqs.tau(t);
+    tau = fhCtrlTrqs(t);
 
     % compute the contact force vector:
     Jc_t      =  Jc.';

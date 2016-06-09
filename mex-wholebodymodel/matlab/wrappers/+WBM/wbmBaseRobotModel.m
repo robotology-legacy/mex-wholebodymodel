@@ -6,6 +6,8 @@ classdef wbmBaseRobotModel
        wf_R_rootLnk@double matrix = eye(3,3);
        wf_p_rootLnk@double vector = zeros(3,1);
        g_wf@double         vector = zeros(3,1);
+       joint_ll@double     vector
+       joint_ul@double     vector
        vfrict_coeff@double vector
        cfrict_coeff@double vector
     end

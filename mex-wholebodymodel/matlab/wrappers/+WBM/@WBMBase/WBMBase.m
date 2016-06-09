@@ -6,6 +6,7 @@ classdef WBMBase < handle
         wf_p_rootLnk@double vector
         g_wf@double         vector
         ndof@uint16         scalar
+        joint_limits@struct
         robot_model@WBM.wbmBaseRobotModel
     end
 
@@ -158,6 +159,30 @@ classdef WBMBase < handle
             stFltb.wf_v_b = v_b; % cartesian velocity and the rotational velocity of the base
         end
 
+        function wf_H_rlnk = transformationMatrix(obj,varargin) % not implemented yet in C++!
+            % wf_R_rootLnk = varargin{1}
+            % wf_p_rootLnk = varargin{2}
+            % q_j          = varargin{3}
+            switch nargin
+                case 5 % normal modes:
+                    urdf_link_name = varargin{1,4};
+                case 4
+                    % use the default link frame ...
+                    urdf_link_name = obj.mwbm_model.urdf_link_name;
+                case 2 % optimized modes:
+                    % urdf_link_name = varargin{1}
+                    wf_H_rlnk = mexWholeBodyModel('rototranslation-matrix', varargin{1,1});
+                    return
+                case 1
+                    wf_H_rlnk = mexWholeBodyModel('rototranslation-matrix', obj.mwbm_model.urdf_link_name);
+                    return
+                otherwise
+                    error('WBMBase::transformationMatrix: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+            wf_R_rlnk_arr = reshape(varargin{1,1}, 9, 1);
+            wf_H_rlnk = mexWholeBodyModel('rototranslation-matrix', wf_R_rlnk_arr, varargin{1,2}, varargin{1,3}, urdf_link_name);
+        end
+
         function M = massMatrix(~, wf_R_rootLnk, wf_p_rootLnk, q_j)
             switch nargin
                 case 4
@@ -176,6 +201,53 @@ classdef WBMBase < handle
             [jl_lower, jl_upper] = mexWholeBodyModel('joint-limits');
         end
 
+        function resv = isJointLimit(obj, q_j)
+            resv = ~((q_j > obj.mwbm_model.joint_ll) & (q_j < obj.mwbm_model.joint_ul));
+        end
+
+        function tau_gen = inverseDynamics(obj, varargin) % not implemented yet in C++!
+            % wf_R_rootLnk = varargin{1}
+            % wf_p_rootLnk = varargin{2}
+            % q_j          = varargin{3}
+            % dq_j         = varargin{4}
+            % v_b          = varargin{5}
+            % ddq_j        = varargin{6}
+            % dv_b         = varargin{7}
+            switch nargin
+                case 9 % normal modes:
+                    urdf_link_name = varargin{1,8};
+                case 8
+                    % use the default link frame name ...
+                    urdf_link_name = obj.mwbm_model.urdf_link_name;
+                case 3 % optimized modes:
+                    % dq_j           = varargin{1}
+                    % urdf_link_name = varargin{2}
+                    tau    = mexWholeBodyModel('inverse-dynamics', varargin{1,2});
+                    tau_fr = frictionForces(obj, varargin{1,1});
+                    tau_fr = vertcat(zeros(6,1), tau_fr);
+
+                    tau_gen = tau + tau_fr;
+                    return
+                case 2
+                    % dq_j = varargin{1}
+                    tau    = mexWholeBodyModel('inverse-dynamics', obj.mwbm_model.urdf_link_name);
+                    tau_fr = frictionForces(obj, varargin{1,1});
+                    tau_fr = vertcat(zeros(6,1), tau_fr);
+
+                    tau_gen = tau + tau_fr;
+                    return
+            otherwise
+                error('WBMBase::inverseDynamics: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+            wf_R_rlnk_arr = reshape(varargin{1,1}, 9, 1);
+            tau    = mexWholeBodyModel('inverse-dynamics', wf_R_rlnk_arr, varargin{1,2}, varargin{1,3}, varargin{1,4}, ...
+                                       varargin{1,5}, varargin{1,6},  varargin{1,7}, urdf_link_name);
+            tau_fr = frictionForces(obj, varargin{1,4});
+            tau_fr = vertcat(zeros(6,1), tau_fr);
+
+            tau_gen = tau + tau_fr;
+        end
+
         function J = jacobian(obj, varargin)
             % wf_R_rootLnk = varargin{1}
             % wf_p_rootLnk = varargin{2}
@@ -184,7 +256,7 @@ classdef WBMBase < handle
                 case 5 % normal modes:
                     urdf_link_name = varargin{1,4};
                 case 4
-                    % use the default link frame name ...
+                    % use the default link frame ...
                     urdf_link_name = obj.mwbm_model.urdf_link_name;
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
@@ -306,7 +378,7 @@ classdef WBMBase < handle
 
         function tau_fr = frictionForces(obj, dq_j)
             if ~exist('dq_j', 'var')
-                [~,~,~,dq_j] = obj.getState();
+                [~,~,~,dq_j] = getState(obj);
             end
             epsilon = 1e-12; % min. value to treat a number as zero ...
 
@@ -324,7 +396,7 @@ classdef WBMBase < handle
             end
             tau_vf = -obj.mwbm_model.vfrict_coeff .* dq_j;       % viscous friction torques
             tau_cf = -obj.mwbm_model.cfrict_coeff .* sign(dq_j); % Coulomb friction torques
-            tau_fr =  tau_vf + tau_cf;                            % friction torques
+            tau_fr =  tau_vf + tau_cf;                           % friction torques
         end
 
         function set.urdfLinkName(obj, new_link_name)
@@ -374,6 +446,11 @@ classdef WBMBase < handle
 
         function ndof = get.ndof(obj)
             ndof = obj.mwbm_model.ndof;
+        end
+
+        function jl = get.joint_limits(obj)
+            jl.lower = obj.mwbm_model.joint_ll;
+            jl.upper = obj.mwbm_model.joint_ul;
         end
 
         function robot_model = get.robot_model(obj)
@@ -476,6 +553,8 @@ classdef WBMBase < handle
                     obj.initModel(model_name);
                 end
             end
+            % set the joint limits for the robot model ...
+            [obj.mwbm_model.joint_ll, obj.mwbm_model.joint_ul] = obj.getJointLimits();
         end
 
         function [nw_p_b, nw_R_b] = computeNewWorld2Base(obj, urdf_link_name, q_j)

@@ -1,4 +1,4 @@
-function [dstvChi, C_qv] = fastForwardDynamics(t, stvChi, ctrlTrqs, robot_model, robot_config)
+function [dstvChi, C_qv] = fastForwardDynamics(t, stvChi, fhCtrlTrqs, robot_model, robot_config)
     ndof         = robot_model.ndof;
     nCstrs       = robot_config.nCstrs;
     vfrict_coeff = robot_model.vfrict_coeff;
@@ -34,7 +34,7 @@ function [dstvChi, C_qv] = fastForwardDynamics(t, stvChi, ctrlTrqs, robot_model,
     end
 
     % get the current control torque vector ...
-    tau = ctrlTrqs.tau(t);
+    tau = fhCtrlTrqs(t);
 
     % compute the contact force vector:
     Jc_t      =  Jc.';

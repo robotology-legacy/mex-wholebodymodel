@@ -28,17 +28,17 @@ g_init = wbm_icub.generalizedBiasForces(R_b, p_b, icub_config.init_state_params.
                                         zeros(icub_model.ndof,1), zeros(6,1));
 len = size(g_init,1);
 % minimalistic data structure for the control torques (further parameters for
-% different computations can be added to this structure) ...
-ctrlTrqs.tau = @(t)zeros(size(g_init(7:len)));
+% different computations can be added to this structure):
+ctrlTrqs.fhTau = @(t)zeros(size(g_init(7:len,1))); % torque function handle
 
 %% ODE-Solver:
 %  Setup the function handle of the form f(t,chi) where chi refers to the dynamic state
 %  of the system. It evaluates the right side of the nonlinear first-order ODEs of the
 %  form chi' = f(t,chi) and returns a vector of rates of change (vector of derivatives)
 %  that will be integrated by the solver.
-fwdDynFunc = @(t, chi)WBM.utilities.fastForwardDynamics(t, chi, ctrlTrqs, ...
-                                                        wbm_icub.robot_model, wbm_icub.robot_config);
-%fwdDynFunc = @(t, chi)wbm_icub.forwardDynamics(t, chi, ctrlTrqs); % optional
+fhFwdDyn = @(t, chi)WBM.utilities.fastForwardDynamics(t, chi, ctrlTrqs.fhTau, ...
+                                                      wbm_icub.robot_model, wbm_icub.robot_config);
+%fhFwdDyn = @(t, chi)wbm_icub.forwardDynamics(t, chi, ctrlTrqs.fhTau); % optional
 
 % specifying the time interval of the integration ...
 sim_time.start = 0.0;
@@ -48,10 +48,10 @@ tspan = sim_time.start:sim_time.step:sim_time.end;
 
 disp('Start the numerical integration...');
 
-ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);           % setup the error tolerances ...
-[t, chi]    = ode15s(fwdDynFunc, tspan, chi_init, ode_options); % ODE-Solver
+ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);         % setup the error tolerances ...
+[t, chi]    = ode15s(fhFwdDyn, tspan, chi_init, ode_options); % ODE-Solver
 
-save('testTrajectory.mat', 't', 'chi', 'ctrlTrqs', 'icub_model', 'icub_config');
+save('testTrajectory.mat', 't', 'chi', 'chi_init', 'ctrlTrqs', 'icub_model', 'icub_config');
 disp('Numerical integration finished.');
 
 nRes = size(chi,1);
