@@ -39,7 +39,6 @@ namespace mexWBIComponent
       virtual bool compute(int, const mxArray**);
       virtual bool computeFast(int, const mxArray**);
 
-      //virtual bool display(int, const mxArray *[]);
       virtual ~ModelCoriolisCentrifugalForces();
 
     private:

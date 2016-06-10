@@ -54,8 +54,8 @@ ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);         % setup the error 
 save('testTrajectory.mat', 't', 'chi', 'chi_init', 'ctrlTrqs', 'icub_model', 'icub_config');
 disp('Numerical integration finished.');
 
-nRes = size(chi,1);
-fprintf('Number of integration results: %d\n', nRes);
+nSteps = size(chi,1);
+fprintf('Number of integrations: %d\n', nSteps);
 
 %% iCub-Simulator:
 
@@ -65,20 +65,23 @@ sim_config = initSimConfig_iCub();           % shows the simulation with a light
 sim_config = wbm_icub.setupSimulation(sim_config);
 x_out = wbm_icub.getPositionsData(chi);
 % show and repeat the simulation 10 times ...
-nRpts = 6;
+nRpts = 5;
 wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:
-stpData = wbm_icub.getStateParamsData(chi);
+wbm_icub.plotCoMTrajectory(chi);
 
-figure('Name', 'iCub - CoM-trajectory:', 'NumberTitle', 'off');
+% alternative, or if you have to plot other parameter values, use e.g.:
+%stp = wbm_icub.getStateParams(chi);
 
-plot3(stpData.x_b(1:nRes,1), stpData.x_b(1:nRes,2), stpData.x_b(1:nRes,3), 'Color', 'b');
-hold on;
-plot3(stpData.x_b(1,1), stpData.x_b(1,2), stpData.x_b(1,3), 'Marker', 'o', 'MarkerEdgeColor', 'r');
+%figure('Name', 'iCub - CoM-trajectory:', 'NumberTitle', 'off');
 
-grid on;
-axis square;
-xlabel('X(nRes)');
-ylabel('Y(nRes)');
-zlabel('Z(nRes)');
+%plot3(stp.x_b(1:nSteps,1), stp.x_b(1:nSteps,2), stp.x_b(1:nSteps,3), 'Color', 'b');
+%hold on;
+%plot3(stp.x_b(1,1), stp.x_b(1,2), stp.x_b(1,3), 'Marker', 'o', 'MarkerEdgeColor', 'r');
+
+%grid on;
+%axis square;
+%xlabel('x_{xb}');
+%ylabel('y_{xb}');
+%zlabel('z_{xb}');

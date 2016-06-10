@@ -125,10 +125,11 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray* prhs[
   p_temp = (double *)mxGetPr(prhs[2]);
 
   double tempR[9],tempP[3];
-  for(int i = 0;i<3;i++)
-  {
-     tempP[i] = p_temp[i];
-  }
+  memcpy(tempP, p_temp, 3*sizeof(double));
+  // for(int i = 0;i<3;i++)
+  // {
+  //    tempP[i] = p_temp[i];
+  // }
 
   reorderMatrixElements(R_temp, tempR);
   wbi::Rotation tempRot(tempR);

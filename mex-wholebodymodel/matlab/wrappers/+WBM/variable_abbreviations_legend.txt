@@ -28,6 +28,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     flt, fltg ...  floating
     fltb      ...  floating base
     frict     ...  friction
+    fwnd      ...  figure window
     g         ...  gravity acceleration (vector)
     h...      ...  "handle" to an object, e.g. hFig = handle to the figure object
     h_c       ...  centroidal momentum (vector)
@@ -77,7 +78,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     shp       ...  shape
     st        ...  state
     stm       ...  state matrix
-    stp       ...  state parameter
+    stp       ...  state parameter(s)
     str       ...  string
     stv       ...  state vector
     stvqT     ...  state vector-quaternion transformation [VQS-Transformation of the current state vector] (vector) (*)

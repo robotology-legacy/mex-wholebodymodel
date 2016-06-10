@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Authors: Naveen Kuppuswamy, Martin Neururer
- * email: naveen.kuppuswamy@iit.it, martin.neururer@gmail.com
+ * Copyright (C) 2016 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ *  Authors: Martin Neururer
+ * email: martin.neururer@gmail.com, gabriele.nava@iit.it
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -48,7 +48,7 @@ ModelCoriolisCentrifugalForces* ModelCoriolisCentrifugalForces::getInstance()
   {
     modelCoriolisCentrifugalForces = new ModelCoriolisCentrifugalForces;
   }
-  return(modelCoriolisCentrifugalForces);
+  return modelCoriolisCentrifugalForces;
 }
 
 void ModelCoriolisCentrifugalForces::deleteInstance()
@@ -63,8 +63,9 @@ bool ModelCoriolisCentrifugalForces::allocateReturnSpace(int nlhs, mxArray **plh
 #endif
   int numDof = modelState->dof();
 
-  plhs[0] =  mxCreateNumericMatrix(numDof+6, 1, mxDOUBLE_CLASS, mxREAL);
+  plhs[0] = mxCreateNumericMatrix(numDof+6, 1, mxDOUBLE_CLASS, mxREAL);
   h = mxGetPr(plhs[0]);
+
   return true;
 }
 
@@ -73,7 +74,7 @@ bool ModelCoriolisCentrifugalForces::compute(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("Trying to compute Coriolis with centrifugal forces\n");
 #endif
-  processArguments(nrhs,prhs);
+  processArguments(nrhs, prhs);
   return true;
 }
 
@@ -84,7 +85,7 @@ bool ModelCoriolisCentrifugalForces::computeFast(int nrhs, const mxArray **prhs)
 #endif
   robotModel = modelState->robotModel();
 
-  qj = modelState->qj();
+  qj    = modelState->qj();
   qjDot = modelState->qjDot();
 
   world_H_rootLink = modelState->getRootWorldRotoTranslation();
@@ -107,21 +108,20 @@ bool ModelCoriolisCentrifugalForces::processArguments(int nrhs, const mxArray **
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state argument dimensions in ModelCoriolisCentrifugalForces call");
   }
-  double *R_temp, *p_temp;
-  R_temp = (double*)mxGetPr(prhs[1]);
-  p_temp = (double*)mxGetPr(prhs[2]);
+  double *pR, *ppos;
+  pR   = mxGetPr(prhs[1]);
+  ppos = mxGetPr(prhs[2]);
 
-  double tempR[9], tempP[3];
-  memcpy(tempP, p_temp, 3*sizeof(double));
+  double R_ro[9];
+  reorderMatrixElements(pR, R_ro);
 
-  reorderMatrixElements(R_temp, tempR);
-  wbi::Rotation tempRot(tempR);
-  wbi::Frame tempFrame(tempRot, tempP);
+  wbi::Rotation rotm(R_ro);
+  wbi::Frame tform(rotm, ppos);
   robotModel = modelState->robotModel();
 
-  qj = mxGetPr(prhs[3]);
+  qj    = mxGetPr(prhs[3]);
   qjDot = mxGetPr(prhs[4]);
-  vb = mxGetPr(prhs[5]);
+  vb    = mxGetPr(prhs[5]);
 
 #ifdef DEBUG
   mexPrintf("qj received\n");
@@ -132,7 +132,7 @@ bool ModelCoriolisCentrifugalForces::processArguments(int nrhs, const mxArray **
   }
 #endif
 
-  world_H_rootLink = tempFrame;
+  world_H_rootLink = tform;
 
   if(h != NULL)
   {

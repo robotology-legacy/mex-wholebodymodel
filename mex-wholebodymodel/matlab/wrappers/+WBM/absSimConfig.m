@@ -12,7 +12,7 @@ classdef (Abstract) absSimConfig
         robot_body@WBM.wbmSimBody
         environment@WBM.wbmSimEnvironment
 
-        hMainFigure
+        hMainFigure@matlab.ui.Figure
         main_title@char
         main_pos@double     vector
 

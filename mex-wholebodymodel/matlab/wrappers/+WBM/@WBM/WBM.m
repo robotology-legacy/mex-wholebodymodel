@@ -155,6 +155,65 @@ classdef WBM < WBM.WBMBase
             end
         end
 
+        function plotCoMTrajectory(obj, stmChi, prop)
+            len = obj.mwbm_config.stvLen;
+
+            [m, n] = size(stmChi);
+            if (n ~= len)
+                error('WBM::plotCoMTrajectory: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+            end
+
+            if ~exist('prop', 'var')
+                % use the default plot properties ...
+                prop.fwnd_title   = 'iCub - CoM-trajectory:';
+                prop.title        = '';
+                prop.title_fnt_sz = 15;
+                prop.line_color   = 'blue';
+                prop.marker       = '*';
+                prop.mkr_color    = 'red';
+                prop.label_fnt_sz = 15;
+            end
+
+            % extract all base position values ...
+            x_b = stmChi(1:m,1:3);
+
+            figure('Name', prop.fwnd_title, 'NumberTitle', 'off');
+
+            % draw the trajectory-line:
+            %         x-axis      y-axis      z-axis
+            plot3(x_b(1:m,1), x_b(1:m,2), x_b(1:m,3), 'Color', prop.line_color);
+            hold on;
+            % mark the start point ...
+            plot3(x_b(1,1), x_b(1,2), x_b(1,3), 'Marker', prop.marker, 'MarkerEdgeColor', prop.mkr_color);
+
+            % add title and axis-lables ...
+            if ~isempty(prop.title)
+                title(prop.title, 'Interpreter', 'latex', 'FontSize', prop.title_fnt_sz);
+            end
+            xlabel('$x_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
+            ylabel('$y_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
+            zlabel('$z_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
+
+            grid on;
+            axis square;
+        end
+
+        % function visualizeTrajectory_iCubGUI(obj, t, stmChi) % does not work (Matlab hangs when it calls the mex-function)
+        %     if (nargin < 2)
+        %         error('WBM::visualizeTrajectory_iCubGUI: %s', WBM.wbmErrorMsg.WRONG_ARG);
+        %     end
+
+        %     [m, n] = size(stmChi);
+        %     if (n ~= obj.mwbm_config.stvLen)
+        %         error('WBM::visualizeTrajectory_iCubGUI: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+        %     end
+        %     cutp = obj.mwbm_model.ndof + 7;
+        %     vqT_b = stmChi(1:m,1:7);    % m -by- vqT_b
+        %     q_j   = stmChi(1:m,8:cutp); % m -by- q_j
+
+        %     mexWholeBodyModel('visualize-trajectory', t, q_j, vqT_b);
+        % end
+
         function [chn_q, chn_dq] = getStateChains(obj, chain_names, q_j, dq_j)
             switch nargin
                 case {2, 4}
@@ -247,128 +306,158 @@ classdef WBM < WBM.WBMBase
             end
         end
 
-        function stParams = getStateParams(obj, stvChi)
-            len = obj.mwbm_config.stvLen;
-            if ( ~iscolumn(stvChi) || (size(stvChi,1) ~= len) )
-               error('WBM::getStateParams: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-            end
-
+        function stParams = getStateParams(obj, stChi)
+            len      = obj.mwbm_config.stvLen;
             ndof     = obj.mwbm_model.ndof;
             stParams = WBM.wbmStateParams;
 
-            % get the base/joint positions and the base orientation ...
-            stParams.x_b  = stvChi(1:3,1);
-            stParams.qt_b = stvChi(4:7,1);
-            stParams.q_j  = stvChi(8:ndof+7,1);
-            % the corresponding velocities ...
-            stParams.dx_b    = stvChi(ndof+8:ndof+10,1);
-            stParams.omega_b = stvChi(ndof+11:ndof+13,1);
-            stParams.dq_j    = stvChi(ndof+14:len,1);
+            if iscolumn(stChi)
+                if (size(stChi,1) ~= len)
+                   error('WBM::getStateParams: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                end
+
+                % get the base/joint positions and the base orientation ...
+                stParams.x_b  = stChi(1:3,1);
+                stParams.qt_b = stChi(4:7,1);
+                stParams.q_j  = stChi(8:ndof+7,1);
+                % the corresponding velocities ...
+                stParams.dx_b    = stChi(ndof+8:ndof+10,1);
+                stParams.omega_b = stChi(ndof+11:ndof+13,1);
+                stParams.dq_j    = stChi(ndof+14:len,1);
+                return
+            elseif ismatrix(stChi)
+                [m, n] = size(stChi);
+                if (n ~= len)
+                    error('WBM::getStateParams: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+                end
+
+                % extract all values ...
+                stParams.x_b  = stChi(1:m,1:3);
+                stParams.qt_b = stChi(1:m,4:7);
+                stParams.q_j  = stChi(1:m,8:ndof+7);
+
+                stParams.dx_b    = stChi(1:m,ndof+8:ndof+10);
+                stParams.omega_b = stChi(1:m,ndof+11:ndof+13);
+                stParams.dq_j    = stChi(1:m,ndof+14:len);
+                return
+            end
+            % else ...
+            error('WBM::getStateParams: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
         end
 
-        function stParams = getStateParamsData(obj, stmChi)
-            len = obj.mwbm_config.stvLen;
-
-            [m, n] = size(stmChi);
-            if (n ~= len)
-                error('WBM::getStateParamsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-            end
-
-            ndof     = obj.mwbm_model.ndof;
-            stParams = WBM.wbmStateParams;
-
-            % extract all values ...
-            stParams.x_b  = stmChi(1:m,1:3);
-            stParams.qt_b = stmChi(1:m,4:7);
-            stParams.q_j  = stmChi(1:m,8:ndof+7);
-
-            stParams.dx_b    = stmChi(1:m,ndof+8:ndof+10);
-            stParams.omega_b = stmChi(1:m,ndof+11:ndof+13);
-            stParams.dq_j    = stmChi(1:m,ndof+14:len);
-        end
-
-        function stvPos = getPositions(obj, stvChi)
-            if ( ~iscolumn(stvChi) || (size(stvChi,1) ~= obj.mwbm_config.stvLen) )
-               error('WBM::getPositions: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-            end
-            % extract the base VQS-Transformation (without S)
-            % and the joint positions ...
-            cutp = obj.mwbm_model.ndof + 7;
-            stvPos = stvChi(1:cutp,1); % [x_b; qt_b; q_j]
-        end
-
-        function stmPos = getPositionsData(obj, stmChi)
-            [m, n] = size(stmChi);
-            if (n ~= obj.mwbm_config.stvLen)
-                error('WBM::getPositionsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-            end
-
-            cutp = obj.mwbm_model.ndof + 7;
-            stmPos = stmChi(1:m,1:cutp); % m -by- [x_b, qt_b, q_j]
-        end
-
-        function stvVel = getVelocities(obj, stvChi)
-            if ( ~iscolumn(stvChi) || (size(stvChi,1) ~= obj.mwbm_config.stvLen) )
-               error('WBM::getVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-            end
-
+        function [vqT_b, q_j] = getPositions(obj, stChi)
             len  = obj.mwbm_config.stvLen;
-            cutp = obj.mwbm_model.ndof + 8;
-            % extract the velocities ...
-            stvVel = stvChi(cutp:len,1); % [dx_b; omega_b; dq_j]
-        end
+            cutp = obj.mwbm_model.ndof + 7; % 3 + 4 + ndof
 
-        function stmVel = getVelocitiesData(obj, stmChi)
-            [m, n] = size(stmChi);
-            if (n ~= obj.mwbm_config.stvLen)
-                error('WBM::getVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+            if iscolumn(stChi)
+                if (size(stChi,1) ~= len)
+                   error('WBM::getPositions: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                end
+
+                % extract the base VQS-Transformation (without S)
+                % and the joint positions ...
+                vqT_b = stChi(1:7,1); % [x_b; qt_b]
+                q_j   = stChi(8:cutp,1);
+                return
+            elseif ismatrix(stChi)
+                [m, n] = size(stChi);
+                if (n ~= len)
+                    error('WBM::getPositions: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+                end
+
+                vqT_b = stChi(1:m,1:7);    % m -by- [x_b, qt_b]
+                q_j   = stChi(1:m,8:cutp); % m -by- q_j
+                return
             end
-
-            cutp = obj.mwbm_model.ndof + 8;
-            stmVel = stmChi(1:m,cutp:len); % m -by- [dx_b, omega_b, dq_j]
+            % else ...
+            error('WBM::getPositions: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
         end
 
-        function stvBsVel = getBaseVelocities(obj, stvChi)
-            if ( ~iscolumn(stvChi) || (size(stvChi,1) ~= obj.mwbm_config.stvLen) )
-               error('WBM::getBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+        function [v_b, dq_j] = getVelocities(obj, stChi)
+            len   = obj.mwbm_config.stvLen;
+            ndof  = obj.mwbm_model.ndof;
+
+            if iscolumn(stChi)
+                if (size(stChi,1) ~= len)
+                   error('WBM::getVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                end
+
+                % extract the velocities ...
+                v_b  = stChi(ndof+8:ndof+13,1); % [dx_b; omega_b]
+                dq_j = stChi(ndof+14:len,1);
+                return
+            elseif ismatrix(stChi)
+                [m, n] = size(stChi);
+                if (n ~= len)
+                    error('WBM::getVelocities: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+                end
+
+                v_b  = stChi(1:m,ndof+8:ndof+13); % m -by- [dx_b; omega_b]
+                dq_j = stChi(1:m,ndof+14:len,1); % m -by- dq_j
+                return
             end
-
-            cutp1 = obj.mwbm_model.ndof + 8;
-            cutp2 = obj.mwbm_model.ndof + 13;
-            stvBsVel = stvChi(cutp1:cutp2,1); % [dx_b; omega_b]
+            % else ...
+            error('WBM::getVelocities: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
         end
 
-        function stmBsVel = getBaseVelocitiesData(obj, stmChi)
-            [m, n] = size(stmChi);
-            if (n ~= obj.mwbm_config.stvLen)
-                error('WBM::getBaseVelocitiesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+        function v_b = getBaseVelocities(obj, stChi)
+            len   = obj.mwbm_config.stvLen;
+            ndof  = obj.mwbm_model.ndof;
+
+            if iscolumn(stChi)
+                if (size(stChi,1) ~= len)
+                   error('WBM::getBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                end
+
+                v_b = stChi(ndof+8:ndof+13,1); % [dx_b; omega_b]
+                return
+            elseif ismatrix(stChi)
+                [m, n] = size(stChi);
+                if (n ~= len)
+                    error('WBM::getBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+                end
+
+                v_b = stChi(1:m,ndof+8:ndof+13); % m -by- [dx_b; omega_b]
+                return
             end
-
-            cutp1 = obj.mwbm_model.ndof + 8;
-            cutp2 = obj.mwbm_model.ndof + 13;
-            stmBsVel = stmChi(1:m,cutp1:cutp2); % m -by- [dx_b, omega_b]
+            % else ...
+            error('WBM::getBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
         end
 
-        function [dx_b, omega_b] = getBaseVelocitiesParams(~, v_b)
-            if ( ~iscolumn(v_b) || (size(v_b,1) ~= 6) )
-               error('WBM::getBaseVelocitiesParams: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+        function [dx_b, omega_b] = baseVel2params(~, v_b)
+            if iscolumn(v_b)
+                if (size(v_b,1) ~= 6)
+                   error('WBM::baseVel2params: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                end
+
+                dx_b    = v_b(1:3,1);
+                omega_b = v_b(4:6,1);
+                return
+            elseif ismatrix(v_b)
+                [m, n] = size(v_b);
+                if (n ~= 6)
+                    error('WBM::baseVel2params: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+                end
+
+                dx_b    = v_b(1:m,1:3);
+                omega_b = v_b(1:m,4:6);
+                return
             end
-
-            dx_b    = v_b(1:3,1);
-            omega_b = v_b(4:6,1);
+            % should never come here ...
+            error('WBM::baseVel2params: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
         end
 
-        function vqT = getRotoTranslation(~, stParams)
+        function vqT_b = params2rotoTrans(~, stParams)
             if isempty(stParams)
-                error('WBM::getRotoTranslation: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
+                error('WBM::params2rotoTrans: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
             end
 
-            vqT = vertcat(stParams.x_b, stParams.qt_b);
+            vqT_b = vertcat(stParams.x_b, stParams.qt_b);
         end
 
-        function stvChi = toStateVector(~, stParams)
+        function stvChi = params2stateVec(~, stParams)
             if isempty(stParams)
-                error('WBM::toStateVector: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
+                error('WBM::params2stateVec: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
             end
 
             stvChi = vertcat(stParams.x_b, stParams.qt_b, stParams.q_j, ...
@@ -439,8 +528,8 @@ classdef WBM < WBM.WBMBase
             vqT_init = vertcat(stInit.x_b, stInit.qt_b);
         end
 
-        function stvqT = get.stvqT(obj)
-            [stvqT,~,~,~] = obj.getState();
+        function vqT_b = get.stvqT(obj)
+            [vqT_b,~,~,~] = getState(obj);
         end
 
         function robot_body = get.robot_body(obj)

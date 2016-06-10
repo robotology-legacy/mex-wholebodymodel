@@ -1,8 +1,8 @@
 classdef wbmBody
     properties(SetAccess = private, GetAccess = public)
-       chains@cell    matrix = {};
+       chains@cell    matrix
        nChains@uint16 scalar = 0;
-       joints@cell    matrix = {};
+       joints@cell    matrix
        nJoints@uint16 scalar = 0;
     end
 
