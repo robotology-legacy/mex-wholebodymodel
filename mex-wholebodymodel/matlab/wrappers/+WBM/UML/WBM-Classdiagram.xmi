@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmi:XMI xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.0" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1">
 	<xmi:Documentation exporter="StarUML" exporterVersion="2.0"/>
-	<uml:Model xmi:id="AAAAAAFVPmcO7yCxOq8=" xmi:type="uml:Model" name="RootModel">
+	<uml:Model xmi:id="AAAAAAFVPqIURVvy+V4=" xmi:type="uml:Model" name="RootModel">
 		<packagedElement xmi:id="AAAAAAFF+qBWK6M3Z8Y=" name="WBM" visibility="public" xmi:type="uml:Model">
 			<packagedElement xmi:id="AAAAAAFPyxdTB0bDk8U=" name="WBMBase" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:Class" isActive="false">
 				<ownedMember xmi:id="AAAAAAFQ8cHXXSReCiA=" visibility="public" xmi:type="uml:Dependency" client="AAAAAAFPyxdTB0bDk8U=" supplier="AAAAAAFQ8as+7wa1fBw=">
@@ -511,14 +511,14 @@
 				</ownedOperation>
 				<ownedOperation xmi:id="AAAAAAFPy0lTbEfqGAs=" name="visualizeForwardDynamics" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFPzKn9BqZ0nX0=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
-					<ownedParameter xmi:id="AAAAAAFPzKn9B6Z1qTY=" name="x_out" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
+					<ownedParameter xmi:id="AAAAAAFPzKn9B6Z1qTY=" name="pos_out" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFP0au+GzEctEw=" name="sim_config" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFTM0z9s+SRih4=" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFSxhhZZu6I1OA=" name="sim_tstep" visibility="public" isStatic="false" isLeaf="false" type="double_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTpAgXnvgGEwU=" name="vis_ctrl" visibility="public" isStatic="false" isLeaf="false" type="struct_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
 				<ownedOperation xmi:id="AAAAAAFUCij8WxT0Fc0=" name="simulateForwardDynamics" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFUCilAeRUfUP8=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
-					<ownedParameter xmi:id="AAAAAAFUCilAeRUges0=" name="x_out" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
+					<ownedParameter xmi:id="AAAAAAFUCilAeRUges0=" name="pos_out" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFUCilAeRUhP3A=" name="sim_config" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFTM0z9s+SRih4=" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFUCilAeRUimxU=" name="sim_tstep" visibility="public" isStatic="false" isLeaf="false" type="double_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFUCilAeRUjUYU=" name="nRpts" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
@@ -534,8 +534,8 @@
 					<ownedParameter xmi:id="AAAAAAFS+VHp7JdXmGg=" name="chn_dq" visibility="public" isStatic="false" isLeaf="false" type="cell_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTGEdjxeK3FDk=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTGEdjxuK4Klo=" name="chain_names" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO9iCyQjE=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO9iCzNJA=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUTlvzCNw=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUTlv0h2E=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 				</ownedOperation>
 				<ownedOperation xmi:id="AAAAAAFS/u1q4ZmrVe0=" name="getStateChains" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
@@ -543,8 +543,8 @@
 					<ownedParameter xmi:id="AAAAAAFS/u3ynpofTNE=" name="chn_dq" visibility="public" isStatic="false" isLeaf="false" type="cell_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFS/u3ynpogqgw=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFS/u3ynpohInE=" name="chain_names" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO9iC0z4A=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO9iC1gAI=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUTlv1FKE=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUTlv2tcY=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 					<ownedParameter xmi:id="AAAAAAFTGEe9oeNZjQM=" name="q_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTGEe9oeNam5Y=" name="dq_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
@@ -554,8 +554,8 @@
 					<ownedParameter xmi:id="AAAAAAFTCK3ApT2PRmM=" name="jnt_dq" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTGEim1eOz+sc=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTGEim1eO0FCk=" name="joint_names" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO9iC2/PQ=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO9iC3EgE=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUTlv30ts=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUTlv4JoU=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 				</ownedOperation>
 				<ownedOperation xmi:id="AAAAAAFTCK845z5u++U=" name="getStateJointNames" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
@@ -563,8 +563,8 @@
 					<ownedParameter xmi:id="AAAAAAFTCK+bhj6a75E=" name="jnt_dq" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTCK+bhj6bFmw=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTCK+bhz6c8W4=" name="joint_names" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO9iC4KmE=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO9iC5bAU=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUTlv5htY=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUTlv6SWI=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 					<ownedParameter xmi:id="AAAAAAFTGEjjYeQNM5s=" name="q_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTGEjjYeQO1Y8=" name="dq_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
@@ -574,8 +574,8 @@
 					<ownedParameter xmi:id="AAAAAAFTGc4pvv43CD8=" name="jnt_dq" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTGc4pv/44m0c=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTGc4pv/45enQ=" name="joint_idx" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO9iC61VY=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO9iC7fvI=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUTlv7L0o=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUTlv8r1w=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 				</ownedOperation>
 				<ownedOperation xmi:id="AAAAAAFTGc1Pnvyc+28=" name="getStateJointIdx" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
@@ -583,8 +583,8 @@
 					<ownedParameter xmi:id="AAAAAAFTGc2iOf0QEmk=" name="jnt_dq" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTGc2iOf0Rv0g=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTGc2iOf0SjFk=" name="joint_idx" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO9iC8/aY=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO9iC9+ow=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUTlv9lOM=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUTlv+2mA=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 					<ownedParameter xmi:id="AAAAAAFTGc2iOv0TJv4=" name="q_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTGc2iOv0U0KA=" name="dq_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
@@ -610,6 +610,11 @@
 					<ownedParameter xmi:id="AAAAAAFSxhy3tPUj/M8=" name="q_j" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFSxhy3tPUkI20=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFVOswKJ7o8FRg=" name="stChi" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
+				</ownedOperation>
+				<ownedOperation xmi:id="AAAAAAFVPpEpN/GhBl0=" name="getPositionsData" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+					<ownedParameter xmi:id="AAAAAAFVPpH7hvxuJIA=" name="stmPos" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
+					<ownedParameter xmi:id="AAAAAAFVPpH7iPxvqlo=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
+					<ownedParameter xmi:id="AAAAAAFVPpH7iPxwWdU=" name="stmChi" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
 				<ownedOperation xmi:id="AAAAAAFRRJYHMUGvoZ4=" name="getVelocities" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFRRJZC6kHR4Jw=" name="v_b" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
@@ -672,15 +677,15 @@
 				<ownedOperation xmi:id="AAAAAAFVEqF0udhs4sA=" name="setLinkPayloads" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFVEqJCWtnn+Fg=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFVEqJCWtnoNdo=" name="link_names" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO9iC+Pho=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO9iC/dPU=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUT1v/bq0=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUT1wA28U=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 					<ownedParameter xmi:id="AAAAAAFVEqJCXNnp23c=" name="pl_data" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
 				<ownedOperation xmi:id="AAAAAAFVAsG8vgQB8VA=" name="getLinkPayloads" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFVAsQFbQbTZJQ=" name="lnk_plds" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFVAJrgjcgfNEM=" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO9iDAdIw=" xmi:type="uml:LiteralInteger" value="0"/>
-						<upperValue xmi:id="AAAAAAFVPmcO9yDBhG4=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUT1wBAB8=" xmi:type="uml:LiteralInteger" value="0"/>
+						<upperValue xmi:id="AAAAAAFVPqIUT1wCrH8=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 					<ownedParameter xmi:id="AAAAAAFVAsQFbgbUeLk=" name="nPlds" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFVA4RmvY79X2M=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
@@ -740,8 +745,8 @@
 					<ownedParameter xmi:id="AAAAAAFTHPezUGOWcg4=" name="q_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTHknivL0JaxU=" name="dq_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTHknivb0KTE8=" name="joint_idx" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO9yDCUDA=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO9yDDi3M=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUUFwDhmg=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUUFwEn10=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 					<ownedParameter xmi:id="AAAAAAFTHkoucb1iI64=" name="len" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
@@ -755,8 +760,8 @@
 			<packagedElement xmi:id="AAAAAAFPy+jwbw/0fN4=" name="wbmBaseRobotModel" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:DataType">
 				<ownedMember xmi:id="AAAAAAFQ8RSPuLEb8Jw=" name="mwbm_model" visibility="protected" xmi:type="uml:Association" isDerived="false">
 					<ownedEnd xmi:id="AAAAAAFQ8RSPuLEcia0=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="composite" isDerived="false" isID="false" type="AAAAAAFPy+jwbw/0fN4=">
-						<lowerValue xmi:id="AAAAAAFVPmcO9yDEsVQ=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO9yDF3FQ=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUUFwFrwY=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUUFwGYFQ=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAFQ8RSPubEdJFo=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAFPyxdTB0bDk8U="/>
 					<memberEnd xmi:idref="AAAAAAFQ8RSPuLEcia0="/>
@@ -764,8 +769,8 @@
 				</ownedMember>
 				<ownedMember xmi:id="AAAAAAFU4lukw+8jSvU=" name="robot_model" visibility="public" xmi:type="uml:Association" isDerived="false">
 					<ownedEnd xmi:id="AAAAAAFU4lukw+8kaA8=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="composite" isDerived="false" isID="false" type="AAAAAAFPy+jwbw/0fN4=">
-						<lowerValue xmi:id="AAAAAAFVPmcO+CDGFZY=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO+CDHdoM=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUUVwHmPI=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUUVwIHc0=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAFU4lukxO8lAIQ=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAFU4lbNqN7G23E="/>
 					<memberEnd xmi:idref="AAAAAAFU4lukw+8kaA8="/>
@@ -801,8 +806,8 @@
 			<packagedElement xmi:id="AAAAAAFQABVa+gl+WMM=" name="wbmStateParams" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:DataType">
 				<ownedMember xmi:id="AAAAAAFQ8YnWOMXN4XM=" name="init_state_params" visibility="public" xmi:type="uml:Association" isDerived="false">
 					<ownedEnd xmi:id="AAAAAAFQ8YnWOMXO4uw=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="composite" isDerived="false" isID="false" type="AAAAAAFQABVa+gl+WMM=">
-						<lowerValue xmi:id="AAAAAAFVPmcO+CDI8NE=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO+CDJ9qE=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUUVwJ02s=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUUVwKKN4=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAFQ8YnWOMXP9HU=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAFQEwAzGd2d/ak="/>
 					<memberEnd xmi:idref="AAAAAAFQ8YnWOMXO4uw="/>
@@ -818,8 +823,8 @@
 			<packagedElement xmi:id="AAAAAAFQEwAzGd2d/ak=" name="wbmBaseRobotConfig" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:DataType">
 				<ownedMember xmi:id="AAAAAAFQ8YSqUbxs65g=" name="mwbm_config" visibility="protected" xmi:type="uml:Association" isDerived="false">
 					<ownedEnd xmi:id="AAAAAAFQ8YSqUbxt10w=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="composite" isDerived="false" isID="false" type="AAAAAAFQEwAzGd2d/ak=">
-						<lowerValue xmi:id="AAAAAAFVPmcO+SDKnSk=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO+SDLgPI=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUUlwLNzg=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUUlwMW+4=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAFQ8YSqUbxu4hw=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAFPyz7/T0ePgyg="/>
 					<memberEnd xmi:idref="AAAAAAFQ8YSqUbxt10w="/>
@@ -827,8 +832,8 @@
 				</ownedMember>
 				<ownedMember xmi:id="AAAAAAFU4lw9hPHjiys=" name="robot_config" visibility="public" xmi:type="uml:Association" isDerived="false">
 					<ownedEnd xmi:id="AAAAAAFU4lw9hPHk4fA=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="composite" isDerived="false" isID="false" type="AAAAAAFQEwAzGd2d/ak=">
-						<lowerValue xmi:id="AAAAAAFVPmcO+SDMOnQ=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO+SDNn8Y=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUUlwNO4U=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUUlwOkDQ=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAFU4lw9hPHlkr0=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAFU4lbNqN7G23E="/>
 					<memberEnd xmi:idref="AAAAAAFU4lw9hPHk4fA="/>
@@ -871,8 +876,8 @@
 			<packagedElement xmi:id="AAAAAAFTEtPLL2v34jE=" name="wbmBody" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:DataType">
 				<ownedMember xmi:id="AAAAAAFTEtstTIINW8U=" name="body" visibility="public" xmi:type="uml:Association" isDerived="false">
 					<ownedEnd xmi:id="AAAAAAFTEtstTIIOIVg=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="composite" isDerived="false" isID="false" type="AAAAAAFTEtPLL2v34jE=">
-						<lowerValue xmi:id="AAAAAAFVPmcO+iDOmUE=" xmi:type="uml:LiteralInteger" value="0"/>
-						<upperValue xmi:id="AAAAAAFVPmcO+iDPWh4=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUU1wPRxQ=" xmi:type="uml:LiteralInteger" value="0"/>
+						<upperValue xmi:id="AAAAAAFVPqIUU1wQwjA=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAFTEtstTIIPyrc=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAFQEwAzGd2d/ak="/>
 					<memberEnd xmi:idref="AAAAAAFTEtstTIIOIVg="/>
@@ -884,37 +889,37 @@
 					</xmi:Extension>
 				</ownedMember>
 				<ownedAttribute xmi:id="AAAAAAFTEtX0bY9cD8Y=" name="chains.name" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false">
-					<lowerValue xmi:id="AAAAAAFVPmcO+iDQi/g=" xmi:type="uml:LiteralInteger" value="1"/>
-					<upperValue xmi:id="AAAAAAFVPmcO+iDRt6g=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+					<lowerValue xmi:id="AAAAAAFVPqIUU1wRuxk=" xmi:type="uml:LiteralInteger" value="1"/>
+					<upperValue xmi:id="AAAAAAFVPqIUU1wS1yw=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 				</ownedAttribute>
 				<ownedAttribute xmi:id="AAAAAAFTEtaqTY9dELM=" name="chains.start_idx" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false">
-					<lowerValue xmi:id="AAAAAAFVPmcO+iDS7bU=" xmi:type="uml:LiteralInteger" value="1"/>
-					<upperValue xmi:id="AAAAAAFVPmcO+iDT838=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+					<lowerValue xmi:id="AAAAAAFVPqIUU1wTsuw=" xmi:type="uml:LiteralInteger" value="1"/>
+					<upperValue xmi:id="AAAAAAFVPqIUU1wU6ZQ=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 				</ownedAttribute>
 				<ownedAttribute xmi:id="AAAAAAFTEtbMpI9eSkQ=" name="chains.end_idx" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false">
-					<lowerValue xmi:id="AAAAAAFVPmcO+iDUpS8=" xmi:type="uml:LiteralInteger" value="1"/>
-					<upperValue xmi:id="AAAAAAFVPmcO+iDVaeI=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+					<lowerValue xmi:id="AAAAAAFVPqIUU1wVTIg=" xmi:type="uml:LiteralInteger" value="1"/>
+					<upperValue xmi:id="AAAAAAFVPqIUU1wWmyQ=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 				</ownedAttribute>
 				<ownedAttribute xmi:id="AAAAAAFTEtbrFI9fH6k=" name="nChains" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<ownedAttribute xmi:id="AAAAAAFTEtb6vI9gftw=" name="joints.name" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false">
-					<lowerValue xmi:id="AAAAAAFVPmcO+iDW9mg=" xmi:type="uml:LiteralInteger" value="1"/>
-					<upperValue xmi:id="AAAAAAFVPmcO+iDXqvI=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+					<lowerValue xmi:id="AAAAAAFVPqIUU1wXSCU=" xmi:type="uml:LiteralInteger" value="1"/>
+					<upperValue xmi:id="AAAAAAFVPqIUU1wYZsM=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 				</ownedAttribute>
 				<ownedAttribute xmi:id="AAAAAAFTEtcbJI9h6MU=" name="joints.idx" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false">
-					<lowerValue xmi:id="AAAAAAFVPmcO+iDYYQY=" xmi:type="uml:LiteralInteger" value="1"/>
-					<upperValue xmi:id="AAAAAAFVPmcO+iDZvFk=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+					<lowerValue xmi:id="AAAAAAFVPqIUU1wZtVA=" xmi:type="uml:LiteralInteger" value="1"/>
+					<upperValue xmi:id="AAAAAAFVPqIUU1waJsA=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 				</ownedAttribute>
 				<ownedAttribute xmi:id="AAAAAAFTEtg/fY9iF5w=" name="nJoints" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<ownedOperation xmi:id="AAAAAAFTEtkapI9mXwk=" name="wbmBody" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFTEtkapI9nRyw=" name="obj" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFTEtPLL2v34jE=" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTEtkapY9oiUM=" name="chain_names" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO+iDanBo=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO+iDb7K0=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUU1wbSy0=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUU1wcD2g=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 					<ownedParameter xmi:id="AAAAAAFTEtkapY9peMs=" name="chain_idx" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFTEtkapY9qEDY=" name="joint_names" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO+iDczLM=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO+iDdS8I=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUU1wdn7A=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUU1we7gE=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 					<ownedParameter xmi:id="AAAAAAFUCpoi81dwe0w=" name="joint_idx" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
@@ -973,8 +978,8 @@
 			<packagedElement xmi:id="AAAAAAFTpAi/7Ppgxc0=" name="wbmSimBody" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:DataType">
 				<ownedMember xmi:id="AAAAAAFUCtwRmcy2WaY=" name="robot_body" visibility="public" xmi:type="uml:Association" isDerived="false">
 					<ownedEnd xmi:id="AAAAAAFUCtwRmcy3dl4=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="composite" isDerived="false" isID="false" type="AAAAAAFTpAi/7Ppgxc0=">
-						<lowerValue xmi:id="AAAAAAFVPmcO+yDeb+o=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO+yDf22g=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUVFwfiK0=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUVFwgUWI=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAFUCtwRmcy4a2Q=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAFTM0z9s+SRih4="/>
 					<memberEnd xmi:idref="AAAAAAFUCtwRmcy3dl4="/>
@@ -993,8 +998,8 @@
 				<ownedAttribute xmi:id="AAAAAAFUCod5wCalYwU=" name="foot_base_sz" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<ownedAttribute xmi:id="AAAAAAFUConieCuggOU=" name="foot_shape_ds" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<ownedAttribute xmi:id="AAAAAAFUCon+2yxUDHA=" name="joint_lnk_names" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false">
-					<lowerValue xmi:id="AAAAAAFVPmcO+yDgJBc=" xmi:type="uml:LiteralInteger" value="1"/>
-					<upperValue xmi:id="AAAAAAFVPmcO+yDhCbE=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+					<lowerValue xmi:id="AAAAAAFVPqIUVFwhW38=" xmi:type="uml:LiteralInteger" value="1"/>
+					<upperValue xmi:id="AAAAAAFVPqIUVFwiwP4=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 				</ownedAttribute>
 				<ownedAttribute xmi:id="AAAAAAFUCon/tiyWZEc=" name="joint_pair_idx" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<ownedAttribute xmi:id="AAAAAAFUCooAkSzYVas=" name="nJoints" visibility="public" isStatic="false" isLeaf="false" type="integer_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
@@ -1009,8 +1014,8 @@
 				<ownedOperation xmi:id="AAAAAAFUCoewsidfAK4=" name="wbmSimBody" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFUCpc8Xkm8Obs=" name="obj" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFTpAi/7Ppgxc0=" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFUCpc8Xkm9eRo=" name="joint_lnk_names" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter">
-						<lowerValue xmi:id="AAAAAAFVPmcO+yDiUDk=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO+yDjMwQ=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUVFwjSyk=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUVFwksdQ=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedParameter>
 					<ownedParameter xmi:id="AAAAAAFUCpc8X0m+WjA=" name="joint_pair_idx" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFUCpdsWUpHDe4=" name="draw_prop" visibility="public" isStatic="false" isLeaf="false" type="wbmDrawProp_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
@@ -1085,8 +1090,8 @@
 			<packagedElement xmi:id="AAAAAAFUCtOtCrt4Kn0=" name="wbmRobotDrawProp" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:DataType">
 				<ownedMember xmi:id="AAAAAAFUCuxLUftz6S4=" name="draw_prop" visibility="public" xmi:type="uml:Association" isDerived="false">
 					<ownedEnd xmi:id="AAAAAAFUCuxLUft0W6w=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="composite" isDerived="false" isID="false" type="AAAAAAFUCtOtCrt4Kn0=">
-						<lowerValue xmi:id="AAAAAAFVPmcO/CDkwpg=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO/CDlxr8=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUVVwlsHI=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUVVwmVKU=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAFUCuxLUft1iTU=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAFTpAi/7Ppgxc0="/>
 					<memberEnd xmi:idref="AAAAAAFUCuxLUft0W6w="/>
@@ -1113,8 +1118,8 @@
 			<packagedElement xmi:id="AAAAAAFULpOXt1N1uHw=" name="wbmSimEnvironment" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:DataType">
 				<ownedMember xmi:id="AAAAAAFULqvBB+halTw=" name="environment" visibility="public" xmi:type="uml:Association" isDerived="false">
 					<ownedEnd xmi:id="AAAAAAFULqvBB+hbI3k=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="composite" isDerived="false" isID="false" type="AAAAAAFULpOXt1N1uHw=">
-						<lowerValue xmi:id="AAAAAAFVPmcO/CDmmfM=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAFVPmcO/CDnZdM=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUVlwnW6g=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAFVPqIUV1woVCA=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAFULqvBB+hcKXU=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAFTM0z9s+SRih4="/>
 					<memberEnd xmi:idref="AAAAAAFULqvBB+hbI3k="/>
@@ -1143,8 +1148,8 @@
 			<packagedElement xmi:id="AAAAAAFVAJrgjcgfNEM=" name="wbmLinkPayload" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:DataType">
 				<ownedMember xmi:id="AAAAAAFVFUVWKawyMu8=" name="lnk_payloads" visibility="public" xmi:type="uml:Association" isDerived="false">
 					<ownedEnd xmi:id="AAAAAAFVFUVWKawzpvo=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="composite" isDerived="false" isID="false" type="AAAAAAFVAJrgjcgfNEM=">
-						<lowerValue xmi:id="AAAAAAFVPmcO/SDodiA=" xmi:type="uml:LiteralInteger" value="0"/>
-						<upperValue xmi:id="AAAAAAFVPmcO/SDphLA=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAFVPqIUV1wpHMQ=" xmi:type="uml:LiteralInteger" value="0"/>
+						<upperValue xmi:id="AAAAAAFVPqIUWFwqNgk=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAFVFUVWKaw0mi4=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAFQEwAzGd2d/ak="/>
 					<memberEnd xmi:idref="AAAAAAFVFUVWKawzpvo="/>

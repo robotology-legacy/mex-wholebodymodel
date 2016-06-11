@@ -1,4 +1,4 @@
-function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
+function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
     if ~exist('vis_ctrl', 'var')
         % draw all graphic elements of the simulated robot ...
         vis_ctrl.drawJnts  = true;
@@ -18,15 +18,15 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     % check the dimension and get the number of instances of the simulation result ...
     ndof = obj.mwbm_model.ndof;
     vlen = ndof + 7;
-    [nRes, len] = size(x_out);
+    [nSteps, len] = size(pos_out);
     if (len ~= vlen)
         error('WBM::visualizeForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
     end
 
     % get the translation, orientation and joint positions from the output vector
-    % "x_out" of the integration part of the forward dynamics function:
-    vqT_b = x_out(1:nRes,1:7);
-    q_j = x_out(1:nRes,8:vlen);
+    % "pos_out" of the integration part of the forward dynamics function:
+    vqT_b = pos_out(1:nSteps,1:7);
+    q_j   = pos_out(1:nSteps,8:vlen);
 
     nJnts  = sim_config.robot_body.nJoints; % number of nodes (virtual joints) to be plotted
     nLnks  = sim_config.robot_body.nLinks;  % number of edges (virtual links) to be plotted
@@ -43,12 +43,12 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     % joint pair (link) translations (xyz-positions):
     fwd_kin.jnt_pair_pos = zeros(nLnks,6);
     % forward kin. roto-translation (in VQS-form):
-    fwd_kin.vqT = zeros(nRes,7,nJnts);
+    fwd_kin.vqT = zeros(nSteps,7,nJnts);
 
     % calculate the forward kinematic roto-translation of each joint in the
     % joint name list of the robot:
-    fwd_kin.vqT(1:nRes,1:7,1) = vqT_b; % use the base data instead the forward kin. of the 'root_link' ...
-    for i = 1:nRes % for each result ...
+    fwd_kin.vqT(1:nSteps,1:7,1) = vqT_b; % use the base data instead the forward kin. of the 'root_link' ...
+    for i = 1:nSteps % for each time step ...
         q   = q_j(i,1:ndof).';
         vqT = squeeze(vqT_b(i,1:7).');
 
@@ -149,7 +149,7 @@ function visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
     %% Update the graphic objects of the robot:
 
     t = 2;
-    while (t <= nRes) % the visualization instance ...
+    while (t <= nSteps) % the visualization instance ...
         tic; % visualization step timer start (needed for adapting the visualization speed)
 
         % update the forward kinematic translations (positions) ...

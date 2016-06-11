@@ -139,19 +139,19 @@ classdef WBM < WBM.WBMBase
 
         sim_config = setupSimulation(~, sim_config)
 
-        [] = visualizeForwardDynamics(obj, x_out, sim_config, sim_tstep, vis_ctrl)
+        [] = visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
 
-        function simulateForwardDynamics(obj, x_out, sim_config, sim_tstep, nRpts, vis_ctrl)
+        function simulateForwardDynamics(obj, pos_out, sim_config, sim_tstep, nRpts, vis_ctrl)
             if ~exist('vis_ctrl', 'var')
                 % use the default ctrl-values ...
                 for i = 1:nRpts
-                    obj.visualizeForwardDynamics(x_out, sim_config, sim_tstep);
+                    obj.visualizeForwardDynamics(pos_out, sim_config, sim_tstep);
                 end
                 return
             end
             % else ...
             for i = 1:nRpts
-                obj.visualizeForwardDynamics(x_out, sim_config, sim_tstep, vis_ctrl);
+                obj.visualizeForwardDynamics(pos_out, sim_config, sim_tstep, vis_ctrl);
             end
         end
 
@@ -371,6 +371,16 @@ classdef WBM < WBM.WBMBase
             end
             % else ...
             error('WBM::getPositions: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+        end
+
+        function stmPos = getPositionsData(obj, stmChi)
+            [m, n] = size(stmChi);
+            if (n ~= obj.mwbm_config.stvLen)
+                error('WBM::getPositionsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+            end
+
+            cutp   = obj.mwbm_model.ndof + 7; % 3 + 4 + ndof
+            stmPos = stmChi(1:m,1:cutp);      % m -by- [x_b, qt_b, q_j]
         end
 
         function [v_b, dq_j] = getVelocities(obj, stChi)
