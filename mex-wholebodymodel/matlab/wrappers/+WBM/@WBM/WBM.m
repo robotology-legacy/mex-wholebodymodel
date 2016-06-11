@@ -443,21 +443,32 @@ classdef WBM < WBM.WBMBase
                 omega_b = v_b(1:m,4:6);
                 return
             end
-            % should never come here ...
+            % else ...
             error('WBM::baseVel2params: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
         end
 
         function vqT_b = params2rotoTrans(~, stParams)
-            if isempty(stParams)
+            if ( isempty(stParams.x_b) || isempty(stParams.qt_b) )
                 error('WBM::params2rotoTrans: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
             end
 
-            vqT_b = vertcat(stParams.x_b, stParams.qt_b);
+            if iscolumn(stParams.x_b)
+                vqT_b = vertcat(stParams.x_b, stParams.qt_b);
+                return
+            elseif ismatrix(stParams.x_b)
+                vqT_b = horzcat(stParams.x_b, stParams.qt_b);
+                return
+            end
+            % else ...
+            error('WBM::params2rotoTrans: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
         end
 
         function stvChi = params2stateVec(~, stParams)
-            if isempty(stParams)
+            if WBM.utilities.isStateEmpty(stParams)
                 error('WBM::params2stateVec: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
+            end
+            if ~iscolumn(stParams.x_b)
+                error('WBM::params2stateVec: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
 
             stvChi = vertcat(stParams.x_b, stParams.qt_b, stParams.q_j, ...
@@ -513,19 +524,19 @@ classdef WBM < WBM.WBMBase
             pl_tbl = cell2table(cplds, 'VariableNames', {'link_name', 'mass', 'pos'});
         end
 
-        function stvChi_init = get.stvChiInit(obj)
+        function stvChi = get.stvChiInit(obj)
             stInit = obj.mwbm_config.init_state_params;
-            stvChi_init = vertcat(stInit.x_b, stInit.qt_b, stInit.q_j, ...
-                                  stInit.dx_b, stInit.omega_b, stInit.dq_j);
+            stvChi = vertcat(stInit.x_b, stInit.qt_b, stInit.q_j, ...
+                             stInit.dx_b, stInit.omega_b, stInit.dq_j);
         end
 
         function stvLen = get.stvLen(obj)
             stvLen = obj.mwbm_config.stvLen;
         end
 
-        function vqT_init = get.vqTInit(obj)
+        function vqT_b = get.vqTInit(obj)
             stInit = obj.mwbm_config.init_state_params;
-            vqT_init = vertcat(stInit.x_b, stInit.qt_b);
+            vqT_b  = vertcat(stInit.x_b, stInit.qt_b);
         end
 
         function vqT_b = get.stvqT(obj)
