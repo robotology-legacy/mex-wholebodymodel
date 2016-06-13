@@ -1,63 +1,69 @@
-function controlParam  = initController(gains,trajectory,dynamics,forKinematics,config,state)
-%INITCONTROLLER is the function which contains all the available
-%               balancing controllers in MATLAB.
+function controlParam  = initController(gains,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE)
+%INITCONTROLLER is the initialization function for iCub balancing controllers
+%               in Matlab.
 %
 %               controlParam  = INITCONTROLLER(gains,trajectory,dynamics,
-%               forKinematics,config) takes as input all the robot-related
-%               structures (dynamics, gains, ecc...). The output is the
-%               structure CONTROLPARAM which contains the control torques
+%               forKinematics,config,state) takes as input the control gains,
+%               the joint reference trajectory, all the configuration parameters
+%               and the robot dynamics, forward kinematics and state. The output
+%               is the structure CONTROLPARAM which contains the control torques
 %               TAU, the contact forces FC and other parameters for visualization.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 
 % ------------Initialization----------------
-%% DEFINE PARAMETERS
-% Feet correction gains
-KCorrPos              = 0;
+%% Feet correction gains
+KCorrPos              = 2.5;
 KCorrVel              = 2*sqrt(KCorrPos);
 
-% Config parameters
-ndof                  = config.ndof;
-SoTController         = config.SoTController;
-JSController          = config.JSController;
-feet_on_ground        = config.feet_on_ground;
-use_QPsolver          = config.use_QPsolver;
-InitForKinematics     = config.InitForKinematics;
+%% Config parameters
+ndof                  = CONFIG.ndof;
+feet_on_ground        = CONFIG.feet_on_ground;
+use_QPsolver          = CONFIG.use_QPsolver;
+initForKinematics     = CONFIG.initForKinematics;
+S                     = [zeros(6,ndof);
+                         eye(ndof,ndof)]; 
 
-% Dynamics parameters
-dJcNu                 = dynamics.dJcNu;
-M                     = dynamics.M;
-Jc                    = dynamics.Jc;
-h                     = dynamics.h;
+%% Dynamics 
+dJcNu                 = DYNAMICS.dJcNu;
+M                     = DYNAMICS.M;
+Jc                    = DYNAMICS.Jc;
+h                     = DYNAMICS.h;
+JcMinv                = Jc/M;
+JcMinvS               = JcMinv*S;
 
-% Forward Kinematics parameters
-VelFeet               = forKinematics.VelFeet;
-TLfoot                = forKinematics.TLfoot;
-TRfoot                = forKinematics.TRfoot;
-RFootPoseEul          = forKinematics.RFootPoseEul;
-LFootPoseEul          = forKinematics.LFootPoseEul;
-DeltaPoseRFoot        = TRfoot*(RFootPoseEul-InitForKinematics.RFootPoseEul); 
-DeltaPoseLFoot        = TLfoot*(LFootPoseEul-InitForKinematics.LFootPoseEul);
+%% Forward Kinematics
+VelFeet               = FORKINEMATICS.VelFeet;
+TLfoot                = FORKINEMATICS.TLfoot;
+TRfoot                = FORKINEMATICS.TRfoot;
+RFootPoseEul          = FORKINEMATICS.RFootPoseEul;
+LFootPoseEul          = FORKINEMATICS.LFootPoseEul;
+DeltaPoseRFoot        = TRfoot*(RFootPoseEul-initForKinematics.RFootPoseEul);
+DeltaPoseLFoot        = TLfoot*(LFootPoseEul-initForKinematics.LFootPoseEul);
 
-%% CONTROLLERS
-if     SoTController == 1
+%% BALANCING CONTROLLERS
+if     strcmp(CONFIG.controller,'StackOfTask') == 1
 
-controlParam         = stackOfTaskController(config,gains,trajectory,dynamics,forKinematics,state); 
+controlParam          = stackOfTaskController(CONFIG,gains,trajectory,DYNAMICS,FORKINEMATICS,STATE); 
 
-if     use_QPsolver  == 1 
-% Quadratic programming solver for the contact forces Nullspace   
-controlParam.fcDes   = QPSolver(controlParam,config,forKinematics);
+if     use_QPsolver == 1 
+
+% Quadratic programming solver for the nullspace of contact forces  
+controlParam.fcDes    = QPSolver(controlParam,CONFIG,FORKINEMATICS);
 end
-controlParam.tau     = controlParam.tauModel + controlParam.Sigma*controlParam.fcDes;
 
-elseif JSController  == 1        
+controlParam.tau      = controlParam.tauModel + controlParam.Sigma*controlParam.fcDes;
+
+elseif strcmp(CONFIG.controller,'JointSpace') == 1 
+    
 % Centroidal coordinates transformation   
-dynamics.centroidal   = centroidalConversion(dynamics,forKinematics,state);
-controlParam          = jointSpaceController(config,gains,trajectory,dynamics.centroidal,state);
+centroidalDynamics    = centroidalConversion(DYNAMICS,FORKINEMATICS,STATE);
+controlParam          = jointSpaceController(CONFIG,gains,trajectory,centroidalDynamics,STATE);
 end
 
-%% FEET POSE CORRECTION
+%% Feet pose correction
+% this will avoid numerical errors during the forward dynamics integration
 if     feet_on_ground(1) == 1 && feet_on_ground(2) == 0
 
 DeltaPoseFeet  = DeltaPoseLFoot;
@@ -72,12 +78,9 @@ DeltaPoseFeet  = [DeltaPoseLFoot;DeltaPoseRFoot];
 end
 
 %% REAL CONTACT FORCES COMPUTATION
-S                = [zeros(6,ndof);
-                    eye(ndof,ndof)]; 
-JcMinv           =  Jc/M;
-JcMinvS          =  JcMinv*S;
-
-if config.visualize_stability_analysis_results == 1
+% for the linearization analysis, the desired contact forces are used
+% instead of the real ones (stack of task only)
+if CONFIG.visualize_stability_analysis_results == 1
 controlParam.fc  = controlParam.fcDes;
 else
 controlParam.fc  = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*controlParam.tau -dJcNu -KCorrVel.*VelFeet-KCorrPos.*DeltaPoseFeet);

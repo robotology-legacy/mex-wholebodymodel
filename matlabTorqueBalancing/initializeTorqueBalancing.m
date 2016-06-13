@@ -27,9 +27,9 @@ CONFIG.controller                           = 'StackOfTask';               %eith
 
 %% Linearized system analysis, gains tuning and QP solver. All these tools
 %% are available only for the 'Stack of Task' controller
-CONFIG.use_QPsolver                         = 0;                           %either 0 or 1
-CONFIG.linearize_for_stability_analysis     = 1;                           %either 0 or 1
-CONFIG.linearize_for_gains_tuning           = 1;                           %either 0 or 1
+CONFIG.use_QPsolver                         = 1;                           %either 0 or 1
+CONFIG.linearize_for_stability_analysis     = 0;                           %either 0 or 1
+CONFIG.linearize_for_gains_tuning           = 0;                           %either 0 or 1
 
 % if params.linearize_for_gains_tuning = 1, choose between two different
 % optimization algorithms: either the nonlinear least squares, 'NonLinLsq' 
@@ -50,14 +50,14 @@ CONFIG.visualize_stability_analysis_results  = 0;                          %eith
                                                                            %                              or linearize_for_stability_analysis  = 1                                    
 %% Integration time [s]
 CONFIG.tStart                                = 0;   
-CONFIG.tEnd                                  = 10;   
+CONFIG.tEnd                                  = 1;   
 CONFIG.sim_step                              = 0.01;
 
 %% Allow the joints references generation using inverse kinematics
 % it will be automatically activated if the "Joint Space" controller is used, 
 % or the visualization of stability analysis results is active.
-CONFIG.jointRef_with_ikin                    = 1;                          %either 0 or 1
-CONFIG.visualize_ikin_results                = 1;                          %either 0 or 1  
+CONFIG.jointRef_with_ikin                    = 0;                          %either 0 or 1
+CONFIG.visualize_ikin_results                = 0;                          %either 0 or 1  
 CONFIG.ikin_integration_step                 = 0.01; 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -67,7 +67,7 @@ CONFIG.massCorr           = 0;
 CONFIG.pinv_tol           = 1e-8;
 CONFIG.pinv_damp          = 5e-6;
 CONFIG.reg_HessianQP      = 1e-3;
-CONFIG.postCorrection     = 1;
+CONFIG.postCorrection     = 0;
 % if the robot is not moving, i.e. CONFIG.demo_movements = 0, the integration 
 % can be very long. In this case try changing the integration options below.
 %

@@ -1,34 +1,35 @@
-function fcDes = QPSolver(controlParam,config,forKinematics)
-%SQPSOLVER implements a quadratic programming solver. The objective is the
+function fcDes = QPSolver(controlParam,CONFIG,FORKINEMATICS)
+%QPSOLVER  implements a quadratic programming solver. The objective is the
 %          minimization of the control torques by means of the nullspace of
-%          contact forces, f0. The friction cones contraints are also take
-%          into account in the optimization.
+%          contact forces, f0. Inequality constraints to ensure fc is inside 
+%          the friction cones are also taken into account in the optimization.
+%
 %          fcDes = QPSOLVER(controlParam,config,forKinematics) takes as 
 %          input the structures: CONTROLPARAM, containing the controller 
-%          parameters; CONFIG, which cointains all the user-defined
-%          parameters and FORKINEMATICS which is the forward kinematics of 
-%          the robot. The output are the desired contact forces
+%          parameters; CONFIG, which contains all the configuration
+%          parameters and FORKINEMATICS, which contains the forward kinematics 
+%          of the robot. The output are the desired contact forces
 %          FCDES [6*numconstraints x 1].
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 
 % ------------Initialization----------------
-% Config parameters
-regHessianQP          = config.reg_HessianQP;
-feet_on_ground        = config.feet_on_ground;
+%% Config parameters
+regHessianQP          = CONFIG.reg_HessianQP;
+feet_on_ground        = CONFIG.feet_on_ground;
 
-% Control parameters
+%% Control parameters
 fcHDot                = controlParam.fcHDot;
 tauModel              = controlParam.tauModel;
-Sigma                 = controlParam.Sigma;    
+Sigma                 = controlParam.Sigma;   
 Nullfc                = controlParam.Nullfc;  
 A                     = controlParam.A;
 SigmaNA               = Sigma*Nullfc;
 
-% Forward Kinematics
-RFootPoseQuat        = forKinematics.RFootPoseQuat;
-LFootPoseQuat        = forKinematics.LFootPoseQuat;
+%% Forward Kinematics
+RFootPoseQuat        = FORKINEMATICS.RFootPoseQuat;
+LFootPoseQuat        = FORKINEMATICS.LFootPoseQuat;
 
 %% Constraints for QP 
 e1                   = [1;0;0];
@@ -37,15 +38,17 @@ e3                   = [0;0;1];
 [~,RotRFoot]         = frame2posrot(RFootPoseQuat);
 [~,RotLFoot]         = frame2posrot(LFootPoseQuat);
 
-numberOfPoints               = 4;   % The friction cone is approximated by using linear interpolation of the circle. 
-                                    % numberOfPoints defines the number of points used to interpolate the circle in each cicle's quadrant 
+% the friction cone is approximated by using linear interpolation of the circle.
+% numberOfPoints defines the number of points used to interpolate the circle in 
+% each cicle's quadrant 
+numberOfPoints               = 4;   
 forceFrictionCoefficient     = 1;              
 torsionalFrictionCoefficient = 2/150;
 footSize                     = [-0.1 0.1;       % xMin, xMax
                                 -0.1 0.1];      % yMin, yMax    
 fZmin                        = 10;
 
-% the QP solver will search a solution f0 that satisfies the inequality Aineq_f F(fo) < bineq_f 
+% the QP solver will search a solution f0 that satisfies the inequality Aineq_f F(f0) < bineq_f 
 [ConstraintsMatrix,bVectorConstraints] = frictionCones(forceFrictionCoefficient,numberOfPoints,torsionalFrictionCoefficient,footSize,fZmin);
 
 %% QP SOLVER    
@@ -67,7 +70,7 @@ bVectorConstraints2Feet   = [bVectorConstraints;bVectorConstraints];
 ConstraintsMatrixQP1Foot  = CL;
 bVectorConstraintsQP1Foot = bVectorConstraints;
 
-if  sum(feet_on_ground) == 1
+if     sum(feet_on_ground) == 1
     
 HessianMatrixQP1Foot      =  A'*A;
 gradientQP1Foot           = -A'*(HDotDes-f_grav);

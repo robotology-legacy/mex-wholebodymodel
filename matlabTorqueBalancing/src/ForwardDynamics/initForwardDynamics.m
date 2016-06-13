@@ -58,6 +58,7 @@ CONFIG.numConstraints           = length(CONFIG.constraintLinkNames);
 
 %% Initial state of the robot 
 qjInit             = [CONFIG.torsoInit;CONFIG.leftArmInit;CONFIG.rightArmInit;CONFIG.leftLegInit;CONFIG.rightLegInit]*(pi/180);
+CONFIG.qjInit      = qjInit;
 dqjInit            = zeros(ndof,1);
 VelBaseInit        = zeros(3,1);
 omegaWorldBaseInit = zeros(3,1);
@@ -102,6 +103,7 @@ CONFIG.initForKinematics         = robotForKinematics(CONFIG.initState,CONFIG.in
 
 %% Initial gains
 CONFIG.gainsInit                 = gains(CONFIG);
+CONFIG.gains                     = CONFIG.gainsInit; 
 
 %% LINEARIZATION AND GAINS TUNING
 if CONFIG.linearizeJointSp == 1
@@ -113,15 +115,14 @@ if CONFIG.linearize_for_gains_tuning == 1
 [CONFIG.gains,CONFIG.visualizeTuning] = gainsTuning(linearization,CONFIG);
 else
 CONFIG.visualizeTuning.KS             = linearization.KS;
-CONFIG.visualizeTuning.KD             = linearization.KD;
-CONFIG.gains                          = CONFIG.gainsInit;  
+CONFIG.visualizeTuning.KD             = linearization.KD; 
 end
 end
 
 %% FORWARD DYNAMICS INTEGRATION
-CONFIG.wait      = waitbar(0,'State integration in progress...');
-#########
-forwardDynFunc   = @(t,chi)forwardDynamics(t,chi,CONFIG);
+CONFIG.wait     = waitbar(0,'State integration in progress...');
+
+forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,CONFIG);
 
 % Choose between fixed step intergator and ODE15s
 if CONFIG.integrateWithFixedStep == 1

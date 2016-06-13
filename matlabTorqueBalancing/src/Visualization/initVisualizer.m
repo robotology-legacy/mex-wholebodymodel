@@ -26,7 +26,7 @@ if config.visualize_stability_analysis_results == 1 || config.visualize_gains_tu
 config.visualizeLinearization = 1;
 end
 
-if config.linearize == 1 && config.visualizeLinearization == 1
+if config.linearizeJointSp  == 1 && config.visualizeLinearization == 1
     
 config.allowVisualization = 1;
 end
@@ -123,7 +123,7 @@ config.ContFig = visualizeJointDynamics(t,config,qj,qjRef);
 end
 
 %% Linearization results (stability and gains tuning)
-if config.linearize == 1
+if config.linearizeJointSp == 1
     
 config.ContFig = visualizeLinearization(t,config,qjErr,dqjErr,ddqjNonLin,ddqjRef);     
 end

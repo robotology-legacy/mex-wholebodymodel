@@ -101,7 +101,7 @@ end
 
 gainsInit.impedances    = diag(gainsInit.impedances);
 gainsInit.dampings      = diag(gainsInit.dampings); 
-gainsInit.VelGainsMom   = [gainsInit.gainsDCoM zeros(3); zeros(3) gainsInit.gainsDAngMom];
-gainsInit.PosGainsMom   = [gainsInit.gainsPCoM zeros(3); zeros(3) gainsInit.gainsPAngMom];
+gainsInit.MomentumGains   = [gainsInit.gainsDCoM zeros(3); zeros(3) gainsInit.gainsDAngMom];
+gainsInit.intMomentumGains   = [gainsInit.gainsPCoM zeros(3); zeros(3) gainsInit.gainsPAngMom];
 
 end

@@ -1,11 +1,12 @@
 function  JointReferences = interpInverseKinematics(t,ikin)
-%INTERPINVERSEKINEMATICS interpolates the joint reference trajectories obtained
-%                        from inverse kinematics (using a fixed step integrator)
+%INTERPINVERSEKINEMATICS interpolates the joint reference trajectory obtained
+%                        from inverse kinematics (which uses a fixed step integrator)
 %                        to make the reference compatible with the variable step
-%                        integrator used for the forward dynamics integrations.
-%   JointReferences = INTERPINVERSEKINEMATICS(t,ikinParam) performs linear
+%                        integrator used in the forward dynamics integrations.
+%
+%   JointReferences = INTERPINVERSEKINEMATICS(t,ikin) performs a linear
 %   interpolation. The inputs are the forward dynamics integration time t
-%   and the structure ikinParam which contains all the parameters from
+%   and the structure ikin which contains all the parameters from
 %   inverse kinematics integration. The output are the Joint References.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)

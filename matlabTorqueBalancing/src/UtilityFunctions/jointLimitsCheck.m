@@ -1,8 +1,9 @@
 function [] = jointLimitsCheck(qj,t)
-%JOINTLIMITSCHECK verify the joints are inside the joint limits.
+%JOINTLIMITSCHECK verifies the joints are inside the joint limits.
+%
 %                 [] = JOINTLIMITSCHECK(qj,t) take as an input the joint
-%                 positions QJ and the current time step T. The output is 
-%                 an error message when the robot reaches the joint limits.
+%                 positions qj and the current time step t. The output is 
+%                 an error message only if a joint reaches the limits.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016

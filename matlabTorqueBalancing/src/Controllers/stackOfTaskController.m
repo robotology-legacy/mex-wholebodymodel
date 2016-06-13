@@ -1,61 +1,62 @@
-function controlParam = stackOfTaskController(config,gains,trajectory,dynamics,forKinematics,state)
-%STACKOFTASKCONTROLLER is a task-based balancing controller for the humanoid
-%                      robot iCub.
-%   STACKOFTASKCONTROLLER computes the control torques at joints using a 
-%   task-based approach. The first task is the control of robot momentum, 
-%   while the second task is a postural task.
+function controlParam = stackOfTaskController(CONFIG,gains,trajectory,DYNAMICS,FORKINEMATICS,STATE)
+%STACKOFTASKCONTROLLER implements a momentum-based control algorithm to
+%                      control the robot iCub.
+%
+%   STACKOFTASKCONTROLLER computes the desired control torques at joints 
+%   using a task-based approach. The first task is the control of robot's 
+%   momentum, while the second task is a postural task.
 %
 %   controlParam = STACKOFTASKCONTROLLER(config, gains, trajectory,
 %   dynamics, forKinematics, state) takes as input the structure CONFIG,
-%   which contains all the utility parameters, and all the structures 
-%   related to the robot dynamics, forward kinematics, gains, ecc... .
+%   which contains all the configuration parameters, while the other
+%   structures contain the control gains, the desired trajectory, the robot
+%   dynamics, forward kinematics and state.
 %   The output is the structure CONTROLPARAM which contains the desired
-%   control torques and others parameters used for visualization and QP 
-%   solver.
+%   control torques, the desired contact forces and others parameters used
+%   for visualization and QP solver.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
 
 % ------------Initialization----------------
-%% DEFINE ALL THE PARAMETERS
-% Config parameters
-pinv_tol            = config.pinv_tol;
-feet_on_ground      = config.feet_on_ground;
-ndof                = config.ndof;
-InitDynamics        = config.InitDynamics;
-InitState           = config.InitState;
-%pinv_damp          = config.pinv_damp;
+%% Config parameters
+pinv_tol            = CONFIG.pinv_tol;
+feet_on_ground      = CONFIG.feet_on_ground;
+ndof                = CONFIG.ndof;
+initDynamics        = CONFIG.initDynamics;
+initState           = CONFIG.initState;
+%pinv_damp          = CONFIG.pinv_damp;
 
-% Gains
+%% Gains
 impedances          = gains.impedances;
 dampings            = gains.dampings;
+MomentumGains       = gains.MomentumGains;
+intMomentumGains    = gains.intMomentumGains;
 posturalCorr        = gains.posturalCorr;
-VelGainsMom         = gains.VelGainsMom;
-PosGainsMom         = gains.PosGainsMom;
 
-% Dynamics
-M                   = dynamics.M;
-g                   = dynamics.g;
-CNu                 = dynamics.CNu;
-dJcNu               = dynamics.dJcNu;
-H                   = dynamics.H;
-Jc                  = dynamics.Jc;
+%% Dynamics
+M                   = DYNAMICS.M;
+g                   = DYNAMICS.g;
+CNu                 = DYNAMICS.CNu;
+dJcNu               = DYNAMICS.dJcNu;
+H                   = DYNAMICS.H;
+Jc                  = DYNAMICS.Jc;
 h                   = g + CNu;
 m                   = M(1,1);
 Mb                  = M(1:6,1:6);
 Mbj                 = M(1:6,7:end);
 Mj                  = M(7:end,7:end);
 
-% Forward kinematics
-xCoM                = forKinematics.xCoM;
-dxCoM               = forKinematics.dxCoM;
-RFootPoseEul        = forKinematics.RFootPoseEul;
-LFootPoseEul        = forKinematics.LFootPoseEul;
+%% Forward kinematics
+xCoM                = FORKINEMATICS.xCoM;
+dxCoM               = FORKINEMATICS.dxCoM;
+RFootPoseEul        = FORKINEMATICS.RFootPoseEul;
+LFootPoseEul        = FORKINEMATICS.LFootPoseEul;
 
-% State
-qj                  = state.qj;
-dqj                 = state.dqj;
+%% Robot State
+qj                  = STATE.qj;
+dqj                 = STATE.dqj;
 
 % Trajectory
 x_dx_ddx_CoMDes     = trajectory.desired_x_dx_ddx_CoM;
@@ -87,7 +88,7 @@ AR                  = [eye(3),     zeros(3);
 if      sum(feet_on_ground) == 2
     
     A      = [AL,AR];
-    pinvA  = pinv(A,pinv_tol);    
+    pinvA  = pinv(A,pinv_tol);   
 else    
     if      feet_on_ground(1) == 1 
     
@@ -101,37 +102,37 @@ end
 
 %% Desired momentum derivative
 % closing the loop on angular momentum integral
-deltaPhi           =  InitDynamics.JhReduced(4:end,:)*(qj-InitState.qj);
+deltaPhi           =  initDynamics.JhReduced(4:end,:)*(qj-initState.qj);
 
 accDesired         =  [m.*x_dx_ddx_CoMDes(:,3); zeros(3,1)];
-velDesired         = -VelGainsMom*[m.*(dxCoM-x_dx_ddx_CoMDes(:,2)); H(4:end)];
-posDesired         = -PosGainsMom*[m.*(xCoM-x_dx_ddx_CoMDes(:,1)); deltaPhi];
+velDesired         = -MomentumGains*[m.*(dxCoM-x_dx_ddx_CoMDes(:,2)); H(4:end)];
+posDesired         = -intMomentumGains*[m.*(xCoM-x_dx_ddx_CoMDes(:,1)); deltaPhi];
 HDotDes            =  accDesired + velDesired + posDesired;
 
 %% Control torques equation
-JcMinv          = Jc/M;
-Lambda          = JcMinv*S;
-JcMinvJct       = JcMinv*transpose(Jc);
-pinvLambda      = pinv(Lambda,pinv_tol);
-%pinvLambda     = Lambda'/(Lambda*Lambda' + pinv_damp*eye(size(Lambda,1)));
+JcMinv             = Jc/M;
+Lambda             = JcMinv*S;
+JcMinvJct          = JcMinv*transpose(Jc);
+pinvLambda         = pinv(Lambda,pinv_tol);
+%pinvLambda        = Lambda'/(Lambda*Lambda' + pinv_damp*eye(size(Lambda,1)));
 
-% multiplier of f in tau0
-JBar            = transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));   
+% multiplier of contact wrenches in tau0
+JBar               = transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));   
 
 % nullspaces
-Nullfc             = eye(6*config.numConstraints)-pinvA*A;
+Nullfc             = eye(6*CONFIG.numConstraints)-pinvA*A;
 NullLambda         = eye(ndof)-pinvLambda*Lambda;
 
 Sigma              = -(pinvLambda*JcMinvJct + NullLambda*JBar);
 SigmaNA            =  Sigma*Nullfc;
-tauModel           =  pinvLambda*(JcMinv*h - dJcNu) +NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
-                     +Mj*ddqjRef -impedances*posturalCorr*qjTilde -dampings*posturalCorr*dqjTilde);
+tauModel           =  pinvLambda*(JcMinv*h - dJcNu) + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
+                     + Mj*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
 
 %% Desired contact forces computation
 fcHDot             = pinvA*(HDotDes - f_grav);
 
 % Desired f0 without Quadratic Programming
-f0                 = zeros(6,1); 
+f0                 = zeros(6,1);
 
 if  sum(feet_on_ground) == 2
 

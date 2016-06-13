@@ -1,43 +1,44 @@
-function centroidal = centroidalConversion(dynamics,forKinematics,state)
-%CENTROIDALCONVERSION applies the centroidal tranformation to the system,
-%                     i.e. the base dynamics will be coincident with the
+function centroidalDyn = centroidalConversion(DYNAMICS,FORKINEMATICS,STATE)
+%CENTROIDALCONVERSION applies the centroidal coordinates tranformation to the 
+%                     system, i.e. the base dynamics now coincides with the
 %                     CoM dynamics. 
 %           
-%           centroidal = CENTROIDALCONVERSION(dynamics,forKinematics) takes 
-%           as an input the structure DYNAMICS, which contains the robot 
-%           dynamics and FORKINEMATICS, which contains the robot forward
-%           kinematics.
-%           The output is the structure CENTROIDAL which contains the robot
-%           dynamics converted to the centroidal coordinates.
+%           centroidal = CENTROIDALCONVERSION(dynamics,forKinematics,state) 
+%           takes as an input the structures containing the robot dynamics,
+%           forward kinematics and state.
+%           The output is the structure CENTROIDALDYN which contains the robot
+%           dynamics converted into the centroidal coordinates.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 
 % ------------Initialization----------------
-% Dynamics parameters
-M       = dynamics.M;
-h       = dynamics.h;
-g       = dynamics.g;
-Jc      = dynamics.Jc;
-dJcNu   = dynamics.dJcNu;
+%% Dynamics
+M       = DYNAMICS.M;
+h       = DYNAMICS.h;
+g       = DYNAMICS.g;
+Jc      = DYNAMICS.Jc;
+dJcNu   = DYNAMICS.dJcNu;
 
-% ForKin parameters
-xCoM     = forKinematics.xCoM;
-VelBase  = state.VelBase;
-PosBase  = state.PosBase;
-dxCoM    = forKinematics.dxCoM;
-Nu       = state.Nu;
+%% Forward kinematics
+xCoM     = FORKINEMATICS.xCoM;
+dxCoM    = FORKINEMATICS.dxCoM;
+
+%% Robot state
+Nu       = STATE.Nu;
+VelBase  = STATE.VelBase;
+PosBase  = STATE.PosBase;
 
 %% CENTROIDAL TRANSFORMATION
 [T,dT]                                 = centroidalTransformationT_TDot(xCoM,PosBase,dxCoM,VelBase,M);
-[MJS, CNuJS, gJS, JcJS, dJcNuJS, NuJS] = fromFloatingToCentroidalDynamics(M, h, g, Jc, dJcNu, Nu, T, dT);
+[M_c, CNu_c, g_c, Jc_c, dJcNu_c, Nu_c] = fromFloatingToCentroidalDynamics(M, h, g, Jc, dJcNu, Nu, T, dT);
 
-centroidal.M                           = MJS;
-centroidal.g                           = gJS;
-centroidal.CNu                         = CNuJS;
-centroidal.dJcNu                       = dJcNuJS;
-centroidal.Nu                          = NuJS;
-centroidal.Jc                          = JcJS;
+centroidalDyn.M                           = M_c;
+centroidalDyn.g                           = g_c;
+centroidalDyn.CNu                         = CNu_c;
+centroidalDyn.dJcNu                       = dJcNu_c;
+centroidalDyn.Nu                          = Nu_c;
+centroidalDyn.Jc                          = Jc_c;
 
 end
 

@@ -1,9 +1,11 @@
 function  desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG)
-%GENERTRAJ generates a desired CoM trajectory. The default trajectory is a
-%          sinusoid.
-%   desired_x_dx_ddx_CoM = GENERTRAJ(xCoMInit,t,config) takes as an
-%   input the initial CoM position, XCOMINIT, the current time T and the
-%   structure CONFIG which contains all the user-defined parameters.
+%TRAJECTORYGENERATOR generates a desired CoM trajectory. The default trajectory 
+%                    is a sinusoid in the Y direction.
+%
+%   desired_x_dx_ddx_CoM = GENERTRAJ(xCoMInit,t,config) takes as an input 
+%   the initial CoM position, XCOMINIT, the current time T and the structure
+%   CONFIG which contains all the user-defined parameters.
+%
 %   The output DESIRED_X_DX_DDX_COM is a matrix [3x3] which contains the
 %   reference acceleration, velocity and position.
 %
@@ -27,7 +29,7 @@ noOscillationTime          = 0;           % If params.demo_movements = 1, the va
 %% Trajectory definition
 if demo_movements == 1
     
-if sum(feet_on_ground) == 2
+if  sum(feet_on_ground) == 2
    
     directionOfOscillation = [0;1;0];
     referenceParams        = [0.035 0.35];     
@@ -42,17 +44,16 @@ if CONFIG.visualize_stability_analysis_results == 1
     directionOfOscillation = [0;1;0];
     referenceParams        = [0.0075 0.1]; 
 end
-
 end
 
 %% Trajectory generation
-frequency = referenceParams(2);
+frequency  = referenceParams(2);
 
 if t >= noOscillationTime
     
-Amplitude = referenceParams(1);    
+Amplitude  = referenceParams(1);    
 else
-Amplitude = 0;
+Amplitude  = 0;
 end
  
 xCoMDes    =  xCoMInit + Amplitude*sin(2*pi*frequency*t)*directionOfOscillation;

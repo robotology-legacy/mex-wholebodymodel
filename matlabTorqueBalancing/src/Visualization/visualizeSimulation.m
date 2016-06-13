@@ -19,7 +19,7 @@ function ContFig = visualizeSimulation(t,chi,config)
 
 % ------------Initialization----------------
 % initial parameters
-ContFig = config.ContFig;
+ContFig = config.figureCont;
 
 %% Simulator setup
 BackGroundColor = [0 0 0];
