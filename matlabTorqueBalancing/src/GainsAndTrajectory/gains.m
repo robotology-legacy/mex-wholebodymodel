@@ -1,4 +1,4 @@
-function gainsInit = gains(config,dynamics)
+function gainsInit = gains(CONFIG)
 %GAINS generates the initial gains matrices for both the
 %      momentum task and the postural task. 
 %      GAINS also apply a modification of the postural task to
@@ -15,22 +15,24 @@ function gainsInit = gains(config,dynamics)
 
 % ------------Initialization----------------
 % Config parameters
-ndof           = config.ndof;
-pinv_damp      = config.pinv_damp;
-postCorrection = config.postCorrection;
+ndof           = CONFIG.ndof;
+pinv_tol       = CONFIG.pinv_tol;
+%pinv_damp     = CONFIG.pinv_damp;
+postCorrection = CONFIG.postCorrection;
+DYNAMICS       = CONFIG.initDynamics;
 
 % Dynamics parameters
-M              = dynamics.M;
-Jc             = dynamics.Jc;
+M              = DYNAMICS.M;
+Jc             = DYNAMICS.Jc;
 
 % General parameters
 S              = [zeros(6,ndof);
-                  eye(ndof,ndof)];
+                  eye(ndof)];
 
 %% Gains for two feet on the ground
-if sum(config.feet_on_ground) == 2
+if sum(CONFIG.feet_on_ground) == 2
     
-   gainsInit.gainsPCoM               = diag([ 45  50  40]);
+   gainsInit.gainsPCoM               = diag([45 50 40]);
    gainsInit.gainsDCoM               = 2*sqrt(gainsInit.gainsPCoM);
    gainsInit.gainsPAngMom            = diag([5 10 5]);
    gainsInit.gainsDAngMom            = 2*sqrt(gainsInit.gainsPAngMom);
@@ -43,7 +45,7 @@ if sum(config.feet_on_ground) == 2
 end
 
 %% Parameters for one foot on the ground
-if  sum(config.feet_on_ground) == 1
+if  sum(CONFIG.feet_on_ground) == 1
  
     gainsInit.gainsPCoM                 = diag([40 45 40]);
     gainsInit.gainsDCoM                 = 2*sqrt(gainsInit.gainsPCoM);
@@ -54,7 +56,7 @@ if  sum(config.feet_on_ground) == 1
      impTorso            = [ 20   20   20]; 
      impArms             = [ 15  15   45   5   5];
 
-if config.feet_on_ground(1) == 1
+if CONFIG.feet_on_ground(1) == 1
     
      impLeftLeg          = [ 70   70  65  30  10  10];  
      impRightLeg         = [ 20   20  20  10  10  10];   
@@ -82,21 +84,24 @@ if postCorrection == 1
 
 JcMinv                  = Jc/M;
 JcMinvS                 = JcMinv*S;
-pinvJcMinvS             = JcMinvS'/(JcMinvS*JcMinvS' + pinv_damp*eye(size(JcMinvS,1)));
+%pinvJcMinvS            = JcMinvS'/(JcMinvS*JcMinvS' + pinv_damp*eye(size(JcMinvS,1)));
+pinvJcMinvS             = pinv(JcMinvS,pinv_tol);
 Mbar                    = M(7:end,7:end)-M(7:end,1:6)/M(1:6,1:6)*M(1:6,7:end);
 
 % damped null space
-NullLambdaDamp          = eye(ndof)-pinvJcMinvS*JcMinvS;
+NullLambda              = eye(ndof)-pinvJcMinvS*JcMinvS;
 
 % this is the term added to the postural task to assure the dynamics to be
 % asymptotically stable
-gainsInit.posturalCorr  = NullLambdaDamp*Mbar;
+gainsInit.posturalCorr  = NullLambda*Mbar;
 
 else  
 gainsInit.posturalCorr  = eye(ndof);
 end
 
 gainsInit.impedances    = diag(gainsInit.impedances);
-gainsInit.dampings      = diag(gainsInit.dampings);  
+gainsInit.dampings      = diag(gainsInit.dampings); 
+gainsInit.VelGainsMom   = [gainsInit.gainsDCoM zeros(3); zeros(3) gainsInit.gainsDAngMom];
+gainsInit.PosGainsMom   = [gainsInit.gainsPCoM zeros(3); zeros(3) gainsInit.gainsPAngMom];
 
 end

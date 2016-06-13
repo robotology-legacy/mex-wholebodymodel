@@ -1,6 +1,6 @@
-function  desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,config)
+function  desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG)
 %GENERTRAJ generates a desired CoM trajectory. The default trajectory is a
-%          sine.
+%          sinusoid.
 %   desired_x_dx_ddx_CoM = GENERTRAJ(xCoMInit,t,config) takes as an
 %   input the initial CoM position, XCOMINIT, the current time T and the
 %   structure CONFIG which contains all the user-defined parameters.
@@ -13,8 +13,8 @@ function  desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,config)
 
 % ------------Initialization----------------
 % Config parameters
-feet_on_ground             = config.feet_on_ground;
-demo_movements             = config.demo_movements;
+feet_on_ground             = CONFIG.feet_on_ground;
+demo_movements             = CONFIG.demo_movements;
 
 % Initial parameters
 directionOfOscillation     = [0;0;0];
@@ -37,7 +37,7 @@ else
     referenceParams        = [0.015 0.15];    
 end
 
-if config.visualize_stability_analysis_results == 1
+if CONFIG.visualize_stability_analysis_results == 1
     
     directionOfOscillation = [0;1;0];
     referenceParams        = [0.0075 0.1]; 

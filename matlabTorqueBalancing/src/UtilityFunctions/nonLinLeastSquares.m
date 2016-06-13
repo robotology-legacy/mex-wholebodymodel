@@ -1,4 +1,4 @@
-function [Kx,Kn] = nonLinLeastSquares(Ax,Bx,An,Bn,Kdes,config)
+function [Kx,Kn] = nonLinLeastSquares(Ax,Bx,An,Bn,Kdes,CONFIG)
 %NONLINLEASTSSQUARES solves a non-linear least squares problem in order to 
 %                    perform a gains optimization on the linearized system 
 %                    dynamics of the robot iCub.
@@ -23,24 +23,22 @@ function [Kx,Kn] = nonLinLeastSquares(Ax,Bx,An,Bn,Kdes,config)
 
 % ------------Initialization----------------
 % setup the initial parameters
-selPos       = strcmp(config.matrixSelector,'position');
-selVel       = strcmp(config.matrixSelector,'velocity');
-ndof         = config.ndof;
-config.gPost = 10;
+ndof         = CONFIG.ndof;
+CONFIG.gPost = 10;
 %gLin        = 1;
 gAng         = 4;
 
-if selPos == 1
+if strcmp(CONFIG.matrixSelector,'position') == 1
 
-gainsL = config.OldGains.PosGainsMom(1:3,1:3);
-gainsW = config.OldGains.PosGainsMom(4:6,4:6);
-gainsP = config.OldGains.KSdes;
+gainsL = CONFIG.gainsInit.PosGainsMom(1:3,1:3);
+gainsW = CONFIG.gainsInit.PosGainsMom(4:6,4:6);
+gainsP = CONFIG.gainsInit.KSdes;
 
-elseif selVel == 1
+elseif strcmp(CONFIG.matrixSelector,'velocity') == 1
 
-gainsL = config.OldGains.VelGainsMom(1:3,1:3);
-gainsW = config.OldGains.VelGainsMom(4:6,4:6);
-gainsP = config.OldGains.KDdes;    
+gainsL = CONFIG.gainsInit.VelGainsMom(1:3,1:3);
+gainsW = CONFIG.gainsInit.VelGainsMom(4:6,4:6);
+gainsP = CONFIG.gainsInit.KDdes;    
 end
 
 %% Separate the linear and angular momentum
@@ -72,7 +70,7 @@ end
 % postural gains
 Up    = chol(gainsP); 
 Up    = Up';
-gPost = config.gPost;
+gPost = CONFIG.gPost;
 
 for kk=1:ndof
       
@@ -87,30 +85,30 @@ end
 end
   
 %% Optimization
-F       = @(X) Kdes-(ALin*Kl(X,config)*BLin + AAng*(Kw(X,config)*Kw(X,config)')*BAng + An*(Kp(X,config)*Kp(X,config)')*Bn);
+F       = @(X) Kdes-(ALin*Kl(X,CONFIG)*BLin + AAng*(Kw(X,CONFIG)*Kw(X,CONFIG)')*BAng + An*(Kp(X,CONFIG)*Kp(X,CONFIG)')*Bn);
  
 OPTIONS = optimset('Algorithm','levenberg-marquardt'); 
 x       = lsqnonlin(F,X0,[],[],OPTIONS);
 
 
 %% Gains matrices
-Kx = [Kl(x,config) zeros(3); zeros(3) Kw(x,config)*Kw(x,config)'];  
-Kn = Kp(x,config)*Kp(x,config)';
+Kx = [Kl(x,CONFIG) zeros(3); zeros(3) Kw(x,CONFIG)*Kw(x,CONFIG)'];  
+Kn = Kp(x,CONFIG)*Kp(x,CONFIG)';
   
 end
 
 %% INTERNAL FUNCTIONS
-function Matr = Kl(X,params)
+function Matr = Kl(X,CONFIG)
 % generate the linear momentum matrix
-PosToll = params.PosToll;
+PosToll = CONFIG.positDefToll;
 Matr    = [abs(X(1))+PosToll     0             0  ;
               0         abs(X(2))+PosToll      0  ;
               0                  0       abs(X(3))+PosToll];
            
 end           
 
-function Matr = Kw(X,params)
-PosToll = params.PosToll;
+function Matr = Kw(X,CONFIG)
+PosToll = CONFIG.positDefToll;
 % generate the angular momentum matrix
 Matr    = [abs(X(4))+PosToll      0              0;
                X(5)       abs(X(6))+PosToll      0;
@@ -118,11 +116,11 @@ Matr    = [abs(X(4))+PosToll      0              0;
 
 end
       
-function Matr = Kp(X,params)
+function Matr = Kp(X,CONFIG)
 % generate the postural matrix        
-gPost    = params.gPost; 
-PosToll  = params.PosToll;
-ndof     = params.ndof;
+gPost    = CONFIG.gPost; 
+PosToll  = CONFIG.positDefToll;
+ndof     = CONFIG.ndof;
 Matr     = zeros(ndof);
 
 for kk = 1:ndof

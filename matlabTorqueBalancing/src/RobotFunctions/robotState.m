@@ -1,4 +1,4 @@
-function state = robotState(chi,config)
+function STATE = robotState(chi,CONFIG)
 %ROBOTSTATE demux the current state of the robot to get the base pose, base
 %           velocity, joint pose and joint velocity.
 %           state = ROBOTSTATE(chi,config) takes as an input the vector that
@@ -18,34 +18,37 @@ function state = robotState(chi,config)
 
 % ------------Initialization----------------
 % Config parameters
-% config.demux.baseOrientationType sets the base orientation in stateDemux.m 
+% CONFIG.demux.baseOrientationType sets the base orientation in stateDemux.m 
 % as positions + quaternions (1) or transformation matrix (0)
-config.demux.baseOrientationType = 1;   
+CONFIG.demux.baseOrientationType = 1;   
 
 %% STATE DEMUX
-[basePose,qj,baseVelocity,dqj]   = stateDemux(chi,config);
+[basePose,qj,baseVelocity,dqj]   = stateDemux(chi,CONFIG);
  
-% base position and orientation (in quaternions) and base velocity; 
-% conversion of the base orientation into a rotation matrix; state velocity
+% Base position and orientation (in quaternions)
 PosBase                          = basePose(1:3,:);
 quatBase                         = basePose(4:7,:);
-% normalize quaternions to avoid numerical errors
+
+% Normalize quaternions to avoid numerical errors
 %quatBase                        = quatBase/norm(quatBase);
+
+% Base velocity; conversion of the base orientation into a rotation matrix; 
+% state velocity
 VelBase                          = baseVelocity(1:3,:);
 omegaBaseWorld                   = baseVelocity(4:6,:);
 [~,RotBase]                      = frame2posrot(basePose);
 Nu                               = [VelBase;omegaBaseWorld;dqj];
 
 %% Define the output structure
-state.qj                         = qj;
-state.dqj                        = dqj;
-state.Nu                         = Nu;
-state.BasePose                   = basePose;
-state.RotBase                    = RotBase;
-state.PosBase                    = PosBase;
-state.VelBase                    = VelBase;
-state.quatBase                   = quatBase;
-state.omegaBaseWorld             = omegaBaseWorld;
+STATE.qj                         = qj;
+STATE.dqj                        = dqj;
+STATE.Nu                         = Nu;
+STATE.basePose                   = basePose;
+STATE.RotBase                    = RotBase;
+STATE.PosBase                    = PosBase;
+STATE.VelBase                    = VelBase;
+STATE.quatBase                   = quatBase;
+STATE.omegaBaseWorld             = omegaBaseWorld;
 
 end
 

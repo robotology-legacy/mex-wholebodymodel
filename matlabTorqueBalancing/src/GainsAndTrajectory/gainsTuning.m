@@ -1,4 +1,4 @@
-function [gains,visualizeTuning] = gainsTuning (linearization,config,gainsInit)
+function [gains,visualizeTuning] = gainsTuning (linearization,CONFIG)
 %GAINSTUNING implements different algorithms to optimize the feedback control 
 %            gains for the linearized joint space dynamics of iCub robot.
 %   GAINSTUNING implements two different algorithms: 'lsq' uses a nonlinear
@@ -7,10 +7,10 @@ function [gains,visualizeTuning] = gainsTuning (linearization,config,gainsInit)
 %   solve the problem. The main difference is that only 'lsq' takes into
 %   account the positive-definiteness constraint.
 %
-%   [gains,visualizeTuning] = GAINSTUNING(linearization,config,gainsInit)
+%   [gains,visualizeTuning] = GAINSTUNING(linearization,config)
 %   takes as input the structure LINEARIZATION that comes from the joint
 %   space linearization; the structure CONFIG containing the user-defined
-%   parameters; the structure GAINSINIT which contains the initial gains.
+%   parameters.
 %
 %   The output are the new gains matrices in the structure GAINS and the
 %   parameters for visualization, VISUALIZETUNING.
@@ -20,31 +20,30 @@ function [gains,visualizeTuning] = gainsTuning (linearization,config,gainsInit)
 
 % ------------Initialization----------------
 % Config parameters
-algorithm        = config.optimization_algorithm;
-KSdes            = gainsInit.KSdes;
-KDdes            = gainsInit.KDdes;
-config.PosToll   = 0.1;
-UseKron          = strcmp(algorithm,'kronecher');
-UseLsq           = strcmp(algorithm,'lsq');
-
-ACartesian       = linearization.ACartesian;
-BCartesian       = linearization.BCartesian;
-ANull            = linearization.ANull;
-BNull            = linearization.BNull;
+ndof                  = CONFIG.ndof;
+gainsInit             = CONFIG.gainsInit;
+KSdes                 = gainsInit.KSdes;
+KDdes                 = gainsInit.KDdes;
+ACartesian            = linearization.ACartesian;
+BCartesian            = linearization.BCartesian;
+ANull                 = linearization.ANull;
+BNull                 = linearization.BNull;
+CONFIG.positDefToll   = 0.1;
 
 %% KRONECHER OPTIMIZATION
-if UseKron == 1
-[Kpx,Kpn] = kronProd(ACartesian,BCartesian,ANull,BNull,KSdes,config);
-[Kdx,Kdn] = kronProd(ACartesian,BCartesian,ANull,BNull,KSdes,config);
+if strcmp(CONFIG.optimization_algorithm,'kronecher') == 1
+    
+[Kpx,Kpn] = kronVectorization(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
+[Kdx,Kdn] = kronVectorization(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
 end
 
 %% NONLINEAR LSQ OPTIMIZATION
-if UseLsq == 1
-config.matrixSelector = 'position';
-[Kpx,Kpn] = leastSquareConstr(ACartesian,BCartesian,ANull,BNull,KSdes,config);
+if strcmp(CONFIG.optimization_algorithm,'NonLinLsq') == 1
+CONFIG.matrixSelector = 'position';
+[Kpx,Kpn] = nonLinLeastSquares(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
 
-config.matrixSelector = 'velocity';
-[Kdx,Kdn] = leastSquareConstr(ACartesian,BCartesian,ANull,BNull,KDdes,config);
+CONFIG.matrixSelector = 'velocity';
+[Kdx,Kdn] = nonLinLeastSquares(ACartesian,BCartesian,ANull,BNull,KDdes,CONFIG);
 end
 
 %% New stiffness and damping matrices
@@ -219,8 +218,8 @@ if flag(4) == 1
 end
 
 % parameters for visualization                                        
-visualizeTuning.KSn          = KSn;
-visualizeTuning.KDn          = KDn;
+visualizeTuning.KS           = KSn;
+visualizeTuning.KD           = KDn;
 visualizeTuning.Kpn          = Kpn;
 visualizeTuning.Kdn          = Kdn;
 visualizeTuning.Kpx          = Kpx;

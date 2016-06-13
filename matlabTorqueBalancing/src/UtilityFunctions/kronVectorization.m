@@ -1,4 +1,4 @@
-function [Kx,Kn] = kronVectorization(Ax,Bx,An,Bn,Kdes,config)
+function [Kx,Kn] = kronVectorization(Ax,Bx,An,Bn,Kdes,CONFIG)
 %KRONVECTORIZATION is a gains optimization for the iCub linearized joint 
 %                  space dynamics through vectorization and Kronecher product.
 %   KRONVECTORIZATION solves the least square problem: x = pinv(M)*xdes 
@@ -25,9 +25,9 @@ function [Kx,Kn] = kronVectorization(Ax,Bx,An,Bn,Kdes,config)
 
 % ------------Initialization----------------
 % setup parameters
-ndof       = config.ndof;
-PosToll    = config.PosToll;
-pinv_damp  = config.pinv_damp;
+ndof       = CONFIG.ndof;
+PosToll    = CONFIG.positDefToll;
+pinv_damp  = CONFIG.pinv_damp;
 %pinv_toll = config.pinv_toll;
 
 %% Decoupling between linear and angular momentum

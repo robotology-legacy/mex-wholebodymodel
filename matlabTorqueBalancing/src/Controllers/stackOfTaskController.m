@@ -2,8 +2,8 @@ function controlParam = stackOfTaskController(config,gains,trajectory,dynamics,f
 %STACKOFTASKCONTROLLER is a task-based balancing controller for the humanoid
 %                      robot iCub.
 %   STACKOFTASKCONTROLLER computes the control torques at joints using a 
-%   two task-based approach. The first task is the control of robot
-%   momentum, while the second task is a postural task.
+%   task-based approach. The first task is the control of robot momentum, 
+%   while the second task is a postural task.
 %
 %   controlParam = STACKOFTASKCONTROLLER(config, gains, trajectory,
 %   dynamics, forKinematics, state) takes as input the structure CONFIG,
@@ -18,6 +18,7 @@ function controlParam = stackOfTaskController(config,gains,trajectory,dynamics,f
 %
 
 % ------------Initialization----------------
+%% DEFINE ALL THE PARAMETERS
 % Config parameters
 pinv_tol            = config.pinv_tol;
 feet_on_ground      = config.feet_on_ground;

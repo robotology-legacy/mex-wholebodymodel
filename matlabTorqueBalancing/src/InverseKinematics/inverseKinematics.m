@@ -1,9 +1,9 @@
-function [dChi, visualizeIkinParam] = inverseKinematics(t,Chi,config)
+function [dChi, visualizeIkinParam] = inverseKinematics(t,Chi,CONFIG)
 %INVERSEKINEMATICS is the function that generates the derivative of
 %                  the robot state from inverse kinematics.
 %   INVERSEKINEMATICS calculates the state derivative using a three
 %   task stack-of-task controller. The first task is the contact constraint
-%   dynamics, the second is the reachement of a desired momentum trajectory,
+%   dynamics, the second is the achievement of a desired momentum trajectory,
 %   the third is to keep the initial posture.
 %
 %   [dChiIkin,visualizeIkinParam]=INVERSEKINEMATICS(t,Chi,config)
@@ -17,50 +17,51 @@ function [dChi, visualizeIkinParam] = inverseKinematics(t,Chi,config)
 %
 
 % ------------Initialization----------------
-waitbar(t/config.tEnd,config.wait)
+waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 % Config parameters
-pinv_tol          = config.pinv_tol;
-feet_on_ground    = config.feet_on_ground;
-ndof              = config.ndof;  
-initState         = config.initState;
+pinv_tol          = CONFIG.pinv_tol;
+feet_on_ground    = CONFIG.feet_on_ground;
+ndof              = CONFIG.ndof;  
+initState         = CONFIG.initState;
+initDynamics      = CONFIG.initDynamics;
+initForKin        = CONFIG.initForKin;
+
 qjInit            = initState.qj;
-initForKin        = config.initForKin;
 xCoMInit          = initForKin.xCoM;
-initDynamics      = config.initDynamics;
 JcInit            = initDynamics.Jc;
 JHInit            = initDynamics.JH;
 JhReduced         = JHInit(:,7:end) -JHInit(:,1:6)*(eye(6)/JcInit(1:6,1:6))*JcInit(1:6,7:end);
 
 % State parameters
-state             = robotState(Chi,config);
-BasePose          = state.BasePose;
-qj                = state.qj;
-[~,RotBase]       = frame2posrot(BasePose);
-Nu                = state.Nu;
-dqj               = state.dqj;
+STATE             = robotState(Chi,CONFIG);
+basePose          = STATE.basePose;
+qj                = STATE.qj;
+RotBase           = STATE.RotBase;
+Nu                = STATE.Nu;
+dqj               = STATE.dqj;
 NuBase            = Nu(1:6);  
 
 % Dynamics parameters
-dynamics          = robotDynamics(state,config);
-m                 = dynamics.M(1,1);
-Jc                = dynamics.Jc;
-JH                = dynamics.JH;
-JCoMPose          = dynamics.JCoM;
+DYNAMICS          = robotDynamics(STATE,CONFIG);
+m                 = DYNAMICS.M(1,1);
+Jc                = DYNAMICS.Jc;
+JH                = DYNAMICS.JH;
+JCoMPose          = DYNAMICS.JCoM;
 JCoM              = JCoMPose(1:3,:);
 JAng              = JH(4:6,:);
-dJCoMNuPose       = dynamics.dJCoMNu;
+dJCoMNuPose       = DYNAMICS.dJCoMNu;
 dJCoMNu           = dJCoMNuPose(1:3);
-dJHNu             = dynamics.dJHNu;
-dJcNu             = dynamics.dJcNu;
+dJHNu             = DYNAMICS.dJHNu;
+dJcNu             = DYNAMICS.dJcNu;
 
 % Forward kinematics
-forKinematics     = robotForKinematics(state,dynamics);
-xCoM              = forKinematics.xCoM;
-TLfoot            = forKinematics.TLfoot;
-TRfoot            = forKinematics.TRfoot;
-RFootPoseEul      = forKinematics.RFootPoseEul;
-LFootPoseEul      = forKinematics.LFootPoseEul;
+FORKINEMATICS     = robotForKinematics(STATE,DYNAMICS);
+xCoM              = FORKINEMATICS.xCoM;
+TLfoot            = FORKINEMATICS.TLfoot;
+TRfoot            = FORKINEMATICS.TRfoot;
+RFootPoseEul      = FORKINEMATICS.RFootPoseEul;
+LFootPoseEul      = FORKINEMATICS.LFootPoseEul;
 
 % Gains for inverse kinematics
 KPosFeet          = 15;
@@ -71,7 +72,7 @@ KVelMom           = 2*sqrt(KPosMom);
 KVelPost          = 2*sqrt(KPosPost);
 
 %% CoM trajectory generator
-desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,config);
+desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG);
 
 %% Joint limits check
 % jointLimitsCheck(qj,t);
@@ -82,20 +83,20 @@ deltaIntAng        = JhReduced(4:6,:)*(qj-qjInit);
 % CoM position
 deltaPosCoM        = xCoM - desired_x_dx_ddx_CoM(:,1);
 % feet pose
-DeltaPoseRFoot     = TRfoot*(RFootPoseEul-initForKin.RFootPoseEul); 
-DeltaPoseLFoot     = TLfoot*(LFootPoseEul-initForKin.LFootPoseEul);
+deltaPoseRFoot     = TRfoot*(RFootPoseEul-initForKin.RFootPoseEul); 
+deltaPoseLFoot     = TLfoot*(LFootPoseEul-initForKin.LFootPoseEul);
 
 if     feet_on_ground(1) == 1 && feet_on_ground(2) == 0
 
-deltaPoseFeet      = DeltaPoseLFoot;
+deltaPoseFeet      = deltaPoseLFoot;
       
 elseif feet_on_ground(1) == 0 && feet_on_ground(2) == 1
      
-deltaPoseFeet      = DeltaPoseRFoot;          
+deltaPoseFeet      = deltaPoseRFoot;          
 
 elseif feet_on_ground(1) == 1 && feet_on_ground(2) == 1
     
-deltaPoseFeet      = [DeltaPoseLFoot;DeltaPoseRFoot];    
+deltaPoseFeet      = [deltaPoseLFoot;deltaPoseRFoot];    
 end
 
 %% Velocity errors
@@ -104,7 +105,7 @@ deltaVelCoM        = JCoM*Nu - desired_x_dx_ddx_CoM(:,2);
 deltaAngMom        = JAng*Nu;
 
 %% STACK OF TASK INVERSE KINEMATICS
-% first task: respect the constraints at feet 
+% first task: not break the constraints at feet 
 feetErrorDynamics  = -dJcNu -KPosFeet*deltaPoseFeet -KVelFeet*deltaVelFeet;
 NullFeet           =  eye(ndof+6) -pinv(Jc,pinv_tol)*Jc;
 
@@ -117,7 +118,7 @@ NullMom            =  eye(ndof+6) - pinv(JMomTaks,pinv_tol)*JMomTaks;
 % third task: keep the initial posture
 JPost              = [zeros(ndof,6) eye(ndof)];
 
-postErrorDynamics  = -KVelPost*Nu(7:end) -KPosPost*(qj-config.qjInit)...
+postErrorDynamics  = -KVelPost*Nu(7:end) -KPosPost*(qj-initState.qj)...
                      -JPost*pinv(Jc,pinv_tol)*feetErrorDynamics -JPost*NullFeet*pinv(JMomTaks,pinv_tol)*MomErrorDynamics;
 JPostTask          =  JPost*NullFeet*NullMom;
 
@@ -127,7 +128,7 @@ dNuMom             = pinv(JMomTaks,pinv_tol)*MomErrorDynamics + NullMom*dNuPost;
 dNu                = pinv(Jc,pinv_tol)*feetErrorDynamics + NullFeet*dNuMom;
 
 %% State derivative
-dQuatBase          = quaternionDerivative(transpose(RotBase)*NuBase(4:end), BasePose(4:end));
+dQuatBase          = quaternionDerivative(transpose(RotBase)*NuBase(4:end), basePose(4:end));
 dChi               = [NuBase(1:3); dQuatBase; dqj; dNu];
 
 %% Parameters for visualization

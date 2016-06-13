@@ -1,4 +1,4 @@
-function centroidal = centroidalConversion(dynamics,forKinematics)
+function centroidal = centroidalConversion(dynamics,forKinematics,state)
 %CENTROIDALCONVERSION applies the centroidal tranformation to the system,
 %                     i.e. the base dynamics will be coincident with the
 %                     CoM dynamics. 
@@ -23,10 +23,10 @@ dJcNu   = dynamics.dJcNu;
 
 % ForKin parameters
 xCoM     = forKinematics.xCoM;
-VelBase  = forKinematics.VelBase;
-PosBase  = forKinematics.PosBase;
+VelBase  = state.VelBase;
+PosBase  = state.PosBase;
 dxCoM    = forKinematics.dxCoM;
-Nu       = forKinematics.Nu;
+Nu       = state.Nu;
 
 %% CENTROIDAL TRANSFORMATION
 [T,dT]                                 = centroidalTransformationT_TDot(xCoM,PosBase,dxCoM,VelBase,M);

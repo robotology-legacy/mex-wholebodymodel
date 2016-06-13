@@ -1,6 +1,6 @@
-function [ikinParam, ChiInit, ContFig] = initInverseKinematics(config,state)
+function [ikin,ChiInit,figureCont] = initInverseKinematics(CONFIG)
 %INITINVERSEKINEMATICS generates the initial condition for inverse kinematics 
-%                      integration of the robot iCub in MATLAB.
+%                      integration of robot iCub in MATLAB.
 %   INITINVERSEKINEMATICS evaluates the desired Momentum trajectory for the
 %   robot and generates proper joint references. The joints accelerations are
 %   calculated using a task-based structure: the first task is to guarantee 
@@ -9,11 +9,10 @@ function [ikinParam, ChiInit, ContFig] = initInverseKinematics(config,state)
 %   robot. Positions and velocities are obtained by means of a double fixed
 %   step integrator.
 %
-%   [ikinParam, ChiInit, ContFig] = INITINVERSEKINEMATICS(config,state) takes
-%   as input the structure CONFIG containing all the utility parameters and
-%   the robot initial state, STATE. 
+%   [ikin, ChiInit, ContFig] = INITINVERSEKINEMATICS(config) takes
+%   as input the structure CONFIG containing all the utility parameters.
 %   The output are the initial conditions for the forward dynamics integration,
-%   CHIINIT [13+2ndof x 1], the structure IKINPARAM which contains the joint
+%   CHIINIT [13+2ndof x 1], the structure IKIN which contains the joint
 %   references and the figures number counter, CONTFIG.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
@@ -22,45 +21,43 @@ function [ikinParam, ChiInit, ContFig] = initInverseKinematics(config,state)
 
 % ------------Initialization----------------
 % Config parameters
-pinv_tol               = config.pinv_tol;
-ContFig                = config.ContFig;
-ndof                   = config.ndof;
+pinv_tol               = CONFIG.pinv_tol;
+figureCont             = CONFIG.figureCont;
+ndof                   = CONFIG.ndof;
+STATE                  = CONFIG.initState;
 
 % State parameters
-config.initState       = state;
-BasePose               = state.BasePose;
-qj                     = state.qj;
+BasePose               = STATE.basePose;
+qj                     = STATE.qj;
 
 % Dynamics parameters
-dynamics               = robotDynamics(state,config);
-m                      = dynamics.M(1,1);
-Jc                     = dynamics.Jc;
-JH                     = dynamics.JH;
-config.initDynamics    = dynamics;
+DYNAMICS               = robotDynamics(STATE,CONFIG);
+m                      = DYNAMICS.M(1,1);
+Jc                     = DYNAMICS.Jc;
+JH                     = DYNAMICS.JH;
+CONFIG.initDynamics    = DYNAMICS;
 
 % Forward kinematics
-forKinematics          = robotForKinematics(state,dynamics);
-xCoM                   = forKinematics.xCoM;
-config.initForKin      = forKinematics;
+FORKINEMATICS          = robotForKinematics(STATE,DYNAMICS);
+xCoM                   = FORKINEMATICS.xCoM;
+CONFIG.initForKin      = FORKINEMATICS;
 
 %% Generate the CoM reference fot the time t = 0
-desired_x_dx_ddx_CoM   = trajectoryGenerator(xCoM,0,config);
+desired_x_dx_ddx_CoM   = trajectoryGenerator(xCoM,0,CONFIG);
 
-%% GENERATE THE INITIAL CONDITIONS FOR NUMERICAL INTEGRATION
-% define the first task for state velocities: respect the contact constraints
+%% INITIAL CONDITIONS FOR INVERSE KINEMATICS INTEGRATION
+% Define the first task for state velocities: not break the contact constraints
 pinvJc                 = pinv(Jc,pinv_tol);
-feetErrorDynamics      = zeros(6*config.numConstraints,1);
+feetErrorDynamics      = zeros(6*CONFIG.numConstraints,1);
 Nullfeet               = eye(ndof+6) - pinvJc*Jc;
 
-% define the second task for state velocities: follow a desired momentum
-% dynamics
+% Define the second task for state velocities: follow a desired momentum dynamics
 pinvJH                 = pinv(JH*Nullfeet,pinv_tol);
 CentroidalErrDynamics  = [m*(desired_x_dx_ddx_CoM(:,3)+desired_x_dx_ddx_CoM(:,2)-(xCoM-desired_x_dx_ddx_CoM(:,1)));...
                           zeros(3,1)] - JH*pinvJc*feetErrorDynamics;
 NullH                  = eye(ndof+6) - pinvJH*(JH*Nullfeet);
 
-% define the third task for joints velocities: follow a desired joints
-% trajectory
+% Define the third task for joints velocities: follow a desired joints trajectory
 JPost                  = [zeros(ndof,6) eye(ndof)];
 JointErrDynamics       = zeros(ndof,1)-JPost*(pinvJc*feetErrorDynamics+Nullfeet*pinvJH*CentroidalErrDynamics);
 pinvJPost              = pinv(JPost*Nullfeet*NullH,pinv_tol);
@@ -74,13 +71,13 @@ NuFirstTask            = pinvJc*feetErrorDynamics + Nullfeet*NuSecondTask;
 ChiInit                = [BasePose; qj; NuFirstTask];
 
 %% Inverse kinematics integrator
-config.wait            = waitbar(0,'Inverse kinematics integration in progress...');
-ikinParam              = integrateInverseKinematics(config,ChiInit);
-delete(config.wait)       
+CONFIG.wait            = waitbar(0,'Inverse kinematics integration in progress...');
+ikin                   = integrateInverseKinematics(CONFIG,ChiInit);
+delete(CONFIG.wait)       
  
 %% Visualize the results of the inverse kinematics
-if config.visualize_ikin_results == 1
+if CONFIG.visualize_ikin_results == 1
     
-ContFig  =  visualizeInverseKin(config,ikinParam);
+figureCont  =  visualizeInverseKin(CONFIG,ikin);
 end
 

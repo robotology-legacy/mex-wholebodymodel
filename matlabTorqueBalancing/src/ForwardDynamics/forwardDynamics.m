@@ -1,4 +1,4 @@
-function [dchi,visualization] = forwardDynamics(t,chi,config)
+function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
 %FORWARDDYNAMICS is the function that will be integrated in the forward 
 %                dynamics integrator.
 %                [dchi,visualization] = FORWARDDYNAMICS(t,chi,config) takes
@@ -14,58 +14,55 @@ function [dchi,visualization] = forwardDynamics(t,chi,config)
 
 % ------------Initialization----------------
 % waitbar
-waitbar(t/config.tEnd,config.wait)
+waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 %% Configuration
-ndof                  = config.ndof;
-gains                 = config.gains;
-InitDynamics          = config.InitDynamics;
-InitState             = config.InitState;
-InitForKinematics     = config.InitForKinematics;
-jointRef_with_ikin    = config.jointRef_with_ikin;
+ndof                  = CONFIG.ndof;
+gains                 = CONFIG.gains;
+initState             = CONFIG.initState;
+initForKinematics     = CONFIG.initForKinematics;
 
 %% State
-state                 = robotState(chi,config);
-RotBase               = state.RotBase;
-omegaBaseWorld        = state.omegaBaseWorld;
-quatBase              = state.quatBase;
-VelBase               = state.VelBase;
-dqj                   = state.dqj;
-qj                    = state.qj;
+STATE                 = robotState(chi,CONFIG);
+RotBase               = STATE.RotBase;
+omegaBaseWorld        = STATE.omegaBaseWorld;
+quatBase              = STATE.quatBase;
+VelBase               = STATE.VelBase;
+dqj                   = STATE.dqj;
+qj                    = STATE.qj;
 
 %% Dynamics
-dynamics              = robotDynamics(state,config);
-Jc                    = dynamics.Jc;
-M                     = dynamics.M;
-h                     = dynamics.h;
-H                     = dynamics.H;
+DYNAMICS              = robotDynamics(STATE,CONFIG);
+Jc                    = DYNAMICS.Jc;
+M                     = DYNAMICS.M;
+h                     = DYNAMICS.h;
+H                     = DYNAMICS.H;
 m                     = M(1,1);
 
 %% Forward kinematics
-forKinematics         = robotForKinematics(state,dynamics);
-RFootPoseEul          = forKinematics.RFootPoseEul;
-LFootPoseEul          = forKinematics.LFootPoseEul;
-xCoM                  = forKinematics.xCoM;
+FORKINEMATICS         = robotForKinematics(STATE,DYNAMICS);
+RFootPoseEul          = FORKINEMATICS.RFootPoseEul;
+LFootPoseEul          = FORKINEMATICS.LFootPoseEul;
+xCoM                  = FORKINEMATICS.xCoM;
 
 %% Joint limits check
 % jointLimitsCheck(qj,t);
 
 %% Interpolation for joint reference trajectory with ikin
-if jointRef_with_ikin == 1
-ikin                               = config.ikin;
-trajectory.JointReferences         = interpInverseKinematics(t,ikin);
+if CONFIG.jointRef_with_ikin == 1
+trajectory.JointReferences         = interpInverseKinematics(t,CONFIG.ikin);
 else
 trajectory.JointReferences.ddqjRef = zeros(ndof,1);
 trajectory.JointReferences.dqjRef  = zeros(ndof,1);
-trajectory.JointReferences.qjRef   = InitState.qj;
+trajectory.JointReferences.qjRef   = initState.qj;
 end
 
 %% CoM trajectory generator
-trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(InitForKinematics.xCoM,t,config);
+trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(initForKinematics.xCoM,t,CONFIG);
 desired_x_dx_ddx_CoM               = trajectory.desired_x_dx_ddx_CoM;
 
 %% Balancing controller
-controlParam      =  initController(gains,trajectory,dynamics,forKinematics,config,state);
+controlParam      =  initController(gains,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE);
 tau               =  controlParam.tau;
 f0                =  controlParam.f0;
 fc                =  controlParam.fc;
@@ -77,7 +74,7 @@ NuQuat           = [VelBase;dquatBase;dqj];
 dNu              = M\(Jc'*fc + [zeros(6,1); tau]-h);
 
 % state to be integrated
-dchi            = [NuQuat;dNu];
+dchi             = [NuQuat;dNu];
 
 %% Visualization parameters
 visualization.ddqjNonLin = dNu(7:end);

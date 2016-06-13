@@ -1,13 +1,13 @@
-function ContFig = visualizeInverseKin(config,ikinParam)
+function figureCont = visualizeInverseKin(CONFIG,ikin)
 %VISUALIZEINVERSEKIN visualizes the results on the inverse kinematics of the
 %                    robot iCub.
 %   VISUALIZEINVERSEKIN verifies if the joint reference trajectory calculated in
 %   the inverse kinematics solver fits with the contact constraints and the
 %   desired CoM and momentum trajectories.
 %
-%   ContFig = VISUALIZEINVERSEKIN(config,ikinParam) takes as input the
-%   structure CONFIG containing all the utility parameters, and the structure
-%   IKINPARAM which contains the visualization parameters. The output ContFig
+%   ContFig = VISUALIZEINVERSEKIN(config,ikin) takes as input the structure 
+%   CONFIG containing all the utility parameters, and the structure IKIN
+%   which contains the visualization parameters. The output ContFig
 %   is a counter which automatically modifies the figure number according 
 %   to the visualization setup.
 %
@@ -18,11 +18,11 @@ function ContFig = visualizeInverseKin(config,ikinParam)
 % ------------Initialization----------------
 % initial parameters
 set(0,'DefaultFigureWindowStyle','Docked');
-ContFig                 = config.ContFig;
-t                       = ikinParam.t;
-CoMTrajectoryError      = ikinParam.CoMTrajectoryError;
-feetError               = ikinParam.feetError;
-momentumError           = ikinParam.momentumError;
+figureCont              = CONFIG.figureCont;
+t                       = ikin.t;
+CoMTrajectoryError      = ikin.CoMTrajectoryError;
+feetError               = ikin.feetError;
+momentumError           = ikin.momentumError;
 
 %% CoM trajectory
 titCoM  = {'X axis' 'Y axis' 'Z axis'};
@@ -30,7 +30,7 @@ titCoM  = {'X axis' 'Y axis' 'Z axis'};
 for k = 1:3
 
 % POSITION
-figure(ContFig)
+figure(figureCont)
 subplot(3,1,k)
 plot(t,CoMTrajectoryError(k,:),'b')
 hold on
@@ -42,7 +42,7 @@ title(titCoM(k))
 legend('desired CoM pos','ikin CoM pos')
 
 % VELOCITY
-figure(ContFig+1)
+figure(figureCont+1)
 subplot(3,1,k)
 plot(t,CoMTrajectoryError(k+3,:),'b')
 hold on
@@ -54,7 +54,7 @@ title(titCoM(k))
 legend('desired CoM vel','ikin CoM vel')
 
 % ACCELERATION
-figure(ContFig+2)
+figure(figureCont+2)
 subplot(3,1,k)
 plot(t,CoMTrajectoryError(k+6,:),'b')
 hold on
@@ -66,7 +66,7 @@ title(titCoM(k))
 legend('desired CoM acc','ikin CoM acc')
 end
 
-ContFig = ContFig +3;
+figureCont = figureCont +3;
 
 %% Feet errors
 titFeet  = {'Error on left foot pos along x axis','Error on left foot pos along y axis','Error on left foot pos along z axis',...
@@ -76,18 +76,18 @@ titFeet  = {'Error on left foot pos along x axis','Error on left foot pos along 
     
 titYFeet = {'[m]' '[m]' '[m]' '[rad]' '[rad]' '[rad]'};
 
-if     config.numConstraints == 1 
+if     CONFIG.numConstraints == 1 
   
   for k=1:6
 
-  figure(ContFig)
+  figure(figureCont)
   subplot(3,2,k)
   plot(t,feetError(k,:))
   grid on
   xlabel('Time [s]')
   ylabel(titYFeet(k))
    
-  if config.feet_on_ground(1) == 1
+  if CONFIG.feet_on_ground(1) == 1
     
   title(titFeet(k))
   else
@@ -95,13 +95,13 @@ if     config.numConstraints == 1
   end
   end
  
-ContFig = ContFig +1;
+figureCont = figureCont +1;
 
-elseif config.numConstraints  == 2
+elseif CONFIG.numConstraints  == 2
 
 for k=1:6
 
-figure(ContFig)
+figure(figureCont)
 subplot(3,2,k)
 plot(t,feetError(k,:))
 grid on
@@ -109,7 +109,7 @@ title(titFeet(k))
 xlabel('Time [s]')
 ylabel(titYFeet(k))
 
-figure(ContFig+1)
+figure(figureCont+1)
 subplot(3,2,k)
 plot(t,feetError(k+6,:))
 grid on
@@ -118,11 +118,11 @@ xlabel('Time [s]')
 ylabel(titYFeet(k))
 end
 
-ContFig = ContFig +2;
+figureCont = figureCont +2;
 end    
 
 %% Momentum error
-figure(ContFig)
+figure(figureCont)
 subplot(2,1,1)
 hold all
 grid on
@@ -139,7 +139,7 @@ xlabel('Time [s]')
 ylabel('H_{Ang}-H_{Ang}^{d}')
 title('Angular Momentum Error (Inverse Kinematics)')
 
-ContFig = ContFig +1;
+figureCont = figureCont +1;
 set(0,'DefaultFigureWindowStyle','Normal');
 
 end

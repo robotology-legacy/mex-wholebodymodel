@@ -1,13 +1,12 @@
-function linearization = jointSpaceLinearization(config,gainsInit)    
+function linearization = jointSpaceLinearization(CONFIG)    
 %JOINTSPACELINEARIZATION linearizes the joint space dynamics of the iCub robot
 %                        around an equilibrium point.
 %   JOINTSPACELINEARIZATION assumes that the robot is balancing on one foot
 %   or two feet, and the feedback controller is momentum-based. The solution is
 %   analytical, i.e. it is not necessary to compute numerical derivatives. 
 %     
-%   linearization = JOINTSPACELINEARIZATION(config,gainsInit)  
-%   defines the robot dynamics through the structure CONFIG, and the feedback 
-%   control gains through the structure GAINSINIT.
+%   linearization = JOINTSPACELINEARIZATION(config)  
+%   defines the robot dynamics through the structure CONFIG.
 %   It returns the structure LINEARIZATION which contains all the parameters
 %   related to the linearized system (i.e. the stiffness and damping
 %   matrix).
@@ -17,17 +16,18 @@ function linearization = jointSpaceLinearization(config,gainsInit)
 
 % ------------Initialization----------------
 % Config parameters
-pinv_tol           = config.pinv_tol;
-feet_on_ground     = config.feet_on_ground;     
-ndof               = config.ndof;
-dynamics           = config.InitDynamics;
-forKinematics      = config.InitForKinematics;
-%pinv_damp         = params.pinv_damp;
+gainsInit          = CONFIG.gainsInit;
+pinv_tol           = CONFIG.pinv_tol;
+feet_on_ground     = CONFIG.feet_on_ground;     
+ndof               = CONFIG.ndof;
+DYNAMICS           = CONFIG.initDynamics;
+FORKINEMATICS      = CONFIG.initForKinematics;
+%pinv_damp         = CONFIG.pinv_damp;
 
 % Dynamics parameters
-Jc                 = dynamics.Jc;
-JH                 = dynamics.JH;
-M                  = dynamics.M;
+Jc                 = DYNAMICS.Jc;
+JH                 = DYNAMICS.JH;
+M                  = DYNAMICS.M;
 Mb                 = M(1:6,1:6);
 Mbj                = M(1:6,7:end);
 Mjb                = M(7:end,1:6);
@@ -38,10 +38,10 @@ Mbar               = Mj - Mjb/Mb*Mbj;
 invMbar            = eye(ndof)/Mbar;
 %invMbar           = Mbar'/(Mbar*Mbar' + pinv_damp*eye(size(Mbar,1)));
 
-% Forward kinematics
-posLFoot           = forKinematics.LFootPoseQuat(1:3);
-posRFoot           = forKinematics.RFootPoseQuat(1:3);
-xCoM               = forKinematics.xCoM;
+% Forward kinematics parameters
+posLFoot           = FORKINEMATICS.LFootPoseQuat(1:3);
+posRFoot           = FORKINEMATICS.RFootPoseQuat(1:3);
+xCoM               = FORKINEMATICS.xCoM;
 
 if sum(feet_on_ground) == 1
     
@@ -51,17 +51,17 @@ else
 posFoot      = posRFoot;
 end
 
-r            = posFoot-xCoM;
+r            = posFoot - xCoM;
 
 A            = [eye(3)   zeros(3);
-                 skew(r)  eye(3) ];
+                skew(r)  eye(3) ];
 pinvA        = eye(6)/A;
 else    
 Pr           = posRFoot - xCoM;  
 Pl           = posLFoot - xCoM;
 
 AL           = [ eye(3),  zeros(3);
-                skew(Pl),  eye(3)];
+                 skew(Pl),  eye(3)];
 AR           = [ eye(3),  zeros(3);
                  skew(Pr),  eye(3)];   
 A            = [AL, AR];
@@ -69,11 +69,11 @@ pinvA        = pinv(A,pinv_tol);
 end
     
 %% Initial gains (before optimization)
-impedances       = gainsInit.impedances; 
-dampings         = gainsInit.dampings;
-posturalCorr     = gainsInit.posturalCorr; 
-VelGainsMom      = [gainsInit.gainsDCoM zeros(3); zeros(3) gainsInit.gainsDAngMom];
-PosGainsMom      = [gainsInit.gainsPCoM zeros(3); zeros(3) gainsInit.gainsPAngMom];
+impedances         = gainsInit.impedances; 
+dampings           = gainsInit.dampings;
+posturalCorr       = gainsInit.posturalCorr; 
+VelGainsMom        = gainsInit.VelGainsMom;
+PosGainsMom        = gainsInit.PosGainsMom;
 
 %% DEFINE THE LINEARIZED JOINT SPACE DYNAMICS
 Lambda             =  (Jj - Jb/Mb*Mbj)*invMbar;
@@ -108,7 +108,7 @@ KD     = invMbar*(-pinvLambda*MultFirstTask*VelGainsMom*CorrMatrixT1 + NullLambd
 
 %% Verify the state matrix
 AStateOld     = [zeros(ndof) eye(ndof);
-                    -KS         -KD];
+                    -KS           -KD];
 
 eigAStateOld  = -real(eig(AStateOld));               
 
@@ -129,17 +129,15 @@ else
 end
 
 % parameters for visualization and gains tuning
-linearization.KS     = KS;
-linearization.KD     = KD;
-linearization.KDdes  = gainsInit.KDdes;
-linearization.KSdes  = gainsInit.KSdes;
+linearization.KS          = KS;
+linearization.KD          = KD;
+linearization.KDdes       = gainsInit.KDdes;
+linearization.KSdes       = gainsInit.KSdes;
+linearization.ACartesian  = -invMbar*pinvLambda*MultFirstTask;
+linearization.BCartesian  =  CorrMatrixT1;
+linearization.ANull       =  invMbar*NullLambda;
 
-% parameters for gains tuning
-linearization.ACartesian = -invMbar*pinvLambda*MultFirstTask;
-linearization.BCartesian =  CorrMatrixT1;
-linearization.ANull      =  invMbar*NullLambda;
-
-if config.postCorrection == 1
+if CONFIG.postCorrection == 1
 linearization.BNull      =  NullLambda*Mbar*CorrMatrix;
 %Linearization.BNull     =  posturalCorr*CorrMatrix;
 else
