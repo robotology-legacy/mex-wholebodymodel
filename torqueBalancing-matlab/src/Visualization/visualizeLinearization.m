@@ -1,7 +1,8 @@
-function ContFig = visualizeLinearization(t,config,qjErr,dqjErr,ddqjNonLin,ddqjRef)
+function figureCont = visualizeLinearization(t,CONFIG,qjErr,dqjErr,ddqjNonLin,ddqjRef)
 %VISUALIZELINEARIZATION visualizes the results on the linearized joint space
 %                       dynamics of robot iCub.
-%   ContFig = VISUALIZELINEARIZATION(t,config,qjErr,dqjErr,ddqjNonLin,ddqjRef) 
+%
+%   figureCont = VISUALIZELINEARIZATION(t,config,qjErr,dqjErr,ddqjNonLin,ddqjRef) 
 %   takes as input the integration time T, the structure CONFIG containing all
 %   the utility parameters, the joint error dynamics and the joint linear
 %   and nonlinear accelerations. It generates all the plots related to the
@@ -16,23 +17,18 @@ function ContFig = visualizeLinearization(t,config,qjErr,dqjErr,ddqjNonLin,ddqjR
 
 % ------------Initialization----------------
 % initial parameters
-ContFig = config.ContFig;
-ndof    = config.ndof; 
+figureCont = CONFIG.figureCont;
+ndof       = CONFIG.ndof; 
 
 %% Linearized joint dynamics
-if config.visualize_stability_analysis_results == 1
+if CONFIG.visualize_stability_analysis_results == 1
     
-if config.linearize_for_gains_tuning == 1
-    
-ddqjLin = ddqjRef - config.visualizeTuning.KSn*qjErr - config.visualizeTuning.KDn*dqjErr;
-else 
-ddqjLin = ddqjRef - config.linearization.KS*qjErr  - config.linearization.KD*dqjErr;
-end
+ddqjLin = ddqjRef - CONFIG.visualizeTuning.KS*qjErr  - CONFIG.visualizeTuning.KD*dqjErr;
 
 for k=1:5
   
 % LEFT ARM    
-figure(ContFig)
+figure(figureCont)
 subplot(3,2,k)
 plot(t,ddqjLin(k+3,:))
 hold on
@@ -45,7 +41,7 @@ title(name)
 legend('Lin Acc','NonLin Acc')
 
 % RIGHT ARM
-figure(ContFig+1)
+figure(figureCont+1)
 subplot(3,2,k)
 plot(t,ddqjLin(k+3+5,:))
 hold on
@@ -58,12 +54,12 @@ title(name)
 legend('Lin Acc','NonLin Acc')
 end
 
-ContFig = ContFig +2;
+figureCont = figureCont +2;
 
 for k=1:6
 
 % LEFT LEG
-figure(ContFig)
+figure(figureCont)
 subplot(3,2,k)
 plot(t,ddqjLin(k+13,:))
 hold on
@@ -76,7 +72,7 @@ title(name)
 legend('Lin Acc','NonLin Acc')
 
 % RIGHT LEG
-figure(ContFig+1)
+figure(figureCont+1)
 subplot(3,2,k)
 plot(t,ddqjLin(k+13+6,:))
 hold on
@@ -89,12 +85,12 @@ title(name)
 legend('Lin Acc','NonLin Acc')
 end
 
-ContFig  = ContFig +2;
+figureCont  = figureCont +2;
 
 for k=1:3
     
 % TORSO
-figure(ContFig)
+figure(figureCont)
 subplot(3,1,k)
 plot(t,ddqjLin(k,:))
 hold on
@@ -107,22 +103,22 @@ title(name)
 legend('Lin Acc','NonLin Acc')
 end
 
-ContFig = ContFig +1;
+figureCont = figureCont +1;
 end
            
 %% Gains Tuning results
-if config.visualize_gains_tuning_results  == 1 && config.linearize_for_gains_tuning == 1
+if CONFIG.visualize_gains_tuning_results  == 1 && CONFIG.linearize_for_gains_tuning == 1
 
 % STATE MATRIX
 AStateDes     = [zeros(ndof)                     eye(ndof);
-                -config.visualizeTuning.KSdes   -config.visualizeTuning.KDdes];
+                -CONFIG.visualizeTuning.KSdes   -CONFIG.visualizeTuning.KDdes];
                 
 
 AStateNew     = [zeros(ndof)                     eye(ndof);
-                -config.visualizeTuning.KSn     -config.visualizeTuning.KDn];
+                -CONFIG.visualizeTuning.KS     -CONFIG.visualizeTuning.KD];
 
 % MATRIX SHAPE VERIFICATION            
-figure(ContFig)
+figure(figureCont)
 subplot(1,2,1)
 surf(-AStateDes)
 hold on
@@ -132,10 +128,10 @@ surf(-AStateNew)
 hold on
 title('Obtained State Matrix (-State)')
 
-ContFig = ContFig +1;
+figureCont = figureCont +1;
 
 % EIGENVALUES
-figure(ContFig)
+figure(figureCont)
 plot(real(eig(AStateDes)),imag(eig(AStateDes)),'xb')
 hold on
 grid on
@@ -145,32 +141,32 @@ legend('Des eigenval','Real eigenval')
 xlabel('Real')
 ylabel('Imag')
 
-ContFig = ContFig +1;
+figureCont = figureCont +1;
 
 % NEW GAINS MATRICES
-figure(ContFig)
+figure(figureCont)
 subplot(1,2,1)
-surf(config.visualizeTuning.Kpn)
+surf(CONFIG.visualizeTuning.Kpn)
 hold on
 title('Opt Impedances')
 subplot(1,2,2)
-surf(config.visualizeTuning.Kdn)
+surf(CONFIG.visualizeTuning.Kdn)
 hold on
 title('Opt Dampings')
 
-ContFig = ContFig +1;
+figureCont = figureCont +1;
 
-figure(ContFig)
+figure(figureCont)
 subplot(1,2,1)
-surf(config.visualizeTuning.Kpx)
+surf(CONFIG.visualizeTuning.Kpx)
 hold on
 title('Opt Momentum Integral Gains')
 subplot(1,2,2)
-surf(config.visualizeTuning.Kdx)
+surf(CONFIG.visualizeTuning.Kdx)
 hold on
 title('Opt Momentum Gains')
 
-ContFig = ContFig +1;
+figureCont = figureCont +1;
 end
 
 end

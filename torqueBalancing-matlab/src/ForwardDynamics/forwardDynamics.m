@@ -75,7 +75,7 @@ dNu                = M\(Jc'*fc + [zeros(6,1); tau]-h);
 dchi               = [NuQuat;dNu];
 
 %% Parameters for visualization
-visualization.ddqjNonLin  = dNu(7:end);
+visualization.ddqjNonLin  = controlParam.ddqjNonLin;
 visualization.dqj         = dqj;
 visualization.qj          = qj;
 visualization.JointRef    = trajectory.JointReferences;

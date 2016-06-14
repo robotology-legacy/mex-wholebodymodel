@@ -23,12 +23,12 @@ clc
 %% Integration setup 
 CONFIG.demo_movements                       = 1;                           %either 0 or 1
 CONFIG.feet_on_ground                       = [1,1];                       %either 0 or 1; [left,right]
-CONFIG.controller                           = 'StackOfTask';               %either 'StackOfTask' or 'JointSpace'
+CONFIG.controller                           = 'StackOfTask';                %either 'StackOfTask' or 'JointSpace'
 
 %% Linearized system analysis, gains tuning and QP solver. All these tools
 %% are available only for the 'Stack of Task' controller
-CONFIG.use_QPsolver                         = 1;                           %either 0 or 1
-CONFIG.linearize_for_stability_analysis     = 0;                           %either 0 or 1
+CONFIG.use_QPsolver                         = 0;                           %either 0 or 1
+CONFIG.linearize_for_stability_analysis     = 1;                           %either 0 or 1
 CONFIG.linearize_for_gains_tuning           = 0;                           %either 0 or 1
 
 % if params.linearize_for_gains_tuning = 1, choose between two different
@@ -40,17 +40,17 @@ CONFIG.optimization_algorithm               = 'NonLinLsq';
 CONFIG.visualize_robot_simulator            = 1;                           %either 0 or 1
 CONFIG.visualize_integration_results        = 1;                           %either 0 or 1
 CONFIG.visualize_joints_dynamics            = 1;                           %either 0 or 1
-CONFIG.visualize_gains_tuning_results       = 0;                           %either 0 or 1; available only if linearize_for_gains_tuning        = 1
+CONFIG.visualize_gains_tuning_results       = 1;                           %either 0 or 1; available only if linearize_for_gains_tuning        = 1
 
 % if the visualization of stability analysis results is activated, the 
 % inverse kinematics solver will be used, too. This is because it is necessary 
 % for the joints references to be always consistent with respect to the first
 % task trajectory, otherwise the linearization is no longer valid.
-CONFIG.visualize_stability_analysis_results  = 0;                          %either 0 or 1; available only if linearize_for_gains_tuning        = 1 
+CONFIG.visualize_stability_analysis_results  = 1;                          %either 0 or 1; available only if linearize_for_gains_tuning        = 1 
                                                                            %                              or linearize_for_stability_analysis  = 1                                    
 %% Integration time [s]
 CONFIG.tStart                                = 0;   
-CONFIG.tEnd                                  = 1;   
+CONFIG.tEnd                                  = 5;   
 CONFIG.sim_step                              = 0.01;
 
 %% Allow the joints references generation using inverse kinematics
@@ -81,6 +81,18 @@ if CONFIG.demo_movements == 0
 else
   CONFIG.integrateWithFixedStep  = 0;
   CONFIG.options                 = odeset('RelTol',1e-6,'AbsTol',1e-6);
+end
+
+% if one want to integrate the forward dynamics using a fixed step
+% integrator, the mass matrix must be corrected to avoid singularities
+if CONFIG.integrateWithFixedStep == 1
+    
+CONFIG.massCorr = 0.05; 
+end
+
+if CONFIG.postCorrection == 1
+    CONFIG.jointRef_with_ikin                    = 1;
+% CONFIG.massCorr = 0.05; 
 end
 
 %% Initialize the model

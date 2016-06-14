@@ -14,7 +14,7 @@ function controlParam  = initController(gains,trajectory,DYNAMICS,FORKINEMATICS,
 
 % ------------Initialization----------------
 %% Feet correction gains
-KCorrPos              = 2.5;
+KCorrPos              = 5;
 KCorrVel              = 2*sqrt(KCorrPos);
 
 %% Config parameters
@@ -78,12 +78,6 @@ DeltaPoseFeet  = [DeltaPoseLFoot;DeltaPoseRFoot];
 end
 
 %% REAL CONTACT FORCES COMPUTATION
-% for the linearization analysis, the desired contact forces are used
-% instead of the real ones (stack of task only)
-if CONFIG.visualize_stability_analysis_results == 1
-controlParam.fc  = controlParam.fcDes;
-else
 controlParam.fc  = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*controlParam.tau -dJcNu -KCorrVel.*VelFeet-KCorrPos.*DeltaPoseFeet);
-end
 
 end

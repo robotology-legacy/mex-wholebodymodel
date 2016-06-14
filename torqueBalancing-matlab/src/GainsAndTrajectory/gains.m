@@ -16,10 +16,10 @@ function gainsInit = gains(CONFIG)
 % ------------Initialization----------------
 % Config parameters
 ndof           = CONFIG.ndof;
-pinv_tol       = CONFIG.pinv_tol;
-%pinv_damp     = CONFIG.pinv_damp;
 postCorrection = CONFIG.postCorrection;
 DYNAMICS       = CONFIG.initDynamics;
+pinv_damp      = CONFIG.pinv_damp;
+%pinv_tol      = CONFIG.pinv_tol;
 
 % Dynamics parameters
 M              = DYNAMICS.M;
@@ -32,10 +32,10 @@ S              = [zeros(6,ndof);
 %% Gains for two feet on the ground
 if sum(CONFIG.feet_on_ground) == 2
     
-   gainsInit.gainsPCoM               = diag([45 50 40]);
-   gainsInit.gainsDCoM               = 2*sqrt(gainsInit.gainsPCoM);
-   gainsInit.gainsPAngMom            = diag([5 10 5]);
-   gainsInit.gainsDAngMom            = 2*sqrt(gainsInit.gainsPAngMom);
+    gainsPCoM           = diag([45 50 40]);
+    gainsDCoM           = 2*sqrt(gainsPCoM);
+    gainsPAngMom        = diag([5 10 5]);
+    gainsDAngMom        = 2*sqrt(gainsPAngMom);
 
 % impedances acting in the null space of the desired contact forces 
     impTorso            = [ 40  40  40]; 
@@ -47,22 +47,22 @@ end
 %% Parameters for one foot on the ground
 if  sum(CONFIG.feet_on_ground) == 1
  
-    gainsInit.gainsPCoM                 = diag([40 45 40]);
-    gainsInit.gainsDCoM                 = 2*sqrt(gainsInit.gainsPCoM);
-    gainsInit.gainsPAngMom              = diag([5 10 5]);
-    gainsInit.gainsDAngMom              = 2*sqrt(gainsInit.gainsPAngMom);
+     gainsPCoM          = diag([40 45 40]);
+     gainsDCoM          = 2*sqrt(gainsPCoM);
+     gainsPAngMom       = diag([5 10 5]);
+     gainsDAngMom       = 2*sqrt(gainsPAngMom);
    
 % impedances acting in the null space of the desired contact forces 
-     impTorso            = [ 20   20   20]; 
-     impArms             = [ 15  15   45   5   5];
+     impTorso           = [ 20   20   20]; 
+     impArms            = [ 15  15   45   5   5];
 
 if CONFIG.feet_on_ground(1) == 1
     
-     impLeftLeg          = [ 70   70  65  30  10  10];  
-     impRightLeg         = [ 20   20  20  10  10  10];   
+     impLeftLeg         = [ 70   70  65  30  10  10];  
+     impRightLeg        = [ 20   20  20  10  10  10];   
 else
-     impLeftLeg          = [ 20   20  20  10  10  10];
-     impRightLeg         = [ 70   70  65  30  10  10]; 
+     impLeftLeg         = [ 20   20  20  10  10  10];
+     impRightLeg        = [ 70   70  65  30  10  10]; 
 end
 end
 
@@ -75,17 +75,23 @@ if (size(gainsInit.impedances,2) ~= ndof)
   error('Dimension mismatch between ndof and dimension of the variable impedences. Check these variables in the file gains.m');    
 end
 
-%% Desired shape for the state matrix of the linearized system, for gains tuning
-gainsInit.KSdes = diag(gainsInit.impedances);
-gainsInit.KDdes = diag(gainsInit.dampings);
+%% MOMENTUM AND POSTURAL GAINS
+gainsInit.impedances         = diag(gainsInit.impedances);
+gainsInit.dampings           = diag(gainsInit.dampings); 
+gainsInit.MomentumGains      = [gainsDCoM zeros(3); zeros(3) gainsDAngMom];
+gainsInit.intMomentumGains   = [gainsPCoM zeros(3); zeros(3) gainsPAngMom];
 
-%% Postural task correction to assure the stability 
-if postCorrection == 1
+% Desired shape for the state matrix of the linearized system, for gains tuning procedure
+gainsInit.KSdes              = gainsInit.impedances;
+gainsInit.KDdes              = gainsInit.dampings;
+
+%% Correction of postural task that ensures the asymptotic stability of the joint space
+if postCorrection == 1 
 
 JcMinv                  = Jc/M;
 JcMinvS                 = JcMinv*S;
-%pinvJcMinvS            = JcMinvS'/(JcMinvS*JcMinvS' + pinv_damp*eye(size(JcMinvS,1)));
-pinvJcMinvS             = pinv(JcMinvS,pinv_tol);
+pinvJcMinvS             = JcMinvS'/(JcMinvS*JcMinvS' + pinv_damp*eye(size(JcMinvS,1)));
+%pinvJcMinvS            = pinv(JcMinvS,pinv_tol);
 Mbar                    = M(7:end,7:end)-M(7:end,1:6)/M(1:6,1:6)*M(1:6,7:end);
 
 % damped null space
@@ -98,10 +104,5 @@ gainsInit.posturalCorr  = NullLambda*Mbar;
 else  
 gainsInit.posturalCorr  = eye(ndof);
 end
-
-gainsInit.impedances    = diag(gainsInit.impedances);
-gainsInit.dampings      = diag(gainsInit.dampings); 
-gainsInit.MomentumGains   = [gainsInit.gainsDCoM zeros(3); zeros(3) gainsInit.gainsDAngMom];
-gainsInit.intMomentumGains   = [gainsInit.gainsPCoM zeros(3); zeros(3) gainsInit.gainsPAngMom];
 
 end

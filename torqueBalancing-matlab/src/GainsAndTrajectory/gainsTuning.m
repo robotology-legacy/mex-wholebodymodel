@@ -21,7 +21,7 @@ function [gains,visualizeTuning] = gainsTuning (linearization,CONFIG)
 % ------------Initialization----------------
 % Config parameters
 ndof                  = CONFIG.ndof;
-gainsInit             = CONFIG.gainsInit;
+gainsInit             = CONFIG.gains;
 KSdes                 = gainsInit.KSdes;
 KDdes                 = gainsInit.KDdes;
 ACartesian            = linearization.ACartesian;
@@ -220,16 +220,19 @@ end
 % parameters for visualization                                        
 visualizeTuning.KS           = KSn;
 visualizeTuning.KD           = KDn;
+visualizeTuning.KSdes        = KSdes;
+visualizeTuning.KDdes        = KDdes;
 visualizeTuning.Kpn          = Kpn;
 visualizeTuning.Kdn          = Kdn;
 visualizeTuning.Kpx          = Kpx;
 visualizeTuning.Kdx          = Kdx;
 
 % gains matrices after optimization
-gains.impedances    = Kpn; 
-gains.dampings      = Kdn;
-gains.VelGainsMom   = Kdx;
-gains.PosGainsMom   = Kpx;
+gains.impedances        = Kpn; 
+gains.dampings          = Kdn;
+gains.MomentumGains     = Kdx;
+gains.intMomentumGains  = Kpx;
+gains.posturalCorr      = gainsInit.posturalCorr;
 
 end
 

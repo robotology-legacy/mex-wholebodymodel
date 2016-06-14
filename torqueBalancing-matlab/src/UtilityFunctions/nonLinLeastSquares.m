@@ -30,15 +30,15 @@ gAng         = 4;
 
 if strcmp(CONFIG.matrixSelector,'position') == 1
 
-gainsL = CONFIG.gainsInit.PosGainsMom(1:3,1:3);
-gainsW = CONFIG.gainsInit.PosGainsMom(4:6,4:6);
-gainsP = CONFIG.gainsInit.KSdes;
+gainsL = CONFIG.gains.intMomentumGains(1:3,1:3);
+gainsW = CONFIG.gains.intMomentumGains(4:6,4:6);
+gainsP = CONFIG.gains.KSdes;
 
 elseif strcmp(CONFIG.matrixSelector,'velocity') == 1
 
-gainsL = CONFIG.gainsInit.VelGainsMom(1:3,1:3);
-gainsW = CONFIG.gainsInit.VelGainsMom(4:6,4:6);
-gainsP = CONFIG.gainsInit.KDdes;    
+gainsL = CONFIG.gains.MomentumGains(1:3,1:3);
+gainsW = CONFIG.gains.MomentumGains(4:6,4:6);
+gainsP = CONFIG.gains.KDdes;    
 end
 
 %% Separate the linear and angular momentum

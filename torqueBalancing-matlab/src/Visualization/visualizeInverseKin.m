@@ -1,13 +1,14 @@
 function figureCont = visualizeInverseKin(CONFIG,ikin)
 %VISUALIZEINVERSEKIN visualizes the results on the inverse kinematics of the
 %                    robot iCub.
-%   VISUALIZEINVERSEKIN verifies if the joint reference trajectory calculated in
-%   the inverse kinematics solver fits with the contact constraints and the
+%
+%   VISUALIZEINVERSEKIN verifies if the joint reference trajectory calculated 
+%   in the inverse kinematics solver fits with the contact constraints and the
 %   desired CoM and momentum trajectories.
 %
-%   ContFig = VISUALIZEINVERSEKIN(config,ikin) takes as input the structure 
+%   figureCont = VISUALIZEINVERSEKIN(config,ikin) takes as input the structure 
 %   CONFIG containing all the utility parameters, and the structure IKIN
-%   which contains the visualization parameters. The output ContFig
+%   which contains the visualization parameters. The output figureCont
 %   is a counter which automatically modifies the figure number according 
 %   to the visualization setup.
 %

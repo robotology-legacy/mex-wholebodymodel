@@ -16,7 +16,7 @@ function linearization = jointSpaceLinearization(CONFIG)
 
 % ------------Initialization----------------
 % Config parameters
-gainsInit          = CONFIG.gainsInit;
+gainsInit          = CONFIG.gains;
 pinv_tol           = CONFIG.pinv_tol;
 feet_on_ground     = CONFIG.feet_on_ground;     
 ndof               = CONFIG.ndof;
@@ -72,39 +72,44 @@ end
 impedances         = gainsInit.impedances; 
 dampings           = gainsInit.dampings;
 posturalCorr       = gainsInit.posturalCorr; 
-VelGainsMom        = gainsInit.VelGainsMom;
-PosGainsMom        = gainsInit.PosGainsMom;
+MomentumGains      = gainsInit.MomentumGains;
+intMomentumGains   = gainsInit.intMomentumGains;
 
 %% DEFINE THE LINEARIZED JOINT SPACE DYNAMICS
 Lambda             =  (Jj - Jb/Mb*Mbj)*invMbar;
 MultFirstTask      =  Jb/Mb*transpose(Jb)*pinvA;
 pinvLambda         =  pinv(Lambda,pinv_tol);
-NullLambda         =  eye(ndof) - pinvLambda*Lambda; 
+NullLambda         =  eye(ndof) - pinvLambda*Lambda;
 JG                 =  JH(:,7:end)-JH(:,1:6)*(eye(6)/Jb)*Jj;
 
 %% COUPLING FOR TWO FEET BALANCING
 if sum(feet_on_ground) == 1
 
 CorrMatrix              = eye(ndof);
-CorrMatrixT1            = JG;
-
+JGCorrMatrixT1          = JG;
 else
-JL     = Jj(1:6,14:19);
-JR     = Jj(7:end,20:25);
-JBl    = Jb(1:6,:);
-JBr    = Jb(7:end,:);
-dLegs  = JR\(JBr/JBl*JL);
-
-CorrMatrix              = eye(ndof);
-CorrMatrix(20:25,14:19) = dLegs;
-CorrMatrixT1            = [JG(1:3,:);JG(4:6,:)*CorrMatrix];
+% the constrained partial derivatives for the robot balancing on 2 feet
+% should be unnecessary. This case is still under investigation, however
+% for now the linearization is performed as in the 1 foot case.
+%
+% JL     = Jj(1:6,14:19);
+% JR     = Jj(7:end,20:25);
+% JBl    = Jb(1:6,:);
+% JBr    = Jb(7:end,:);
+% dLegs  = JR\(JBr/JBl*JL);
+% 
+% CorrMatrix              = eye(ndof);
+% CorrMatrix(20:25,14:19) = dLegs;
+% JGCorrMatrixT1          = [JG(1:3,:);JG(4:6,:)*CorrMatrix];
+CorrMatrix                = eye(ndof);
+JGCorrMatrixT1            = JG;
 end
 
 %% Stiffness matrix
-KS     = invMbar*(-pinvLambda*MultFirstTask*PosGainsMom*CorrMatrixT1 + NullLambda*impedances*posturalCorr*CorrMatrix);
+KS     = invMbar*(-pinvLambda*MultFirstTask*intMomentumGains*JGCorrMatrixT1 + NullLambda*impedances*posturalCorr*CorrMatrix);
 
 %% Damping matrix
-KD     = invMbar*(-pinvLambda*MultFirstTask*VelGainsMom*CorrMatrixT1 + NullLambda*dampings*posturalCorr*CorrMatrix);
+KD     = invMbar*(-pinvLambda*MultFirstTask*MomentumGains*JGCorrMatrixT1 + NullLambda*dampings*posturalCorr*CorrMatrix);
 
 %% Verify the state matrix
 AStateOld     = [zeros(ndof) eye(ndof);
@@ -134,7 +139,7 @@ linearization.KD          = KD;
 linearization.KDdes       = gainsInit.KDdes;
 linearization.KSdes       = gainsInit.KSdes;
 linearization.ACartesian  = -invMbar*pinvLambda*MultFirstTask;
-linearization.BCartesian  =  CorrMatrixT1;
+linearization.BCartesian  =  JGCorrMatrixT1;
 linearization.ANull       =  invMbar*NullLambda;
 
 if CONFIG.postCorrection == 1

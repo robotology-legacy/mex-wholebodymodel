@@ -13,18 +13,11 @@ To execute scripts that use `mex-wholebodymodel`, make sure that this directorie
 An example on how to use mex-wholebodymodel to compute the dynamics quantities of 
 a rigid body is available at [examples/rigidBodyDynamics.m](examples/rigidBodyDynamics.m).
 
-## Matlab-src
+## Balancing controllers
 
-### Controllers simulations
-In [matlab-src/torqueBalancing_matlab](matlab-src/torqueBalancing_matlab/) the user can find two different
-simulations of whole-body controller implemented using the mex-wholebodymodel interface. One uses the Stack of task approach while 
-the other is a Joint Space controller. 
-For more information please check the relative [README_SoT](matlab-src/torqueBalancing_matlab/StackOfTask_balancing/) and
-[README_Jc](matlab-src/torqueBalancing_matlab/JointSpace_balancing/)
-
-### Joint space linearization
-In [matlab-src/jointSpaceLinearization](matlab-src/jointSpaceLinearization/) there is a program which linearize the joint space of the system, when balancing 
-on 1 foot, controlled with 'Stack of Task' approach. For further informations check the relative [README](matlab-src/jointSpaceLinearization/).
+In [torqueBalancing-matlab](torqueBalancing-matlab/) the user can find two different simulations of whole-body controller implemented using the 
+mex-wholebodymodel interface. One uses the Stack of task approach while the other is a Joint Space controller. 
+For more information please check the relative [README](torqueBalancing-matlab/)
 
 ## Mex-wholebodymodel
 

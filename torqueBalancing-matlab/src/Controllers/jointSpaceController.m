@@ -77,7 +77,10 @@ elseif  sum(feet_on_ground) == 2
  tau             = pinvTauMatrix*(CNuTilde + gTilde + dJcNuTilde + Mj*ddqjRef -impedances*qjTilde -dampings*dqjTilde);
 end
 
-controlParam.f0  = zeros(6*CONFIG.numConstraints,1);
-controlParam.tau = tau;
+% these parameters are added only for the compatibility of this controller
+% with the software architecture
+controlParam.f0         = zeros(6*CONFIG.numConstraints,1);
+controlParam.tau        = tau;
+controlParam.ddqjNonLin = zeros(ndof,1);
 
 end

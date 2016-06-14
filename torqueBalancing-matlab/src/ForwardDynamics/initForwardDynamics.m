@@ -1,11 +1,12 @@
 function [] = initForwardDynamics(CONFIG)
-%INITFORWARDDYNAMICS setup the forward dynamics integration of
-%                    robot iCub in MATLAB.
+%INITFORWARDDYNAMICS setup the forward dynamics integration of robot iCub 
+%                    in MATLAB.
 %
-%   [] = INITFORWARDDYNAMICS(config) takes as input the structure
-%   CONFIG containing all the utility parameters. It has no output. The 
-%   forward dynamics integration will be performed following the options
-%   the user specified in the initialization file.
+%             [] = INITFORWARDDYNAMICS(config) takes as input the structure
+%             CONFIG containing all the configuration parameters. It has no 
+%             output. The forward dynamics integration will be performed 
+%             following the options the user specifies in the initialization 
+%             file.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -58,7 +59,6 @@ CONFIG.numConstraints           = length(CONFIG.constraintLinkNames);
 
 %% Initial state of the robot 
 qjInit             = [CONFIG.torsoInit;CONFIG.leftArmInit;CONFIG.rightArmInit;CONFIG.leftLegInit;CONFIG.rightLegInit]*(pi/180);
-CONFIG.qjInit      = qjInit;
 dqjInit            = zeros(ndof,1);
 VelBaseInit        = zeros(3,1);
 omegaWorldBaseInit = zeros(3,1);
@@ -102,13 +102,12 @@ CONFIG.initDynamics.JhReduced    = JH(:,7:end) -JH(:,1:6)*(eye(6)/Jc(1:6,1:6))*J
 CONFIG.initForKinematics         = robotForKinematics(CONFIG.initState,CONFIG.initDynamics);
 
 %% Initial gains
-CONFIG.gainsInit                 = gains(CONFIG);
-CONFIG.gains                     = CONFIG.gainsInit; 
+CONFIG.gains                     = gains(CONFIG);
 
 %% LINEARIZATION AND GAINS TUNING
 if CONFIG.linearizeJointSp == 1
     
-linearization                    = jointSpaceLinearization(CONFIG);
+linearization                         = jointSpaceLinearization(CONFIG);
 
 if CONFIG.linearize_for_gains_tuning == 1
     
@@ -121,12 +120,11 @@ end
 
 %% FORWARD DYNAMICS INTEGRATION
 CONFIG.wait     = waitbar(0,'State integration in progress...');
-
 forwardDynFunc  = @(t,chi)forwardDynamics(t,chi,CONFIG);
 
-% Choose between fixed step intergator and ODE15s
+% Either fixed step integrator or ODE15s
 if CONFIG.integrateWithFixedStep == 1
-   
+  
 [t,chi]         = euleroForward(forwardDynFunc,chiInit,CONFIG.tEnd,CONFIG.tStart,CONFIG.sim_step);   
 else    
 [t,chi]         = ode15s(forwardDynFunc,CONFIG.tStart:CONFIG.sim_step:CONFIG.tEnd,chiInit,CONFIG.options);
@@ -135,6 +133,6 @@ end
 delete(CONFIG.wait)       
  
 %% VISUALIZER
-initVisualizer(t,chi,CONFIG);
+CONFIG.figureCont = initVisualizer(t,chi,CONFIG);
 
 end

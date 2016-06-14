@@ -150,4 +150,20 @@ controlParam.f0       = f0;
 controlParam.Nullfc   = Nullfc;
 controlParam.A        = A;
 
+%% Desired nonLinear joints accelerations for the linearized system analysis
+Mjb          = M(7:end,1:6);
+Mbar         = Mj - Mjb/Mb*Mbj;
+Mbar_inv     = eye(ndof)/Mbar;
+%Mbar_inv    = Mbar'/(Mbar*Mbar' + pinv_damp*eye(size(Mbar,1)));
+JcBase       = Jc(:,1:6);
+JcJoint      = Jc(:,7:end);
+B2           = (JcJoint - JcBase/Mb*Mbj)*Mbar_inv;
+B3           = JcBase/Mb*transpose(JcBase)*pinvA;
+pinvB2       = pinv(B2,pinv_tol);
+CbNu         = CNu(1:6);
+NullB2       = eye(ndof) - pinvB2*B2;
+u0           = -Mbar*ddqjRef+ impedances*posturalCorr*qjTilde +dampings*posturalCorr*dqjTilde;
+
+controlParam.ddqjNonLin   = -Mbar_inv*(pinvB2*(B3*(HDotDes-CbNu)+dJcNu) + NullB2*u0);
+
 end
