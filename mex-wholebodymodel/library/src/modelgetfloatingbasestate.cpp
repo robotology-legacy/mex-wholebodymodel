@@ -17,23 +17,23 @@
  * Public License for more details
  */
 
-// global includes
+//global includes
 
-// library includes
-#include <wbi/iWholeBodyModel.h>
+//library includes
+// #include <wbi/iWholeBodyModel.h>
+// #include <boost/concept_check.hpp>
 
-// local includes
+//local includes
 #include "modelgetfloatingbasestate.h"
-#include <boost/concept_check.hpp>
 
 using namespace mexWBIComponent;
 
 ModelGetFloatingBaseState *ModelGetFloatingBaseState::modelGetFloatingBaseState;
 
-ModelGetFloatingBaseState::ModelGetFloatingBaseState() : ModelComponent(0,1,3)
+ModelGetFloatingBaseState::ModelGetFloatingBaseState() : ModelComponent(0, 1, 3)
 {
 #ifdef DEBUG
-  mexPrintf("ModelGetFloatingBaseState Constructuted\n");
+  mexPrintf("ModelGetFloatingBaseState constructuted\n");
 #endif
 }
 
@@ -41,12 +41,11 @@ ModelGetFloatingBaseState::~ModelGetFloatingBaseState()
 {
 }
 
-ModelGetFloatingBaseState* ModelGetFloatingBaseState::getInstance()
+ModelGetFloatingBaseState *ModelGetFloatingBaseState::getInstance()
 {
   if(modelGetFloatingBaseState == NULL)
-  {
     modelGetFloatingBaseState = new ModelGetFloatingBaseState;
-  }
+
   return modelGetFloatingBaseState;
 }
 
@@ -60,11 +59,8 @@ bool ModelGetFloatingBaseState::allocateReturnSpace(int nlhs, mxArray **plhs)
 #ifdef DEBUG
   mexPrintf("Trying to allocateReturnSpace in ModelGetFloatingBaseState\n");
 #endif
-
   if(nlhs != 3)
-  {
-     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumOutputs", "3 output arguments required for ModelGetFloatingBaseState");
-  }
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumOutputs", "3 output arguments required for ModelGetFloatingBaseState");
 
   plhs[0] = mxCreateDoubleMatrix(3,3, mxREAL);
   plhs[1] = mxCreateDoubleMatrix(3,1, mxREAL);
@@ -82,7 +78,6 @@ bool ModelGetFloatingBaseState::compute(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("ModelGetFloatingBaseState performing Compute");
 #endif
-
   world_H_rootLink = modelState->getRootWorldRotoTranslation();
 
 #ifdef DEBUG
@@ -97,8 +92,7 @@ bool ModelGetFloatingBaseState::compute(int nrhs, const mxArray **prhs)
   mexPrintf("\n\n");
 #endif
 
-  double rotm[9];   // 3x3 rotation matrix array ...
-  double rotm_t[9]; // transposed rotation matrix array ...
+  double rotm[9]; // 3x3 rotation matrix array ...
   world_H_rootLink.R.getDcm(rotm);
 
 #ifdef DEBUG
@@ -126,16 +120,8 @@ bool ModelGetFloatingBaseState::compute(int nrhs, const mxArray **prhs)
   // since the values in the array are stored in row-major order and Matlab
   // uses the column-major order for multi-dimensional arrays, we have to
   // make an array-transposition ...
-  int nRows = 3;
-  int nCols = nRows;
-  for(int i=0; i < nRows; i++) {
-    for(int j= 0; j < nCols; j++) {
-        // write the array in column major ...
-        *(rotm_t + (j*nCols + i)) = *(rotm + (i*nRows + j));
-    }
-  }
+  reorderMatrixInColMajor(rotm, w_R_b);
 
-  memcpy(w_R_b, rotm_t, 9*sizeof(double));
   memcpy(w_p_b, world_H_rootLink.p, 3*sizeof(double));
   modelState->vb(vb);
 
@@ -144,29 +130,26 @@ bool ModelGetFloatingBaseState::compute(int nrhs, const mxArray **prhs)
 
 bool ModelGetFloatingBaseState::computeFast(int nrhs, const mxArray **prhs)
 {
- #ifdef DEBUG
-  mexPrintf("ModelGetFloatingBaseState performing Compute");
+#ifdef DEBUG
+  mexPrintf("ModelGetFloatingBaseState performing Compute Fast");
 #endif
-
+#ifdef DEBUG
   world_H_rootLink = modelState->getRootWorldRotoTranslation();
 
-#ifdef DEBUG
   mexPrintf("Inside getState\nRootWorldRotoTrans\n");
-
   mexPrintf("world_H_root\n");
   mexPrintf( (world_H_rootLink.R.toString()).c_str() );
   mexPrintf(" = \n");
-
   mexPrintf("world_H_ReferenceLink\n");
   mexPrintf( ((modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str() );
   mexPrintf("\n\n");
 #endif
-
   double rotm[9];
-  world_H_rootLink.R.getDcm(rotm);
 
-  memcpy(w_R_b, rotm, 9*sizeof(double));
-  memcpy(w_p_b, world_H_rootLink.p, 3*sizeof(double));
+  (modelState->getRootWorldRotoTranslation()).R.getDcm(rotm);
+  reorderMatrixInColMajor(rotm, w_R_b);
+
+  memcpy(w_p_b, (modelState->getRootWorldRotoTranslation()).p, 3*sizeof(double));
   modelState->vb(vb);
 
   return true;

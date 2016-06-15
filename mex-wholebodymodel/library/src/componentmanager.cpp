@@ -20,33 +20,35 @@
 
 //global includes
 #include <iostream>
-#include <stdio.h>
 #include <map>
-#include <mex.h>
+// #include <stdio.h>
+// #include <mex.h>
 
 //library includes
-#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
+// #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 //local includes
 #include "componentmanager.h"
+#include "modelcentroidalmomentum.h"
 #include "modelcomponent.h"
-#include "modeljointlimits.h"
-#include "modelmassmatrix.h"
-#include "modelupdatestate.h"
-#include "modelgetstate.h"
-#include "modelgetfloatingbasestate.h"
-#include "modelgeneralisedbiasforces.h"
 #include "modelcorioliscentrifugalforces.h"
-#include "modelgravityforces.h"
-#include "modelstate.h"
 #include "modeldjdq.h"
-#include "modeljacobian.h"
+#include "modelforwardkinematics.h"
+#include "modelgeneralisedbiasforces.h"
+#include "modelgetfloatingbasestate.h"
+#include "modelgetstate.h"
+#include "modelgravityforces.h"
 #include "modelinitialise.h"
 #include "modelinitialiseurdf.h"
-#include "modelforwardkinematics.h"
-#include "modelvisualizetrajectory.h"
-#include "modelcentroidalmomentum.h"
+#include "modelinversedynamics.h"
+#include "modeljacobian.h"
+#include "modeljointlimits.h"
+#include "modelmassmatrix.h"
+#include "modelrototranslationmatrix.h"
 #include "modelsetworldframe.h"
+#include "modelstate.h"
+#include "modelupdatestate.h"
+#include "modelvisualizetrajectory.h"
 
 using namespace mexWBIComponent;
 
@@ -54,13 +56,14 @@ ComponentManager * ComponentManager::componentManager;
 
 ComponentManager* ComponentManager::getInstance(std::string robotName)
 {
-  if(componentManager == NULL) {
+  if(componentManager == NULL)
     componentManager = new ComponentManager(robotName);
-  }
+
 #ifdef DEBUG
   mexPrintf("ComponentManager initialised \n");
 #endif
-  return(componentManager);
+
+  return componentManager;
 }
 
 void ComponentManager::deleteInstance()
@@ -74,46 +77,49 @@ ComponentManager::ComponentManager(std::string robotName)
   mexPrintf("ComponentManager constructed \n");
 #endif
   initialise(robotName);
+  //componentList["inverse-dynamics"] = modelInverseDynamics;
+  componentList["centroidal-momentum"] = modelCentroidalMomentum;
+  componentList["coriolis-centrifugal-forces"] = modelCoriolisCentrifugalForces;
+  componentList["djdq"] = modelDjDq;
+  componentList["forward-kinematics"] = modelForwardKinematics;
+  componentList["generalised-forces"] = modelGeneralisedBiasForces;
+  componentList["get-floating-base-state"] = modelGetFloatingBaseState;
+  componentList["get-state"] = modelGetState;
+  componentList["gravity-forces"] = modelGravityForces;
+  componentList["jacobian"] = modelJacobian;
   componentList["joint-limits"] = modelJointLimits;
   componentList["mass-matrix"] = modelMassMatrix;
-  componentList["generalised-forces"] = modelGeneralisedBiasForces;
-  componentList["coriolis-centrifugal-forces"] = modelCoriolisCentrifugalForces;
-  componentList["gravity-forces"] = modelGravityForces;
-  componentList["djdq"] = modelDjDq;
-  componentList["jacobian"] = modelJacobian;
-  componentList["update-state"] = modelUpdateState;
-  componentList["get-state"] = modelGetState;
-  componentList["get-floating-base-state"] = modelGetFloatingBaseState;
   componentList["model-initialise"] = modelInitialise;
   componentList["model-initialise-urdf"] = modelInitialiseURDF;
-  componentList["forward-kinematics"] = modelForwardKinematics;
-  componentList["visualize-trajectory"] = modelVisualizeTrajectory;
-  componentList["centroidal-momentum"] = modelCentroidalMomentum;
+  componentList["rototranslation-matrix"] = modelRotoTranslationMatrix;
   componentList["set-world-frame"] = modelSetWorldFrame;
+  componentList["update-state"] = modelUpdateState;
+  componentList["visualize-trajectory"] = modelVisualizeTrajectory;
 }
 
 void ComponentManager::cleanup()
 {
+  ModelCentroidalMomentum::deleteInstance();
+  ModelCoriolisCentrifugalForces::deleteInstance();
+  ModelDjDq::deleteInstance();
+  ModelForwardKinematics::deleteInstance();
+  ModelGeneralisedBiasForces::deleteInstance();
+  ModelGetFloatingBaseState::deleteInstance();
+  ModelGetState::deleteInstance();
+  ModelGravityForces::deleteInstance();
+  ModelInitialise::deleteInstance();
+  ModelInitialiseURDF::deleteInstance();
+  ModelJacobian::deleteInstance();
+  ModelJointLimits::deleteInstance();
+  ModelMassMatrix::deleteInstance();
+  ModelRotoTranslationMatrix::deleteInstance();
+  ModelSetWorldFrame::deleteInstance();
+  ModelState::deleteInstance();
+  ModelUpdateState::deleteInstance();
+  ModelVisualizeTrajectory::deleteInstance();
 #ifdef DEBUG
   mexPrintf("ComponentManager destructed\n");
 #endif
-  ModelJointLimits::deleteInstance();
-  ModelMassMatrix::deleteInstance();
-  ModelUpdateState::deleteInstance();
-  ModelGetState::deleteInstance();
-  ModelGetFloatingBaseState::deleteInstance();
-  ModelGeneralisedBiasForces::deleteInstance();
-  ModelCoriolisCentrifugalForces::deleteInstance();
-  ModelGravityForces::deleteInstance();
-  ModelDjDq::deleteInstance();
-  ModelJacobian::deleteInstance();
-  ModelForwardKinematics::deleteInstance();
-  ModelInitialise::deleteInstance();
-  ModelInitialiseURDF::deleteInstance();
-  ModelVisualizeTrajectory::deleteInstance();
-  ModelCentroidalMomentum::deleteInstance();
-  ModelSetWorldFrame::deleteInstance();
-  ModelState::deleteInstance();
 }
 
 ComponentManager::~ComponentManager(void)
@@ -123,70 +129,60 @@ ComponentManager::~ComponentManager(void)
 
 void ComponentManager::initialise(std::string robotName)
 {
-  modelState = ModelState::getInstance(robotName);
-  modelUpdateState = ModelUpdateState::getInstance();
-  modelGetState = ModelGetState::getInstance();
-  modelGetFloatingBaseState = ModelGetFloatingBaseState::getInstance();
-  modelJointLimits = ModelJointLimits::getInstance();
-  modelMassMatrix = ModelMassMatrix::getInstance();
-  modelGeneralisedBiasForces = ModelGeneralisedBiasForces::getInstance();
+  modelCentroidalMomentum = ModelCentroidalMomentum::getInstance();
   modelCoriolisCentrifugalForces = ModelCoriolisCentrifugalForces::getInstance();
-  modelGravityForces = ModelGravityForces::getInstance();
   modelDjDq = ModelDjDq::getInstance();
-  modelJacobian = ModelJacobian::getInstance();
   modelForwardKinematics = ModelForwardKinematics::getInstance();
+  modelGeneralisedBiasForces = ModelGeneralisedBiasForces::getInstance();
+  modelGetFloatingBaseState = ModelGetFloatingBaseState::getInstance();
+  modelGetState = ModelGetState::getInstance();
+  modelGravityForces = ModelGravityForces::getInstance();
   modelInitialise = ModelInitialise::getInstance();
   modelInitialiseURDF = ModelInitialiseURDF::getInstance();
-  modelVisualizeTrajectory = ModelVisualizeTrajectory::getInstance();
-  modelCentroidalMomentum = ModelCentroidalMomentum::getInstance();
+  modelJacobian = ModelJacobian::getInstance();
+  modelJointLimits = ModelJointLimits::getInstance();
+  modelMassMatrix = ModelMassMatrix::getInstance();
+  modelRotoTranslationMatrix = ModelRotoTranslationMatrix::getInstance();
   modelSetWorldFrame = ModelSetWorldFrame::getInstance();
+  modelState = ModelState::getInstance(robotName);
+  modelUpdateState = ModelUpdateState::getInstance();
+  modelVisualizeTrajectory = ModelVisualizeTrajectory::getInstance();
 }
 
-bool ComponentManager::processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
+bool ComponentManager::processFunctionCall(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  bool returnVal = false;
-  ModelComponent *activeComponent;
-  char *str;
-
 #ifdef DEBUG
   mexPrintf("Trying to parseMexArguments\n");
 #endif
-
-  str = mxArrayToString(prhs[0]);
+  ModelComponent *activeComponent;
+  char *str = mxArrayToString(prhs[0]);
 
 #ifdef DEBUG
-  mexPrintf("Searching for the component '%s', of size  %d\n",str,sizeof(str));
+  mexPrintf("Searching for the component '%s', of size  %d\n", str, sizeof(str));
 #endif
 
-  std::map<std::string,ModelComponent*>::iterator search = componentList.find(str);
+  std::map<std::string, ModelComponent*>::iterator search = componentList.find(str);
   if(search == componentList.end())
-  {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Requested component not found. Please request a valid component");
-  }
 
   activeComponent = search->second;
   if(nlhs != (int)activeComponent->numReturns())
-  {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Error in number of returned parameters in requested component, check docs");
-  }
 
-  if(nrhs != (int)(1+activeComponent->numArguments()) && nrhs != (int)(1+activeComponent->numAltArguments()))
+  if( (nrhs != (int)(1 + activeComponent->numArguments())) &&
+      (nrhs != (int)(1 + activeComponent->numAltArguments())) )
   {
-     mexPrintf("Requested component uses  uses %d arguments and returns %d items",activeComponent->numArguments(),activeComponent->numReturns());
-     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Error in number of arguments, check docs");
+    mexPrintf("Requested component uses  uses %d arguments and returns %d items", activeComponent->numArguments(), activeComponent->numReturns());
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Error in number of arguments, check docs");
   }
-  activeComponent->allocateReturnSpace(nlhs,plhs);
+  activeComponent->allocateReturnSpace(nlhs, plhs);
 
-  if(nrhs == (int)(1+activeComponent->numAltArguments()))
+  if(nrhs == (int)(1 + activeComponent->numAltArguments()))
   {
-    activeComponent->computeFast(nrhs,prhs);
-    returnVal = true;
+    activeComponent->computeFast(nrhs, prhs);
+    return true;
   }
-  else
-  {
-    activeComponent->compute(nrhs, prhs);
-    returnVal = true;
-  }
-
-  return returnVal;
+  // else ...
+  activeComponent->compute(nrhs, prhs);
+  return true;
 }

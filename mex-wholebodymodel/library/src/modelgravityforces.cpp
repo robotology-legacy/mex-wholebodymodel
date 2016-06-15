@@ -20,8 +20,8 @@
 //global includes
 
 //library includes
-#include <wbi/iWholeBodyModel.h>
-#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
+// #include <wbi/iWholeBodyModel.h>
+// #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 //local includes
 #include "modelgravityforces.h"
@@ -31,7 +31,7 @@ using namespace mexWBIComponent;
 ModelGravityForces *ModelGravityForces::modelGravityForces;
 double ModelGravityForces::vb_0[6] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
-ModelGravityForces::ModelGravityForces() : ModelComponent(3,0,1)
+ModelGravityForces::ModelGravityForces() : ModelComponent(3, 0, 1)
 {
 #ifdef DEBUG
   mexPrintf("ModelGravityForces constructed\n");
@@ -43,12 +43,11 @@ ModelGravityForces::~ModelGravityForces()
 {
 }
 
-ModelGravityForces* ModelGravityForces::getInstance()
+ModelGravityForces *ModelGravityForces::getInstance()
 {
-  if(modelGravityForces == NULL)
-  {
+  if (modelGravityForces == NULL)
     modelGravityForces = new ModelGravityForces;
-  }
+
   return modelGravityForces;
 }
 
@@ -64,7 +63,7 @@ bool ModelGravityForces::allocateReturnSpace(int nlhs, mxArray **plhs)
 #endif
   int numDof = modelState->dof();
 
-  plhs[0] = mxCreateNumericMatrix(numDof+6, 1, mxDOUBLE_CLASS, mxREAL);
+  plhs[0] = mxCreateDoubleMatrix(numDof+6, 1, mxREAL);
   h = mxGetPr(plhs[0]);
 
   return true;
@@ -75,8 +74,7 @@ bool ModelGravityForces::compute(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("Trying to compute gravity forces\n");
 #endif
-  processArguments(nrhs, prhs);
-  return true;
+  return processArguments(nrhs, prhs);
 }
 
 bool ModelGravityForces::computeFast(int nrhs, const mxArray **prhs)
@@ -84,18 +82,20 @@ bool ModelGravityForces::computeFast(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("Trying to fast compute gravity forces\n");
 #endif
-  robotModel = modelState->robotModel();
+#ifdef DEBUG
+  if(h == NULL) return false;
+#endif
+  size_t numDof = modelState->dof();
+  robotModel    = modelState->robotModel();
 
+  world_H_rootLink = modelState->getRootWorldRotoTranslation();
   qj = modelState->qj();
+  g  = modelState->g();
 
-  size_t numDof   = modelState->dof();
   double *qjDot_0 = new double[numDof];
   memset(qjDot_0, 0, numDof*sizeof(double));
 
-  g = modelState->g();
-  world_H_rootLink = modelState->getRootWorldRotoTranslation();
-
-  if( !robotModel->computeGeneralizedBiasForces(qj, world_H_rootLink, qjDot_0, vb_0, g, h) )
+  if ( !robotModel->computeGeneralizedBiasForces(qj, world_H_rootLink, qjDot_0, vb_0, g, h) )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeGeneralizedBiasForces call");
   }
@@ -108,48 +108,44 @@ bool ModelGravityForces::computeFast(int nrhs, const mxArray **prhs)
 
 bool ModelGravityForces::processArguments(int nrhs, const mxArray **prhs)
 {
+#ifdef DEBUG
+  if(h == NULL) return false;
+#endif
   size_t numDof = modelState->dof();
 
-  if( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||
-      mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 )
+  if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||
+       mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 )
   {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state argument dimensions in ModelGeneralisedForces call");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state argument dimensions in ModelGravityForces call");
   }
+  robotModel = modelState->robotModel();
+
   double *pR, *ppos;
   pR   = mxGetPr(prhs[1]);
   ppos = mxGetPr(prhs[2]);
 
-  double R_ro[9];
-  reorderMatrixElements(pR, R_ro);
-
-  wbi::Rotation rotm(R_ro);
-  wbi::Frame tform(rotm, ppos);
-  robotModel = modelState->robotModel();
-
   qj = mxGetPr(prhs[3]);
-
-  double *qjDot_0 = new double[numDof];
-  memset(qjDot_0, 0, numDof*sizeof(double));
 
 #ifdef DEBUG
   mexPrintf("qj received\n");
 
-  for(size_t i = 0; i < numDof; i++)
-  {
+  for (size_t i=0; i < numDof; i++)
     mexPrintf(" %f", *(qj + i));
-  }
 #endif
 
-  world_H_rootLink = tform;
+  double R_ro[9];
+  reorderMatrixInRowMajor(pR, R_ro);
+
+  wbi::Rotation rotm(R_ro);
+  world_H_rootLink = wbi::Frame(rotm, ppos);
+
+  double *qjDot_0 = new double[numDof];
+  memset(qjDot_0, 0, numDof * sizeof(double));
+
   g = modelState->g();
 
-  if(h != NULL)
-  {
-    if( !robotModel->computeGeneralizedBiasForces(qj, world_H_rootLink, qjDot_0, vb_0, g, h) )
-    {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeGeneralizedBiasForces call");
-    }
-  }
+  if( !robotModel->computeGeneralizedBiasForces(qj, world_H_rootLink, qjDot_0, vb_0, g, h) )
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeGeneralizedBiasForces call");
 
   delete[] qjDot_0;
   qjDot_0 = NULL;

@@ -16,6 +16,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details
  */
+
 #ifndef MODELGENERALISEDBIASFORCES_H
 #define MODELGENERALISEDBIASFORCES_H
 
@@ -23,34 +24,36 @@
 
 namespace mexWBIComponent
 {
-class ModelGeneralisedBiasForces : public ModelComponent
-{
-public:
-   static ModelGeneralisedBiasForces* getInstance();
-  /**
-   * Delete the (static) instance of this component,
-   * and set the instance pointer to NULL.
-   */
-  static void deleteInstance();
+  class ModelGeneralisedBiasForces : public ModelComponent
+  {
+    public:
+      static ModelGeneralisedBiasForces *getInstance();
 
-  virtual bool allocateReturnSpace(int, mxArray*[]);
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
+      /**
+       * Delete the (static) instance of this component,
+       * and set the instance pointer to NULL.
+       */
+      static void deleteInstance();
 
-//   virtual bool display(int, const mxArray *[]);
-  virtual ~ModelGeneralisedBiasForces();
+      virtual bool allocateReturnSpace(int, mxArray*[]);
+      virtual bool compute(int, const mxArray *[]);
+      virtual bool computeFast(int, const mxArray *[]);
+      //virtual bool display(int, const mxArray *[]);
 
-private:
-  ModelGeneralisedBiasForces();
-  static ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
-  bool processArguments(int, const mxArray *[]);
+      virtual ~ModelGeneralisedBiasForces();
 
-  double *qj;
-  double *qjDot;
-  double *vb;
-  double *h;
-  double *g;
-};
+    private:
+      ModelGeneralisedBiasForces();
+      bool processArguments(int, const mxArray *[]);
+
+      static ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
+
+      double *qj;
+      double *qjDot;
+      double *vb;
+      double *g;
+      double *h;
+    };
 
 }
 

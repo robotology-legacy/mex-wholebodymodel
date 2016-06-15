@@ -2,18 +2,19 @@ set(SOURCES src/componentmanager.cpp
             src/mexmain.cpp
             src/modelcentroidalmomentum.cpp
             src/modelcomponent.cpp
+            src/modelcorioliscentrifugalforces.cpp
             src/modeldjdq.cpp
             src/modelforwardkinematics.cpp
             src/modelgeneralisedbiasforces.cpp
-            src/modelcorioliscentrifugalforces.cpp
-            src/modelgravityforces.cpp
-            src/modelgetstate.cpp
             src/modelgetfloatingbasestate.cpp
+            src/modelgetstate.cpp
+            src/modelgravityforces.cpp
             src/modelinitialise.cpp
             src/modelinitialiseurdf.cpp
             src/modeljacobian.cpp
             src/modeljointlimits.cpp
             src/modelmassmatrix.cpp
+            src/modelrototranslationmatrix.cpp
             src/modelsetworldframe.cpp
             src/modelstate.cpp
             src/modelupdatestate.cpp
@@ -24,18 +25,19 @@ set(HEADERS include/componentmanager.h
             include/mexwholebodymodelsettings.h
             include/modelcentroidalmomentum.h
             include/modelcomponent.h
+            include/modelcorioliscentrifugalforces.h
             include/modeldjdq.h
             include/modelforwardkinematics.h
             include/modelgeneralisedbiasforces.h
-            include/modelcorioliscentrifugalforces.h
-            include/modelgravityforces.h
-            include/modelgetstate.h
             include/modelgetfloatingbasestate.h
+            include/modelgetstate.h
+            include/modelgravityforces.h
             include/modelinitialise.h
             include/modelinitialiseurdf.h
             include/modeljacobian.h
             include/modeljointlimits.h
             include/modelmassmatrix.h
+            include/modelrototranslationmatrix.h
             include/modelsetworldframe.h
             include/modelstate.h
             include/modelupdatestate.h

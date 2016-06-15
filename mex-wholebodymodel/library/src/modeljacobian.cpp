@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -20,61 +21,61 @@
 //global includes
 
 //library includes
-#include <wbi/iWholeBodyModel.h>
-#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
+// #include <Eigen/Core>
+// #include <wbi/iWholeBodyModel.h>
+#include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 //local includes
-#include <Eigen/Core>
-
 #include "modeljacobian.h"
+
 using namespace mexWBIComponent;
 
-ModelJacobian * ModelJacobian::modelJacobian;
+ModelJacobian *ModelJacobian::modelJacobian;
 
-ModelJacobian::ModelJacobian(): ModelComponent(4,1,1)
+ModelJacobian::ModelJacobian() : ModelComponent(4, 1, 1)
 {
-    j_rowMajor = NULL;
 #ifdef DEBUG
-  mexPrintf("ModelJacobian constructed \n");
+  mexPrintf("ModelJacobian constructed\n");
 #endif
+  j_rowMajor = NULL;
 }
 
 ModelJacobian::~ModelJacobian()
 {
-
-    if(j_rowMajor != NULL){
-        free(j_rowMajor);
-            j_rowMajor = 0;
-    }
+  if(j_rowMajor != NULL) {
+    // free(j_rowMajor);
+    // j_rowMajor = 0;
+    delete[] j_rowMajor;
+    j_rowMajor = NULL;
+  }
 }
 
-bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray* plhs[])
+bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray *plhs[])
 {
 #ifdef DEBUG
   mexPrintf("Trying to allocateReturnSpace in ModelJacobian\n");
 #endif
-  int numDof = modelState->dof();
+  int nCols = modelState->dof() + 6;
 
-  bool returnVal = false;
-
-  plhs[0]=mxCreateDoubleMatrix(6,numDof+6, mxREAL);
+  plhs[0]    = mxCreateDoubleMatrix(6, nCols, mxREAL);
   j_colMajor = mxGetPr(plhs[0]);
 
-    if(j_rowMajor == NULL)
-  {
-      j_rowMajor = (double*)malloc(sizeof(double) * 6 * (numDof + 6));
-  }
-  returnVal = true;
-  return(returnVal);
+  // if(j_rowMajor == NULL)
+  // {
+  //   j_rowMajor = (double*)malloc(sizeof(double)*6*nCols);
+  // }
+  if(j_rowMajor == NULL)
+    j_rowMajor = new double[6*nCols];
+
+  return true;
 }
 
-ModelJacobian * ModelJacobian::getInstance()
+ModelJacobian *ModelJacobian::getInstance()
 {
   if(modelJacobian == NULL)
-  {
     modelJacobian = new ModelJacobian;
-  }
-  return(modelJacobian);
+
+  return modelJacobian;
 }
 
 void ModelJacobian::deleteInstance()
@@ -82,135 +83,150 @@ void ModelJacobian::deleteInstance()
   deleteObject(&modelJacobian);
 }
 
-
 bool ModelJacobian::compute(int nrhs, const mxArray * prhs[])
 {
 #ifdef DEBUG
-  mexPrintf("Trying to compute ModelJacobian \n");
+  mexPrintf("Trying to compute ModelJacobian\n");
 #endif
-  processArguments(nrhs,prhs);
-#ifdef DEBUG
-  mexPrintf("ModelJacobian computed\n");
-#endif
-  return(true);
+  return processArguments(nrhs, prhs);
 }
 
 bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
 {
 #ifdef DEBUG
-  mexPrintf("Trying to fastCompute ModelJacobian \n");
+  mexPrintf("Trying to fast compute ModelJacobian\n");
 #endif
-
-  if(!mxIsChar(prhs[1]))
-  {
-     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
-  }
+#ifdef DEBUG
+  if( (j_rowMajor == NULL) || (j_colMajor == NULL) ) return false;
+#endif
+  if( !mxIsChar(prhs[1]) )
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components");
 
   int numDof = modelState->dof();
 
   qj = modelState->qj();
- world_H_rootLink = modelState->getRootWorldRotoTranslation();
+  world_H_rootLink = modelState->getRootWorldRotoTranslation();
+
   refLink = mxArrayToString(prhs[1]);
   robotModel = modelState->robotModel();
-  int refLinkID;
+
   std::string com("com");
+  int refLinkID = -1; // if refLink = "com"
 
-  if(com.compare(refLink)==0)
-  {
-    refLinkID = -1;
-  }
-  else
-  {
-    //robotModel->getLinkId (refLink, refLinkID);
+  if(com.compare(refLink) != 0)
     robotModel->getFrameList().idToIndex(refLink, refLinkID);
-  }
 
-    modelState = ModelState::getInstance();
+  // if(com.compare(refLink) == 0)
+  // {
+  //   refLinkID = -1;
+  // }
+  // else
+  // {
+  //   //robotModel->getLinkId (refLink, refLinkID);
+  //   robotModel->getFrameList().idToIndex(refLink, refLinkID);
+  // }
 
-  if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j_rowMajor)))
-  {
-     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
-  }
-  int columnMajCtr = 0;
-  for (int i = 0; i<(numDof+6); i++)
-  {
-      for (int j = 0;j<6;j++)
-      {
-          j_colMajor[columnMajCtr] = j_rowMajor[i+j*(numDof+6)];
-          columnMajCtr = columnMajCtr+1;
-      }
-  }
+  // modelState = ModelState::getInstance(); // ??
+
+  if( !(robotModel->computeJacobian(qj, world_H_rootLink, refLinkID, j_rowMajor)) )
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the jacobian call");
+
+  // int columnMajCtr = 0;
+  // for(int i = 0; i < (numDof + 6); i++) // columns
+  // {
+  //   for(int j = 0; j < 6; j++) // rows
+  //   {
+  //     j_colMajor[columnMajCtr] = j_rowMajor[i + j*(numDof + 6)];
+  //     columnMajCtr = columnMajCtr + 1;
+  //   }
+  // }
+
+  // since Matlab uses the column-major order for multi-dimensional arrays,
+  // we have to make an array-transposition ...
+  reorderMatrixInColMajor(j_rowMajor, j_colMajor, 6, numDof+6);
+
 #ifdef DEBUG
-  mexPrintf("ModelJacobian fastComputed\n");
+  mexPrintf("ModelJacobian fast computed\n");
 #endif
-  return(true);
+
+  return true;
 }
 
-bool ModelJacobian::processArguments(int nrhs, const mxArray * prhs[])
+bool ModelJacobian::processArguments(int nrhs, const mxArray *prhs[])
 {
+#ifdef DEBUG
+  if( (j_rowMajor == NULL) || (j_colMajor == NULL) ) return false;
+#endif
   size_t numDof = modelState->dof();
 
-  if(mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || !mxIsChar(prhs[4]))
+  if( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||
+      mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || !mxIsChar(prhs[4]))
   {
-     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions/components");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components");
   }
   robotModel = modelState->robotModel();
 
-  qj = mxGetPr(prhs[3]);
+  double *R_temp, *p_temp;
+  R_temp = mxGetPr(prhs[1]);
+  p_temp = mxGetPr(prhs[2]);
+
+  qj      = mxGetPr(prhs[3]);
   refLink = mxArrayToString(prhs[4]);
 
-  double *R_temp,*p_temp;
-  R_temp = (double *)mxGetPr(prhs[1]);
-  p_temp = (double *)mxGetPr(prhs[2]);
-
-  double tempR[9],tempP[3];
-  for(int i = 0;i<3;i++)
-  {
-     tempP[i] = p_temp[i];
-  }
-  
-  reorderMatrixElements(R_temp, tempR);
-  wbi::Rotation tempRot(tempR);
-  wbi::Frame tempFrame(tempRot, tempP);
-
 #ifdef DEBUG
-  mexPrintf("qj received \n");
+  mexPrintf("qj received\n");
 
-  for(size_t i = 0; i< numDof;i++)
-  {
-    mexPrintf(" %f",qj[i]);
-  }
+  for (size_t i=0; i < numDof; i++)
+    mexPrintf(" %f", *(qj + i));
 #endif
 
-  world_H_rootLink = tempFrame;
+  double tempR[9];//, tempP[3];
+  // for (int i = 0; i < 3; i++)
+  // {
+  //   tempP[i] = p_temp[i];
+  // }
 
-  if(j_rowMajor != NULL && j_colMajor != NULL)
-  {
-    int refLinkID;
+  reorderMatrixInRowMajor(R_temp, tempR);
+  wbi::Rotation tempRot(tempR);
+  // wbi::Frame tempFrame(tempRot, tempP);
+
+  world_H_rootLink = wbi::Frame(tempRot, p_temp); //tempFrame;
+
+  // if (j_rowMajor != NULL && j_colMajor != NULL)
+  // {
     std::string com("com");
+    int refLinkID = -1; // if refLink = "com"
 
-    if(com.compare(refLink)==0)
-    {
-      refLinkID = -1;
-    }
-    else
-    {
+    if(com.compare(refLink) != 0)
       robotModel->getFrameList().idToIndex(refLink, refLinkID);
-    }
-    if(!(robotModel->computeJacobian(qj,world_H_rootLink,refLinkID,j_rowMajor)))
-    {
-      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs","Something failed in the jacobian call");
-    }
-  }
-  int columnMajCtr = 0;
-  for (size_t i = 0; i<(numDof+6); i++)
-  {
-      for (int j = 0;j<6;j++)
-      {
-          j_colMajor[columnMajCtr] = j_rowMajor[i+j*(numDof+6)];
-          columnMajCtr = columnMajCtr+1;
-      }
-  }
 
-  return(true);
+      // int refLinkID;
+      // std::string com("com");
+
+      // if (com.compare(refLink) == 0)
+      // {
+      //   refLinkID = -1;
+      // }
+      // else
+      // {
+      //   robotModel->getFrameList().idToIndex(refLink, refLinkID);
+      // }
+
+    if( !(robotModel->computeJacobian(qj, world_H_rootLink, refLinkID, j_rowMajor)) )
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the jacobian call");
+  // }
+
+  // int columnMajCtr = 0;
+  // for(size_t i=0; i < (numDof + 6); i++) // columns
+  // {
+  //   for(int j=0; j < 6; j++) // rows
+  //   {
+  //     j_colMajor[columnMajCtr] = j_rowMajor[i + j*(numDof + 6)];
+  //     columnMajCtr = columnMajCtr + 1;
+  //   }
+  // }
+
+  reorderMatrixInColMajor(j_rowMajor, j_colMajor, 6, numDof+6);
+
+  return true;
 }

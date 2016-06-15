@@ -24,34 +24,36 @@
 
 namespace mexWBIComponent
 {
-class ModelDjDq : public ModelComponent
-{
-public:
-   static ModelDjDq* getInstance(void);
-  /**
-   * Delete the (static) instance of this component,
-   * and set the instance pointer to NULL.
-   */
-  static void deleteInstance();
+  class ModelDjDq : public ModelComponent
+  {
+    public:
+      static ModelDjDq *getInstance(void);
 
-  virtual bool allocateReturnSpace(int, mxArray*[]);
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
+      /**
+       * Delete the (static) instance of this component,
+       * and set the instance pointer to NULL.
+       */
+      static void deleteInstance();
 
-    //virtual bool display(int, const mxArray *[]);
-  virtual ~ModelDjDq();
+      virtual bool allocateReturnSpace(int, mxArray*[]);
+      virtual bool compute(int, const mxArray *[]);
+      virtual bool computeFast(int, const mxArray *[]);
+      //virtual bool display(int, const mxArray *[]);
 
-private:
-  ModelDjDq(void);
-  static ModelDjDq *modelDjDq;
-  bool processArguments(int, const mxArray *[]);
+      virtual ~ModelDjDq();
 
-  double *qj;
-  double *qjDot;
-  double *vb;
-  double *Djdq;
-  char *refLink;
-};
+    private:
+      ModelDjDq(void);
+      bool processArguments(int, const mxArray *[]);
+
+      static ModelDjDq *modelDjDq;
+
+      double *qj;
+      double *qjDot;
+      double *vb;
+      char   *refLink;
+      double *Djdq;
+  };
 
 }
 

@@ -27,7 +27,7 @@ namespace mexWBIComponent
   class ModelCoriolisCentrifugalForces : public ModelComponent
   {
     public:
-      static ModelCoriolisCentrifugalForces* getInstance();
+      static ModelCoriolisCentrifugalForces *getInstance();
 
       /**
        * Delete the (static) instance of this component,
@@ -43,14 +43,15 @@ namespace mexWBIComponent
 
     private:
       ModelCoriolisCentrifugalForces();
-      static ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
       bool processArguments(int, const mxArray**);
 
+      static ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
+
+      static double g_0[3];
       double *qj;
       double *qjDot;
       double *vb;
       double *h;
-      static double g_0[3];
   };
 
 }

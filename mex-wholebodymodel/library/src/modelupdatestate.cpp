@@ -18,38 +18,33 @@
  */
 
 
-// global includes
+//global includes
 
-// library includes
-#include <wbi/iWholeBodyModel.h>
-#include <mex.h>
+//library includes
+// #include <wbi/iWholeBodyModel.h>
+// #include <mex.h>
 
-
-// local includes
+//local includes
 #include "modelupdatestate.h"
-#include "modelstate.h"
-
+// #include "modelstate.h"
 
 using namespace mexWBIComponent;
 
 ModelUpdateState *ModelUpdateState::modelUpdateState;
 
-ModelUpdateState::ModelUpdateState() : ModelComponent(3,3,0)
+ModelUpdateState::ModelUpdateState() : ModelComponent(3, 3, 0)
 {
 #ifdef DEBUG
-  mexPrintf("ModelUpdateState constructed \n");
+  mexPrintf("ModelUpdateState constructed\n");
 #endif
-
 }
 
-ModelUpdateState * ModelUpdateState::getInstance()
+ModelUpdateState *ModelUpdateState::getInstance()
 {
   if(modelUpdateState == NULL)
-  {
     modelUpdateState = new ModelUpdateState;
-  }
 
-  return(modelUpdateState);
+  return modelUpdateState;
 }
 
 void ModelUpdateState::deleteInstance()
@@ -70,9 +65,7 @@ bool ModelUpdateState::compute(int nrhs, const mxArray *prhs[])
   mexPrintf("Trying to compute ModelUpdateState\n");
 #endif
   robotModel = modelState->robotModel();
-  bool retVal = setState(nrhs,prhs);
-  return(retVal);
-
+  return setState(nrhs, prhs);
 }
 
 bool ModelUpdateState::computeFast(int nrhs, const mxArray *prhs[])
@@ -81,43 +74,41 @@ bool ModelUpdateState::computeFast(int nrhs, const mxArray *prhs[])
   mexPrintf("Trying to compute ModelUpdateState\n");
 #endif
   robotModel = modelState->robotModel();
-  bool retVal = setState(nrhs,prhs);
-  return(retVal);
+  return setState(nrhs, prhs);
 }
 
-bool ModelUpdateState::allocateReturnSpace(int nlhs, mxArray* plhs[])
+bool ModelUpdateState::allocateReturnSpace(int nlhs, mxArray *plhs[])
 {
-
 #ifdef DEBUG
   mexPrintf("Trying to allocate memory in ModelUpdateState (nothing to do really)\n");
 #endif
-  return(true);
 
+  return true;
 }
 
-bool ModelUpdateState::setState(int nrhs, const mxArray* prhs[])
+bool ModelUpdateState::setState(int nrhs, const mxArray *prhs[])
 {
-    size_t numDof = modelState->dof();
+  size_t numDof = modelState->dof();
 
-    if(mxGetM(prhs[1])!=numDof || mxGetN(prhs[1])!=1 || mxGetM(prhs[2])!=numDof ||mxGetN(prhs[2])!=1 || mxGetM(prhs[3])!=6 || mxGetN(prhs[3])!=1)
-    {
-      mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs","Malformed state dimensions / inputs");
-    }
+  if( mxGetM(prhs[1]) != numDof || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != numDof ||
+      mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != 6 || mxGetN(prhs[3]) != 1 )
+  {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions / inputs");
+  }
 #ifdef DEBUG
-       mexPrintf("Updating state\n");
+  mexPrintf("Updating state\n");
 #endif
-     robotModel = modelState->robotModel();
-     double *q_temp,*dq_temp,*dxb_temp;
-      q_temp = (double *)mxGetPr(prhs[1]);
-      dq_temp = (double *)mxGetPr(prhs[2]);
-      dxb_temp = (double *)mxGetPr(prhs[3]);
+  robotModel = modelState->robotModel();
 
-      modelState->setState(q_temp,dq_temp,dxb_temp);
+  double *q_temp, *dq_temp, *dxb_temp;
+  q_temp   = mxGetPr(prhs[1]);
+  dq_temp  = mxGetPr(prhs[2]);
+  dxb_temp = mxGetPr(prhs[3]);
+
+  modelState->setState(q_temp, dq_temp, dxb_temp);
 
 #ifdef DEBUG
-      mexPrintf("Updated state : (q,dq)\n");
-
-      mexPrintf("Updated State\n");
+  mexPrintf("Updated State\n");
 #endif
-  return(true);
+  return true;
 }

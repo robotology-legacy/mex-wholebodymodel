@@ -27,7 +27,7 @@ namespace mexWBIComponent
   class ModelGravityForces : public ModelComponent
   {
     public:
-      static ModelGravityForces* getInstance();
+      static ModelGravityForces *getInstance();
 
       /**
        * Delete the (static) instance of this component,
@@ -43,13 +43,14 @@ namespace mexWBIComponent
 
     private:
       ModelGravityForces();
-      static ModelGravityForces *modelGravityForces;
       bool processArguments(int, const mxArray**);
 
-      double *qj;
-      double *h;
-      double *g;
+      static ModelGravityForces *modelGravityForces;
+
       static double vb_0[6];
+      double *qj;
+      double *g;
+      double *h;
   };
 
 }

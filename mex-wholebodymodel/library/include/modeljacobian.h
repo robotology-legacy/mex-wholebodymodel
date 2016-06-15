@@ -20,52 +20,49 @@
 #ifndef MODELJACOBIAN_H
 #define MODELJACOBIAN_H
 
-#include "modelcomponent.h"
-#include "wbi/iWholeBodyModel.h"
-#include "wbi/wbiUtil.h"
+//global includes
 
+//library includes
+// #include "wbi/iWholeBodyModel.h"
+// #include "wbi/wbiUtil.h"
 
 //local includes
-#include "mexwholebodymodelsettings.h"
+#include "modelcomponent.h"
+// #include "mexwholebodymodelsettings.h"
 
-
-namespace mexWBIComponent{
-class ModelJacobian : public ModelComponent
+namespace mexWBIComponent
 {
-public:
+  class ModelJacobian : public ModelComponent
+  {
+    public:
+      static ModelJacobian *getInstance();
 
+      /**
+       * Delete the (static) instance of this component,
+       * and set the instance pointer to NULL.
+       */
+      static void deleteInstance();
 
-  static ModelJacobian* getInstance();
+      virtual bool allocateReturnSpace(int, mxArray *[]);
+      virtual bool compute(int, const mxArray *[]);
+      virtual bool computeFast(int, const mxArray *[]);
+      //virtual bool display(int, const mxArray *[]);
+      //virtual const int numReturns();
 
-  /**
-   * Delete the (static) instance of this component,
-   * and set the instance pointer to NULL.
-   */
-  static void deleteInstance();
+      virtual ~ModelJacobian();
 
-//   virtual const int numReturns();
-//   virtual bool display(int, const mxArray *[]);
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
-  virtual bool allocateReturnSpace(int, mxArray *[]);
+    private:
+      ModelJacobian();
+      bool processArguments(int, const mxArray *[]);
 
-  virtual ~ModelJacobian();
-private:
-  ModelJacobian();
-  static ModelJacobian* modelJacobian;
+      static ModelJacobian *modelJacobian;
 
-  bool processArguments(int, const mxArray *[]);
+      double *qj;
+      char   *refLink;
+      double *j_rowMajor; //[6*(6+MEX_WBMODEL_MAX_NUM_JOINTS)];
+      double *j_colMajor;
+  };
 
-//<<<<<< HEAD
-  double *j_colMajor;
-  double *j_rowMajor;//[6*(6+MEX_WBMODEL_MAX_NUM_JOINTS)];
-//=======
-//   double *j;
-//   double *temporaryJacobian;
-// >>>>>>> 2079d9e9aecaad2016bf292be94bc8c6b2688f1a
-  double *qj;
-  char * refLink;
-
-};
 }
+
 #endif // MODELJACOBIAN_H

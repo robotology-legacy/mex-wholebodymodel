@@ -21,40 +21,40 @@
 #define COMPONENTNMAINTAINER_H
 
 //standard includes
-#include <string.h>
+// #include <string.h>
 
-// external headers
+//external headers
 #include <mex.h>
 
-// forward declarations
-namespace mexWBIComponent{
-  class ModelState;
-  class ModelComponent;
-  class ModelJointLimits;
-  class ModelUpdateState;
-  class ModelGetState;
-  class ModelGetFloatingBaseState;
-  class ModelGeneralisedBiasForces;
-  class ModelCoriolisCentrifugalForces;
-  class ModelGravityForces;
-  class ModelDjDq;
-  class ModelJacobian;
-  class ModelInitialiseURDF;
-  class ModelForwardKinematics;
-  class ModelVisualizeTrajectory;
+//forward declarations
+namespace mexWBIComponent
+{
   class ModelCentroidalMomentum;
-  class ModelMassMatrix;
-  class ModelSetWorldFrame;
+  class ModelComponent;
+  class ModelCoriolisCentrifugalForces;
+  class ModelDjDq;
+  class ModelForwardKinematics;
+  class ModelGeneralisedBiasForces;
+  class ModelGetFloatingBaseState;
+  class ModelGetState;
+  class ModelGravityForces;
   class ModelInitialise;
+  class ModelInitialiseURDF;
+  class ModelJacobian;
+  class ModelJointLimits;
+  class ModelMassMatrix;
+  class ModelRotoTranslationMatrix;
+  class ModelSetWorldFrame;
+  class ModelState;
+  class ModelUpdateState;
+  class ModelVisualizeTrajectory;
 }
-//#include "modelsetworldlink.h"
 
 namespace mexWBIComponent
 {
   class ComponentManager
-  {
+{
   public:
-
     static ComponentManager *getInstance(std::string robotName = "icub");
 
     /**
@@ -63,34 +63,37 @@ namespace mexWBIComponent
      */
     static void deleteInstance();
 
-    bool processFunctionCall(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]);
+    bool processFunctionCall(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void cleanup();
-     ~ComponentManager(void);
-
     //int getDofs();
+
+    ~ComponentManager(void);
+
   private:
     ComponentManager(std::string);
-    static ComponentManager *componentManager;
     void initialise(std::string);
 
-    ModelState *modelState;
+    static ComponentManager *componentManager;
+
+    ModelCentroidalMomentum *modelCentroidalMomentum;
     ModelComponent *currentComponent;
-    ModelJointLimits *modelJointLimits;
-    ModelMassMatrix *modelMassMatrix;
-    ModelUpdateState *modelUpdateState;
-    ModelGetState *modelGetState;
-    ModelGetFloatingBaseState *modelGetFloatingBaseState;
-    ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
     ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
-    ModelGravityForces *modelGravityForces;
     ModelDjDq *modelDjDq;
-    ModelJacobian *modelJacobian;
+    ModelForwardKinematics *modelForwardKinematics;
+    ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
+    ModelGetFloatingBaseState *modelGetFloatingBaseState;
+    ModelGetState *modelGetState;
+    ModelGravityForces *modelGravityForces;
     ModelInitialise *modelInitialise;
     ModelInitialiseURDF *modelInitialiseURDF;
-    ModelForwardKinematics *modelForwardKinematics;
-    ModelVisualizeTrajectory *modelVisualizeTrajectory;
-    ModelCentroidalMomentum *modelCentroidalMomentum;
+    ModelJacobian *modelJacobian;
+    ModelJointLimits *modelJointLimits;
+    ModelMassMatrix *modelMassMatrix;
+    ModelRotoTranslationMatrix *modelRotoTranslationMatrix;
     ModelSetWorldFrame *modelSetWorldFrame;
+    ModelState *modelState;
+    ModelUpdateState *modelUpdateState;
+    ModelVisualizeTrajectory *modelVisualizeTrajectory;
 
     int numDof;
 

@@ -198,7 +198,8 @@ classdef WBM < WBM.WBMBase
             axis square;
         end
 
-        % function visualizeTrajectory_iCubGUI(obj, t, stmChi) % does not work (Matlab hangs when it calls the mex-function)
+        % Experimental: method does not work at the moment (Matlab hangs when it calls the mex-function)
+        % function visualizeTrajectory_iCubGUI(obj, t, stmChi)
         %     if (nargin < 2)
         %         error('WBM::visualizeTrajectory_iCubGUI: %s', WBM.wbmErrorMsg.WRONG_ARG);
         %     end

@@ -20,41 +20,44 @@
 #ifndef MODELUPDATESTATE_H
 #define MODELUPDATESTATE_H
 
-// global includes
+//global includes
 
-// library includes
+//library includes
 
-// local includes
+//local includes
 #include "modelcomponent.h"
 
-namespace mexWBIComponent{
-
-class ModelUpdateState : public ModelComponent
+namespace mexWBIComponent
 {
-public:
-  static ModelUpdateState* getInstance();
+  class ModelUpdateState : public ModelComponent
+  {
+    public:
+      static ModelUpdateState *getInstance();
 
-  /**
-   * Delete the (static) instance of this component,
-   * and set the instance pointer to NULL.
-   */
-  static void deleteInstance();
+      /**
+       * Delete the (static) instance of this component,
+       * and set the instance pointer to NULL.
+       */
+      static void deleteInstance();
 
-  virtual bool allocateReturnSpace(int, mxArray*[]);
-//   virtual bool display(int, const mxArray *[]);
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
+      virtual bool allocateReturnSpace(int, mxArray*[]);
+      virtual bool compute(int, const mxArray *[]);
+      virtual bool computeFast(int, const mxArray *[]);
+      //virtual bool display(int, const mxArray *[]);
 
-  virtual ~ModelUpdateState();
-private:
-  ModelUpdateState();
-  static ModelUpdateState *modelUpdateState;
-//   const int numReturnArguments;
+      virtual ~ModelUpdateState();
 
-  bool setState(int, const mxArray *[]);
-//   wbi::Frame updateBaseFrame(double *);
-  Eigen::Matrix4d H_w2b;
-};
+    private:
+      ModelUpdateState();
+      bool setState(int, const mxArray *[]);
+      //wbi::Frame updateBaseFrame(double*);
+
+      static ModelUpdateState *modelUpdateState;
+
+      //const int numReturnArguments;
+      Eigen::Matrix4d H_w2b;
+  };
+
 }
 
 #endif // MODELUPDATESTATE_H

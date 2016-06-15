@@ -21,36 +21,40 @@
 #define MODELMASSMATRIX_H
 
 #include "modelcomponent.h"
-#include "wbi/iWholeBodyModel.h"
-#include "wbi/wbiUtil.h"
+// #include "wbi/iWholeBodyModel.h"
+// #include "wbi/wbiUtil.h"
 
-
-namespace mexWBIComponent{
-class ModelMassMatrix : public ModelComponent
+namespace mexWBIComponent
 {
-public:
+  class ModelMassMatrix : public ModelComponent
+  {
+  public:
 
-  static ModelMassMatrix* getInstance();
+    static ModelMassMatrix *getInstance();
 
-  /**
-   * Delete the (static) instance of this component,
-   * and set the instance pointer to NULL.
-   */
-  static void deleteInstance();
+    /**
+     * Delete the (static) instance of this component,
+     * and set the instance pointer to NULL.
+     */
+    static void deleteInstance();
 
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
-  virtual bool allocateReturnSpace(int, mxArray *[]);
+    virtual bool allocateReturnSpace(int, mxArray *[]);
+    virtual bool compute(int, const mxArray *[]);
+    virtual bool computeFast(int, const mxArray *[]);
 
-  virtual ~ModelMassMatrix();
-private:
- // ModelJointLimits(int = 0, mxArray * = NULL );
-  ModelMassMatrix();
-  static ModelMassMatrix* modelMassMatrix;
+    virtual ~ModelMassMatrix();
 
-  bool processArguments(int, const mxArray *[]);
-  double *massMatrix;
-  double *qj;
-};
+  private:
+    ModelMassMatrix();
+    bool processArguments(int, const mxArray *[]);
+    //ModelJointLimits(int = 0, mxArray* = NULL );
+
+    static ModelMassMatrix *modelMassMatrix;
+
+    double *qj;
+    double *massMatrix;
+  };
+
 }
+
 #endif // MODELMASSMATRIX_H

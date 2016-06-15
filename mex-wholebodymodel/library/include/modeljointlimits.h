@@ -21,38 +21,39 @@
 #define MODELJOINTLIMITS_H
 
 # include <modelcomponent.h>
-#include <stdio.h>
-# include <mex.h>
-#include<yarpWholeBodyInterface/yarpWholeBodyModel.h>
-// # include <wbiIcub/icubWholeBodyModel.h>
+// #include <stdio.h>
+// #include <mex.h>
+// #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
+// #include <wbiIcub/icubWholeBodyModel.h>
 
-namespace mexWBIComponent{
-
-class ModelJointLimits : public ModelComponent
+namespace mexWBIComponent
 {
-public:
+  class ModelJointLimits : public ModelComponent
+  {
+    public:
+      static ModelJointLimits *getInstance();
 
-  virtual ~ModelJointLimits();
-  static ModelJointLimits* getInstance();
+      /**
+       * Delete the (static) instance of this component,
+       * and set the instance pointer to NULL.
+       */
+      static void deleteInstance();
 
-  /**
-   * Delete the (static) instance of this component,
-   * and set the instance pointer to NULL.
-   */
-  static void deleteInstance();
+      virtual bool allocateReturnSpace(int, mxArray *[]);
+      virtual bool compute(int, const mxArray *[]);
+      virtual bool computeFast(int, const mxArray *[]);
+      //virtual bool display(int, const mxArray *[]);
 
-  //virtual bool display(int, const mxArray *[]);
-  virtual bool allocateReturnSpace(int, mxArray *[]);
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
+      virtual ~ModelJointLimits();
 
+    private:
+      ModelJointLimits();
 
+      static ModelJointLimits *modelJointLimits;
 
-private:
-  ModelJointLimits();
-  static ModelJointLimits* modelJointLimits;
-  double *jointLowerLimit, *jointUpperLimit;
-};
+      double *jointLowerLimit;
+      double *jointUpperLimit;
+  };
 
 }
 
