@@ -70,7 +70,6 @@ omegaWorldBase     = transpose(RotBase)*omegaBaseWorld;
 dquatBase          = quaternionDerivative(omegaWorldBase,quatBase);      
 NuQuat             = [VelBase;dquatBase;dqj];
 dNu                = M\(Jc'*fc + [zeros(6,1); tau]-h);
-
 % state derivative 
 dchi               = [NuQuat;dNu];
 

@@ -22,8 +22,8 @@ clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Integration setup 
 CONFIG.demo_movements                       = 1;                           %either 0 or 1
-CONFIG.feet_on_ground                       = [1,1];                       %either 0 or 1; [left,right]
-CONFIG.controller                           = 'StackOfTask';                %either 'StackOfTask' or 'JointSpace'
+CONFIG.feet_on_ground                       = [1,0];                       %either 0 or 1; [left,right]
+CONFIG.controller                           = 'StackOfTask';               %either 'StackOfTask' or 'JointSpace'
 
 %% Linearized system analysis, gains tuning and QP solver. All these tools
 %% are available only for the 'Stack of Task' controller
@@ -40,7 +40,7 @@ CONFIG.optimization_algorithm               = 'NonLinLsq';
 CONFIG.visualize_robot_simulator            = 1;                           %either 0 or 1
 CONFIG.visualize_integration_results        = 1;                           %either 0 or 1
 CONFIG.visualize_joints_dynamics            = 1;                           %either 0 or 1
-CONFIG.visualize_gains_tuning_results       = 1;                           %either 0 or 1; available only if linearize_for_gains_tuning        = 1
+CONFIG.visualize_gains_tuning_results       = 0;                           %either 0 or 1; available only if linearize_for_gains_tuning        = 1
 
 % if the visualization of stability analysis results is activated, the 
 % inverse kinematics solver will be used, too. This is because it is necessary 
@@ -56,7 +56,7 @@ CONFIG.sim_step                              = 0.01;
 %% Allow the joints references generation using inverse kinematics
 % it will be automatically activated if the "Joint Space" controller is used, 
 % or the visualization of stability analysis results is active.
-CONFIG.jointRef_with_ikin                    = 0;                          %either 0 or 1
+CONFIG.jointRef_with_ikin                    = 1;                          %either 0 or 1
 CONFIG.visualize_ikin_results                = 0;                          %either 0 or 1  
 CONFIG.ikin_integration_step                 = 0.01; 
 
@@ -90,9 +90,12 @@ if CONFIG.integrateWithFixedStep == 1
 CONFIG.massCorr = 0.05; 
 end
 
+% if one wants to use the postural correction, it is necessary to define
+% the joint references using inverse kinematics, or add a correction to the
+% mass matrix
 if CONFIG.postCorrection == 1
-    CONFIG.jointRef_with_ikin                    = 1;
-% CONFIG.massCorr = 0.05; 
+    CONFIG.jointRef_with_ikin     = 1;
+%   CONFIG.massCorr               = 0.05; 
 end
 
 %% Initialize the model

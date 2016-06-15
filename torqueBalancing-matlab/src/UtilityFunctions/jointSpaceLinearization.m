@@ -52,7 +52,6 @@ posFoot      = posRFoot;
 end
 
 r            = posFoot - xCoM;
-
 A            = [eye(3)   zeros(3);
                 skew(r)  eye(3) ];
 pinvA        = eye(6)/A;
@@ -82,34 +81,11 @@ pinvLambda         =  pinv(Lambda,pinv_tol);
 NullLambda         =  eye(ndof) - pinvLambda*Lambda;
 JG                 =  JH(:,7:end)-JH(:,1:6)*(eye(6)/Jb)*Jj;
 
-%% COUPLING FOR TWO FEET BALANCING
-if sum(feet_on_ground) == 1
-
-CorrMatrix              = eye(ndof);
-JGCorrMatrixT1          = JG;
-else
-% the constrained partial derivatives for the robot balancing on 2 feet
-% should be unnecessary. This case is still under investigation, however
-% for now the linearization is performed as in the 1 foot case.
-%
-% JL     = Jj(1:6,14:19);
-% JR     = Jj(7:end,20:25);
-% JBl    = Jb(1:6,:);
-% JBr    = Jb(7:end,:);
-% dLegs  = JR\(JBr/JBl*JL);
-% 
-% CorrMatrix              = eye(ndof);
-% CorrMatrix(20:25,14:19) = dLegs;
-% JGCorrMatrixT1          = [JG(1:3,:);JG(4:6,:)*CorrMatrix];
-CorrMatrix                = eye(ndof);
-JGCorrMatrixT1            = JG;
-end
-
 %% Stiffness matrix
-KS     = invMbar*(-pinvLambda*MultFirstTask*intMomentumGains*JGCorrMatrixT1 + NullLambda*impedances*posturalCorr*CorrMatrix);
+KS     = invMbar*(-pinvLambda*MultFirstTask*intMomentumGains*JG + NullLambda*impedances*posturalCorr);
 
 %% Damping matrix
-KD     = invMbar*(-pinvLambda*MultFirstTask*MomentumGains*JGCorrMatrixT1 + NullLambda*dampings*posturalCorr*CorrMatrix);
+KD     = invMbar*(-pinvLambda*MultFirstTask*MomentumGains*JG + NullLambda*dampings*posturalCorr);
 
 %% Verify the state matrix
 AStateOld     = [zeros(ndof) eye(ndof);
@@ -139,14 +115,14 @@ linearization.KD          = KD;
 linearization.KDdes       = gainsInit.KDdes;
 linearization.KSdes       = gainsInit.KSdes;
 linearization.ACartesian  = -invMbar*pinvLambda*MultFirstTask;
-linearization.BCartesian  =  JGCorrMatrixT1;
+linearization.BCartesian  =  JG;
 linearization.ANull       =  invMbar*NullLambda;
 
 if CONFIG.postCorrection == 1
-linearization.BNull      =  NullLambda*Mbar*CorrMatrix;
-%Linearization.BNull     =  posturalCorr*CorrMatrix;
+linearization.BNull      =  NullLambda*Mbar;
+%Linearization.BNull     =  posturalCorr;
 else
-linearization.BNull      =  posturalCorr*CorrMatrix;
+linearization.BNull      =  posturalCorr;
 end
 
 end

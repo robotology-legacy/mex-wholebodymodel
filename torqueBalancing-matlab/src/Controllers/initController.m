@@ -66,15 +66,15 @@ end
 % this will avoid numerical errors during the forward dynamics integration
 if     feet_on_ground(1) == 1 && feet_on_ground(2) == 0
 
-DeltaPoseFeet  = DeltaPoseLFoot;
+DeltaPoseFeet    = DeltaPoseLFoot;
       
 elseif feet_on_ground(1) == 0 && feet_on_ground(2) == 1
      
-DeltaPoseFeet  = DeltaPoseRFoot;          
+DeltaPoseFeet    = DeltaPoseRFoot;          
 
 elseif feet_on_ground(1) == 1 && feet_on_ground(2) == 1
     
-DeltaPoseFeet  = [DeltaPoseLFoot;DeltaPoseRFoot];    
+DeltaPoseFeet    = [DeltaPoseLFoot;DeltaPoseRFoot];    
 end
 
 %% REAL CONTACT FORCES COMPUTATION

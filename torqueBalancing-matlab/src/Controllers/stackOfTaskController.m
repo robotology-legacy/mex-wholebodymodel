@@ -47,6 +47,8 @@ m                   = M(1,1);
 Mb                  = M(1:6,1:6);
 Mbj                 = M(1:6,7:end);
 Mj                  = M(7:end,7:end);
+Mjb                 = M(7:end,1:6);
+Mbar                = Mj - Mjb/Mb*Mbj;
 
 %% Forward kinematics
 xCoM                = FORKINEMATICS.xCoM;
@@ -126,7 +128,7 @@ NullLambda         = eye(ndof)-pinvLambda*Lambda;
 Sigma              = -(pinvLambda*JcMinvJct + NullLambda*JBar);
 SigmaNA            =  Sigma*Nullfc;
 tauModel           =  pinvLambda*(JcMinv*h - dJcNu) + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
-                     + Mj*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
+                     +Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
 
 %% Desired contact forces computation
 fcHDot             = pinvA*(HDotDes - f_grav);
@@ -151,19 +153,16 @@ controlParam.Nullfc   = Nullfc;
 controlParam.A        = A;
 
 %% Desired nonLinear joints accelerations for the linearized system analysis
-Mjb          = M(7:end,1:6);
-Mbar         = Mj - Mjb/Mb*Mbj;
-Mbar_inv     = eye(ndof)/Mbar;
-%Mbar_inv    = Mbar'/(Mbar*Mbar' + pinv_damp*eye(size(Mbar,1)));
-JcBase       = Jc(:,1:6);
-JcJoint      = Jc(:,7:end);
-B2           = (JcJoint - JcBase/Mb*Mbj)*Mbar_inv;
-B3           = JcBase/Mb*transpose(JcBase)*pinvA;
-pinvB2       = pinv(B2,pinv_tol);
-CbNu         = CNu(1:6);
-NullB2       = eye(ndof) - pinvB2*B2;
-u0           = -Mbar*ddqjRef+ impedances*posturalCorr*qjTilde +dampings*posturalCorr*dqjTilde;
-
-controlParam.ddqjNonLin   = -Mbar_inv*(pinvB2*(B3*(HDotDes-CbNu)+dJcNu) + NullB2*u0);
+JcBase                   = Jc(:,1:6);
+JcJoint                  = Jc(:,7:end);
+invMbar                  = eye(ndof)/Mbar;
+%invMbar                 = Mbar'/(Mbar*Mbar' + pinv_damp*eye(size(Mbar,1)));
+LambdaNonLin             = (JcJoint - JcBase/Mb*Mbj)*invMbar;
+pinvLambdaNonLin         = pinv(LambdaNonLin,pinv_tol);
+B                        = JcBase/Mb*transpose(JcBase)*pinvA;
+CbNu                     = CNu(1:6);
+NullLambdaNonLin         = eye(ndof) - pinvLambdaNonLin*LambdaNonLin;
+u0                       = -Mbar*ddqjRef + impedances*posturalCorr*qjTilde + dampings*posturalCorr*dqjTilde;
+controlParam.ddqjNonLin  = -invMbar*(pinvLambdaNonLin*(B*(HDotDes-CbNu)+dJcNu) + NullLambdaNonLin*u0);
 
 end
