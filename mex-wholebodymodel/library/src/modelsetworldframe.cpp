@@ -19,10 +19,8 @@
  */
 
 // global includes
-// #include <string.h>
 
 // library includes
-// #include <wbi/iWholeBodyModel.h>
 
 // local includes
 #include "modelsetworldframe.h"
@@ -73,15 +71,10 @@ bool ModelSetWorldFrame::compute(int nrhs, const mxArray *prhs[])
   p_temp = mxGetPr(prhs[2]);
   g_temp = mxGetPr(prhs[3]);
 
-  double tempR[9];//, tempP[3];
-
-  // for (int i = 0; i < 3; i++)
-  // {
-  //   tempP[i] = p_temp[i];
-  // }
+  double tempR[9];
   reorderMatrixInRowMajor(R_temp, tempR);
   wbi::Rotation tempRot(tempR);
-  wbi::Frame tempFrame(tempRot, p_temp); //tempP);
+  wbi::Frame tempFrame(tempRot, p_temp);
 
   modelState->setRootWorldRotoTranslation(tempFrame);
   modelState->setGravity(g_temp);
@@ -98,24 +91,9 @@ bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray* prhs[])
   R_temp = mxGetPr(prhs[1]);
   p_temp = mxGetPr(prhs[2]);
 
-  // double tempR[9], tempP[3];
-  // for (int i = 0; i < 9; i++)
-  // {
-  //   tempR[i] = R_temp[i];
-  //   if (i < 3)
-  //   {
-  //     tempP[i] = p_temp[i];
-  //   }
-  // }
-
-  wbi::Rotation tempRot(R_temp); //tempR);
-  wbi::Frame tempFrame(tempRot, p_temp); //tempP);
-
-  //H_baseLink_wrWorld = temp;
-  //H_baseLink_wrWorld = tempFrame;
+  wbi::Rotation tempRot(R_temp);
+  wbi::Frame tempFrame(tempRot, p_temp);
 
   modelState->setRootWorldRotoTranslation(tempFrame);
-  //mexPrintf("Roto translation of world from base frame applied\n");
-
   return true;
 }

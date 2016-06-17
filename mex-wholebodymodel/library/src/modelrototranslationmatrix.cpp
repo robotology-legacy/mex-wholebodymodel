@@ -17,12 +17,12 @@
  * Public License for more details
  */
 
-//global includes
+// global includes
 
-//library includes
+// library includes
 #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
-//local includes
+// local includes
 #include "modelrototranslationmatrix.h"
 
 using namespace mexWBIComponent;
@@ -85,7 +85,7 @@ bool ModelRotoTranslationMatrix::computeFast(int nrhs, const mxArray **prhs)
 
   robotModel = modelState->robotModel();
   std::string strCom = "com";
-  int refLinkID = -1; // ID for ref. link "com" is -1
+  int refLinkID = -1; // the ID for ref. link "com" is -1
 
   strRefLink = mxArrayToString(prhs[1]);
   if(strCom.compare(strRefLink) != 0) // if strRefLink != "com"
@@ -146,7 +146,7 @@ bool ModelRotoTranslationMatrix::processArguments(int nrhs, const mxArray **prhs
   world_H_rootLink = wbi::Frame(rotm, ppos);
 
   std::string strCom = "com";
-  int refLinkID = -1; // the ID for ref. link "com" is -1
+  int refLinkID = -1; // if ref. link = "com"
 
   if(strCom.compare(strRefLink) != 0) // if strRefLink != "com"
     robotModel->getFrameList().idToIndex(strRefLink, refLinkID);

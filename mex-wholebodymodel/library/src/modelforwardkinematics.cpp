@@ -19,13 +19,11 @@
  */
 
 // global includes
-// #include <string.h>
 
 // library includes
 #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
-// #include <wbi/wbiUtil.h>
 
-//local includes
+// local includes
 #include "modelforwardkinematics.h"
 
 using namespace mexWBIComponent;
@@ -93,38 +91,18 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray *prhs[])
     mexPrintf(" %f", *(qj + i));
 #endif
 
-  double tempR[9];//, tempP[3];
-  // for (int i = 0; i < 3; i++)
-  // {
-  //   tempP[i] = p_temp[i];
-  // }
-
+  double tempR[9];
   reorderMatrixInRowMajor(R_temp, tempR);
   wbi::Rotation tempRot(tempR);
-  // wbi::Frame tempFrame(tempRot, tempP);
 
-  world_H_rootLink = wbi::Frame(tempRot, p_temp); //tempFrame;
+  world_H_rootLink = wbi::Frame(tempRot, p_temp);
 
-  // if(xT != NULL)
-  // {
   std::string com("com");
   int refLinkID = -1; // if refLink = "com"
 
   if(com.compare(refLink) != 0)
     if( !robotModel->getFrameList().idToIndex(refLink, refLinkID) )
       mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "forwardKinematics call Link ID does not exist");
-
-  // if(com.compare(refLink) == 0)
-  // {
-  //   refLinkID = -1;
-  // }
-  // else
-  // {
-  //   if( !robotModel->getFrameList().idToIndex(refLink, refLinkID) )
-  //   {
-  //     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs", "forwardKinematics call Link ID does not exist");
-  //   }
-  // }
 
   double xTemp[7];
   if( !(robotModel->forwardKinematics(qj, world_H_rootLink, refLinkID, xTemp)) )
@@ -133,10 +111,6 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray *prhs[])
   int i;
   for(i=0; i < 3; i++)
     *(xT + i) = *(xTemp + i);
-
-  // xT[0] = xTemp[0];
-  // xT[1] = xTemp[1];
-  // xT[2] = xTemp[2];
 
   double axisAngTemp[] = {xTemp[3], xTemp[4], xTemp[5], xTemp[6]}, quatTemp[4];
   wbi::Rotation R = wbi::Rotation::axisAngle(axisAngTemp);
@@ -153,12 +127,6 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray *prhs[])
   R.getQuaternion(quatTemp[1], quatTemp[2], quatTemp[3], quatTemp[0]);
   for(i=0; i < 4; i++)
     *(xT + 3+i) = *(quatTemp + i);
-
-  // xT[3] = quatTemp[0];
-  // xT[4] = quatTemp[1];
-  // xT[5] = quatTemp[2];
-  // xT[6] = quatTemp[3];
-  // }
 
   return true;
 }
@@ -187,18 +155,6 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray *prhs[])
     if( !robotModel->getFrameList().idToIndex(refLink, refLinkID) )
       mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "forwardKinematics call Link ID does not exist");
 
-  // if(com.compare(refLink) == 0)
-  // {
-  //   refLinkID = -1;
-  // }
-  // else
-  // {
-  //   if(!robotModel->getFrameList().idToIndex(refLink, refLinkID))
-  //   {
-  //     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs", "forwardKinematics call Link ID does not exist");
-  //   }
-  // }
-
   double xTemp[7];
   if( !(robotModel->forwardKinematics(qj, world_H_rootLink, refLinkID, xTemp)) )
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the forwardKinematics call");
@@ -206,10 +162,6 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray *prhs[])
   int i;
   for(i=0; i < 3; i++)
     *(xT + i) = *(xTemp + i);
-
-  // xT[0] = xTemp[0];
-  // xT[1] = xTemp[1];
-  // xT[2] = xTemp[2];
 
   double axisAngTemp[] = {xTemp[3], xTemp[4], xTemp[5], xTemp[6]}, quatTemp[4];
   wbi::Rotation R = wbi::Rotation::axisAngle(axisAngTemp);
@@ -227,15 +179,9 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray *prhs[])
   for(i=0; i < 4; i++)
     *(xT + 3+i) = *(quatTemp + i);
 
-  // xT[3] = quatTemp[0];
-  // xT[4] = quatTemp[1];
-  // xT[5] = quatTemp[2];
-  // xT[6] = quatTemp[3];
-
 #ifdef DEBUG
   mexPrintf("ModelJacobian fast computed\n");
 #endif
-
   return true;
 }
 

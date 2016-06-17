@@ -20,13 +20,11 @@
 #ifndef MODELGETFLOATINGBASESTATE_H
 #define MODELGETFLOATINGBASESTATE_H
 
-//global includes
+// global includes
 
-//library includes
-// #include <wbi/iWholeBodyModel.h>
+// library includes
 
-//local includes
-// #include "mexwholebodymodelsettings.h"
+// local includes
 #include "modelcomponent.h"
 
 namespace mexWBIComponent

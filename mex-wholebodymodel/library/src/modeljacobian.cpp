@@ -18,14 +18,12 @@
  * Public License for more details
  */
 
-//global includes
+// global includes
 
-//library includes
-// #include <Eigen/Core>
-// #include <wbi/iWholeBodyModel.h>
+// library includes
 #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
-//local includes
+// local includes
 #include "modeljacobian.h"
 
 using namespace mexWBIComponent;
@@ -43,8 +41,6 @@ ModelJacobian::ModelJacobian() : ModelComponent(4, 1, 1)
 ModelJacobian::~ModelJacobian()
 {
   if(j_rowMajor != NULL) {
-    // free(j_rowMajor);
-    // j_rowMajor = 0;
     delete[] j_rowMajor;
     j_rowMajor = NULL;
   }
@@ -60,10 +56,6 @@ bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray *plhs[])
   plhs[0]    = mxCreateDoubleMatrix(6, nCols, mxREAL);
   j_colMajor = mxGetPr(plhs[0]);
 
-  // if(j_rowMajor == NULL)
-  // {
-  //   j_rowMajor = (double*)malloc(sizeof(double)*6*nCols);
-  // }
   if(j_rowMajor == NULL)
     j_rowMajor = new double[6*nCols];
 
@@ -116,30 +108,8 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
   if(com.compare(refLink) != 0)
     robotModel->getFrameList().idToIndex(refLink, refLinkID);
 
-  // if(com.compare(refLink) == 0)
-  // {
-  //   refLinkID = -1;
-  // }
-  // else
-  // {
-  //   //robotModel->getLinkId (refLink, refLinkID);
-  //   robotModel->getFrameList().idToIndex(refLink, refLinkID);
-  // }
-
-  // modelState = ModelState::getInstance(); // ??
-
   if( !(robotModel->computeJacobian(qj, world_H_rootLink, refLinkID, j_rowMajor)) )
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the jacobian call");
-
-  // int columnMajCtr = 0;
-  // for(int i = 0; i < (numDof + 6); i++) // columns
-  // {
-  //   for(int j = 0; j < 6; j++) // rows
-  //   {
-  //     j_colMajor[columnMajCtr] = j_rowMajor[i + j*(numDof + 6)];
-  //     columnMajCtr = columnMajCtr + 1;
-  //   }
-  // }
 
   // since Matlab uses the column-major order for multi-dimensional arrays,
   // we have to make an array-transposition ...
@@ -148,7 +118,6 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray* prhs[])
 #ifdef DEBUG
   mexPrintf("ModelJacobian fast computed\n");
 #endif
-
   return true;
 }
 
@@ -180,53 +149,22 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray *prhs[])
     mexPrintf(" %f", *(qj + i));
 #endif
 
-  double tempR[9];//, tempP[3];
-  // for (int i = 0; i < 3; i++)
-  // {
-  //   tempP[i] = p_temp[i];
-  // }
+  double tempR[9];
 
   reorderMatrixInRowMajor(R_temp, tempR);
   wbi::Rotation tempRot(tempR);
-  // wbi::Frame tempFrame(tempRot, tempP);
 
-  world_H_rootLink = wbi::Frame(tempRot, p_temp); //tempFrame;
+  world_H_rootLink = wbi::Frame(tempRot, p_temp);
 
-  // if (j_rowMajor != NULL && j_colMajor != NULL)
-  // {
-    std::string com("com");
-    int refLinkID = -1; // if refLink = "com"
+  std::string com("com");
+  int refLinkID = -1; // if refLink = "com"
 
-    if(com.compare(refLink) != 0)
-      robotModel->getFrameList().idToIndex(refLink, refLinkID);
+  if(com.compare(refLink) != 0)
+    robotModel->getFrameList().idToIndex(refLink, refLinkID);
 
-      // int refLinkID;
-      // std::string com("com");
-
-      // if (com.compare(refLink) == 0)
-      // {
-      //   refLinkID = -1;
-      // }
-      // else
-      // {
-      //   robotModel->getFrameList().idToIndex(refLink, refLinkID);
-      // }
-
-    if( !(robotModel->computeJacobian(qj, world_H_rootLink, refLinkID, j_rowMajor)) )
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the jacobian call");
-  // }
-
-  // int columnMajCtr = 0;
-  // for(size_t i=0; i < (numDof + 6); i++) // columns
-  // {
-  //   for(int j=0; j < 6; j++) // rows
-  //   {
-  //     j_colMajor[columnMajCtr] = j_rowMajor[i + j*(numDof + 6)];
-  //     columnMajCtr = columnMajCtr + 1;
-  //   }
-  // }
+  if( !(robotModel->computeJacobian(qj, world_H_rootLink, refLinkID, j_rowMajor)) )
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the jacobian call");
 
   reorderMatrixInColMajor(j_rowMajor, j_colMajor, 6, numDof+6);
-
   return true;
 }

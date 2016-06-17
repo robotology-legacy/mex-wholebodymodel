@@ -20,11 +20,12 @@
 #ifndef MODELJOINTLIMITS_H
 #define MODELJOINTLIMITS_H
 
+// global includes
+
+// library includes
+
+// local includes
 # include <modelcomponent.h>
-// #include <stdio.h>
-// #include <mex.h>
-// #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
-// #include <wbiIcub/icubWholeBodyModel.h>
 
 namespace mexWBIComponent
 {
@@ -42,7 +43,6 @@ namespace mexWBIComponent
       virtual bool allocateReturnSpace(int, mxArray *[]);
       virtual bool compute(int, const mxArray *[]);
       virtual bool computeFast(int, const mxArray *[]);
-      //virtual bool display(int, const mxArray *[]);
 
       virtual ~ModelJointLimits();
 

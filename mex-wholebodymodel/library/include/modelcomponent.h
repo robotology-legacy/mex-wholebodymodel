@@ -21,16 +21,11 @@
 #ifndef MODELCOMPONENT_H
 #define MODELCOMPONENT_H
 
-//global includes
-// #include <iostream>
-// #include <mex.h>
+// global includes
 
-//library includes
-// #include <wbi/iWholeBodyModel.h>
-// #include <wbi/wbiUtil.h>
-// #include <Eigen/Core>
+// library includes
 
-//local includes
+// local includes
 #include "modelstate.h"
 
 namespace mexWBIComponent
@@ -42,7 +37,6 @@ namespace mexWBIComponent
       virtual bool allocateReturnSpace(int, mxArray**) = 0;
       virtual bool compute(int, const mxArray**) = 0;
       virtual bool computeFast(int, const mxArray**) = 0;
-      //virtual bool display(int, const mxArray**) = 0;
 
       const unsigned int numReturns();
       const unsigned int numArguments();
@@ -60,15 +54,15 @@ namespace mexWBIComponent
       bool reorderMatrixInRowMajor(const double *srcMat, double *destMat, int nRows = 3, int nCols = 3);
       bool reorderMatrixInColMajor(const double *srcMat, double *destMat, int nRows = 3, int nCols = 3);
 
-      const unsigned int numArgs;
-      const unsigned int numRets;
-      const unsigned int numAltArgs;
+      ModelState *modelState;
       wbi::iWholeBodyModel *robotModel;
 
       Eigen::Matrix4d H_w2b;
       wbi::Frame world_H_rootLink;
 
-      ModelState *modelState;
+      const unsigned int numArgs;
+      const unsigned int numRets;
+      const unsigned int numAltArgs;
   };
 
 }

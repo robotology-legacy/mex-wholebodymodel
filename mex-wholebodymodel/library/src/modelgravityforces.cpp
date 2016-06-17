@@ -17,13 +17,11 @@
  * Public License for more details
  */
 
-//global includes
+// global includes
 
-//library includes
-// #include <wbi/iWholeBodyModel.h>
-// #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
+// library includes
 
-//local includes
+// local includes
 #include "modelgravityforces.h"
 
 using namespace mexWBIComponent;
@@ -140,7 +138,7 @@ bool ModelGravityForces::processArguments(int nrhs, const mxArray **prhs)
   world_H_rootLink = wbi::Frame(rotm, ppos);
 
   double *qjDot_0 = new double[numDof];
-  memset(qjDot_0, 0, numDof * sizeof(double));
+  memset(qjDot_0, 0, numDof*sizeof(double));
 
   g = modelState->g();
 

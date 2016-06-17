@@ -20,11 +20,11 @@
 #ifndef MODELSETWORLDFRAME_H
 #define MODELSETWORLDFRAME_H
 
-//global includes
+// global includes
 
-//library includes
+// library includes
 
-//local includes
+// local includes
 #include "modelcomponent.h"
 
 namespace mexWBIComponent {

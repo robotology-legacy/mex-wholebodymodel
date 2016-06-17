@@ -21,7 +21,6 @@
 // global includes
 
 // library includes
-// #include <wbi/iWholeBodyModel.h>
 
 // local includes
 #include "modelgetstate.h"
@@ -154,13 +153,6 @@ bool ModelGetState::computeFast(int nrhs, const mxArray *prhs[])
   modelState->qjDot(qjDot);
   modelState->vb(vb);
 
-  //qjDot = modelState->qjDot();
-  //vb    = modelState->vb();
-
-  // for(int i=0; i < numDof; i++)
-  // {
-  //   mexPrintf("ModelGetState qj[%d] : %2.2f, qjDot[%d] : %2.2f\n", i, qj[i], i, qjDot[i]);
-  // }
   return true;
 }
 

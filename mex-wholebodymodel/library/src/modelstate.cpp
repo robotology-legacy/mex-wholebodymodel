@@ -25,22 +25,20 @@
 #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
 #include <yarpWholeBodyInterface/yarpWbiUtil.h>
 #include <yarp/os/ResourceFinder.h>
-// #include <yarp/os/Network.h> // do we need this here, or where else??
-// #include <yarp/sig/Image.h>
 
 // local includes
 #include "modelstate.h"
 
 using namespace mexWBIComponent;
 
-ModelState* ModelState::modelState;
-wbi::iWholeBodyModel * ModelState::robotWBIModel = NULL;
+ModelState *ModelState::modelState = NULL;
+wbi::iWholeBodyModel *ModelState::robotWBIModel = NULL;
 
-bool isRobotNameAFile(const std::string & robotName)
+bool isRobotNameAFile(const std::string &robotName)
 {
   // Ugly hack: check the last four char of robotName :
   // if it ends in .xxx or .xxxx (where xxx or xxxx is is an classical extention)
-  // call the robotModelFromURDF , otherwise the usual robotModel
+  // call the robotModelFromURDF, otherwise the usual robotModel
   if(robotName.size() < 5)
     return false;
 
@@ -62,49 +60,42 @@ ModelState::ModelState(std::string robotName)
   numDof = robotWBIModel->getDoFs();
   qjS    = new double[numDof];
   qjDotS = new double[numDof];
-  // qjS    = (double*)malloc(sizeof(double)*numDof);
-  // qjDotS = (double*)malloc(sizeof(double)*numDof);
 
   gS[0] = 0; gS[1] = 0; gS[2] = -9.81;
 }
 
 ModelState::~ModelState()
 {
+  // TO CHECK: since the object is static, the destructor
+  // will not called and can cause some inconsistency in
+  // the memory management ...
 #ifdef DEBUG
   mexPrintf("ModelState destructor called\n");
 #endif
-  if(qjDotS != 0)
+
+  if(qjDotS != NULL)
   {
-    // free(qjDotS);
-    // qjDotS = 0;
     delete[] qjDotS;
     qjDotS = NULL;
   }
-
 #ifdef DEBUG
   mexPrintf("free(qjDotS) called\n");
 #endif
+
   if(qjS != NULL)
   {
-    // free(qjS);
-    // qjS = 0;
     delete[] qjS;
     qjS = NULL;
   }
-
 #ifdef DEBUG
   mexPrintf("free(qjS) called\n");
 #endif
-#ifdef DEBUG
-  mexPrintf("free(gS) called\n");
-#endif
 
-  if(robotWBIModel != 0)
+  if(robotWBIModel != NULL)
   {
     delete robotWBIModel;
     robotWBIModel = NULL;
   }
-
 #ifdef DEBUG
   mexPrintf("ModelState destructor returning\n");
 #endif
@@ -120,7 +111,12 @@ ModelState *ModelState::getInstance(std::string robotName)
 
 void ModelState::deleteInstance()
 {
-  deleteObject(&modelState);
+  // mexPrintf("ModState::delInst\n");
+  //deleteObject(&modelState); // error
+
+  // the deletion of the static objects must be done in
+  // a different way. Maybe with the help of smart pointers,
+  // like, boost::scoped_ptr or std::unique_ptr.
 }
 
 bool ModelState::setState(double *qj_t, double *qjDot_t, double *vb_t)
@@ -128,18 +124,6 @@ bool ModelState::setState(double *qj_t, double *qjDot_t, double *vb_t)
 #ifdef DEBUG
   mexPrintf("Trying to update state\n");
 #endif
-
-  // for(size_t i=0; i < numDof; i++)
-  // {
-  //   qjS[i]    = qj_t[i];
-  //   qjDotS[i] = qjDot_t[i];
-  // }
-
-  // for(size_t i=0; i < 6; i++)
-  // {
-  //   vbS[i] = vb_t[i];
-  // }
-
   memcpy(qjS, qj_t, sizeof(double)*numDof);
   memcpy(qjDotS, qjDot_t, sizeof(double)*numDof);
   memcpy(vbS, vb_t, sizeof(double)*6);
@@ -149,10 +133,6 @@ bool ModelState::setState(double *qj_t, double *qjDot_t, double *vb_t)
 
 void ModelState::setGravity(double *g_temp)
 {
-  // for(int i=0; i < 3; i++)
-  // {
-  //   gS[i] = g_temp[i];
-  // }
   memcpy(gS, g_temp, sizeof(double)*3);
 }
 
@@ -163,10 +143,6 @@ double *ModelState::qj()
 
 void ModelState::qj(double *qj_t)
 {
-  // for(size_t i=0; i < numDof; i++)
-  // {
-  //   qj_t[i] = qjS[i];
-  // }
   memcpy(qj_t, qjS, sizeof(double)*numDof);
 }
 
@@ -177,10 +153,6 @@ double *ModelState::qjDot()
 
 void ModelState::qjDot(double *qjDot_t)
 {
-  // for (size_t i = 0; i < numDof; i++)
-  // {
-  //   qjDot_t[i] = qjDotS[i];
-  // }
   memcpy(qjDot_t, qjDotS, sizeof(double)*numDof);
 }
 
@@ -191,24 +163,16 @@ double *ModelState::vb()
 
 void ModelState::vb(double *vb_t)
 {
-  // for (int i = 0; i < 6; i++)
-  // {
-  //   vb_t[i] = vbS[i];
-  // }
   memcpy(vb_t, vbS, sizeof(double)*6);
 }
 
 double* ModelState::g(void)
 {
-  return (&gS[0]);
+  return &gS[0];
 }
 
 void ModelState::g(double *gT)
 {
-  // for (int i = 0; i < 3; i++)
-  // {
-  //   gT[i] = gS[i];
-  // }
   memcpy(gT, gS, sizeof(double)*3);
 }
 

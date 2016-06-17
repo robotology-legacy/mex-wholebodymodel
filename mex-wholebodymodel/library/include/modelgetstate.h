@@ -20,13 +20,11 @@
 #ifndef MODELGETSTATE_H
 #define MODELGETSTATE_H
 
-//global includes
+// global includes
 
-//library includes
-// #include <wbi/iWholeBodyModel.h>
+// library includes
 
-//local includes
-// #include "mexwholebodymodelsettings.h"
+// local includes
 #include "modelcomponent.h"
 
 namespace mexWBIComponent
@@ -45,7 +43,6 @@ namespace mexWBIComponent
       virtual bool allocateReturnSpace(int, mxArray*[]);
       virtual bool compute(int, const mxArray *[]);
       virtual bool computeFast(int, const mxArray *[]);
-      //virtual bool display(int, const mxArray *[]);
 
       virtual ~ModelGetState();
 
@@ -54,15 +51,14 @@ namespace mexWBIComponent
 
       static ModelGetState *modelGetState;
 
-      //wbi::Frame rootRotoTrans;
-      //wbi::Rotation rootRoto;
       double rootQuaternion[4];
 
-      double *wTb;   //[7];
-      double *qj;    //[MEX_WBMODEL_MAX_NUM_JOINTS];
-      double *qjDot; //[MEX_WBMODEL_MAX_NUM_JOINTS];
+      double *wTb;
+      double *qj;
+      double *qjDot;
       double *vb;
   };
 
 }
+
 #endif // MODELGETSTATE_H

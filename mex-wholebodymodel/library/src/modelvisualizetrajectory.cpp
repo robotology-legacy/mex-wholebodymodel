@@ -17,13 +17,13 @@
  * Public License for more details
  */
 
-//global includes
+// global includes
 
-//library includes
+// library includes
 #include <yarp/os/Time.h>
 #include <wbi/wbiUtil.h>
 
-//local includes
+// local includes
 #include "modelvisualizetrajectory.h"
 
 using namespace mexWBIComponent;
@@ -118,7 +118,7 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs
 
     baseRot.getEulerZYX(roll, pitch, yaw);
 
-    // 3orientations and 3 positions
+    // 3 orientations and 3 positions
     floatingBaseData.addDouble(yaw);
     floatingBaseData.addDouble(pitch);
     floatingBaseData.addDouble(roll);
@@ -137,7 +137,7 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs
     //mexPrintf("Time : %f, Torso : %f, %f, %f \n", t[ti],qj[ti*modelState->dof()+0],qj[ti*modelState->dof()+1],qj[ti*modelState->dof()+2]);
     //mexPrintf("Time : %f, Torso : %f, %f, %f \n", t[ti],qj[ti+0*numTSteps],qj[ti+1*numTSteps],qj[ti+2*numTSteps]);
 
-    //left_arm
+    // left_arm
     leftArmData.clear();
     for(i=3; i < 7; i++)
     {

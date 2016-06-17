@@ -20,15 +20,12 @@
 #ifndef MODELJACOBIAN_H
 #define MODELJACOBIAN_H
 
-//global includes
+// global includes
 
-//library includes
-// #include "wbi/iWholeBodyModel.h"
-// #include "wbi/wbiUtil.h"
+// library includes
 
-//local includes
+// local includes
 #include "modelcomponent.h"
-// #include "mexwholebodymodelsettings.h"
 
 namespace mexWBIComponent
 {
@@ -46,8 +43,6 @@ namespace mexWBIComponent
       virtual bool allocateReturnSpace(int, mxArray *[]);
       virtual bool compute(int, const mxArray *[]);
       virtual bool computeFast(int, const mxArray *[]);
-      //virtual bool display(int, const mxArray *[]);
-      //virtual const int numReturns();
 
       virtual ~ModelJacobian();
 
@@ -59,7 +54,7 @@ namespace mexWBIComponent
 
       double *qj;
       char   *refLink;
-      double *j_rowMajor; //[6*(6+MEX_WBMODEL_MAX_NUM_JOINTS)];
+      double *j_rowMajor;
       double *j_colMajor;
   };
 

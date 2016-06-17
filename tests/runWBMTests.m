@@ -21,5 +21,6 @@ catch ME
 end
 
 % if we arrive at this point all test went well
-disp('mex-wholebodymodel tests: all test completed successfully!')
+disp('mex-wholebodymodel tests: all tests completed successfully!')
 exit(0)
+

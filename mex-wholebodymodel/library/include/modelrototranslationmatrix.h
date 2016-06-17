@@ -20,14 +20,11 @@
 #ifndef MODELROTOTRANSLATIONMATRIX_H
 #define MODELROTOTRANSLATIONMATRIX_H
 
-//global includes
+// global includes
 
-//library includes
-// #include "wbi/iWholeBodyModel.h"
-// #include "wbi/wbiUtil.h"
+// library includes
 
-//local includes
-// #include "mexwholebodymodelsettings.h"
+// local includes
 #include "modelcomponent.h"
 
 namespace mexWBIComponent

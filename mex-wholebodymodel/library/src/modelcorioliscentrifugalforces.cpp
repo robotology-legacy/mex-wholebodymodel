@@ -17,13 +17,11 @@
  * Public License for more details
  */
 
-//global includes
+// global includes
 
-//library includes
-// #include <wbi/iWholeBodyModel.h>
-// #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
+// library includes
 
-//local includes
+// local includes
 #include "modelcorioliscentrifugalforces.h"
 
 using namespace mexWBIComponent;

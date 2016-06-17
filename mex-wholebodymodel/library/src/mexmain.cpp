@@ -17,19 +17,16 @@
  * Public License for more details
  */
 
-//global includes
-// #include <iostream>
-// #include <stdio.h>
-// #include <mex.h>
+// global includes
 
-//local includes
+// local includes
 #include "modelcomponent.h"
 #include "componentmanager.h"
 
-//namespaces
+// namespaces
 using namespace mexWBIComponent;
 
-//global variables
+// global variables
 
 /**
  * just a local copy of the pointer that you get
@@ -38,20 +35,21 @@ using namespace mexWBIComponent;
  * To properly destroy, call ComponentManager::deleteInstance()
  * and then set this pointer to 0.
  */
-static ComponentManager *componentManagerLocalPointerCopy = 0;
+static ComponentManager *componentManagerLocalPointerCopy = NULL;
 
 // Cleanup function to call when matlab exits or mex clears
 void MEXWBM_Matlab_ExitFcn(void)
 {
   ComponentManager::deleteInstance();
-  componentManagerLocalPointerCopy = 0;
+  componentManagerLocalPointerCopy = NULL;
+  // mexPrintf("DONE_5\n");
 }
 
 //=========================================================================================================================
 // Entry point function to library
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(componentManagerLocalPointerCopy == 0)
+  if(componentManagerLocalPointerCopy == NULL)
   {
     // Initialisation of the component, i.e first call after a 'close all' or matlab start
     if(nrhs < 1)

@@ -17,11 +17,12 @@
  * Public License for more details
  */
 
-#include "modeljointlimits.h"
+// global includes
 
-// #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
-// #include <stdio.h>
-// #include <mex.h>
+// library includes
+
+// local includes
+#include "modeljointlimits.h"
 
 using namespace mexWBIComponent;
 

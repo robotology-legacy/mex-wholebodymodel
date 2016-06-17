@@ -20,12 +20,11 @@
 #ifndef MODELFORWARDKINEMATICS_H
 #define MODELFORWARDKINEMATICS_H
 
-//global includes
+// global includes
 
-//library includes
-// #include <wbi/iWholeBodyModel.h>
+// library includes
 
-//local includes
+// local includes
 #include "modelcomponent.h"
 
 namespace mexWBIComponent

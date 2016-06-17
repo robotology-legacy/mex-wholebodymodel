@@ -17,16 +17,12 @@
  * Public License for more details
  */
 
+// global includes
 
-//global includes
+// library includes
 
-//library includes
-// #include <wbi/iWholeBodyModel.h>
-// #include <mex.h>
-
-//local includes
+// local includes
 #include "modelupdatestate.h"
-// #include "modelstate.h"
 
 using namespace mexWBIComponent;
 

@@ -18,14 +18,11 @@
  * Public License for more details
  */
 
-//global includes
-// #include <iostream>
+// global includes
 
-//library includes
-// #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
+// library includes
 
-//local includes
-// #include "modelstate.h"
+// local includes
 #include "modelcomponent.h"
 
 using namespace mexWBIComponent;
@@ -38,7 +35,7 @@ ModelComponent::ModelComponent(const unsigned int args, const unsigned int altAr
 
 ModelComponent::~ModelComponent()
 {
-  //delete(modelState);
+  //deleteObject(&modelState);
 }
 
 ModelComponent *ModelComponent::getInstance()
@@ -74,15 +71,8 @@ bool ModelComponent::reorderMatrixInRowMajor(const double *srcMat, double *destM
   return true;
 }
 
-// bool ModelComponent::reorderMatrixElements(double *sourceMatrix, double (&destinationMatrix)[9])
 bool ModelComponent::reorderMatrixInColMajor(const double *srcMat, double *destMat, int nRows, int nCols)
 {
-  // for (int i = 0; i < 3; i++) { // columns
-  //     for (int j = 0; j < 3; j++) { // rows
-  //         destinationMatrix[i*3 + j] = sourceMatrix[i + 3*j];
-  //     }
-  // }
-
   // store the values of the matrix-array in column-major order (*):
   // 2D column-major:  offset = i_col*nRows + i_row
   int idx = 0;

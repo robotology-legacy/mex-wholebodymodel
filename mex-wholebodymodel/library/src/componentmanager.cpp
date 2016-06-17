@@ -18,16 +18,13 @@
  * Public License for more details
  */
 
-//global includes
+// global includes
 #include <iostream>
 #include <map>
-// #include <stdio.h>
-// #include <mex.h>
 
-//library includes
-// #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
+// library includes
 
-//local includes
+// local includes
 #include "componentmanager.h"
 #include "modelcentroidalmomentum.h"
 #include "modelcomponent.h"
@@ -52,31 +49,34 @@
 
 using namespace mexWBIComponent;
 
-ComponentManager * ComponentManager::componentManager;
+ComponentManager *ComponentManager::componentManager;
 
-ComponentManager* ComponentManager::getInstance(std::string robotName)
+ComponentManager *ComponentManager::getInstance(std::string robotName)
 {
   if(componentManager == NULL)
     componentManager = new ComponentManager(robotName);
 
 #ifdef DEBUG
-  mexPrintf("ComponentManager initialised \n");
+  mexPrintf("ComponentManager initialised\n");
 #endif
 
   return componentManager;
 }
 
-void ComponentManager::deleteInstance()
+void ComponentManager::deleteInstance() // TO DEBUG: the destructor causes sometimes still some access violations!
 {
-  deleteObject(&componentManager);
+  // mexPrintf("CompManag::deleteInst\n");
+  deleteObject(&componentManager); // TO CHECK: sometimes it hangs also there
+  // mexPrintf("DONE_4\n");
 }
 
 ComponentManager::ComponentManager(std::string robotName)
 {
 #ifdef DEBUG
-  mexPrintf("ComponentManager constructed \n");
+  mexPrintf("ComponentManager constructed\n");
 #endif
   initialise(robotName);
+
   //componentList["inverse-dynamics"] = modelInverseDynamics;
   componentList["centroidal-momentum"] = modelCentroidalMomentum;
   componentList["coriolis-centrifugal-forces"] = modelCoriolisCentrifugalForces;
@@ -114,9 +114,15 @@ void ComponentManager::cleanup()
   ModelMassMatrix::deleteInstance();
   ModelRotoTranslationMatrix::deleteInstance();
   ModelSetWorldFrame::deleteInstance();
-  ModelState::deleteInstance();
   ModelUpdateState::deleteInstance();
   ModelVisualizeTrajectory::deleteInstance();
+
+  // mexPrintf("DONE_1\n");
+
+  //ModelState::deleteInstance(); // TO DEBUG: at the end of the ctest it causes always a segmentation violation!
+
+  // mexPrintf("DONE_2\n");
+
 #ifdef DEBUG
   mexPrintf("ComponentManager destructed\n");
 #endif
@@ -124,11 +130,15 @@ void ComponentManager::cleanup()
 
 ComponentManager::~ComponentManager(void)
 {
+  // mexPrintf("start cleanup\n");
   cleanup();
+  // mexPrintf("DONE_3\n");
 }
 
 void ComponentManager::initialise(std::string robotName)
 {
+  modelState = ModelState::getInstance(robotName);
+
   modelCentroidalMomentum = ModelCentroidalMomentum::getInstance();
   modelCoriolisCentrifugalForces = ModelCoriolisCentrifugalForces::getInstance();
   modelDjDq = ModelDjDq::getInstance();
@@ -144,7 +154,6 @@ void ComponentManager::initialise(std::string robotName)
   modelMassMatrix = ModelMassMatrix::getInstance();
   modelRotoTranslationMatrix = ModelRotoTranslationMatrix::getInstance();
   modelSetWorldFrame = ModelSetWorldFrame::getInstance();
-  modelState = ModelState::getInstance(robotName);
   modelUpdateState = ModelUpdateState::getInstance();
   modelVisualizeTrajectory = ModelVisualizeTrajectory::getInstance();
 }

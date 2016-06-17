@@ -20,6 +20,11 @@
 #ifndef MODELGENERALISEDBIASFORCES_H
 #define MODELGENERALISEDBIASFORCES_H
 
+// global includes
+
+// library includes
+
+// local includes
 #include "modelcomponent.h"
 
 namespace mexWBIComponent
@@ -38,7 +43,6 @@ namespace mexWBIComponent
       virtual bool allocateReturnSpace(int, mxArray*[]);
       virtual bool compute(int, const mxArray *[]);
       virtual bool computeFast(int, const mxArray *[]);
-      //virtual bool display(int, const mxArray *[]);
 
       virtual ~ModelGeneralisedBiasForces();
 

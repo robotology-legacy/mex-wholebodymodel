@@ -21,8 +21,6 @@
 // global includes
 
 // library includes
-// #include <wbi/iWholeBodyModel.h>
-// #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
 // local includes
 #include "modelcentroidalmomentum.h"
@@ -125,23 +123,15 @@ bool ModelCentroidalMomentum::processArguments(int nrhs, const mxArray *prhs[])
     mexPrintf(" %f", qj[i]);
 #endif
 
-  double tempR[9];//, tempP[3];
-  // for (int i = 0; i < 3; i++)
-  // {
-  //   tempP[i] = p_temp[i];
-  // }
-
+  double tempR[9];
   reorderMatrixInRowMajor(R_temp, tempR);
   wbi::Rotation tempRot(tempR);
-  // wbi::Frame tempFrame(tempRot, tempP);
 
-  world_H_rootLink = wbi::Frame(tempRot, p_temp); //tempFrame;
+  world_H_rootLink = wbi::Frame(tempRot, p_temp);
 
-  // if(h != NULL)
-  // {
   if( !robotModel->computeCentroidalMomentum(qj, world_H_rootLink, qjDot, vb, h) )
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeCentroidalMomentum call");
-  // }
+
   return true;
 }
 

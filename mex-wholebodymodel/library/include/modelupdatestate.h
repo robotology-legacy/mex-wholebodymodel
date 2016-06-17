@@ -20,11 +20,11 @@
 #ifndef MODELUPDATESTATE_H
 #define MODELUPDATESTATE_H
 
-//global includes
+// global includes
 
-//library includes
+// library includes
 
-//local includes
+// local includes
 #include "modelcomponent.h"
 
 namespace mexWBIComponent
@@ -43,18 +43,15 @@ namespace mexWBIComponent
       virtual bool allocateReturnSpace(int, mxArray*[]);
       virtual bool compute(int, const mxArray *[]);
       virtual bool computeFast(int, const mxArray *[]);
-      //virtual bool display(int, const mxArray *[]);
 
       virtual ~ModelUpdateState();
 
     private:
       ModelUpdateState();
       bool setState(int, const mxArray *[]);
-      //wbi::Frame updateBaseFrame(double*);
 
       static ModelUpdateState *modelUpdateState;
 
-      //const int numReturnArguments;
       Eigen::Matrix4d H_w2b;
   };
 

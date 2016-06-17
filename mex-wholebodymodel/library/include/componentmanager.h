@@ -20,13 +20,12 @@
 #ifndef COMPONENTNMAINTAINER_H
 #define COMPONENTNMAINTAINER_H
 
-//standard includes
-// #include <string.h>
+// standard includes
 
-//external headers
+// external headers
 #include <mex.h>
 
-//forward declarations
+// forward declarations
 namespace mexWBIComponent
 {
   class ModelCentroidalMomentum;
@@ -62,10 +61,9 @@ namespace mexWBIComponent
      * and set the instance pointer to NULL.
      */
     static void deleteInstance();
+    static void cleanup();
 
     bool processFunctionCall(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void cleanup();
-    //int getDofs();
 
     ~ComponentManager(void);
 
@@ -74,6 +72,8 @@ namespace mexWBIComponent
     void initialise(std::string);
 
     static ComponentManager *componentManager;
+
+    ModelState *modelState;
 
     ModelCentroidalMomentum *modelCentroidalMomentum;
     ModelComponent *currentComponent;
@@ -91,13 +91,11 @@ namespace mexWBIComponent
     ModelMassMatrix *modelMassMatrix;
     ModelRotoTranslationMatrix *modelRotoTranslationMatrix;
     ModelSetWorldFrame *modelSetWorldFrame;
-    ModelState *modelState;
     ModelUpdateState *modelUpdateState;
     ModelVisualizeTrajectory *modelVisualizeTrajectory;
 
     int numDof;
 
-    //static wbi::iWholeBodyModel *robotModel;
     std::map <std::string, ModelComponent*> componentList;
   };
 

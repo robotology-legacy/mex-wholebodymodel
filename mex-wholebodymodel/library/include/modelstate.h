@@ -20,17 +20,15 @@
 #ifndef MODELSTATE_H
 #define MODELSTATE_H
 
-//global includes
-// #include <iostream>
+// global includes
 #include <mex.h>
 
-//library includes
+// library includes
 #include <wbi/wbiUtil.h>
 #include <wbi/iWholeBodyModel.h>
 #include <Eigen/Dense>
 
-//local includes
-// #include "mexwholebodymodelsettings.h"
+// local includes
 
 namespace mexWBIComponent
 {
@@ -83,16 +81,20 @@ namespace mexWBIComponent
 
     private:
       ModelState(std::string);
+
+      // Note: The difference here is that the 'pointers' are static
+      // not the objects! The delete process is there different.
+      // With the delete-operator we delete only the pointer
+      // to the object and not the object self --> segmentation fault!
       static ModelState *modelState;
       static wbi::iWholeBodyModel *robotWBIModel;
-
-      double vbS[6], *qjS, *qjDotS, gS[3];
 
       size_t numDof;
       std::string currentRobotName;
 
-      Eigen::Matrix4d H_w2b;
+      double vbS[6], *qjS, *qjDotS, gS[3];
 
+      Eigen::Matrix4d H_w2b;
       wbi::Frame world_H_rootLink;
   };
 
@@ -103,10 +105,11 @@ namespace mexWBIComponent
    */
   template <class T> void deleteObject(T **pp)
   {
-    if(*pp != 0)
+    if(*pp != NULL)
     {
       delete *pp;
-      *pp = 0;
+      *pp = NULL;
+      // mexPrintf("delete object executed.\n");
     }
   }
 

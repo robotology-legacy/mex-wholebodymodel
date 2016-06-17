@@ -18,14 +18,11 @@
  * Public License for more details
  */
 
-//global includes
+// global includes
 
-//library includes
-// #include <wbi/iWholeBodyModel.h>
-// #include <wbiIcub/icubWholeBodyModel.h>
-// #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
+// library includes
 
-//local includes
+// local includes
 #include "modelgeneralisedbiasforces.h"
 
 using namespace mexWBIComponent;
@@ -38,12 +35,6 @@ ModelGeneralisedBiasForces::ModelGeneralisedBiasForces() : ModelComponent(5, 0, 
   mexPrintf("ModelGeneralisedBiasForces constructed\n");
 #endif
   g = modelState->g();
-  //g[0] = 0; g[1] = 0;g[2] = -9.81;
-  //since the foot frame is with x pointing upwards g must also be in that frame
-
-  //qj = new double(numDof);
-  //qjDot = new double(numDof);
-  //vb = new double(6);
 }
 
 ModelGeneralisedBiasForces::~ModelGeneralisedBiasForces()
@@ -123,15 +114,10 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray *prhs[
   R_temp = mxGetPr(prhs[1]);
   p_temp = mxGetPr(prhs[2]);
 
-  double tempR[9];//, tempP[3];
-  // for(int i = 0;i<3;i++)
-  // {
-  //    tempP[i] = p_temp[i];
-  // }
+  double tempR[9];
 
   reorderMatrixInRowMajor(R_temp, tempR);
   wbi::Rotation tempRot(tempR);
-  //wbi::Frame tempFrame(tempRot, tempP);
 
   robotModel = modelState->robotModel();
 
@@ -146,13 +132,11 @@ bool ModelGeneralisedBiasForces::processArguments(int nrhs, const mxArray *prhs[
     mexPrintf(" %f", *(qj + i));
 #endif
 
-  world_H_rootLink = wbi::Frame(tempRot, p_temp); //tempFrame;
+  world_H_rootLink = wbi::Frame(tempRot, p_temp);
   g = modelState->g();
 
-  // if(h != NULL)
-  // {
   if( !robotModel->computeGeneralizedBiasForces(qj, world_H_rootLink, qjDot, vb, g, h) )
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeGeneralizedBiasForces call");
-  // }
+
   return true;
 }

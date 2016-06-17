@@ -20,9 +20,12 @@
 #ifndef MODELMASSMATRIX_H
 #define MODELMASSMATRIX_H
 
+// global includes
+
+// library includes
+
+// local includes
 #include "modelcomponent.h"
-// #include "wbi/iWholeBodyModel.h"
-// #include "wbi/wbiUtil.h"
 
 namespace mexWBIComponent
 {
@@ -47,7 +50,6 @@ namespace mexWBIComponent
   private:
     ModelMassMatrix();
     bool processArguments(int, const mxArray *[]);
-    //ModelJointLimits(int = 0, mxArray* = NULL );
 
     static ModelMassMatrix *modelMassMatrix;
 

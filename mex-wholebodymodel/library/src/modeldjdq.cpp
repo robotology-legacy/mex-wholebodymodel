@@ -21,15 +21,9 @@
 //global includes
 
 // library includes
-// #include <wbi/iWholeBodyModel.h>
 #include <yarpWholeBodyInterface/yarpWholeBodyModel.h>
 
-// #include <wbiIcub/icubWholeBodyModel.h>
-// #include <wbiIcub/wbiIcubUtil.h>
-// #include <yarpWholeBodyInterface/yarpWbiUtil.h>
-
-// project includes
-// #include "modelcomponent.h"
+// local includes
 #include "modeldjdq.h"
 
 using namespace mexWBIComponent;
@@ -111,15 +105,6 @@ bool ModelDjDq::computeFast(int nrhs, const mxArray *prhs[])
     robotModel->getFrameList().idToIndex(refLink, refLinkID);
   }
 
-  // if (com.compare(refLink) == 0)
-  // {
-  //   refLinkID = -1;
-  // }
-  // else
-  // {
-  //   robotModel->getFrameList().idToIndex(refLink, refLinkID);
-  // }
-
   if( !robotModel->computeDJdq(qj, world_H_rootLink, qjDot, vb, refLinkID, Djdq) )
     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs", "Something failed in the WBI DJDq call");
 
@@ -157,37 +142,20 @@ bool ModelDjDq::processArguments(int nrhs, const mxArray *prhs[])
     mexPrintf(" %f", *(qj + i));
 #endif
 
-  double tempR[9];//, tempP[3];
-  // for(int i = 0; i < 3; i++)
-  // {
-  //   tempP[i] = p_temp[i];
-  // }
-
+  double tempR[9];
   reorderMatrixInRowMajor(R_temp, tempR);
   wbi::Rotation tempRot(tempR);
-  // wbi::Frame tempFrame(tempRot, tempP);
 
-  world_H_rootLink = wbi::Frame(tempRot, p_temp); //tempFrame;
+  world_H_rootLink = wbi::Frame(tempRot, p_temp);
 
-  // if(Djdq != NULL)
-  // {
   std::string com("com");
   int refLinkID = -1; // if refLink = "com"
 
   if(com.compare(refLink) != 0)
     robotModel->getFrameList().idToIndex(refLink, refLinkID);
 
-  // if(com.compare(refLink) == 0)
-  // {
-  //   refLinkID = -1;
-  // }
-  // else
-  // {
-  //   robotModel->getFrameList().idToIndex(refLink, refLinkID);
-  // }
-
   if( !robotModel->computeDJdq(qj, world_H_rootLink, qjDot, vb, refLinkID, Djdq) )
     mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs", "Something failed in the WBI DJDq call");
-  // }
+
   return true;
 }

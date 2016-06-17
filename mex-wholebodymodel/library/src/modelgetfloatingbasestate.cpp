@@ -17,13 +17,11 @@
  * Public License for more details
  */
 
-//global includes
+// global includes
 
-//library includes
-// #include <wbi/iWholeBodyModel.h>
-// #include <boost/concept_check.hpp>
+// library includes
 
-//local includes
+// local includes
 #include "modelgetfloatingbasestate.h"
 
 using namespace mexWBIComponent;
