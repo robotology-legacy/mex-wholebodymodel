@@ -61,10 +61,10 @@ CONFIG.numConstraints           = length(CONFIG.constraintLinkNames);
 qjInit             = [CONFIG.torsoInit;CONFIG.leftArmInit;CONFIG.rightArmInit;CONFIG.leftLegInit;CONFIG.rightLegInit]*(pi/180);
 dqjInit            = zeros(ndof,1);
 VelBaseInit        = zeros(3,1);
-omegaWorldBaseInit = zeros(3,1);
+omegaBaseWorldInit = zeros(3,1);
 
 % Update the initial position
-wbm_updateState(qjInit,dqjInit,[VelBaseInit;omegaWorldBaseInit]);
+wbm_updateState(qjInit,dqjInit,[VelBaseInit;omegaBaseWorldInit]);
 
 % Fixing the world reference frame w.r.t. the foot on ground position
 if  feet_on_ground(1) == 1
@@ -78,7 +78,7 @@ wbm_setWorldFrame(RotBaseInit,PosBaseInit,[0 0 -9.81]')
 
 % Initial base pose; initial state
 [~,BasePoseInit,~,~]         = wbm_getState();
-chiInit                      = [BasePoseInit; qjInit; VelBaseInit; omegaWorldBaseInit; dqjInit];
+chiInit                      = [BasePoseInit; qjInit; VelBaseInit; omegaBaseWorldInit; dqjInit];
 CONFIG.initState             = robotState(chiInit,CONFIG);
 
 %% INVERSE KINEMATICS
@@ -96,27 +96,52 @@ CONFIG.initDynamics              = robotDynamics(CONFIG.initState,CONFIG);
 % is then used to compute the approximation of the angular momentum integral
 JH                               = CONFIG.initDynamics.JH;
 Jc                               = CONFIG.initDynamics.Jc;
-CONFIG.initDynamics.JhReduced    = JH(:,7:end) -JH(:,1:6)*(eye(6)/Jc(1:6,1:6))*Jc(1:6,7:end);
+% CONFIG.initDynamics.JhReduced    = JH(:,7:end) -JH(:,1:6)*(eye(6)/Jc(1:6,1:6))*Jc(1:6,7:end);
+CONFIG.JHRed   = JH(:,7:end) -JH(:,1:6)*(eye(6)/Jc(1:6,1:6))*Jc(1:6,7:end);
+CONFIG.initForKinematics         = robotForKinematics(CONFIG.initState,CONFIG.initDynamics);
+CONFIG.xCoMRef = CONFIG.initForKinematics.xCoM;
 
-% Initial forward kinematics
+% PoseLFootQuat                    =  CONFIG.initForKinematics.LFootPoseQuat;
+% PoseRFootQuat                    =  CONFIG.initForKinematics.RFootPoseQuat;
+% PoseLFootEul                     = CONFIG.initForKinematics.LFootPoseEul;
+% PoseRFootEul                     = CONFIG.initForKinematics.RFootPoseEul
+
+%%%%%%%%%%%%%%%%%%%%% DELTA POSITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+qjInit(1:13)             = qjInit(1:13)+5*pi/180;
+dqjInit            = zeros(ndof,1);
+VelBaseInit        = zeros(3,1);
+omegaBaseWorldInit = zeros(3,1);
+
+% Update the initial position
+wbm_updateState(qjInit,dqjInit,[VelBaseInit;omegaBaseWorldInit]);
+
+% Fixing the world reference frame w.r.t. the foot on ground position
+if  feet_on_ground(1) == 1
+
+    [RotBaseInit,PosBaseInit] = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
+else
+    [RotBaseInit,PosBaseInit] = wbm_getWorldFrameFromFixedLink('r_sole',qjInit);    
+end
+
+wbm_setWorldFrame(RotBaseInit,PosBaseInit,[0 0 -9.81]')
+
+% Initial base pose; initial state
+[~,BasePoseInit,~,~]         = wbm_getState();
+chiInit                      = [BasePoseInit; qjInit; VelBaseInit; omegaBaseWorldInit; dqjInit];
+CONFIG.initState             = robotState(chiInit,CONFIG);
+CONFIG.initDynamics              = robotDynamics(CONFIG.initState,CONFIG);
+CONFIG.initDynamics.JhReduced    = CONFIG.JHRed ;
 CONFIG.initForKinematics         = robotForKinematics(CONFIG.initState,CONFIG.initDynamics);
 
-%% Initial gains
-CONFIG.gains                     = gains(CONFIG);
+% CONFIG.initForKinematics.RFootPoseEul 
+% CONFIG.initForKinematics.LFootPoseEul = PoseLFootEul;
+% CONFIG.initForKinematics.RFootPoseEul = PoseRFootEul;
+% CONFIG.initForKinematics.LFootPoseQuat = PoseLFootQuat;
+% CONFIG.initForKinematics.RFootPoseQuat = PoseRFootQuat;
 
-%% LINEARIZATION AND GAINS TUNING
-if CONFIG.linearizeJointSp == 1
-    
-linearization                         = jointSpaceLinearization(CONFIG);
-
-if CONFIG.linearize_for_gains_tuning == 1
-    
-[CONFIG.gains,CONFIG.visualizeTuning] = gainsTuning(linearization,CONFIG);
-else
-CONFIG.visualizeTuning.KS             = linearization.KS;
-CONFIG.visualizeTuning.KD             = linearization.KD; 
-end
-end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% INITIAL GAINS
+CONFIG.gains                 = gains(CONFIG);
 
 %% FORWARD DYNAMICS INTEGRATION
 CONFIG.wait     = waitbar(0,'State integration in progress...');

@@ -104,8 +104,8 @@ end
 
 %% Desired momentum derivative
 % closing the loop on angular momentum integral
-deltaPhi           =  initDynamics.JhReduced(4:end,:)*(qj-initState.qj);
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+deltaPhi           =  initDynamics.JhReduced(4:end,:)*(qj-qjRef);
 accDesired         =  [m.*x_dx_ddx_CoMDes(:,3); zeros(3,1)];
 velDesired         = -MomentumGains*[m.*(dxCoM-x_dx_ddx_CoMDes(:,2)); H(4:end)];
 posDesired         = -intMomentumGains*[m.*(xCoM-x_dx_ddx_CoMDes(:,1)); deltaPhi];
@@ -151,18 +151,5 @@ controlParam.Sigma    = Sigma;
 controlParam.f0       = f0;
 controlParam.Nullfc   = Nullfc;
 controlParam.A        = A;
-
-%% Desired nonLinear joints accelerations for the linearized system analysis
-JcBase                   = Jc(:,1:6);
-JcJoint                  = Jc(:,7:end);
-invMbar                  = eye(ndof)/Mbar;
-%invMbar                 = Mbar'/(Mbar*Mbar' + pinv_damp*eye(size(Mbar,1)));
-LambdaNonLin             = (JcJoint - JcBase/Mb*Mbj)*invMbar;
-pinvLambdaNonLin         = pinv(LambdaNonLin,pinv_tol);
-B                        = JcBase/Mb*transpose(JcBase)*pinvA;
-CbNu                     = CNu(1:6);
-NullLambdaNonLin         = eye(ndof) - pinvLambdaNonLin*LambdaNonLin;
-u0                       = -Mbar*ddqjRef + impedances*posturalCorr*qjTilde + dampings*posturalCorr*dqjTilde;
-controlParam.ddqjNonLin  = -invMbar*(pinvLambdaNonLin*(B*(HDotDes-CbNu)+dJcNu) + NullLambdaNonLin*u0);
 
 end

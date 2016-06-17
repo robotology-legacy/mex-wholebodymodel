@@ -14,7 +14,7 @@ function controlParam  = initController(gains,trajectory,DYNAMICS,FORKINEMATICS,
 
 % ------------Initialization----------------
 %% Feet correction gains
-KCorrPos              = 5;
+KCorrPos              = gains.CorrPosFeet;
 KCorrVel              = 2*sqrt(KCorrPos);
 
 %% Config parameters

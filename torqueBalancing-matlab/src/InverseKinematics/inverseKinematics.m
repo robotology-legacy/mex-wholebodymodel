@@ -64,12 +64,14 @@ RFootPoseEul      = FORKINEMATICS.RFootPoseEul;
 LFootPoseEul      = FORKINEMATICS.LFootPoseEul;
 
 % Gains for inverse kinematics
-KPosFeet          = 15;
-KPosMom           = 15;
-KPosPost          = 15;
-KVelFeet          = 2*sqrt(KPosFeet);
-KVelMom           = 2*sqrt(KPosMom);
-KVelPost          = 2*sqrt(KPosPost);
+CONFIG.initDynamics  = DYNAMICS;
+gainsInit            = gains(CONFIG);
+KPosFeet             = gainsInit.CorrPosFeet;
+KPosMom              = gainsInit.intMomentumGains;
+KPosPost             = gainsInit.impedances;
+KVelFeet             = 2*sqrt(KPosFeet);
+KVelMom              = 2*sqrt(KPosMom);
+KVelPost             = 2*sqrt(KPosPost);
 
 %% CoM trajectory generator
 desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG);
@@ -134,7 +136,6 @@ dChi               = [NuBase(1:3); dQuatBase; dqj; dNu];
 %% Parameters for visualization
 ObtainedCoMTraj                       = [xCoM; JCoM*Nu; (JCoM*dNu+dJCoMNu)];
 DesiredCoMTraj                        = [desired_x_dx_ddx_CoM(:,1); desired_x_dx_ddx_CoM(:,2); desired_x_dx_ddx_CoM(:,3)];
-
 visualizeIkinParam.CoMTrajectoryError = [DesiredCoMTraj; ObtainedCoMTraj];
 visualizeIkinParam.feetError          = deltaPoseFeet;
 visualizeIkinParam.momentumError      = [m*deltaVelCoM; JAng*Nu];

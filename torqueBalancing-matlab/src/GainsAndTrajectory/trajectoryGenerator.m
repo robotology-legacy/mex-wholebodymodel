@@ -42,7 +42,7 @@ end
 if CONFIG.visualize_stability_analysis_results == 1
     
     directionOfOscillation = [0;1;0];
-    referenceParams        = [0.015 0.15]; 
+    referenceParams        = [0.0075 0.1]; 
 end
 end
 

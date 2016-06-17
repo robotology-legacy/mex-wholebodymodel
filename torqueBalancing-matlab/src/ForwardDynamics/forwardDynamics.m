@@ -20,7 +20,7 @@ waitbar(t/CONFIG.tEnd,CONFIG.wait)
 ndof                  = CONFIG.ndof;
 gains                 = CONFIG.gains;
 initState             = CONFIG.initState;
-initForKinematics     = CONFIG.initForKinematics;
+initForKinematics     = CONFIG.initForKinematics;         
 
 %% Robot State
 STATE                 = robotState(chi,CONFIG);
@@ -30,6 +30,11 @@ quatBase              = STATE.quatBase;
 VelBase               = STATE.VelBase;
 dqj                   = STATE.dqj;
 qj                    = STATE.qj;
+PosBase               = STATE.PosBase;
+
+%% Set the robot state (for wbm functions)
+wbm_setWorldFrame(RotBase,PosBase,[0 0 -9.81]')
+wbm_updateState(qj,dqj,[VelBase;omegaBaseWorld]);
 
 %% Robot Dynamics
 DYNAMICS              = robotDynamics(STATE,CONFIG);
@@ -58,23 +63,37 @@ trajectory.JointReferences.qjRef   = initState.qj;
 end
 
 %% CoM trajectory generator
-trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(initForKinematics.xCoM,t,CONFIG);
+trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(CONFIG.xCoMRef,t,CONFIG);
 
+%% LINEARIZATION ALONG THE JOINT REFERENCE TRAJECTORY
+if CONFIG.linearizeJointSp == 1
+    
+linearization   = jointSpaceLinearization(CONFIG,STATE);
+ddqjLin         = trajectory.JointReferences.ddqjRef-linearization.KS*(qj-trajectory.JointReferences.qjRef)...
+                 -linearization.KD*(dqj-trajectory.JointReferences.dqjRef);
+[gains2,visualizeTuning] = gainsTuning (linearization,CONFIG);
+else  
+ddqjLin         = zeros(ndof,1);
+end
+     
 %% Balancing controller
-controlParam        =  initController(gains,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE);
-tau                 =  controlParam.tau;
-fc                  =  controlParam.fc;
+controlParam    =  initController(gains,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE);
+tau             =  controlParam.tau;
+fc              =  controlParam.fc;
 
 %% State derivative computation
-omegaWorldBase     = transpose(RotBase)*omegaBaseWorld;                               
-dquatBase          = quaternionDerivative(omegaWorldBase,quatBase);      
-NuQuat             = [VelBase;dquatBase;dqj];
-dNu                = M\(Jc'*fc + [zeros(6,1); tau]-h);
+omegaWorldBase  = transpose(RotBase)*omegaBaseWorld;                               
+dquatBase       = quaternionDerivative(omegaWorldBase,quatBase);      
+NuQuat          = [VelBase;dquatBase;dqj];
+dNu             = M\(Jc'*fc + [zeros(6,1); tau]-h);
 % state derivative 
-dchi               = [NuQuat;dNu];
+dchi            = [NuQuat;dNu];
+
+[dNu(7:end) ddqjLin]
 
 %% Parameters for visualization
-visualization.ddqjNonLin  = controlParam.ddqjNonLin;
+visualization.ddqjNonLin  = dNu(7:end);
+visualization.ddqjLin     = ddqjLin;
 visualization.dqj         = dqj;
 visualization.qj          = qj;
 visualization.JointRef    = trajectory.JointReferences;

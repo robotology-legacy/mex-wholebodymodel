@@ -1,4 +1,4 @@
-function figureCont = visualizeLinearization(t,CONFIG,qjErr,dqjErr,ddqjNonLin,ddqjRef)
+function figureCont = visualizeLinearization(t,CONFIG,ddqjNonLin,ddqjLin)
 %VISUALIZELINEARIZATION visualizes the results on the linearized joint space
 %                       dynamics of robot iCub.
 %
@@ -22,8 +22,6 @@ ndof       = CONFIG.ndof;
 
 %% Linearized joint dynamics
 if CONFIG.visualize_stability_analysis_results == 1
-    
-ddqjLin = ddqjRef - CONFIG.visualizeTuning.KS*qjErr  - CONFIG.visualizeTuning.KD*dqjErr;
 
 for k=1:5
   

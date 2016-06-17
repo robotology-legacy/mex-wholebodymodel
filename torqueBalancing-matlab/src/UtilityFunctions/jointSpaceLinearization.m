@@ -1,4 +1,4 @@
-function linearization = jointSpaceLinearization(CONFIG)    
+function linearization = jointSpaceLinearization(CONFIG,STATE)    
 %JOINTSPACELINEARIZATION linearizes the joint space dynamics of the iCub robot
 %                        around an equilibrium point.
 %   JOINTSPACELINEARIZATION assumes that the robot is balancing on one foot
@@ -20,9 +20,31 @@ gainsInit          = CONFIG.gains;
 pinv_tol           = CONFIG.pinv_tol;
 feet_on_ground     = CONFIG.feet_on_ground;     
 ndof               = CONFIG.ndof;
-DYNAMICS           = CONFIG.initDynamics;
-FORKINEMATICS      = CONFIG.initForKinematics;
-%pinv_damp         = CONFIG.pinv_damp;
+pinv_damp          = CONFIG.pinv_damp;
+
+% Initialization
+% qjRef              = qj;
+% 
+% % if  feet_on_ground(1) == 1
+% % 
+% %     [RotBaseRef,PosBaseRef] = wbm_getWorldFrameFromFixedLink('l_sole',qjRef);
+% % else
+% %     [RotBaseRef,PosBaseRef] = wbm_getWorldFrameFromFixedLink('r_sole',qjRef);    
+% % end
+% % 
+% % wbm_setWorldFrame(RotBaseRef,PosBaseRef,[0 0 -9.81]')
+% 
+% [~,BasePose,~,~]   = wbm_getState();
+% chi                = [BasePose; qjRef; zeros(6,1); zeros(ndof,1)];
+
+% STATE              = robotState(chi,CONFIG);
+STATE.dqj                        = zeros(ndof,1);
+STATE.Nu                         = zeros(ndof+6,1);
+STATE.VelBase                    = zeros(3,1);
+STATE.omegaBaseWorld             = zeros(3,1);
+DYNAMICS           = robotDynamics(STATE,CONFIG);
+FORKINEMATICS      = robotForKinematics(STATE,DYNAMICS);
+
 
 % Dynamics parameters
 Jc                 = DYNAMICS.Jc;
@@ -36,7 +58,7 @@ Jb                 = Jc(:,1:6);
 Jj                 = Jc(:,7:end);
 Mbar               = Mj - Mjb/Mb*Mbj;
 invMbar            = eye(ndof)/Mbar;
-%invMbar           = Mbar'/(Mbar*Mbar' + pinv_damp*eye(size(Mbar,1)));
+% invMbar           = Mbar'/(Mbar*Mbar' + pinv_damp*eye(size(Mbar,1)));
 
 % Forward kinematics parameters
 posLFoot           = FORKINEMATICS.LFootPoseQuat(1:3);
@@ -78,8 +100,9 @@ intMomentumGains   = gainsInit.intMomentumGains;
 Lambda             =  (Jj - Jb/Mb*Mbj)*invMbar;
 MultFirstTask      =  Jb/Mb*transpose(Jb)*pinvA;
 pinvLambda         =  pinv(Lambda,pinv_tol);
+% pinvLambda         = Lambda'/(Lambda*Lambda' + pinv_damp*eye(size(Lambda,1)));
 NullLambda         =  eye(ndof) - pinvLambda*Lambda;
-JG                 =  JH(:,7:end)-JH(:,1:6)*(eye(6)/Jb)*Jj;
+JG                 =  JH(:,7:end)-JH(:,1:6)*(eye(6)/Jb(1:6,1:6))*Jj(1:6,:);
 
 %% Stiffness matrix
 KS     = invMbar*(-pinvLambda*MultFirstTask*intMomentumGains*JG + NullLambda*impedances*posturalCorr);
@@ -104,9 +127,9 @@ end
 
 if flag == 1
 
-    disp('Warning: the linearized state dynamics is NOT asymptotically stable')
+%     disp('Warning: the linearized state dynamics is NOT asymptotically stable')
 else
-    disp('The linearized state dynamics is asymptotically stable')      
+%     disp('The linearized state dynamics is asymptotically stable')      
 end
 
 % parameters for visualization and gains tuning
@@ -119,8 +142,8 @@ linearization.BCartesian  =  JG;
 linearization.ANull       =  invMbar*NullLambda;
 
 if CONFIG.postCorrection == 1
-linearization.BNull      =  NullLambda*Mbar;
-%Linearization.BNull     =  posturalCorr;
+linearization.BNull    =  NullLambda*Mbar;
+% linearization.BNull      =  posturalCorr;
 else
 linearization.BNull      =  posturalCorr;
 end

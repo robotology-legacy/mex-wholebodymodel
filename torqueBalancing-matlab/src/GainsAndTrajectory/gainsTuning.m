@@ -80,16 +80,16 @@ end
 
 if flag(1) == 1
 
-    disp('Warning: the new linearized state dynamics after gains tuning is NOT asymptotically stable')
+%     disp('Warning: the new linearized state dynamics after gains tuning is NOT asymptotically stable')
     
 elseif flag(2) == 1
     
-    disp('Warning: your desired linearized state dynamics is NOT asymptotically stable')
+%     disp('Warning: your desired linearized state dynamics is NOT asymptotically stable')
     
 
 elseif sum(flag) == 0
     
-    disp('The linearized state dynamics after gains tuning is asymptotically stable')
+%     disp('The linearized state dynamics after gains tuning is asymptotically stable')
 end
 
 %% New gains verification
@@ -132,27 +132,27 @@ end
 
 if sum(flag)  == 0
     
-    disp('All the gains matrices are symmetric')
+%     disp('All the gains matrices are symmetric')
 end
 
 if flag(1) == 1   
     
-    disp('Warning: the gains matrix on centroidal momentum pose is not symmetric')
+%     disp('Warning: the gains matrix on centroidal momentum pose is not symmetric')
 end
 
 if flag(2) == 1
     
-    disp('Warning: the gains matrix on centroidal momentum velocity is not symmetric')
+%     disp('Warning: the gains matrix on centroidal momentum velocity is not symmetric')
 end
 
 if flag(3) == 1
     
-    disp('Warning: the gains matrix on joint position is not symmetric')
+%     disp('Warning: the gains matrix on joint position is not symmetric')
 end
 
 if flag(4) == 1
     
-    disp('Warning: the gains matrix on joint velocity is not symmetric')
+%     disp('Warning: the gains matrix on joint velocity is not symmetric')
 end
 
 % verify the positive definiteness
@@ -194,27 +194,27 @@ end
 
 if sum(flag)  == 0
     
-    disp('All the gains matrices are positive definite')
+%     disp('All the gains matrices are positive definite')
 end
 
 if flag(1) == 1
     
-    disp('Warning: the gains matrix on centroidal momentum pose is not positive definite')
+%     disp('Warning: the gains matrix on centroidal momentum pose is not positive definite')
 end
 
 if flag(2) == 1
     
-    disp('Warning: the gains matrix on centroidal momentum velocity is not positive definite')
+%     disp('Warning: the gains matrix on centroidal momentum velocity is not positive definite')
 end
 
 if flag(3) == 1
     
-    disp('Warning: the gains matrix on joint position is not positive definite')   
+%     disp('Warning: the gains matrix on joint position is not positive definite')   
 end
 
 if flag(4) == 1
     
-    disp('Warning: the gains matrix on joint velocity is not positive definite')   
+%     disp('Warning: the gains matrix on joint velocity is not positive definite')   
 end
 
 % parameters for visualization                                        
@@ -233,6 +233,9 @@ gains.dampings          = Kdn;
 gains.MomentumGains     = Kdx;
 gains.intMomentumGains  = Kpx;
 gains.posturalCorr      = gainsInit.posturalCorr;
+gains.CorrPosFeet       = gainsInit.CorrPosFeet;
+% gains.KSdes             = gainsInit.KSdes;
+% gains.KDdes             = gainsInit.KDdes;
 
 end
 

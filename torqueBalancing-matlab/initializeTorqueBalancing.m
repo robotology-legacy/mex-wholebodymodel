@@ -22,19 +22,19 @@ clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Integration setup 
 CONFIG.demo_movements                       = 1;                           %either 0 or 1
-CONFIG.feet_on_ground                       = [1,0];                       %either 0 or 1; [left,right]
+CONFIG.feet_on_ground                       = [1,1];                       %either 0 or 1; [left,right]
 CONFIG.controller                           = 'StackOfTask';               %either 'StackOfTask' or 'JointSpace'
 
 %% Linearized system analysis, gains tuning and QP solver. All these tools
 %% are available only for the 'Stack of Task' controller
 CONFIG.use_QPsolver                         = 0;                           %either 0 or 1
-CONFIG.linearize_for_stability_analysis     = 1;                           %either 0 or 1
-CONFIG.linearize_for_gains_tuning           = 0;                           %either 0 or 1
+CONFIG.linearize_for_stability_analysis     = 0;                           %either 0 or 1
+CONFIG.linearize_for_gains_tuning           = 1;                           %either 0 or 1
 
 % if params.linearize_for_gains_tuning = 1, choose between two different
 % optimization algorithms: either the nonlinear least squares, 'NonLinLsq' 
 % or the vectorization using Kronecher product, 'kronecher'
-CONFIG.optimization_algorithm               = 'NonLinLsq'; 
+CONFIG.optimization_algorithm               = 'kronecher'; 
 
 %% Visualization setup 
 CONFIG.visualize_robot_simulator            = 1;                           %either 0 or 1
@@ -57,7 +57,7 @@ CONFIG.sim_step                              = 0.01;
 % it will be automatically activated if the "Joint Space" controller is used, 
 % or the visualization of stability analysis results is active.
 CONFIG.jointRef_with_ikin                    = 1;                          %either 0 or 1
-CONFIG.visualize_ikin_results                = 0;                          %either 0 or 1  
+CONFIG.visualize_ikin_results                = 1;                          %either 0 or 1  
 CONFIG.ikin_integration_step                 = 0.01; 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -68,6 +68,7 @@ CONFIG.pinv_tol           = 1e-8;
 CONFIG.pinv_damp          = 5e-6;
 CONFIG.reg_HessianQP      = 1e-3;
 CONFIG.postCorrection     = 0;
+
 % if the robot is not moving, i.e. CONFIG.demo_movements = 0, the integration 
 % can be very long. In this case try changing the integration options below.
 %
@@ -90,12 +91,11 @@ if CONFIG.integrateWithFixedStep == 1
 CONFIG.massCorr = 0.05; 
 end
 
-% if one wants to use the postural correction, it is necessary to define
-% the joint references using inverse kinematics, or add a correction to the
-% mass matrix
+% if one wants to use the postural correction, it is necessary for now to 
+% define the joint references using inverse kinematics
 if CONFIG.postCorrection == 1
-    CONFIG.jointRef_with_ikin     = 1;
-%   CONFIG.massCorr               = 0.05; 
+    
+CONFIG.jointRef_with_ikin  = 1;
 end
 
 %% Initialize the model
@@ -104,32 +104,28 @@ CONFIG.ndof        = 25;
 wbm_modelInitialise('icubGazeboSim');
 
 %% Initial joints position [deg]
+CONFIG.leftArmInit  = [ -20   30  0.0  45   0.0]';          
+CONFIG.rightArmInit = [ -20   30  0.0  45   0.0]'; 
+CONFIG.torsoInit    = [ -10.0   0.0    0.0]';
+ 
 if       CONFIG.feet_on_ground(1) == 1 && CONFIG.feet_on_ground(2) == 1
-
+     
 % initial conditions for balancing on two feet 
-CONFIG.torsoInit    = [   0    0   -5]';    
-CONFIG.leftArmInit  = [ -35   30    0    50    0]';          
-CONFIG.rightArmInit = [ -35   30    0    50    0]'; 
-CONFIG.leftLegInit  = [  12    5    0   -10   -1.5  -5]';
-CONFIG.rightLegInit = [  12    5    0   -10   -2.5  -5]';
+ CONFIG.leftLegInit  = [  25.5   0.1   0.0  -18.5  -5.5  -0.1]';
+ CONFIG.rightLegInit = [  25.5   0.1   0.0  -18.5  -5.5  -0.1]';
 
 elseif   CONFIG.feet_on_ground(1) == 1 && CONFIG.feet_on_ground(2) == 0
      
 % initial conditions for the robot standing on the left foot
-CONFIG.torsoInit    = [ 0   15  -1 ]';    
-CONFIG.leftArmInit  = [-40  95   0    50    0 ]';          
-CONFIG.rightArmInit = [-40  50   0    35    0 ]'; 
-CONFIG.leftLegInit  = [ 20  25   0   -20   -5    -5 ]';
-CONFIG.rightLegInit = [ 10  15   0   -10   -5     5 ]';
+ CONFIG.leftLegInit  = [  25.5   15.0   0.0  -18.5  -5.5  -0.1]';
+ CONFIG.rightLegInit = [  25.5   5.0    0.0  -40    -5.5  -0.1]'; 
  
 elseif   CONFIG.feet_on_ground(1) == 0 && CONFIG.feet_on_ground(2) == 1
   
 % initial conditions for the robot standing on the right foot
-CONFIG.torsoInit    = [  0  -15   1 ]';    
-CONFIG.leftArmInit  = [-40   50   0    35    0]';          
-CONFIG.rightArmInit = [-40   95   0    50    0 ]'; 
-CONFIG.leftLegInit  = [ 10   15   0   -10   -5   5]';
-CONFIG.rightLegInit = [ 20   25   0   -20   -5  -5]';
+ CONFIG.leftLegInit  = [  25.5   5.0    0.0  -40    -5.5  -0.1]';
+ CONFIG.rightLegInit = [  25.5   15.0   0.0  -18.5  -5.5  -0.1]';
+   
 end
 
 %% %%%%%%%%%%%%%%%%%%%%% FORWARD DYNAMICS INTEGRATION %%%%%%%%%%%%%%%%%% %%

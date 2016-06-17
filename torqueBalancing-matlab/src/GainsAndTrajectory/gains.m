@@ -28,7 +28,7 @@ Jc             = DYNAMICS.Jc;
 % General parameters
 S              = [zeros(6,ndof);
                   eye(ndof)];
-
+                         
 %% Gains for two feet on the ground
 if sum(CONFIG.feet_on_ground) == 2
     
@@ -69,6 +69,7 @@ end
 %% Definition of the impedances and dampings vectors 
 gainsInit.impedances    = [impTorso,impArms,impArms,impLeftLeg,impRightLeg];
 gainsInit.dampings      = 2*sqrt(gainsInit.impedances);
+% gainsInit.dampings      = 0.5;
 
 if (size(gainsInit.impedances,2) ~= ndof)
     
@@ -79,11 +80,15 @@ end
 gainsInit.impedances         = diag(gainsInit.impedances);
 gainsInit.dampings           = diag(gainsInit.dampings); 
 gainsInit.MomentumGains      = [gainsDCoM zeros(3); zeros(3) gainsDAngMom];
+% gainsInit.MomentumGains      = 0.5;
 gainsInit.intMomentumGains   = [gainsPCoM zeros(3); zeros(3) gainsPAngMom];
 
 % Desired shape for the state matrix of the linearized system, for gains tuning procedure
 gainsInit.KSdes              = gainsInit.impedances;
 gainsInit.KDdes              = gainsInit.dampings;
+
+% Gains for feet correction to avoid numerical errors
+gainsInit.CorrPosFeet        = 5;
 
 %% Correction of postural task that ensures the asymptotic stability of the joint space
 if postCorrection == 1 

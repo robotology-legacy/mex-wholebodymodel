@@ -40,8 +40,8 @@ CONFIG.figureCont = visualizeSimulation(t,chi,CONFIG);
 end
 
 %% FORWARD DYNAMICS (basic parameters)
-if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamics == 1 || CONFIG.allowVisualization == 1
-
+if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamics == 1 || CONFIG.allowVisualization == 1 
+    
 CONFIG.wait = waitbar(0,'Generating the plots...');
 set(0,'DefaultFigureWindowStyle','Docked');
 
@@ -53,6 +53,7 @@ qjRef         = zeros(ndof,length(t));
 dqjRef        = zeros(ndof,length(t));
 ddqjRef       = zeros(ndof,length(t));
 ddqjNonLin    = zeros(ndof,length(t));
+ddqjLin       = zeros(ndof,length(t));
 
 % contact forces and torques
 fc            = zeros(6*CONFIG.numConstraints,length(t));
@@ -68,6 +69,7 @@ H             = zeros(6,length(t));
 HRef          = zeros(6,length(t));
 
 % generate the vectors from forward dynamics
+
 for time = 1:length(t)
     
 [~,visual]          = forwardDynamics(t(time), chi(time,:)', CONFIG);
@@ -80,6 +82,7 @@ qjRef(:,time)       = visual.JointRef.qjRef;
 dqjRef(:,time)      = visual.JointRef.dqjRef;
 ddqjRef(:,time)     = visual.JointRef.ddqjRef;
 ddqjNonLin(:,time)  = visual.ddqjNonLin;
+ddqjLin(:,time)     = visual.ddqjLin;
 
 % contact forces and torques
 fc(:,time)          = visual.fc;
@@ -108,9 +111,7 @@ end
 delete(CONFIG.wait)
 
 % composed parameters
-HErr                   = H-HRef;
-qjErr                  = qj-qjRef;
-dqjErr                 = dqj-dqjRef;
+HErr                = H-HRef;
 
 %% Basic visualization (forward dynamics integration results)
 if CONFIG.visualize_integration_results == 1
@@ -127,7 +128,7 @@ end
 %% Linearization results (soundness of linearization and gains tuning)
 if CONFIG.allowLinVisualization == 1
     
-CONFIG.figureCont = visualizeLinearization(t,CONFIG,qjErr,dqjErr,ddqjNonLin,ddqjRef);     
+CONFIG.figureCont = visualizeLinearization(t,CONFIG,ddqjNonLin,ddqjLin);     
 end
 
 figureCont = CONFIG.figureCont;

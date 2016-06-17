@@ -64,10 +64,11 @@ ddqj(:,kk)                    = dChiIkin(14+ndof:end);
 
 CoMTrajectoryError(:,kk)      = visualizeIkinParam.CoMTrajectoryError;
 feetError(:,kk)               = visualizeIkinParam.feetError;         
-momentumError(:,kk)           = visualizeIkinParam.momentumError;   
+momentumError(:,kk)           = visualizeIkinParam.momentumError; 
 end
 
 %% Joint trajectory and visualization parameters
+ikin.ChiIkin                = ChiIkin;
 ikin.qj                     = qj;
 ikin.dqj                    = dqj;
 ikin.ddqj                   = ddqj;

@@ -30,7 +30,7 @@ PosBase                          = basePose(1:3,:);
 quatBase                         = basePose(4:7,:);
 
 % Normalize quaternions to avoid numerical errors
-%quatBase                        = quatBase/norm(quatBase);
+quatBase                        = quatBase/norm(quatBase);
 
 % Base velocity; conversion of the base orientation into a rotation matrix; 
 % state velocity
