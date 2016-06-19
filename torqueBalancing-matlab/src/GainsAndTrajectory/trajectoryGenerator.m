@@ -27,7 +27,7 @@ noOscillationTime          = 0;           % If params.demo_movements = 1, the va
                                           % that the robot waits before starting the left-and-right
                                           
 %% Trajectory definition
-if demo_movements == 1
+if  demo_movements == 1
     
 if  sum(feet_on_ground) == 2
    
@@ -37,12 +37,6 @@ else
         
     directionOfOscillation = [0;1;0];
     referenceParams        = [0.015 0.15];    
-end
-
-if CONFIG.visualize_stability_analysis_results == 1
-    
-    directionOfOscillation = [0;1;0];
-    referenceParams        = [0.0075 0.1]; 
 end
 end
 

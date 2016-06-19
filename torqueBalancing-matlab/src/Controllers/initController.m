@@ -48,15 +48,13 @@ if     strcmp(CONFIG.controller,'StackOfTask') == 1
 controlParam          = stackOfTaskController(CONFIG,gains,trajectory,DYNAMICS,FORKINEMATICS,STATE); 
 
 if     use_QPsolver == 1 
-
 % Quadratic programming solver for the nullspace of contact forces  
 controlParam.fcDes    = QPSolver(controlParam,CONFIG,FORKINEMATICS);
 end
 
 controlParam.tau      = controlParam.tauModel + controlParam.Sigma*controlParam.fcDes;
 
-elseif strcmp(CONFIG.controller,'JointSpace') == 1 
-    
+elseif strcmp(CONFIG.controller,'JointSpace') == 1     
 % Centroidal coordinates transformation   
 centroidalDynamics    = centroidalConversion(DYNAMICS,FORKINEMATICS,STATE);
 controlParam          = jointSpaceController(CONFIG,gains,trajectory,centroidalDynamics,STATE);

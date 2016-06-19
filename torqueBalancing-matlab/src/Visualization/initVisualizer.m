@@ -23,12 +23,7 @@ CONFIG.visualizeLinearization    = 0;
 CONFIG.allowLinVisualization     = 0;
 initState                        = CONFIG.initState;
 
-if CONFIG.visualize_stability_analysis_results == 1 || CONFIG.visualize_gains_tuning_results == 1
-
-CONFIG.visualizeLinearization = 1;
-end
-
-if CONFIG.linearizeJointSp  == 1 && CONFIG.visualizeLinearization == 1
+if CONFIG.gains_tuning  == 1 || CONFIG.linearizationDebug == 1
     
 CONFIG.allowLinVisualization  = 1;
 end
@@ -82,8 +77,9 @@ qjRef(:,time)       = visual.JointRef.qjRef;
 dqjRef(:,time)      = visual.JointRef.dqjRef;
 ddqjRef(:,time)     = visual.JointRef.ddqjRef;
 ddqjNonLin(:,time)  = visual.ddqjNonLin;
+if CONFIG.linearizationDebug == 1
 ddqjLin(:,time)     = visual.ddqjLin;
-
+end
 % contact forces and torques
 fc(:,time)          = visual.fc;
 f0(:,time)          = visual.f0;

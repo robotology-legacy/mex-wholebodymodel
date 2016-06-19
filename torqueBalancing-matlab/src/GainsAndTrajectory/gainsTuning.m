@@ -30,15 +30,15 @@ ANull                 = linearization.ANull;
 BNull                 = linearization.BNull;
 CONFIG.positDefToll   = 0.1;
 
-%% KRONECHER OPTIMIZATION
-if strcmp(CONFIG.optimization_algorithm,'kronecher') == 1
+%% KRONECHER OPTIMIZATION (real time)
+if strcmp(CONFIG.optimization_algorithm,'realTimeOpt') == 1
     
 [Kpx,Kpn] = kronVectorization(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
 [Kdx,Kdn] = kronVectorization(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
 end
 
-%% NONLINEAR LSQ OPTIMIZATION
-if strcmp(CONFIG.optimization_algorithm,'NonLinLsq') == 1
+%% NONLINEAR LSQ OPTIMIZATION (offline)
+if strcmp(CONFIG.optimization_algorithm,'offlineOpt') == 1
 CONFIG.matrixSelector = 'position';
 [Kpx,Kpn] = nonLinLeastSquares(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
 
@@ -217,7 +217,7 @@ if flag(4) == 1
 %     disp('Warning: the gains matrix on joint velocity is not positive definite')   
 end
 
-% parameters for visualization                                        
+%% Parameters for visualization                                        
 visualizeTuning.KS           = KSn;
 visualizeTuning.KD           = KDn;
 visualizeTuning.KSdes        = KSdes;
@@ -227,15 +227,12 @@ visualizeTuning.Kdn          = Kdn;
 visualizeTuning.Kpx          = Kpx;
 visualizeTuning.Kdx          = Kdx;
 
-% gains matrices after optimization
-gains.impedances        = Kpn; 
-gains.dampings          = Kdn;
-gains.MomentumGains     = Kdx;
-gains.intMomentumGains  = Kpx;
-gains.posturalCorr      = gainsInit.posturalCorr;
-gains.CorrPosFeet       = gainsInit.CorrPosFeet;
-% gains.KSdes             = gainsInit.KSdes;
-% gains.KDdes             = gainsInit.KDdes;
+%% Gains matrices after optimization
+gains.impedances             = Kpn; 
+gains.dampings               = Kdn;
+gains.MomentumGains          = Kdx;
+gains.intMomentumGains       = Kpx;
+gains.CorrPosFeet            = gainsInit.CorrPosFeet;
 
 end
 

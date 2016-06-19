@@ -21,7 +21,7 @@ figureCont = CONFIG.figureCont;
 ndof       = CONFIG.ndof; 
 
 %% Linearized joint dynamics
-if CONFIG.visualize_stability_analysis_results == 1
+if CONFIG.linearizationDebug  == 1
 
 for k=1:5
   
@@ -105,7 +105,7 @@ figureCont = figureCont +1;
 end
            
 %% Gains Tuning results
-if CONFIG.visualize_gains_tuning_results  == 1 && CONFIG.linearize_for_gains_tuning == 1
+if CONFIG.visualize_gains_tuning_results  == 1 
 
 % STATE MATRIX
 AStateDes     = [zeros(ndof)                     eye(ndof);

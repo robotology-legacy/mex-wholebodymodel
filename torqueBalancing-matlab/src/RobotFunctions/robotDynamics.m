@@ -27,7 +27,7 @@ omegaBaseWorld = STATE.omegaBaseWorld;
 %% ROBOT DYNAMICS
 % mass matrix
 M                                = wbm_massMatrix(RotBase,PosBase,qj);
-% correction to make the mass matrix positive definite 
+% correction to ensure the mass matrix to be positive definite 
 M(7:end,7:end)                   = M(7:end,7:end) + massCorr.*eye(ndof);
 
 % generalized bias forces, Coriolis and gravity

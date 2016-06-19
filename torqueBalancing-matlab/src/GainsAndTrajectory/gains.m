@@ -1,8 +1,6 @@
 function gainsInit = gains(CONFIG)
 %GAINS generates the initial gains matrices for both the
-%      momentum task and the postural task. 
-%      GAINS also apply a modification of the postural task to
-%      assure the system's asymptotic stability.
+%      momentum task (primary task in SoT controller) and the postural task. 
 %
 %      gains = GAINS(config) takes as an input the structure CONFIG, which
 %      contains all the utility parameters, and the structure DYNAMICS 
@@ -15,20 +13,8 @@ function gainsInit = gains(CONFIG)
 
 % ------------Initialization----------------
 % Config parameters
-ndof           = CONFIG.ndof;
-postCorrection = CONFIG.postCorrection;
-DYNAMICS       = CONFIG.initDynamics;
-pinv_damp      = CONFIG.pinv_damp;
-%pinv_tol      = CONFIG.pinv_tol;
+ndof                    = CONFIG.ndof;
 
-% Dynamics parameters
-M              = DYNAMICS.M;
-Jc             = DYNAMICS.Jc;
-
-% General parameters
-S              = [zeros(6,ndof);
-                  eye(ndof)];
-                         
 %% Gains for two feet on the ground
 if sum(CONFIG.feet_on_ground) == 2
     
@@ -69,7 +55,6 @@ end
 %% Definition of the impedances and dampings vectors 
 gainsInit.impedances    = [impTorso,impArms,impArms,impLeftLeg,impRightLeg];
 gainsInit.dampings      = 2*sqrt(gainsInit.impedances);
-% gainsInit.dampings      = 0.5;
 
 if (size(gainsInit.impedances,2) ~= ndof)
     
@@ -80,7 +65,6 @@ end
 gainsInit.impedances         = diag(gainsInit.impedances);
 gainsInit.dampings           = diag(gainsInit.dampings); 
 gainsInit.MomentumGains      = [gainsDCoM zeros(3); zeros(3) gainsDAngMom];
-% gainsInit.MomentumGains      = 0.5;
 gainsInit.intMomentumGains   = [gainsPCoM zeros(3); zeros(3) gainsPAngMom];
 
 % Desired shape for the state matrix of the linearized system, for gains tuning procedure
@@ -90,24 +74,13 @@ gainsInit.KDdes              = gainsInit.dampings;
 % Gains for feet correction to avoid numerical errors
 gainsInit.CorrPosFeet        = 5;
 
-%% Correction of postural task that ensures the asymptotic stability of the joint space
-if postCorrection == 1 
-
-JcMinv                  = Jc/M;
-JcMinvS                 = JcMinv*S;
-pinvJcMinvS             = JcMinvS'/(JcMinvS*JcMinvS' + pinv_damp*eye(size(JcMinvS,1)));
-%pinvJcMinvS            = pinv(JcMinvS,pinv_tol);
-Mbar                    = M(7:end,7:end)-M(7:end,1:6)/M(1:6,1:6)*M(1:6,7:end);
-
-% damped null space
-NullLambda              = eye(ndof)-pinvJcMinvS*JcMinvS;
-
-% this is the term added to the postural task to assure the dynamics to be
-% asymptotically stable
-gainsInit.posturalCorr  = NullLambda*Mbar;
-
-else  
-gainsInit.posturalCorr  = eye(ndof);
+% Reduce the damping in case one wants to verify the soundness of
+% linearization
+if CONFIG.linearizationDebug  == 1
+% gainsInit.dampings           = 2.5.*eye(ndof);
+% gainsInit.MomentumGains      = 2.5.*eye(6);   
+gainsInit.dampings           = gainsInit.dampings/2;
+gainsInit.MomentumGains      = gainsInit.MomentumGains/2;  
 end
 
 end

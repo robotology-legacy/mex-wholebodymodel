@@ -64,14 +64,13 @@ RFootPoseEul      = FORKINEMATICS.RFootPoseEul;
 LFootPoseEul      = FORKINEMATICS.LFootPoseEul;
 
 % Gains for inverse kinematics
-CONFIG.initDynamics  = DYNAMICS;
-gainsInit            = gains(CONFIG);
-KPosFeet             = gainsInit.CorrPosFeet;
-KPosMom              = gainsInit.intMomentumGains;
-KPosPost             = gainsInit.impedances;
-KVelFeet             = 2*sqrt(KPosFeet);
-KVelMom              = 2*sqrt(KPosMom);
-KVelPost             = 2*sqrt(KPosPost);
+gainsInit         = CONFIG.gains;
+KPosFeet          = gainsInit.CorrPosFeet;
+KPosMom           = gainsInit.intMomentumGains;
+KPosPost          = gainsInit.impedances;
+KVelFeet          = 2*sqrt(KPosFeet);
+KVelMom           = gainsInit.MomentumGains;
+KVelPost          = gainsInit.dampings;
 
 %% CoM trajectory generator
 desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG);

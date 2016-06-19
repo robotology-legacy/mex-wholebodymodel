@@ -19,8 +19,8 @@ waitbar(t/CONFIG.tEnd,CONFIG.wait)
 %% Robot Configuration
 ndof                  = CONFIG.ndof;
 gains                 = CONFIG.gains;
-initState             = CONFIG.initState;
-initForKinematics     = CONFIG.initForKinematics;         
+qjInit                = CONFIG.qjInit;
+xCoMRef               = CONFIG.xCoMRef;
 
 %% Robot State
 STATE                 = robotState(chi,CONFIG);
@@ -59,22 +59,36 @@ trajectory.JointReferences         = interpInverseKinematics(t,CONFIG.ikin);
 else
 trajectory.JointReferences.ddqjRef = zeros(ndof,1);
 trajectory.JointReferences.dqjRef  = zeros(ndof,1);
-trajectory.JointReferences.qjRef   = initState.qj;
+trajectory.JointReferences.qjRef   = qjInit;
 end
 
 %% CoM trajectory generator
-trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(CONFIG.xCoMRef,t,CONFIG);
+trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(xCoMRef,t,CONFIG);
 
-%% LINEARIZATION ALONG THE JOINT REFERENCE TRAJECTORY
-if CONFIG.linearizeJointSp == 1
-    
-linearization   = jointSpaceLinearization(CONFIG,STATE);
-ddqjLin         = trajectory.JointReferences.ddqjRef-linearization.KS*(qj-trajectory.JointReferences.qjRef)...
-                 -linearization.KD*(dqj-trajectory.JointReferences.dqjRef);
-[gains2,visualizeTuning] = gainsTuning (linearization,CONFIG);
-else  
-ddqjLin         = zeros(ndof,1);
+%% Linearization and gains tuning procedure 
+if CONFIG.gains_tuning == 1 && strcmp(CONFIG.optimization_algorithm,'realTimeOpt') == 1
+
+linearization            = jointSpaceLinearization(CONFIG,qj);
+% reset the world frame
+wbm_setWorldFrame(RotBase,PosBase,[0 0 -9.81]')
+% gains optimization
+[gains,visualizeTuning]  = gainsTuning(linearization,CONFIG);
+visualization.gainTun    = visualizeTuning;
 end
+
+%%%%%%%%%%%%%%% LINEARIZATION DEBUG AND STABILITY ANALYSIS %%%%%%%%%%%%%%%%
+if CONFIG.linearizationDebug  == 1
+ 
+linearization            = jointSpaceLinearization(CONFIG,qj);
+% reset the world frame
+wbm_setWorldFrame(RotBase,PosBase,[0 0 -9.81]')
+
+% linearized joint accelerations
+visualization.ddqjLin    = trajectory.JointReferences.ddqjRef-linearization.KS*(qj-trajectory.JointReferences.qjRef)...
+                          -linearization.KD*(dqj-trajectory.JointReferences.dqjRef);
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      
 %% Balancing controller
 controlParam    =  initController(gains,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE);
@@ -89,11 +103,8 @@ dNu             = M\(Jc'*fc + [zeros(6,1); tau]-h);
 % state derivative 
 dchi            = [NuQuat;dNu];
 
-[dNu(7:end) ddqjLin]
-
 %% Parameters for visualization
 visualization.ddqjNonLin  = dNu(7:end);
-visualization.ddqjLin     = ddqjLin;
 visualization.dqj         = dqj;
 visualization.qj          = qj;
 visualization.JointRef    = trajectory.JointReferences;

@@ -24,16 +24,13 @@ function controlParam = stackOfTaskController(CONFIG,gains,trajectory,DYNAMICS,F
 pinv_tol            = CONFIG.pinv_tol;
 feet_on_ground      = CONFIG.feet_on_ground;
 ndof                = CONFIG.ndof;
-initDynamics        = CONFIG.initDynamics;
-initState           = CONFIG.initState;
-%pinv_damp          = CONFIG.pinv_damp;
+pinv_damp           = CONFIG.pinv_damp;
 
 %% Gains
 impedances          = gains.impedances;
 dampings            = gains.dampings;
 MomentumGains       = gains.MomentumGains;
 intMomentumGains    = gains.intMomentumGains;
-posturalCorr        = gains.posturalCorr;
 
 %% Dynamics
 M                   = DYNAMICS.M;
@@ -49,6 +46,10 @@ Mbj                 = M(1:6,7:end);
 Mj                  = M(7:end,7:end);
 Mjb                 = M(7:end,1:6);
 Mbar                = Mj - Mjb/Mb*Mbj;
+% The centroidal momentum jacobian is reduced to the joint velocity. This
+% is then used to compute the approximation of the angular momentum integral
+JH                  = DYNAMICS.JH;
+JG                  = JH(:,7:end) -JH(:,1:6)*(eye(6)/Jc(1:6,1:6))*Jc(1:6,7:end);
 
 %% Forward kinematics
 xCoM                = FORKINEMATICS.xCoM;
@@ -104,8 +105,7 @@ end
 
 %% Desired momentum derivative
 % closing the loop on angular momentum integral
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-deltaPhi           =  initDynamics.JhReduced(4:end,:)*(qj-qjRef);
+deltaPhi           =  JG(4:end,:)*(qj-qjRef);
 accDesired         =  [m.*x_dx_ddx_CoMDes(:,3); zeros(3,1)];
 velDesired         = -MomentumGains*[m.*(dxCoM-x_dx_ddx_CoMDes(:,2)); H(4:end)];
 posDesired         = -intMomentumGains*[m.*(xCoM-x_dx_ddx_CoMDes(:,1)); deltaPhi];
@@ -127,8 +127,18 @@ NullLambda         = eye(ndof)-pinvLambda*Lambda;
 
 Sigma              = -(pinvLambda*JcMinvJct + NullLambda*JBar);
 SigmaNA            =  Sigma*Nullfc;
+
+% Postural task correction
+if CONFIG.postCorrection == 1
+pinvLambdaDamp     =  Lambda'/(Lambda*Lambda' + pinv_damp*eye(size(Lambda,1)));
+NullLambdaDamp     =  eye(ndof) - pinvLambdaDamp*Lambda;
+posturalCorr       =  NullLambdaDamp*Mbar;
+else
+posturalCorr       =  eye(ndof);
+end
+
 tauModel           =  pinvLambda*(JcMinv*h - dJcNu) + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
-                     +Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
+                     + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
 
 %% Desired contact forces computation
 fcHDot             = pinvA*(HDotDes - f_grav);

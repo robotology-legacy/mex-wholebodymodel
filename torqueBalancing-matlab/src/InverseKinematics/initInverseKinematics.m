@@ -78,6 +78,6 @@ delete(CONFIG.wait)
 %% Visualize the results of the inverse kinematics
 if CONFIG.visualize_ikin_results == 1
     
-figureCont  =  visualizeInverseKin(CONFIG,ikin);
+figureCont             =  visualizeInverseKin(CONFIG,ikin);
 end
 

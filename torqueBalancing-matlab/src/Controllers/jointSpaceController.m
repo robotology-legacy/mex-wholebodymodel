@@ -81,6 +81,5 @@ end
 % with the software architecture
 controlParam.f0         = zeros(6*CONFIG.numConstraints,1);
 controlParam.tau        = tau;
-controlParam.ddqjNonLin = zeros(ndof,1);
 
 end
