@@ -93,3 +93,5 @@ bool ModelComponent::reorderMatrixInColMajor(const double *srcMat, double *destM
 //      [3] An exhaustive evaluation of row-major, column-major and Morton layouts for large two-dimensional arrays,
 //          Thiyagalingam & Beckmann & Kelly, Imperial College, 2003, p. 2,
 //            url: https://www.doc.ic.ac.uk/~phjk/Publications/ExhaustiveMortonUKPEW2003.pdf
+//      [4] The Art of Assembly Language Programming, Randall Hyde, 2003, pp. 468-475,
+//            url: http://www.plantation-productions.com/Webster/www.artofasm.com/Linux/HTML/Arraysa2.html

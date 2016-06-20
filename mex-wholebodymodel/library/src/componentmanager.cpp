@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
- * modified by: Martin Neururer, email: martin.neururer@gmail.com
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -119,7 +119,7 @@ void ComponentManager::cleanup()
 
   // mexPrintf("DONE_1\n");
 
-  //ModelState::deleteInstance(); // TO DEBUG: at the end of the ctest it causes always a segmentation violation!
+  // ModelState::deleteInstance(); // TO DEBUG: at the end of the ctest it causes always a segmentation violation!
 
   // mexPrintf("DONE_2\n");
 
@@ -128,10 +128,12 @@ void ComponentManager::cleanup()
 #endif
 }
 
-ComponentManager::~ComponentManager(void)
+ComponentManager::~ComponentManager()
 {
   // mexPrintf("start cleanup\n");
   cleanup();
+  // deleteObject(&modelState); // error
+
   // mexPrintf("DONE_3\n");
 }
 

@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -26,22 +27,25 @@
 // library includes
 #include <wbi/wbiUtil.h>
 #include <wbi/iWholeBodyModel.h>
+#include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <Eigen/Dense>
 
 // local includes
 
 namespace mexWBIComponent
 {
-  class ModelState
+  class ModelState : private boost::noncopyable
   {
     public:
       static ModelState *getInstance(std::string = "icubGazeboSim");
+      static void initModelState();
 
       /**
       * Delete the (static) instance of this component,
       * and set the instance pointer to NULL.
       */
-      static void deleteInstance();
+      // static void deleteInstance();
 
       bool setState(double*, double*, double*);
 
@@ -77,16 +81,22 @@ namespace mexWBIComponent
       wbi::iWholeBodyModel *robotModel(void);
       std::string robotName(void);
 
-      virtual ~ModelState();
+      // virtual ~ModelState();
+      ~ModelState();
 
     private:
       ModelState(std::string);
 
-      // Note: The difference here is that the 'pointers' are static
-      // not the objects! The delete process is there different.
-      // With the delete-operator we delete only the pointer
+      // Note: The difference here is that the 'pointer' for the variable
+      // modelState is static and not the object! The deletion process is
+      // here different. With the delete-operator we delete only the pointer
       // to the object and not the object self --> segmentation fault!
-      static ModelState *modelState;
+      // Furthermore, this class describes a singelton pattern. When the
+      // instance will be created, we have to add it to a 'deletion-manager'
+      // that the object is guaranteed to be deleted.
+
+      // static ModelState *modelState;
+      static boost::scoped_ptr<ModelState> modelState;
       static wbi::iWholeBodyModel *robotWBIModel;
 
       size_t numDof;
@@ -111,7 +121,7 @@ namespace mexWBIComponent
       *pp = NULL;
       // mexPrintf("delete object executed.\n");
     }
-  }
+  };
 
 }
 

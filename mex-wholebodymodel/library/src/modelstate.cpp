@@ -31,7 +31,8 @@
 
 using namespace mexWBIComponent;
 
-ModelState *ModelState::modelState = NULL;
+// ModelState *ModelState::modelState = NULL;
+boost::scoped_ptr<ModelState> ModelState::modelState(NULL);
 wbi::iWholeBodyModel *ModelState::robotWBIModel = NULL;
 
 bool isRobotNameAFile(const std::string &robotName)
@@ -61,63 +62,65 @@ ModelState::ModelState(std::string robotName)
   qjS    = new double[numDof];
   qjDotS = new double[numDof];
 
-  gS[0] = 0; gS[1] = 0; gS[2] = -9.81;
+  gS[0] = 0.0f; gS[1] = 0.0f; gS[2] = -9.81f;
 }
 
 ModelState::~ModelState()
 {
-  // TO CHECK: since the object is static, the destructor
-  // will not called and can cause some inconsistency in
-  // the memory management ...
 #ifdef DEBUG
   mexPrintf("ModelState destructor called\n");
-#endif
-
-  if(qjDotS != NULL)
-  {
-    delete[] qjDotS;
-    qjDotS = NULL;
-  }
-#ifdef DEBUG
-  mexPrintf("free(qjDotS) called\n");
-#endif
-
-  if(qjS != NULL)
-  {
-    delete[] qjS;
-    qjS = NULL;
-  }
-#ifdef DEBUG
-  mexPrintf("free(qjS) called\n");
 #endif
 
   if(robotWBIModel != NULL)
   {
     delete robotWBIModel;
     robotWBIModel = NULL;
+    // mexPrintf("deleted_1\n");
   }
+
+  if(qjDotS != NULL) // TO DEBUG: the dynamic allocated arrays qjDotS and qjS cannot be deleted --> access violations!
+  {
+    // mexPrintf("deleting_2\n");
+    delete[] qjDotS;
+    qjDotS = NULL;
+    // mexPrintf("deleted_2\n");
+  }
+
 #ifdef DEBUG
+  mexPrintf("free(qjDotS) called\n");
+#endif
+
+  if(qjS != NULL)
+  {
+    // mexPrintf("deleting_3\n");
+    delete[] qjS;
+    qjS = NULL;
+    // mexPrintf("deleted_3\n");
+  }
+
+#ifdef DEBUG
+  mexPrintf("free(qjS) called\n");
   mexPrintf("ModelState destructor returning\n");
 #endif
 }
 
 ModelState *ModelState::getInstance(std::string robotName)
 {
-  if(modelState == NULL)
-    modelState = new ModelState(robotName);
+  // if(modelState == NULL)
+  //   modelState = new ModelState(robotName);
 
-  return modelState;
+  if(modelState == NULL)
+    modelState.reset( new ModelState(robotName) );
+
+  // return modelState;
+  return modelState.get();
 }
 
-void ModelState::deleteInstance()
+/*void ModelState::deleteInstance()
 {
   // mexPrintf("ModState::delInst\n");
-  //deleteObject(&modelState); // error
-
-  // the deletion of the static objects must be done in
-  // a different way. Maybe with the help of smart pointers,
-  // like, boost::scoped_ptr or std::unique_ptr.
-}
+  // deleteObject(&modelState); // error
+} */
 
 bool ModelState::setState(double *qj_t, double *qjDot_t, double *vb_t)
 {

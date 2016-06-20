@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -52,51 +53,52 @@ namespace mexWBIComponent
 namespace mexWBIComponent
 {
   class ComponentManager
-{
-  public:
-    static ComponentManager *getInstance(std::string robotName = "icub");
+  {
+    public:
+      static ComponentManager *getInstance(std::string robotName = "icub");
 
-    /**
-     * Delete the (static) instance of this component,
-     * and set the instance pointer to NULL.
-     */
-    static void deleteInstance();
-    static void cleanup();
+      bool processFunctionCall(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
 
-    bool processFunctionCall(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+      /**
+       * Delete the (static) instance of this component,
+       * and set the instance pointer to NULL.
+       */
+      static void deleteInstance();
 
-    ~ComponentManager(void);
+      ~ComponentManager();
 
-  private:
-    ComponentManager(std::string);
-    void initialise(std::string);
+    private:
+      ComponentManager(std::string);
+      void initialise(std::string);
 
-    static ComponentManager *componentManager;
+      static void cleanup();
 
-    ModelState *modelState;
+      static ComponentManager *componentManager;
 
-    ModelCentroidalMomentum *modelCentroidalMomentum;
-    ModelComponent *currentComponent;
-    ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
-    ModelDjDq *modelDjDq;
-    ModelForwardKinematics *modelForwardKinematics;
-    ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
-    ModelGetFloatingBaseState *modelGetFloatingBaseState;
-    ModelGetState *modelGetState;
-    ModelGravityForces *modelGravityForces;
-    ModelInitialise *modelInitialise;
-    ModelInitialiseURDF *modelInitialiseURDF;
-    ModelJacobian *modelJacobian;
-    ModelJointLimits *modelJointLimits;
-    ModelMassMatrix *modelMassMatrix;
-    ModelRotoTranslationMatrix *modelRotoTranslationMatrix;
-    ModelSetWorldFrame *modelSetWorldFrame;
-    ModelUpdateState *modelUpdateState;
-    ModelVisualizeTrajectory *modelVisualizeTrajectory;
+      ModelState *modelState;
 
-    int numDof;
+      ModelCentroidalMomentum *modelCentroidalMomentum;
+      ModelComponent *currentComponent;
+      ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
+      ModelDjDq *modelDjDq;
+      ModelForwardKinematics *modelForwardKinematics;
+      ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
+      ModelGetFloatingBaseState *modelGetFloatingBaseState;
+      ModelGetState *modelGetState;
+      ModelGravityForces *modelGravityForces;
+      ModelInitialise *modelInitialise;
+      ModelInitialiseURDF *modelInitialiseURDF;
+      ModelJacobian *modelJacobian;
+      ModelJointLimits *modelJointLimits;
+      ModelMassMatrix *modelMassMatrix;
+      ModelRotoTranslationMatrix *modelRotoTranslationMatrix;
+      ModelSetWorldFrame *modelSetWorldFrame;
+      ModelUpdateState *modelUpdateState;
+      ModelVisualizeTrajectory *modelVisualizeTrajectory;
 
-    std::map <std::string, ModelComponent*> componentList;
+      int numDof;
+
+      std::map <std::string, ModelComponent*> componentList;
   };
 
 }
