@@ -1,4 +1,4 @@
-function [gains,visualizeTuning] = gainsTuning (linearization,CONFIG)
+function gainsOpt = gainsTuning (linearization,CONFIG,mode)
 %GAINSTUNING implements different algorithms to optimize the feedback control 
 %            gains for the linearized joint space dynamics of iCub robot.
 %   GAINSTUNING implements two different algorithms: 'lsq' uses a nonlinear
@@ -7,13 +7,15 @@ function [gains,visualizeTuning] = gainsTuning (linearization,CONFIG)
 %   solve the problem. The main difference is that only 'lsq' takes into
 %   account the positive-definiteness constraint.
 %
-%   [gains,visualizeTuning] = GAINSTUNING(linearization,config)
+%   gainsOpt = GAINSTUNING(linearization,config,mode)
 %   takes as input the structure LINEARIZATION that comes from the joint
 %   space linearization; the structure CONFIG containing the user-defined
-%   parameters.
+%   parameters. The string MODE can be either 'normal' or 'debug'. The only
+%   difference is that in 'debug' mode the function also verifies the gains
+%   matrices to be symmetric positive definite, and the new state matrix to
+%   have all the eigenvalues with negative real part.
 %
-%   The output are the new gains matrices in the structure GAINS and the
-%   parameters for visualization, VISUALIZETUNING.
+%   The output are the new gains matrices in the structure GAINSOPT.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -21,7 +23,7 @@ function [gains,visualizeTuning] = gainsTuning (linearization,CONFIG)
 % ------------Initialization----------------
 % Config parameters
 ndof                  = CONFIG.ndof;
-gainsInit             = CONFIG.gains;
+gainsInit             = CONFIG.gainsInit;
 KSdes                 = gainsInit.KSdes;
 KDdes                 = gainsInit.KDdes;
 ACartesian            = linearization.ACartesian;
@@ -30,26 +32,18 @@ ANull                 = linearization.ANull;
 BNull                 = linearization.BNull;
 CONFIG.positDefToll   = 0.1;
 
-%% KRONECHER OPTIMIZATION (real time)
-if strcmp(CONFIG.optimization_algorithm,'realTimeOpt') == 1
-    
-[Kpx,Kpn] = kronVectorization(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
-[Kdx,Kdn] = kronVectorization(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
-end
-
-%% NONLINEAR LSQ OPTIMIZATION (offline)
-if strcmp(CONFIG.optimization_algorithm,'offlineOpt') == 1
+%% NONLINEAR LSQ OPTIMIZATION
 CONFIG.matrixSelector = 'position';
 [Kpx,Kpn] = nonLinLeastSquares(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
 
 CONFIG.matrixSelector = 'velocity';
 [Kdx,Kdn] = nonLinLeastSquares(ACartesian,BCartesian,ANull,BNull,KDdes,CONFIG);
-end
 
 %% New stiffness and damping matrices
 KSn = ACartesian*Kpx*BCartesian + ANull*Kpn*BNull;
 KDn = ACartesian*Kdx*BCartesian + ANull*Kdn*BNull;
 
+if strcmp(mode,'debug') == 1
 % new state matrix
 AStateNew     = [zeros(ndof) eye(ndof);
                    -KSn        -KDn];
@@ -80,16 +74,16 @@ end
 
 if flag(1) == 1
 
-%     disp('Warning: the new linearized state dynamics after gains tuning is NOT asymptotically stable')
+    disp('Warning: the new linearized state dynamics after gains tuning is NOT asymptotically stable')
     
 elseif flag(2) == 1
     
-%     disp('Warning: your desired linearized state dynamics is NOT asymptotically stable')
+    disp('Warning: your desired linearized state dynamics is NOT asymptotically stable')
     
 
 elseif sum(flag) == 0
     
-%     disp('The linearized state dynamics after gains tuning is asymptotically stable')
+    disp('The linearized state dynamics after gains tuning is asymptotically stable')
 end
 
 %% New gains verification
@@ -132,27 +126,27 @@ end
 
 if sum(flag)  == 0
     
-%     disp('All the gains matrices are symmetric')
+    disp('All the gains matrices are symmetric')
 end
 
 if flag(1) == 1   
     
-%     disp('Warning: the gains matrix on centroidal momentum pose is not symmetric')
+    disp('Warning: the gains matrix on centroidal momentum pose is not symmetric')
 end
 
 if flag(2) == 1
     
-%     disp('Warning: the gains matrix on centroidal momentum velocity is not symmetric')
+    disp('Warning: the gains matrix on centroidal momentum velocity is not symmetric')
 end
 
 if flag(3) == 1
     
-%     disp('Warning: the gains matrix on joint position is not symmetric')
+    disp('Warning: the gains matrix on joint position is not symmetric')
 end
 
 if flag(4) == 1
     
-%     disp('Warning: the gains matrix on joint velocity is not symmetric')
+    disp('Warning: the gains matrix on joint velocity is not symmetric')
 end
 
 % verify the positive definiteness
@@ -194,45 +188,40 @@ end
 
 if sum(flag)  == 0
     
-%     disp('All the gains matrices are positive definite')
+    disp('All the gains matrices are positive definite')
 end
 
 if flag(1) == 1
     
-%     disp('Warning: the gains matrix on centroidal momentum pose is not positive definite')
+    disp('Warning: the gains matrix on centroidal momentum pose is not positive definite')
 end
 
 if flag(2) == 1
     
-%     disp('Warning: the gains matrix on centroidal momentum velocity is not positive definite')
+    disp('Warning: the gains matrix on centroidal momentum velocity is not positive definite')
 end
 
 if flag(3) == 1
     
-%     disp('Warning: the gains matrix on joint position is not positive definite')   
+    disp('Warning: the gains matrix on joint position is not positive definite')   
 end
 
 if flag(4) == 1
     
-%     disp('Warning: the gains matrix on joint velocity is not positive definite')   
+    disp('Warning: the gains matrix on joint velocity is not positive definite')   
+end
 end
 
-%% Parameters for visualization                                        
-visualizeTuning.KS           = KSn;
-visualizeTuning.KD           = KDn;
-visualizeTuning.KSdes        = KSdes;
-visualizeTuning.KDdes        = KDdes;
-visualizeTuning.Kpn          = Kpn;
-visualizeTuning.Kdn          = Kdn;
-visualizeTuning.Kpx          = Kpx;
-visualizeTuning.Kdx          = Kdx;
-
 %% Gains matrices after optimization
-gains.impedances             = Kpn; 
-gains.dampings               = Kdn;
-gains.MomentumGains          = Kdx;
-gains.intMomentumGains       = Kpx;
-gains.CorrPosFeet            = gainsInit.CorrPosFeet;
+gainsOpt.impedances             = Kpn; 
+gainsOpt.dampings               = Kdn;
+gainsOpt.MomentumGains          = Kdx;
+gainsOpt.intMomentumGains       = Kpx;
+gainsOpt.CorrPosFeet            = gainsInit.CorrPosFeet;
+gainsOpt.KSdes                  = KSdes;
+gainsOpt.KDdes                  = KDdes;
+gainsOpt.KSn                    = KSn;
+gainsOpt.KDn                    = KDn;
 
 end
 

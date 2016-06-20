@@ -2,11 +2,11 @@ function DYNAMICS = robotDynamics(STATE,CONFIG)
 %ROBOTDYNAMICS defines the robot dynamics from the current state and the user
 %         desired configuration. It is a wrapper for the mex-WBM functions.
 %
-%         dynamics = ROBOTDYNAMICS(state,config) takes as an input the current 
-%         state of the robot, which is defined in the structure STATE, and
-%         the structure CONFIG which contains all the user-defined
-%         parameters. The output is the structure DYNAMICS which contains
-%         the system mass matrix, Coriolis forces, gravity vector, and so on.
+%       dynamics = ROBOTDYNAMICS(state,config) takes as an input the current 
+%       state of the robot, which is defined in the structure STATE, and
+%       the structure CONFIG which contains all the user-defined
+%       parameters. The output is the structure DYNAMICS which contains
+%       the system mass matrix, Coriolis forces, gravity vector, and so on.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016

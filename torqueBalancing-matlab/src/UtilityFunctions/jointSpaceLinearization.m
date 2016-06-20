@@ -1,13 +1,16 @@
-function linearization = jointSpaceLinearization(CONFIG,qjConfig)    
+function linearization = jointSpaceLinearization(CONFIG,qjConfig,mode)    
 %JOINTSPACELINEARIZATION linearizes the joint space dynamics of the iCub robot
 %                        around an equilibrium point.
 %   JOINTSPACELINEARIZATION assumes that the robot is balancing on one foot
 %   or two feet, and the feedback controller is momentum-based. The solution is
 %   analytical, i.e. it is not necessary to compute numerical derivatives. 
 %     
-%   linearization = JOINTSPACELINEARIZATION(config,qjConfig) takes as an input the 
+%   linearization = JOINTSPACELINEARIZATION(config,qjConfig,mode) takes as an input the 
 %   robot dynamics through the structure CONFIG, and the joint configuration 
-%   around which the system is linearized, qjConfig. 
+%   around which the system is linearized, qjConfig. The variable MODE is a
+%   string, and can be either 'normal' mode or 'stability'. The only
+%   difference is that the 'stability' mode verifies the eigenvalues of the
+%   state matrix and returns a message about system's stability properties.
 %   It returns the structure LINEARIZATION which contains all the parameters
 %   related to the linearized system (i.e. the stiffness and damping
 %   matrix).
@@ -17,7 +20,7 @@ function linearization = jointSpaceLinearization(CONFIG,qjConfig)
 
 % ------------Initialization----------------
 %% Config parameters
-gainsInit          = CONFIG.gains;
+gainsInit          = CONFIG.gainsInit;
 pinv_tol           = CONFIG.pinv_tol;
 feet_on_ground     = CONFIG.feet_on_ground;     
 ndof               = CONFIG.ndof;
@@ -115,9 +118,7 @@ KS     = invMbar*(-pinvLambda*MultFirstTask*intMomentumGains*JG + NullLambda*imp
 KD     = invMbar*(-pinvLambda*MultFirstTask*MomentumGains*JG + NullLambda*dampings*posturalCorr);
 
 %% Verify the state matrix (only for stability analysis, only at time t=0)
-logic_qj = CONFIG.initState.qj == qjConfig;
-
-if CONFIG.linearizationDebug  == 1 && sum(logic_qj)==ndof
+if strcmp(mode,'stability')==1
     
 AStateOld     = [zeros(ndof) eye(ndof);
                     -KS           -KD];
@@ -153,6 +154,12 @@ linearization.KSdes       = gainsInit.KSdes;
 linearization.ACartesian  = -invMbar*pinvLambda*MultFirstTask;
 linearization.BCartesian  = JG;
 linearization.ANull       = invMbar*NullLambda;
-linearization.BNull       = posturalCorr;
+
+% Postural task correction
+if CONFIG.postCorrection == 1
+linearization.BNull       =  NullLambdaDamp*Mbar;
+else
+linearization.BNull       =  eye(ndof);
+end
 
 end

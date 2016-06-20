@@ -2,11 +2,11 @@ function [] = initForwardDynamics(CONFIG)
 %INITFORWARDDYNAMICS setup the forward dynamics integration of robot iCub 
 %                    in MATLAB.
 %
-%             [] = INITFORWARDDYNAMICS(config) takes as input the structure
-%             CONFIG containing all the configuration parameters. It has no 
-%             output. The forward dynamics integration will be performed 
-%             following the options the user specifies in the initialization 
-%             file.
+%            [] = INITFORWARDDYNAMICS(config) takes as input the structure
+%            CONFIG containing all the configuration parameters. It has no 
+%            output. The forward dynamics integration will be performed 
+%            following the options the user specifies in the initialization 
+%            file.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -58,7 +58,7 @@ chiInit                       = [BasePoseInit; qjInit; VelBaseInit; omegaBaseWor
 CONFIG.initState              = robotState(chiInit,CONFIG);
 
 %% Initial gains
-CONFIG.gains                  = gains(CONFIG);
+CONFIG.gainsInit              = gains(CONFIG);
 
 %% Joint references with inverse kinematics
 if CONFIG.jointRef_with_ikin == 1
@@ -79,10 +79,8 @@ if CONFIG.linearizationDebug  == 1
 
 % the initial configuration is changed by a small delta, but the references 
 % are not updated. In this way the robot will move to the reference position
-qjInit(1:13)       = qjInit(1:13)+0.5*pi/180;
-dqjInit            = zeros(ndof,1);
-VelBaseInit        = zeros(3,1);
-omegaBaseWorldInit = zeros(3,1);
+qjInit(1:13)       = qjInit(1:13)+1*pi/180;
+
 wbm_updateState(qjInit,dqjInit,[VelBaseInit;omegaBaseWorldInit]);
 
 if  feet_on_ground(1) == 1
@@ -98,9 +96,37 @@ chiInit                      = [BasePoseInit; qjInit; VelBaseInit; omegaBaseWorl
 CONFIG.initState             = robotState(chiInit,CONFIG);
 CONFIG.initDynamics          = robotDynamics(CONFIG.initState,CONFIG);
 CONFIG.initForKinematics     = robotForKinematics(CONFIG.initState,CONFIG.initDynamics);
+
+% the system is linearized around the initial position, to verify the stability
+jointSpaceLinearization(CONFIG,qjInit,'stability');
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% Gains tuning procedure
+if CONFIG.gains_tuning == 1
+ 
+CONFIG.vectorOfPoints = round(linspace(1,length(CONFIG.ikin.t),CONFIG.numberOfPoints));
+ 
+for k = 1:length(CONFIG.vectorOfPoints)
+     
+linearization = jointSpaceLinearization(CONFIG,CONFIG.ikin.qj(:,CONFIG.vectorOfPoints(k)) ,'normal');
+% reset the world frame
+wbm_setWorldFrame(RotBaseInit,PosBaseInit,[0 0 -9.81]')
+% gains optimization (run in 'debug' mode for debugging)
+gainsOpt      = gainsTuning(linearization,CONFIG,'normal');
+% gains matrices vectorization
+CONFIG.gainsVec.impedances(:,k)        = gainsOpt.impedances(:);
+CONFIG.gainsVec.dampings(:,k)          = gainsOpt.dampings(:); 
+CONFIG.gainsVec.MomentumGains(:,k)     = gainsOpt.MomentumGains(:);
+CONFIG.gainsVec.intMomentumGains(:,k)  = gainsOpt.intMomentumGains(:); 
+CONFIG.gainsVec.KSdes                  = gainsOpt.KSdes;               
+CONFIG.gainsVec.KDdes                  = gainsOpt.KDdes;                  
+CONFIG.gainsVec.KSn                    = gainsOpt.KSn;                   
+CONFIG.gainsVec.KDn                    = gainsOpt.KDn; 
+CONFIG.gainsVec.CorrPosFeet            = CONFIG.gainsInit.CorrPosFeet;
+end
+end
+ 
 %% FORWARD DYNAMICS INTEGRATION
 CONFIG.wait       = waitbar(0,'Forward dynamics integration...');
 forwardDynFunc    = @(t,chi)forwardDynamics(t,chi,CONFIG);

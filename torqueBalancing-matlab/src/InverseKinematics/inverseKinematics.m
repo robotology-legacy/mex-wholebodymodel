@@ -64,7 +64,7 @@ RFootPoseEul      = FORKINEMATICS.RFootPoseEul;
 LFootPoseEul      = FORKINEMATICS.LFootPoseEul;
 
 % Gains for inverse kinematics
-gainsInit         = CONFIG.gains;
+gainsInit         = CONFIG.gainsInit;
 KPosFeet          = gainsInit.CorrPosFeet;
 KPosMom           = gainsInit.intMomentumGains;
 KPosPost          = gainsInit.impedances;

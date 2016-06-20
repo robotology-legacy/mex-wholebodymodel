@@ -2,10 +2,10 @@ function gainsInit = gains(CONFIG)
 %GAINS generates the initial gains matrices for both the
 %      momentum task (primary task in SoT controller) and the postural task. 
 %
-%      gains = GAINS(config) takes as an input the structure CONFIG, which
-%      contains all the utility parameters, and the structure DYNAMICS 
-%      which contains the robot dynamics. The output is the structure 
-%      GAINSINIT, which contains the initial gains matrices.
+%     gains = GAINS(config) takes as an input the structure CONFIG, which
+%     contains all the utility parameters, and the structure DYNAMICS 
+%     which contains the robot dynamics. The output is the structure 
+%     GAINSINIT, which contains the initial gains matrices.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -25,9 +25,9 @@ if sum(CONFIG.feet_on_ground) == 2
 
 % impedances acting in the null space of the desired contact forces 
     impTorso            = [ 40  40  40]; 
-    impArms             = [ 10  10   10   5   5];
-    impLeftLeg          = [ 35  40   10  30   5  10]; 
-    impRightLeg         = [ 35  40   10  30   5  10];       
+    impArms             = [ 10  10  10   5   5];
+    impLeftLeg          = [ 35  40  10  30   5  10]; 
+    impRightLeg         = [ 35  40  10  30   5  10];       
 end
 
 %% Parameters for one foot on the ground
@@ -40,7 +40,7 @@ if  sum(CONFIG.feet_on_ground) == 1
    
 % impedances acting in the null space of the desired contact forces 
      impTorso           = [ 20   20   20]; 
-     impArms            = [ 15  15   45   5   5];
+     impArms            = [ 15   15   45   5   5];
 
 if CONFIG.feet_on_ground(1) == 1
     
@@ -76,9 +76,7 @@ gainsInit.CorrPosFeet        = 5;
 
 % Reduce the damping in case one wants to verify the soundness of
 % linearization
-if CONFIG.linearizationDebug  == 1
-% gainsInit.dampings           = 2.5.*eye(ndof);
-% gainsInit.MomentumGains      = 2.5.*eye(6);   
+if CONFIG.linearizationDebug  == 1  
 gainsInit.dampings           = gainsInit.dampings/2;
 gainsInit.MomentumGains      = gainsInit.MomentumGains/2;  
 end

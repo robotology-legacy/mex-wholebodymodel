@@ -1,13 +1,14 @@
 function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
 %FORWARDDYNAMICS is the function that will be integrated in the forward 
 %                dynamics integrator.
-%                [dchi,visualization] = FORWARDDYNAMICS(t,chi,config) takes
-%                as input the current time step, T; the robot state, CHI
-%                [13+2ndof x 1]; the structure CONFIG which contains the
-%                user-defined parameters.
-%                The output are the vector to be integrated, DCHI [13+2ndof x1]
-%                and the structure VISUALIZATION which contains all the parameters 
-%                used to generate the plots in the visualizer.
+%
+%             [dchi,visualization] = FORWARDDYNAMICS(t,chi,config) takes
+%             as input the current time step, T; the robot state, CHI
+%             [13+2ndof x 1]; the structure CONFIG which contains the
+%             user-defined parameters.
+%             The output are the vector to be integrated, DCHI [13+2ndof x1]
+%             and the structure VISUALIZATION which contains all the parameters 
+%             used to generate the plots in the visualizer.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -18,7 +19,7 @@ waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 %% Robot Configuration
 ndof                  = CONFIG.ndof;
-gains                 = CONFIG.gains;
+gains                 = CONFIG.gainsInit;
 qjInit                = CONFIG.qjInit;
 xCoMRef               = CONFIG.xCoMRef;
 
@@ -66,20 +67,54 @@ end
 trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(xCoMRef,t,CONFIG);
 
 %% Linearization and gains tuning procedure 
-if CONFIG.gains_tuning == 1 && strcmp(CONFIG.optimization_algorithm,'realTimeOpt') == 1
+if CONFIG.gains_tuning == 1 
+    
+cont           = 0;
+gains          = CONFIG.gainsVec;
+vectorOfPoints = CONFIG.vectorOfPoints;
+ 
+for k = 2:length(vectorOfPoints)
+  
+if t>=CONFIG.ikin.t(vectorOfPoints(k-1)) && t<=CONFIG.ikin.t(vectorOfPoints(k))
+    
+cont  = k;
+end
+end
 
-linearization            = jointSpaceLinearization(CONFIG,qj);
+% define the scalar value for interpolation
+if (CONFIG.ikin.t(vectorOfPoints(cont))-CONFIG.ikin.t(vectorOfPoints(cont-1))) == 0
+
+delta = 0;
+
+else
+delta = (t-CONFIG.ikin.t(vectorOfPoints(cont-1)))/(CONFIG.ikin.t(vectorOfPoints(cont))-CONFIG.ikin.t(vectorOfPoints(cont-1)));
+end
+
+% gains matrix interpolation in the Lie group of symmetric positve definite
+% matrices
+Kpn = expm(delta*logm(reshape(gains.impedances(:,cont),[ndof,ndof]))+(1-delta)*logm(reshape(gains.impedances(:,cont-1),[ndof,ndof])));
+Kdn = expm(delta*logm(reshape(gains.dampings(:,cont),[ndof,ndof]))+(1-delta)*logm(reshape(gains.dampings(:,cont-1),[ndof,ndof])));
+Kpx = expm(delta*logm(reshape(gains.intMomentumGains(:,cont),[6,6]))+(1-delta)*logm(reshape(gains.intMomentumGains(:,cont-1),[6,6])));
+Kdx = expm(delta*logm(reshape(gains.MomentumGains(:,cont),[6,6]))+(1-delta)*logm(reshape(gains.MomentumGains(:,cont-1),[6,6])));
+  
+lin = jointSpaceLinearization(CONFIG,trajectory.JointReferences.qjRef ,'normal');
 % reset the world frame
 wbm_setWorldFrame(RotBase,PosBase,[0 0 -9.81]')
-% gains optimization
-[gains,visualizeTuning]  = gainsTuning(linearization,CONFIG);
-visualization.gainTun    = visualizeTuning;
+
+gains.impedances        = Kpn;
+gains.dampings          = Kdn;
+gains.intMomentumGains  = Kpx;
+gains.MomentumGains     = Kdx;  
+
+gains.KSn = lin.ACartesian*Kpx*lin.BCartesian + lin.ANull*Kpn*lin.BNull;
+gains.KDn = lin.ACartesian*Kdx*lin.BCartesian + lin.ANull*Kdn*lin.BNull;
+visualization.gainTun   = gains;
 end
 
 %%%%%%%%%%%%%%% LINEARIZATION DEBUG AND STABILITY ANALYSIS %%%%%%%%%%%%%%%%
 if CONFIG.linearizationDebug  == 1
  
-linearization            = jointSpaceLinearization(CONFIG,qj);
+linearization            = jointSpaceLinearization(CONFIG,qj,'normal');
 % reset the world frame
 wbm_setWorldFrame(RotBase,PosBase,[0 0 -9.81]')
 

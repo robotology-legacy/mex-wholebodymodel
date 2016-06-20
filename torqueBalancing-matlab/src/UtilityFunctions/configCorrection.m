@@ -15,7 +15,7 @@ function [correctedCONFIG] = configCorrection(CONFIG)
 
 % ------------Initialization----------------
 %% Initialize the output
-correctedCONFIG   = CONFIG;
+correctedCONFIG  = CONFIG;
 
 %% Forward dynamics integration correction
 % if one wants to integrate the forward dynamics using the fixed step
@@ -39,7 +39,7 @@ plot_set
 
 % this is the figure counter. It is used to automatically adapt the figure
 % number in case new figures are added
-correctedCONFIG.figureCont         = 1;
+correctedCONFIG.figureCont          = 1;
 
 %% Joint space controller
 % the gain tuning procedure and the QP solver are not available for joint
@@ -52,7 +52,16 @@ correctedCONFIG.use_QPsolver                         = 0;
 correctedCONFIG.jointRef_with_ikin                   = 1;
 end
 
+%% Gains tuning
+% since the gain tuning is based on the joint reference trajectory, the
+% inverse kinematics is required
+if correctedCONFIG.gains_tuning  == 1
+    
+correctedCONFIG.jointRef_with_ikin  = 1;
+end
+
 %% LINEARIZATION DEBUG AND STABILITY ANALYSIS MODE
+% enter in debug mode
 if correctedCONFIG.linearizationDebug == 1
     
 correctedCONFIG.demo_movements                        = 0;                          

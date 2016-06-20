@@ -19,14 +19,7 @@ function figureCont = initVisualizer(t,chi,CONFIG)
 % ------------Initialization----------------
 %% Config parameters
 ndof                             = CONFIG.ndof;
-CONFIG.visualizeLinearization    = 0;
-CONFIG.allowLinVisualization     = 0;
 initState                        = CONFIG.initState;
-
-if CONFIG.gains_tuning  == 1 || CONFIG.linearizationDebug == 1
-    
-CONFIG.allowLinVisualization  = 1;
-end
 
 %% ROBOT SIMULATOR
 if CONFIG.visualize_robot_simulator == 1
@@ -35,7 +28,7 @@ CONFIG.figureCont = visualizeSimulation(t,chi,CONFIG);
 end
 
 %% FORWARD DYNAMICS (basic parameters)
-if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamics == 1 || CONFIG.allowVisualization == 1 
+if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamics == 1 || CONFIG.gains_tuning  == 1 || CONFIG.linearizationDebug == 1
     
 CONFIG.wait = waitbar(0,'Generating the plots...');
 set(0,'DefaultFigureWindowStyle','Docked');
@@ -77,9 +70,20 @@ qjRef(:,time)       = visual.JointRef.qjRef;
 dqjRef(:,time)      = visual.JointRef.dqjRef;
 ddqjRef(:,time)     = visual.JointRef.ddqjRef;
 ddqjNonLin(:,time)  = visual.ddqjNonLin;
+
 if CONFIG.linearizationDebug == 1
 ddqjLin(:,time)     = visual.ddqjLin;
 end
+
+%% Gain tuning results
+if CONFIG.gains_tuning == 1 && CONFIG.visualize_gains_tuning_results  == 1 
+    
+gainTun             = visual.gainTun;   
+CONFIG.figureCont   = visualizeLinearizAndGains([],CONFIG,ddqjNonLin,ddqjLin,gainTun);         
+end
+
+%% Other parameters
+
 % contact forces and torques
 fc(:,time)          = visual.fc;
 f0(:,time)          = visual.f0;
@@ -108,6 +112,10 @@ delete(CONFIG.wait)
 
 % composed parameters
 HErr                = H-HRef;
+if CONFIG.gains_tuning == 1 && CONFIG.visualize_gains_tuning_results  == 1
+
+CONFIG.figureCont   = CONFIG.figureCont+1;
+end
 
 %% Basic visualization (forward dynamics integration results)
 if CONFIG.visualize_integration_results == 1
@@ -122,9 +130,9 @@ CONFIG.figureCont = visualizeJointDynamics(t,CONFIG,qj,qjRef);
 end
 
 %% Linearization results (soundness of linearization and gains tuning)
-if CONFIG.allowLinVisualization == 1
+if CONFIG.linearizationDebug == 1
     
-CONFIG.figureCont = visualizeLinearization(t,CONFIG,ddqjNonLin,ddqjLin);     
+CONFIG.figureCont = visualizeLinearizAndGains(t,CONFIG,ddqjNonLin,ddqjLin,[]);     
 end
 
 figureCont = CONFIG.figureCont;

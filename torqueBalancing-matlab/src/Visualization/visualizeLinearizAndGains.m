@@ -1,11 +1,11 @@
-function figureCont = visualizeLinearization(t,CONFIG,ddqjNonLin,ddqjLin)
-%VISUALIZELINEARIZATION visualizes the results on the linearized joint space
-%                       dynamics of robot iCub.
+function figureCont = visualizeLinearizAndGains(t,CONFIG,ddqjNonLin,ddqjLin,gainTun)
+%VISUALIZELINEARIZANDGAINS visualizes the results on the linearized joint space
+%                          dynamics of robot iCub.
 %
-%   figureCont = VISUALIZELINEARIZATION(t,config,qjErr,dqjErr,ddqjNonLin,ddqjRef) 
+%   figureCont = VISUALIZELINEARIZANDGAINS(t,CONFIG,ddqjNonLin,ddqjLin,gainTun)
 %   takes as input the integration time T, the structure CONFIG containing all
-%   the utility parameters, the joint error dynamics and the joint linear
-%   and nonlinear accelerations. It generates all the plots related to the
+%   the utility parameters, the joint linear and nonlinear accelerations and
+%   all the gains matrices (gainTun). It generates all the plots related to the
 %   stability analysis, it verifies the soundness of the linearization
 %   procedure and visualizes the gains matrices after optimization. The 
 %   output is a counter for the automatic correction of figures numbers in 
@@ -103,68 +103,73 @@ end
 
 figureCont = figureCont +1;
 end
-           
+
 %% Gains Tuning results
-if CONFIG.visualize_gains_tuning_results  == 1 
+if CONFIG.gains_tuning == 1 && CONFIG.visualize_gains_tuning_results  == 1
+
+figureGains   = [figureCont+1;figureCont+2;figureCont+3;figureCont+4];
 
 % STATE MATRIX
-AStateDes     = [zeros(ndof)                     eye(ndof);
-                -CONFIG.visualizeTuning.KSdes   -CONFIG.visualizeTuning.KDdes];
+AStateDes     = [zeros(ndof)      eye(ndof);
+                -gainTun.KSdes   -gainTun.KDdes];
                 
 
-AStateNew     = [zeros(ndof)                     eye(ndof);
-                -CONFIG.visualizeTuning.KS     -CONFIG.visualizeTuning.KD];
+AStateNew     = [zeros(ndof)     eye(ndof);
+                -gainTun.KSn     -gainTun.KDn];
 
 % MATRIX SHAPE VERIFICATION            
-figure(figureCont)
-subplot(1,2,1)
-surf(-AStateDes)
-hold on
-title('Desired State Matrix (-State)')
-subplot(1,2,2)
+figure(figureGains(1))
+% subplot(1,2,1)
+% surf(-AStateDes)
+% hold on
+% title('Desired State Matrix (-State)')
+% subplot(1,2,2)
 surf(-AStateNew)
-hold on
+% image(-AStateNew,'CDataMapping','scaled')
+% hold on
 title('Obtained State Matrix (-State)')
 
-figureCont = figureCont +1;
-
 % EIGENVALUES
-figure(figureCont)
-plot(real(eig(AStateDes)),imag(eig(AStateDes)),'xb')
-hold on
-grid on
-plot(real(eig(AStateNew)),imag(eig(AStateNew)),'xr')
-title('Root Locus')
-legend('Des eigenval','Real eigenval')
-xlabel('Real')
-ylabel('Imag')
-
-figureCont = figureCont +1;
+% figure(figureGains(2))
+% plot(real(eig(AStateDes)),imag(eig(AStateDes)),'xb')
+% hold on
+% grid on
+% plot(real(eig(AStateNew)),imag(eig(AStateNew)),'xr')
+% title('Root Locus')
+% legend('Des eigenval','Real eigenval')
+% xlabel('Real')
+% ylabel('Imag')
 
 % NEW GAINS MATRICES
-figure(figureCont)
-subplot(1,2,1)
-surf(CONFIG.visualizeTuning.Kpn)
-hold on
-title('Opt Impedances')
-subplot(1,2,2)
-surf(CONFIG.visualizeTuning.Kdn)
-hold on
-title('Opt Dampings')
-
-figureCont = figureCont +1;
-
-figure(figureCont)
-subplot(1,2,1)
-surf(CONFIG.visualizeTuning.Kpx)
-hold on
-title('Opt Momentum Integral Gains')
-subplot(1,2,2)
-surf(CONFIG.visualizeTuning.Kdx)
-hold on
-title('Opt Momentum Gains')
-
-figureCont = figureCont +1;
+% % % figure(figureGains(1))
+% % % subplot(2,2,1) 
+% % % image(gainTun.impedances,'CDataMapping','scaled')
+% % % % colorbar
+% % % % surf(gainTun.impedances)
+% % % % zlim([-30 90])
+% % % % hold on
+% % % title('Opt Impedances')
+% % % subplot(2,2,2) 
+% % % image(gainTun.dampings,'CDataMapping','scaled')
+% % % % colorbar
+% % % % surf(gainTun.dampings)
+% % % zlim([-10 15])
+% % % % hold on
+% % % title('Opt Dampings')
+% % % % 
+% % % % figure(figureGains(4))
+% % % subplot(2,2,3)
+% % % image(gainTun.intMomentumGains,'CDataMapping','scaled')
+% % % % colorbar
+% % % % surf(gainTun.intMomentumGains)
+% % % % hold on
+% % % title('Opt Momentum Integral Gains')
+% % % subplot(2,2,4)
+% % % image(gainTun.MomentumGains,'CDataMapping','scaled')
+% % % % colorbar
+% % % % surf(gainTun.MomentumGains)
+% % % % hold on
+% % % title('Opt Momentum Gains')
 end
 
 end

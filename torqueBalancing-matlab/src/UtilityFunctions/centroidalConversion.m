@@ -30,8 +30,8 @@ VelBase  = STATE.VelBase;
 PosBase  = STATE.PosBase;
 
 %% CENTROIDAL TRANSFORMATION
-[T,dT]                                 = centroidalTransformationT_TDot(xCoM,PosBase,dxCoM,VelBase,M);
-[M_c, CNu_c, g_c, Jc_c, dJcNu_c, Nu_c] = fromFloatingToCentroidalDynamics(M, h, g, Jc, dJcNu, Nu, T, dT);
+[T,dT]                                    = centroidalTransformationT_TDot(xCoM,PosBase,dxCoM,VelBase,M);
+[M_c, CNu_c, g_c, Jc_c, dJcNu_c, Nu_c]    = fromFloatingToCentroidalDynamics(M, h, g, Jc, dJcNu, Nu, T, dT);
 
 centroidalDyn.M                           = M_c;
 centroidalDyn.g                           = g_c;

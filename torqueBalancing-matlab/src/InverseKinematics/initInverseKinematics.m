@@ -71,7 +71,7 @@ NuFirstTask            = pinvJc*feetErrorDynamics + Nullfeet*NuSecondTask;
 ChiInit                = [BasePose; qj; NuFirstTask];
 
 %% Inverse kinematics integrator
-CONFIG.wait            = waitbar(0,'Inverse kinematics integration in progress...');
+CONFIG.wait            = waitbar(0,'Inverse kinematics integration...');
 ikin                   = integrateInverseKinematics(CONFIG,ChiInit);
 delete(CONFIG.wait)       
  
