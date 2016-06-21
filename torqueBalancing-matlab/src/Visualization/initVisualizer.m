@@ -71,6 +71,7 @@ dqjRef(:,time)      = visual.JointRef.dqjRef;
 ddqjRef(:,time)     = visual.JointRef.ddqjRef;
 ddqjNonLin(:,time)  = visual.ddqjNonLin;
 
+% linearization debug
 if CONFIG.linearizationDebug == 1
 ddqjLin(:,time)     = visual.ddqjLin;
 end
@@ -83,7 +84,6 @@ CONFIG.figureCont   = visualizeLinearizAndGains([],CONFIG,ddqjNonLin,ddqjLin,gai
 end
 
 %% Other parameters
-
 % contact forces and torques
 fc(:,time)          = visual.fc;
 f0(:,time)          = visual.f0;

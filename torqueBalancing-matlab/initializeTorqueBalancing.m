@@ -32,7 +32,7 @@ CONFIG.gains_tuning                          = 1;                          %eith
 % if CONFIG.gains_tuning = 1, CONFIG.numberOfPoints is the number of points
 % along the joint reference trajectory in which the gains tuning procedure
 % is performed
-CONFIG.numberOfPoints                        = 7;
+CONFIG.numberOfPoints                        = 5;
 
 %% Visualization setup 
 % robot simulator
@@ -51,13 +51,13 @@ CONFIG.linearizationDebug                    = 0;                          %eith
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;   
-CONFIG.tEnd                                  = 1;   
+CONFIG.tEnd                                  = 10;   
 CONFIG.sim_step                              = 0.01;
 
 %% Generate the joint references with the inverse kinematics solver
 % it will be automatically activated if the "Joint Space" controller is used 
 CONFIG.jointRef_with_ikin                    = 1;                          %either 0 or 1
-CONFIG.visualize_ikin_results                = 0;                          %either 0 or 1  
+CONFIG.visualize_ikin_results                = 1;                          %either 0 or 1  
 CONFIG.ikin_integration_step                 = 0.01; 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%

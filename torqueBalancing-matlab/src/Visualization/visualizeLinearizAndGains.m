@@ -107,69 +107,37 @@ end
 %% Gains Tuning results
 if CONFIG.gains_tuning == 1 && CONFIG.visualize_gains_tuning_results  == 1
 
-figureGains   = [figureCont+1;figureCont+2;figureCont+3;figureCont+4];
-
-% STATE MATRIX
-AStateDes     = [zeros(ndof)      eye(ndof);
-                -gainTun.KSdes   -gainTun.KDdes];
-                
-
-AStateNew     = [zeros(ndof)     eye(ndof);
-                -gainTun.KSn     -gainTun.KDn];
-
-% MATRIX SHAPE VERIFICATION            
-figure(figureGains(1))
-% subplot(1,2,1)
-% surf(-AStateDes)
-% hold on
-% title('Desired State Matrix (-State)')
-% subplot(1,2,2)
-surf(-AStateNew)
-% image(-AStateNew,'CDataMapping','scaled')
-% hold on
-title('Obtained State Matrix (-State)')
-
-% EIGENVALUES
-% figure(figureGains(2))
-% plot(real(eig(AStateDes)),imag(eig(AStateDes)),'xb')
-% hold on
-% grid on
-% plot(real(eig(AStateNew)),imag(eig(AStateNew)),'xr')
-% title('Root Locus')
-% legend('Des eigenval','Real eigenval')
-% xlabel('Real')
-% ylabel('Imag')
+figureGains   = figureCont+1;
 
 % NEW GAINS MATRICES
-% % % figure(figureGains(1))
-% % % subplot(2,2,1) 
-% % % image(gainTun.impedances,'CDataMapping','scaled')
-% % % % colorbar
-% % % % surf(gainTun.impedances)
-% % % % zlim([-30 90])
-% % % % hold on
-% % % title('Opt Impedances')
-% % % subplot(2,2,2) 
-% % % image(gainTun.dampings,'CDataMapping','scaled')
-% % % % colorbar
-% % % % surf(gainTun.dampings)
-% % % zlim([-10 15])
-% % % % hold on
-% % % title('Opt Dampings')
-% % % % 
-% % % % figure(figureGains(4))
-% % % subplot(2,2,3)
-% % % image(gainTun.intMomentumGains,'CDataMapping','scaled')
-% % % % colorbar
-% % % % surf(gainTun.intMomentumGains)
-% % % % hold on
-% % % title('Opt Momentum Integral Gains')
-% % % subplot(2,2,4)
-% % % image(gainTun.MomentumGains,'CDataMapping','scaled')
-% % % % colorbar
-% % % % surf(gainTun.MomentumGains)
-% % % % hold on
-% % % title('Opt Momentum Gains')
+figure(figureGains)
+subplot(2,2,1) 
+% image(gainTun.impedances,'CDataMapping','scaled')
+% colorbar
+surf(gainTun.impedances)
+% zlim([-30 90])
+% hold on
+title('Opt Impedances')
+subplot(2,2,2) 
+% image(gainTun.dampings,'CDataMapping','scaled')
+% colorbar
+surf(gainTun.dampings)
+zlim([-10 15])
+% hold on
+title('Opt Dampings')
+% 
+subplot(2,2,3)
+% image(gainTun.intMomentumGains,'CDataMapping','scaled')
+% colorbar
+surf(gainTun.intMomentumGains)
+% hold on
+title('Opt Momentum Integral Gains')
+subplot(2,2,4)
+% image(gainTun.MomentumGains,'CDataMapping','scaled')
+% colorbar
+surf(gainTun.MomentumGains)
+% hold on
+title('Opt Momentum Gains')
 end
 
 end

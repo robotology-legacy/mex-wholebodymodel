@@ -123,7 +123,7 @@ CONFIG.gainsVec.KSdes                  = gainsOpt.KSdes;
 CONFIG.gainsVec.KDdes                  = gainsOpt.KDdes;                  
 CONFIG.gainsVec.KSn                    = gainsOpt.KSn;                   
 CONFIG.gainsVec.KDn                    = gainsOpt.KDn; 
-CONFIG.gainsVec.CorrPosFeet            = CONFIG.gainsInit.CorrPosFeet;
+CONFIG.gainsVec.CorrPosFeet            = gainsOpt.CorrPosFeet;
 end
 end
  
