@@ -159,7 +159,7 @@ classdef WBMBase < handle
             stFltb.wf_v_b = v_b; % cartesian velocity and the rotational velocity of the base
         end
 
-        function wf_H_rlnk = transformationMatrix(obj,varargin) % not implemented yet in C++!
+        function wf_H_rlnk = transformationMatrix(obj,varargin)
             % wf_R_rootLnk = varargin{1}
             % wf_p_rootLnk = varargin{2}
             % q_j          = varargin{3}

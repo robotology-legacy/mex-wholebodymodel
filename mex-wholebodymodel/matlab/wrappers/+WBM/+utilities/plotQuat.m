@@ -8,7 +8,7 @@ function plotQuat(vqT, twait)
         error('plotQuat: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
     % the matrix-dimension must be of m-by-7:
-    [nRows,nCols] = size(vqT);
+    [nRows, nCols] = size(vqT);
     if (nCols ~= 7)
         error('plotQuat: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
     end

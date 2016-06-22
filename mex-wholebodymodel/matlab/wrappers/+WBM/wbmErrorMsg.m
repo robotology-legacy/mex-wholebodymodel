@@ -1,7 +1,7 @@
 classdef wbmErrorMsg
     properties(Constant)
         DIM_MISMATCH      = 'Mismatching dimensions!';
-        EMPTY_CELL_ARR    = 'Cell array is empty!';
+        EMPTY_ARRAY       = 'The array is empty!';
         EMPTY_DATA_TYPE   = 'Empty data type!';
         EMPTY_STRING      = 'Empty string!';
         EMPTY_VECTOR      = 'Empty vector(s)!';

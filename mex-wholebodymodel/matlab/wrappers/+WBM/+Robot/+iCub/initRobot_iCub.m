@@ -12,7 +12,7 @@ function wbm_icub = initRobot_iCub(wf2fixLnk)
 
     %% Base robot config:
     icub_config = WBM.wbmHumanoidConfig;
-    icub_config.nCstrs          = 2;
+    % icub_config.nCstrs          = 2;
     icub_config.cstr_link_names = {'l_sole', 'r_sole'};
     %icub_config.nPlds = 0;
     %icub_config.lnk_payloads = [];
