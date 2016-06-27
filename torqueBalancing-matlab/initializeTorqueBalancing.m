@@ -51,7 +51,7 @@ CONFIG.linearizationDebug                    = 0;                          %eith
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;   
-CONFIG.tEnd                                  = 10;   
+CONFIG.tEnd                                  = 5;   
 CONFIG.sim_step                              = 0.01;
 
 %% Generate the joint references with the inverse kinematics solver
@@ -66,7 +66,7 @@ CONFIG.ikin_integration_step                 = 0.01;
 CONFIG.pinv_tol           = 1e-8;
 CONFIG.pinv_damp          = 5e-6;
 CONFIG.reg_HessianQP      = 1e-3;
-CONFIG.postCorrection     = 0;                                             %either 0 or 1
+CONFIG.postCorrection     = 1;                                             %either 0 or 1
 CONFIG.massCorr           = 0;
 
 %% Forward dynamics integration setup

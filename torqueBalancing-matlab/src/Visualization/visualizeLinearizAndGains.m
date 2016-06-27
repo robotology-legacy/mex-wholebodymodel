@@ -18,7 +18,6 @@ function figureCont = visualizeLinearizAndGains(t,CONFIG,ddqjNonLin,ddqjLin,gain
 % ------------Initialization----------------
 % initial parameters
 figureCont = CONFIG.figureCont;
-ndof       = CONFIG.ndof; 
 
 %% Linearized joint dynamics
 if CONFIG.linearizationDebug  == 1
@@ -107,10 +106,8 @@ end
 %% Gains Tuning results
 if CONFIG.gains_tuning == 1 && CONFIG.visualize_gains_tuning_results  == 1
 
-figureGains   = figureCont+1;
-
 % NEW GAINS MATRICES
-figure(figureGains)
+figure(figureCont)
 subplot(2,2,1) 
 % image(gainTun.impedances,'CDataMapping','scaled')
 % colorbar
