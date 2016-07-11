@@ -22,7 +22,6 @@ find_package(ICUB                   REQUIRED)
 find_package(Eigen3                 REQUIRED)
 find_package(TinyXML                REQUIRED)
 find_package(iDynTree 0.3.9         REQUIRED)
-find_package(paramHelp              REQUIRED)
 find_package(wholeBodyInterface     REQUIRED)
 find_package(yarpWholeBodyInterface REQUIRED)
 
