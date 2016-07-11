@@ -20,6 +20,7 @@ waitbar(t/CONFIG.tEnd,CONFIG.wait)
 %% Robot Configuration
 ndof                  = CONFIG.ndof;
 gains                 = CONFIG.gainsInit;
+% gains                 = CONFIG.gainsOpt;
 qjInit                = CONFIG.qjInit;
 xCoMRef               = CONFIG.xCoMRef;
 

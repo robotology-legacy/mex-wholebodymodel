@@ -21,7 +21,7 @@ clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation 
 CONFIG.demo_movements                        = 1;                          %either 0 or 1
-CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left,right]
+CONFIG.feet_on_ground                        = [1,0];                      %either 0 or 1; [left,right]
 % choose the balancing controller algorithm. The possibilities for now are
 % either 'StackOfTask' or 'JointSpace' controller
 CONFIG.controller                            = 'StackOfTask';               
@@ -36,9 +36,9 @@ CONFIG.numberOfPoints                        = 5;
 
 %% Visualization setup 
 % robot simulator
-CONFIG.visualize_robot_simulator             = 1;                          %either 0 or 1
+CONFIG.visualize_robot_simulator             = 0;                          %either 0 or 1
 % forward dynamics integration results
-CONFIG.visualize_integration_results         = 1;                          %either 0 or 1
+CONFIG.visualize_integration_results         = 0;                          %either 0 or 1
 CONFIG.visualize_joints_dynamics             = 1;                          %either 0 or 1
 % linearization and gains tuning
 CONFIG.visualize_gains_tuning_results        = 1;                          %either 0 or 1; available only if gains_tuning = 1
@@ -47,17 +47,17 @@ CONFIG.visualize_gains_tuning_results        = 1;                          %eith
 % run the simulation with CONFIG.linearizationDebug = 1 to verify that the
 % joint space linearization is performed properly, and to check the
 % controlled system's stability
-CONFIG.linearizationDebug                    = 0;                          %either 0 or 1
+CONFIG.linearizationDebug                    = 1;                          %either 0 or 1
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;   
-CONFIG.tEnd                                  = 5;   
+CONFIG.tEnd                                  = 4;   
 CONFIG.sim_step                              = 0.01;
 
 %% Generate the joint references with the inverse kinematics solver
 % it will be automatically activated if the "Joint Space" controller is used 
 CONFIG.jointRef_with_ikin                    = 1;                          %either 0 or 1
-CONFIG.visualize_ikin_results                = 1;                          %either 0 or 1  
+CONFIG.visualize_ikin_results                = 0;                          %either 0 or 1  
 CONFIG.ikin_integration_step                 = 0.01; 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%

@@ -78,7 +78,7 @@ end
 
 %% Gain tuning results
 if CONFIG.gains_tuning == 1 && CONFIG.visualize_gains_tuning_results  == 1 
-    
+
 gainTun             = visual.gainTun;   
 CONFIG.figureCont   = visualizeLinearizAndGains([],CONFIG,ddqjNonLin,ddqjLin,gainTun);         
 end
@@ -126,7 +126,8 @@ end
 %% Joints positions and position error
 if CONFIG.visualize_joints_dynamics == 1 
       
-CONFIG.figureCont = visualizeJointDynamics(t,CONFIG,qj,qjRef);
+    tAss = 3./(sqrt(diag(CONFIG.gainsInit.KSdes))); 
+CONFIG.figureCont = visualizeJointDynamics(t,CONFIG,qj,qjRef,tAss);
 end
 
 %% Linearization results (soundness of linearization and gains tuning)

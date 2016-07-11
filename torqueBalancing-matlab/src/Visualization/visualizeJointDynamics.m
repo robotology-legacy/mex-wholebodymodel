@@ -1,4 +1,4 @@
-function figureCont = visualizeJointDynamics(t,CONFIG,qj,qjRef)
+function figureCont = visualizeJointDynamics(t,CONFIG,qj,qjRef,tAss)
 %VISUALIZEJOINTDYNAMICS visualizes the joint space dynamics of the iCub robot
 %                       from forward dynamics integration.
 %
@@ -15,6 +15,10 @@ function figureCont = visualizeJointDynamics(t,CONFIG,qj,qjRef)
 % ------------Initialization----------------
 % setup parameters
 figureCont  = CONFIG.figureCont;
+for k = 1:length(tAss)
+    
+    index(k) = sum(t>tAss(k))+1;
+end
 
 %% Joints dynamics
 for k=1:5
@@ -24,7 +28,11 @@ figure(figureCont)
 subplot(3,2,k)
 plot(t,qj(k+3,:))
 hold on
+plot(tAss(k+3),qj(k+3,end-index(k+3)),'ok')
+hold on
 plot(t,qjRef(k+3,:),'k')
+plot(t,0.95.*qjRef(k+3,:),'-')
+plot(t,1.05.*qjRef(k+3,:),'-')
 grid on
 xlabel('Time [s]')
 ylabel('Angle [rad]')
@@ -37,7 +45,11 @@ figure(figureCont+1)
 subplot(3,2,k)
 plot(t,qj(k+3+5,:))
 hold on
+plot(tAss(k+3+5),qj(k+3+5,end-index(k+3+5)),'ok')
+hold on
 plot(t,qjRef(k+3+5,:),'k')
+plot(t,0.95.*qjRef(k+3+5,:),'-')
+plot(t,1.05.*qjRef(k+3+5,:),'-')
 grid on
 xlabel('Time [s]')
 ylabel('Angle [rad]')
@@ -55,6 +67,8 @@ figure(figureCont)
 subplot(3,2,k)
 plot(t,qj(k+13,:))
 hold on
+plot(tAss(k+13),qj(k+13,end-index(k+13)),'ok')
+hold on
 plot(t,qjRef(k+13,:),'k')
 grid on
 xlabel('Time [s]')
@@ -67,6 +81,8 @@ legend('qj','qjRef')
 figure(figureCont+1)
 subplot(3,2,k)
 plot(t,qj(k+13+6,:))
+hold on
+plot(tAss(k+13+6),qj(k+13+6,end-index(k+13+6)),'ok')
 hold on
 plot(t,qjRef(k+13+6,:),'k')
 grid on
@@ -86,7 +102,11 @@ figure(figureCont)
 subplot(3,1,k)
 plot(t,qj(k,:))
 hold on
+plot(tAss(k),qj(k,end-index(k)),'ok')
+hold on
 plot(t,qjRef(k,:),'k')
+plot(t,(qjRef(k,:)+0.05.*qjRef(k,:)),'g')
+plot(t,(qjRef(k,:)-0.05.*qjRef(k,:)),'g')
 grid on
 xlabel('Time [s]')
 ylabel('Angle [rad]')

@@ -69,7 +69,13 @@ gainsInit.intMomentumGains   = [gainsPCoM zeros(3); zeros(3) gainsPAngMom];
 
 % Desired shape for the state matrix of the linearized system, for gains tuning procedure
 gainsInit.KSdes              = gainsInit.impedances;
-gainsInit.KDdes              = gainsInit.dampings;
+gainsInit.KSdes(12,12)                = 0;
+gainsInit.KSdes(16,16)                = 0;
+gainsInit.KSdes(17,17)                = 0;
+gainsInit.KSdes(18,18)                = 0;
+gainsInit.KSdes(22,22)                = 0;
+gainsInit.KSdes(23,23)                = 0;
+gainsInit.KDdes              = 2*sqrt(gainsInit.KSdes);
 
 % Gains for feet correction to avoid numerical errors
 gainsInit.CorrPosFeet        = 5;

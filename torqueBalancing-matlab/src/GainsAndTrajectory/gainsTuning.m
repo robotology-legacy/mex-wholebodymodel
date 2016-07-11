@@ -34,10 +34,12 @@ CONFIG.positDefToll   = 0.1;
 
 %% NONLINEAR LSQ OPTIMIZATION
 CONFIG.matrixSelector = 'position';
-[Kpx,Kpn] = nonLinLeastSquares(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
+[Kpx,Kpn] = kronVectorization(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
+% [Kpx,Kpn] = nonLinLeastSquares(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
 
 CONFIG.matrixSelector = 'velocity';
-[Kdx,Kdn] = nonLinLeastSquares(ACartesian,BCartesian,ANull,BNull,KDdes,CONFIG);
+[Kdx,Kdn] = kronVectorization(ACartesian,BCartesian,ANull,BNull,KDdes,CONFIG);
+% [Kdx,Kdn] = nonLinLeastSquares(ACartesian,BCartesian,ANull,BNull,KDdes,CONFIG);
 
 %% New stiffness and damping matrices
 KSn = ACartesian*Kpx*BCartesian + ANull*Kpn*BNull;

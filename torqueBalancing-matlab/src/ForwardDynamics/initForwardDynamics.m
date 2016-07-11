@@ -79,7 +79,7 @@ if CONFIG.linearizationDebug  == 1
 
 % the initial configuration is changed by a small delta, but the references 
 % are not updated. In this way the robot will move to the reference position
-qjInit(1:13)       = qjInit(1:13)+1*pi/180;
+qjInit(1:13)       = qjInit(1:13)+5*pi/180;
 
 wbm_updateState(qjInit,dqjInit,[VelBaseInit;omegaBaseWorldInit]);
 
@@ -98,7 +98,8 @@ CONFIG.initDynamics          = robotDynamics(CONFIG.initState,CONFIG);
 CONFIG.initForKinematics     = robotForKinematics(CONFIG.initState,CONFIG.initDynamics);
 
 % the system is linearized around the initial position, to verify the stability
-jointSpaceLinearization(CONFIG,qjInit,'stability');
+CONFIG.linearization = jointSpaceLinearization(CONFIG,qjInit,'stability');
+CONFIG.gainsOpt      = gainsTuning (CONFIG.linearization,CONFIG,'debug');
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
