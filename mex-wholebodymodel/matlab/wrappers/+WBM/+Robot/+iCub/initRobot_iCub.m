@@ -7,15 +7,15 @@ function wbm_icub = initRobot_iCub(wf2fixLnk)
     icub_model.wf_R_rootLnk  = eye(3,3);
     icub_model.wf_p_rootLnk  = zeros(3,1);
     icub_model.g_wf          = [0; 0; -9.81];
-    %icub_model.vfrict_coeff  = repmat(0.75, icub_model.ndof, 1); % optional
-    %icub_model.cfrict_coeff  = repmat(0.1, icub_model.ndof, 1);
+    %icub_model.frict_coeff.v = repmat(0.75, icub_model.ndof, 1); % optional
+    %icub_model.frict_coeff.c = repmat(0.1, icub_model.ndof, 1);
 
     %% Base robot config:
     icub_config = WBM.wbmHumanoidConfig;
     % icub_config.nCstrs          = 2;
     icub_config.cstr_link_names = {'l_sole', 'r_sole'};
     %icub_config.nPlds = 0;
-    %icub_config.lnk_payloads = [];
+    %icub_config.payload_links = [];
 
     % Setup the body of the iCub-Robot with the initial body (joint) positions (in degrees):
     % Note: This configuration assumes an iCub-Robot with 25 DoFs.

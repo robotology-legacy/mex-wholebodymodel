@@ -5,7 +5,7 @@ function [t, stmChi] = fastIntForwardDynamics(fhCtrlTrqs, tspan, stvChi_0, robot
     if ( (robot_config.stvLen == 0) || (robot_config.nCstrs == 0) )
         error('fastIntForwardDynamics: %s', WBM.wbmErrorMsg.VALUE_IS_ZERO);
     end
-    if ( isempty(robot_model.vfrict_coeff) || isempty(robot_model.cfrict_coeff) )
+    if ( isempty(robot_model.frict_coeff.v) || isempty(robot_model.frict_coeff.c) )
         error('fastIntForwardDynamics: %s', WBM.wbmErrorMsg.EMPTY_VECTOR);
     end
 

@@ -122,7 +122,7 @@ classdef WBM < WBM.WBMBase
             wf_vqT_rlnk = obj.forwardKinematics(R_b, p_b, q_j, urdf_link_name);
         end
 
-        [dstvChi, C_qv] = forwardDynamics(obj, t, stvChi, ctrlTrqs)
+        [dstvChi, C_qv] = forwardDynamics(obj, t, stvChi, fhCtrlTrqs)
 
         function [t, stmChi] = intForwardDynamics(obj, fhCtrlTrqs, tspan, stvChi_0, ode_opt)
             if ~isa(fhCtrlTrqs, 'function_handle')
@@ -238,13 +238,13 @@ classdef WBM < WBM.WBMBase
             for i = 1:m
                 obj.mwbm_config.payload_links(i,1).urdf_link_name = link_names{1,i};
                 obj.mwbm_config.payload_links(i,1).pt_mass        = pl_data(i,1);
-                obj.mwbm_config.payload_links(i,1).rlnk_p_pl     = pl_data(i,2:4).';
+                obj.mwbm_config.payload_links(i,1).rlnk_p_pl      = pl_data(i,2:4).';
             end
         end
 
         function [pl_lnks, nPlds] = getPayloadLinks(obj)
             pl_lnks = obj.mwbm_config.payload_links;
-            nPlds    = obj.mwbm_config.nPlds;
+            nPlds   = obj.mwbm_config.nPlds;
         end
 
         function pl_tbl = getPayloadTable(obj)
@@ -308,6 +308,10 @@ classdef WBM < WBM.WBMBase
             wf_H_pl(1:3,4) = wf_H_rlnk(1:3,4) + rlnk_p_pl; % wf_p_pl = wf_p_rlnk + rlnk_p_pl (= pos. of the CoM of the payload)
         end
 
+        % function tau_pl = payloadForces(obj, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
+
+        % end
+
         function setToolLinks(obj, link_names, pos_data)
             % verify the input types ...
             if ( ~iscell(link_names) || ~ismatrix(pos_data) )
@@ -321,7 +325,7 @@ classdef WBM < WBM.WBMBase
             if (size(link_names,2) ~= m) % the list must be a row-vector ...
                 error('WBM::setToolLinks: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
             end
-            if (m > MAX_NUM_TOOLS)
+            if (m > obj.MAX_NUM_TOOLS)
                 error('WBM::setToolLinks: %s', WBM.wbmErrorMsg.MAX_NUM_LIMIT);
             end
 
@@ -329,13 +333,28 @@ classdef WBM < WBM.WBMBase
             obj.mwbm_config.tool_links(1:m,1) = WBM.wbmToolLink;
             for i = 1:m
                 obj.mwbm_config.tool_links(i,1).urdf_link_name = link_names{1,i};
-                obj.mwbm_config.tool_links(i,1).wf_p_rlnk      = pos_data(i,1:3).';
+                obj.mwbm_config.tool_links(i,1).rlnk_p_tp      = pos_data(i,1:3).';
             end
         end
 
         function [tool_lnks, nTools] = getToolLinks(obj)
             tool_lnks = obj.mwbm_config.tool_links;
             nTools    = obj.mwbm_config.nTools;
+        end
+
+        function updateToolLink(obj, lnk_idx, new_pos_tp)
+            if (obj.mwbm_config.nTools == 0)
+                error('WBM::updateToolLink: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
+            end
+            if (lnk_idx > obj.MAX_NUM_TOOLS)
+                error('WBM::updateToolLink: %s', WBM.wbmErrorMsg.MAX_NUM_LIMIT);
+            end
+            if (size(new_pos_tp,1) ~= 3)
+                error('WBM::updateToolLink: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+            end
+
+            % update the position of the tool-tip with the new position ...
+            obj.mwbm_config.tool_links(lnk_idx,1).rlnk_p_tp = new_pos_tp;
         end
 
         function tool_tbl = getToolTable(obj)
@@ -353,12 +372,12 @@ classdef WBM < WBM.WBMBase
                 clnk_names{i,1} = tool_lnks(i,1).urdf_link_name;
                 cpos{i,1}       = tool_lnks(i,1).wf_p_rlnk;
             end
-            ctools  = horzcat(clnk_names, cpos);
-            tool_tbl = cell2table(ctools, 'VariableNames', {'link_name', 'pos'});
+            ctools = horzcat(clnk_names, cpos);
 
+            tool_tbl = cell2table(ctools, 'VariableNames', {'link_name', 'pos'});
         end
 
-        function wf_H_tp = toolFrame(obj, varargin)
+        function wf_H_tp = toolFrame(obj, varargin) % is this calculation correct?
             if (obj.mwbm_config.nTools == 0)
                 error('WBM::toolFrame: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
             end
@@ -392,13 +411,13 @@ classdef WBM < WBM.WBMBase
                 otherwise
                     error('WBM::getToolFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            wf_H_pl = wf_H_rlnk;
+            wf_H_tp = wf_H_rlnk;
             % translation - we assume that both frames (rlnk & tp) have the same orientation:
             %                wf_p_rlnk (= position of the origin of the ref. link)
             wf_H_tp(1:3,4) = wf_H_rlnk(1:3,4) + rlnk_p_tp; % wf_p_tp = wf_p_rlnk + rlnk_p_tp (= pos. of the tooltip)
         end
 
-        function J_tool = jacobianTool(obj, wf_R_rootLnk, wf_p_rootLnk, q_j, lnk_idx) % Jacobian matrix in tool frame (end-effector frame)
+        function J_tp = jacobianTool(obj, wf_R_rootLnk, wf_p_rootLnk, q_j, lnk_idx) % Jacobian matrix in tool frame (end-effector frame)
             % is this kind of calculation correct? (not sure)
             switch nargin
                 case 5
@@ -411,11 +430,11 @@ classdef WBM < WBM.WBMBase
                 otherwise
                     error('WBM::jacobianTool: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            % get the orientation and the translation of the tooltip ...
-            [p_tp, R_tp] = WBM.utilities.frame2posRotm(wf_H_tp);
-            % compute the jacobian of the tooltip:
+            % get the orientation and the translation of the tool-tip ...
+            [p_tp, R_tp] = WBM.utilities.tform2posRotm(wf_H_tp);
+            % compute the jacobian of the tool-tip:
             R_tp_arr = reshape(R_tp, 9, 1);
-            J_tool = mexWholeBodyModel('jacobian', R_tp, p_tp, q_j, urdf_link_name);
+            J_tp = mexWholeBodyModel('jacobian', R_tp_arr, p_tp, q_j, urdf_link_name);
         end
 
         function [chn_q, chn_dq] = getStateChains(obj, chain_names, q_j, dq_j)
@@ -818,18 +837,13 @@ classdef WBM < WBM.WBMBase
             result = true;
         end
 
-        function lnk_name = getLinkName(obj, lnk_list, idx)
-            if isinteger(idx)
-                % check range ...
-                if ( (idx > size(lnk_list,1)) || (idx < 1) )
-                    error('WBM::getLinkName: %s', WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
-                end
-
-                lnk_name = lnk_list(idx,1).urdf_link_name;
-                return
+        function lnk_name = getLinkName(~, lnk_list, idx)
+            % check range ...
+            if ( (idx > size(lnk_list,1)) || (idx < 1) )
+                error('WBM::getLinkName: %s', WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
             end
-            % else ...
-            error('WBM::getLinkName: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+
+            lnk_name = lnk_list(idx,1).urdf_link_name;
         end
 
     end

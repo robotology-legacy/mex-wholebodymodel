@@ -6,6 +6,7 @@ classdef WBMBase < handle
         wf_p_rootLnk@double vector
         g_wf@double         vector
         ndof@uint16         scalar
+        frict_coeff@struct
         joint_limits@struct
         robot_model@WBM.wbmBaseRobotModel
     end
@@ -159,7 +160,7 @@ classdef WBMBase < handle
             stFltb.wf_v_b = v_b; % cartesian velocity and the rotational velocity of the base
         end
 
-        function wf_H_rlnk = transformationMatrix(obj,varargin)
+        function wf_H_rlnk = transformationMatrix(obj, varargin)
             % wf_R_rootLnk = varargin{1}
             % wf_p_rootLnk = varargin{2}
             % q_j          = varargin{3}
@@ -202,7 +203,7 @@ classdef WBMBase < handle
         end
 
         function resv = isJointLimit(obj, q_j)
-            resv = ~((q_j > obj.mwbm_model.joint_ll) & (q_j < obj.mwbm_model.joint_ul));
+            resv = ~((q_j > obj.mwbm_model.jlim.lwr) & (q_j < obj.mwbm_model.jlim.upr));
         end
 
         function tau_gen = inverseDynamics(obj, varargin) % not implemented yet in C++!
@@ -394,9 +395,9 @@ classdef WBMBase < handle
                 tau_fr = zeros(obj.mwbm_model.ndof,1);
                 return
             end
-            tau_vf = -obj.mwbm_model.vfrict_coeff .* dq_j;       % viscous friction torques
-            tau_cf = -obj.mwbm_model.cfrict_coeff .* sign(dq_j); % Coulomb friction torques
-            tau_fr =  tau_vf + tau_cf;                           % friction torques
+            tau_vf = -obj.mwbm_model.frict_coeff.v .* dq_j;       % viscous friction torques
+            tau_cf = -obj.mwbm_model.frict_coeff.c .* sign(dq_j); % Coulomb friction torques
+            tau_fr =  tau_vf + tau_cf;                            % friction torques
         end
 
         function set.urdfLinkName(obj, new_link_name)
@@ -448,9 +449,24 @@ classdef WBMBase < handle
             ndof = obj.mwbm_model.ndof;
         end
 
+        function set.frict_coeff(obj, frict_coeff)
+            if ~isstruct(frict_coeff)
+                error('WBMBase::set.frict_coeff: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+            end
+            if ( ~iscolumn(frict_coeff.v) || ~iscolumn(frict_coeff.c) )
+                error('WBMBase::set.frict_coeff: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+            end
+            % update the friction coefficients ...
+            obj.mwbm_model.frict_coeff.v = frict_coeff.v;
+            obj.mwbm_model.frict_coeff.c = frict_coeff.c;
+        end
+
+        function frict_coeff = get.frict_coeff(obj)
+            frict_coeff = obj.mwbm_model.frict_coeff;
+        end
+
         function jl = get.joint_limits(obj)
-            jl.lower = obj.mwbm_model.joint_ll;
-            jl.upper = obj.mwbm_model.joint_ul;
+            jl = obj.mwbm_model.jlim;
         end
 
         function robot_model = get.robot_model(obj)
@@ -471,13 +487,13 @@ classdef WBMBase < handle
                 strURDFname = sprintf(' URDF robot model:    %s', strName);
             end
 
-            if ~any(obj.mwbm_model.vfrict_coeff,1) % if vfrict_coeff = 0:
+            if ~any(obj.mwbm_model.frict_coeff.v,1) % if frict_coeff.v = 0:
                 strFrictions = '  frictionless';
             else
                 strFrictions = sprintf(['  viscous frictions:  %s\n' ...
                                         '  Coulomb frictions:  %s'], ...
-                                       mat2str(obj.mwbm_model.vfrict_coeff, prec), ...
-                                       mat2str(obj.mwbm_model.cfrict_coeff, prec));
+                                       mat2str(obj.mwbm_model.frict_coeff.v, prec), ...
+                                       mat2str(obj.mwbm_model.frict_coeff.c, prec));
             end
 
             strParams = sprintf(['WBM Parameters:\n\n' ...
@@ -515,26 +531,26 @@ classdef WBMBase < handle
             obj.mwbm_model.ndof           = robot_model.ndof;
             obj.mwbm_model.urdf_link_name = robot_model.urdf_link_name;
 
-            if ~isempty(robot_model.vfrict_coeff)
-                if (size(robot_model.vfrict_coeff,1) ~= robot_model.ndof)
+            if ~isempty(robot_model.frict_coeff.v)
+                if (size(robot_model.frict_coeff.v,1) ~= robot_model.ndof)
                     error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
                 end
 
-                obj.mwbm_model.vfrict_coeff = robot_model.vfrict_coeff;
-                if ~isempty(obj.mwbm_model.cfrict_coeff)
-                    if (size(robot_model.cfrict_coeff,1) ~= robot_model.ndof)
+                obj.mwbm_model.frict_coeff.v = robot_model.frict_coeff.v;
+                if ~isempty(obj.mwbm_model.frict_coeff.c)
+                    if (size(robot_model.frict_coeff.c,1) ~= robot_model.ndof)
                         error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
                     end
 
-                    obj.mwbm_model.cfrict_coeff = robot_model.cfrict_coeff;
+                    obj.mwbm_model.frict_coeff.c = robot_model.frict_coeff.c;
                 else
-                    % only viscous friction: set the Coulomb friction to 0.
-                    obj.mwbm_model.cfrict_coeff = zeros(robot_model.ndof,1);
+                    % viscous friction only: set the Coulomb friction to 0.
+                    obj.mwbm_model.frict_coeff.c = zeros(robot_model.ndof,1);
                 end
             else
                 % frictionless model: set both coefficient vectors to 0.
-                obj.mwbm_model.vfrict_coeff = zeros(robot_model.ndof,1);
-                obj.mwbm_model.cfrict_coeff = obj.mwbm_model.vfrict_coeff;
+                obj.mwbm_model.frict_coeff.v = zeros(robot_model.ndof,1);
+                obj.mwbm_model.frict_coeff.c = obj.mwbm_model.frict_coeff.v;
             end
 
             % Initialize the mex-WholeBodyModel for a floating base robot,
@@ -554,7 +570,7 @@ classdef WBMBase < handle
                 end
             end
             % set the joint limits for the robot model ...
-            [obj.mwbm_model.joint_ll, obj.mwbm_model.joint_ul] = obj.getJointLimits();
+            [obj.mwbm_model.jlim.lwr, obj.mwbm_model.jlim.upr] = obj.getJointLimits();
         end
 
         function [nw_p_b, nw_R_b] = computeNewWorld2Base(obj, urdf_link_name, q_j)

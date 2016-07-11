@@ -34,7 +34,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     h_c       ...  centroidal momentum (vector)
     hgt       ...  height
     idx       ...  index(es)
-    jl        ...  joint limit(s)
+    jlim, jl  ...  joint limit(s)
     jnt       ...  joint
     jpos      ...  joint position(s)
     ker       ...  kernel (null space)
@@ -44,6 +44,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ln        ...  line
     lnk       ...  link
     lnkfr     ...  link frame (frame to a specified link in the current joint of the robot)
+    lwr       ...  lower
     m...      ...  "member", 'm' declares that this variable is a private member variable, e.g. "mwbm", "mstv", etc.
     mult      ...  multiplier(s)
     ndof      ...  number degrees of freedom
@@ -69,6 +70,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     r         ...  root
     rax       ...  rotation axis
     ref       ...  reference
+    resv      ...  result vector (boolean)
     ridx      ...  row index(es)
     rlnk      ...  root link OR reference link
     rpts      ...  repeats
@@ -88,6 +90,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     trans     ...  translation(s)
     trqs      ...  torques
     ul        ...  upper limit(s)
+    upr       ...  upper
     v         ...  vector
     vel       ...  velocit(y/ies)
     vfrict    ...  viscous friction

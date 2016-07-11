@@ -9,6 +9,7 @@ classdef wbmErrorMsg
         IDX_OUT_OF_BOUNDS = 'Index value out of bounds!';
         MAX_JOINT_LIMIT   = 'Maximum number of joints exceeded!';
         MAX_NUM_LIMIT     = 'Value exceeds the maximum number!';
+        NAME_NOT_EXIST    = 'The name does not exist in the list!'
         NOT_HOMOG_MAT     = 'Matrix is not homogeneous!';
         STRING_MISMATCH   = 'String mismatch!';
         UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';

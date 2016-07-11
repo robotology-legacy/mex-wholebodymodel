@@ -22,7 +22,7 @@ function icub_body = setupBody_iCub()
     joint_names = vertcat(robot_torso_joints, robot_left_arm_joints, robot_right_arm_joints, robot_left_leg_joints, robot_right_leg_joints);
 
     chain_idx = [1 3; 4 8; 9 13; 14 19; 20 25]; % joint index pairs to define the start and the end of each chain ...
-    joint_idx = (1:25)';
+    joint_idx = (1:25).';
 
     icub_body = WBM.wbmBody(chain_names, chain_idx, joint_names, joint_idx);
 end

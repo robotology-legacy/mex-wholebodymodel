@@ -45,6 +45,45 @@ classdef wbmBody
             obj.joints  = horzcat(joint_names, num2cell(joint_idx));
         end
 
+        function jnt_idx = getChainIndices(obj, chain_name)
+            pos = find(strcmp(obj.chains(1:obj.nChains,1), chain_name));
+            if isempty(pos)
+                error('wbmBody::getChainIndices: %s', WBM.wbmErrorMsg.NAME_NOT_EXIST);
+            end
+
+            start_idx = obj.chains{pos,2};
+            end_idx   = obj.chains{pos,3};
+            jnt_idx   = start_idx:end_idx;
+        end
+
+        function jnt_idx = getJointIndex(obj, joint_name)
+            jnt_idx = find(strcmp(obj.joints(1:obj.nJoints,1), joint_name));
+        end
+
+        function jnt_names = getJointNames(obj, joint_idx)
+            % check ranges ...
+            if isscalar(joint_idx)
+                if ( (joint_idx > obj.nJoints) || (joint_idx < 1) )
+                    error('wbmBody::getJointNames: %s', WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
+                end
+
+                jnt_names = obj.joints{joint_idx, 1};
+                return
+            end
+            % else ...
+            if ~isrow(joint_idx)
+                error('wbmBody::getJointNames: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+            end
+            % we assume that the elements are in ascending or descending order ...
+            n = size(joint_idx,2);
+            if ( (joint_idx(1,1) > obj.nJoints) || (joint_idx(1,1) < 1) || ...
+                 (joint_idx(1,n) > obj.nJoints) || (joint_idx(1,n) < 1) )
+                error('wbmBody::getJointNames: %s', WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
+            end
+
+            jnt_names = obj.joints(joint_idx,1);
+        end
+
         function chn_tbl = getChainTable(obj)
             chn_tbl = cell2table(obj.chains, 'VariableNames', {'chain_name', 'start_idx', 'end_idx'});
         end

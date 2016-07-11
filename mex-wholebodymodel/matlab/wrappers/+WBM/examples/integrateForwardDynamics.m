@@ -50,6 +50,10 @@ disp('Start the numerical integration...');
 
 ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);         % setup the error tolerances ...
 [t, chi]    = ode15s(fhFwdDyn, tspan, chi_init, ode_options); % ODE-Solver
+% or, optional:
+%[t, chi] = fastIntForwardDynamics(ctrlTrqs.fhTau, tspan, chi_init, wbm_icub.robot_model, ...
+%                                  wbm_icub.robot_config, ode_options);
+%[t, chi] = wbm_icub.intForwardDynamics(ctrlTrqs.fhTau, tspan, chi_init, ode_options);
 
 save('testTrajectory.mat', 't', 'chi', 'chi_init', 'ctrlTrqs', 'icub_model', 'icub_config');
 disp('Numerical integration finished.');
@@ -71,7 +75,7 @@ wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 %% Plot the results -- CoM-trajectory:
 wbm_icub.plotCoMTrajectory(chi);
 
-% alternative, or if you have to plot other parameter values, use e.g.:
+% alternatively, or if you have to plot other parameter values, use e.g.:
 %stp = wbm_icub.getStateParams(chi);
 
 %figure('Name', 'iCub - CoM-trajectory:', 'NumberTitle', 'off');
