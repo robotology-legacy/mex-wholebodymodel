@@ -68,13 +68,17 @@ gainsInit.MomentumGains      = [gainsDCoM zeros(3); zeros(3) gainsDAngMom];
 gainsInit.intMomentumGains   = [gainsPCoM zeros(3); zeros(3) gainsPAngMom];
 
 % Desired shape for the state matrix of the linearized system, for gains tuning procedure
-gainsInit.KSdes              = gainsInit.impedances;
-gainsInit.KSdes(12,12)                = 0;
-gainsInit.KSdes(16,16)                = 0;
-gainsInit.KSdes(17,17)                = 0;
-gainsInit.KSdes(18,18)                = 0;
-gainsInit.KSdes(22,22)                = 0;
-gainsInit.KSdes(23,23)                = 0;
+gainsInit.KSdes              = 2*gainsInit.impedances;
+
+if  sum(CONFIG.feet_on_ground) == 2
+% gainsInit.KSdes(20,20)       = 0;
+% gainsInit.KSdes(21,21)       = 0;
+% gainsInit.KSdes(22,22)       = 0;
+% gainsInit.KSdes(23,23)       = 0;
+% gainsInit.KSdes(24,24)       = 0;
+% gainsInit.KSdes(25,25)       = 0;
+end
+
 gainsInit.KDdes              = 2*sqrt(gainsInit.KSdes);
 
 % Gains for feet correction to avoid numerical errors
@@ -82,9 +86,9 @@ gainsInit.CorrPosFeet        = 5;
 
 % Reduce the damping in case one wants to verify the soundness of
 % linearization
-if CONFIG.linearizationDebug  == 1  
-gainsInit.dampings           = gainsInit.dampings/2;
-gainsInit.MomentumGains      = gainsInit.MomentumGains/2;  
-end
+% if CONFIG.linearizationDebug  == 1  
+% gainsInit.dampings           = 0.5*gainsInit.dampings;
+% gainsInit.MomentumGains      = 0.5*gainsInit.MomentumGains;  
+% end
 
 end

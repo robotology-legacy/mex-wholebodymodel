@@ -2,12 +2,12 @@ function [correctedCONFIG] = configCorrection(CONFIG)
 %CONFIGCORRECTION corrects the user-defined initial configuration of the
 %                 robot to avoid unfeasible configurations.
 %
-%    [correctedCONFIG] = configCorrection(CONFIG) takes as input the structure
-%    CONFIG containing all the configuration parameters. The output is the
-%    same structure, but with all the possible configuration conficts
-%    resolved. E.g., is the user sets the balancing controller to be 'joint
-%    space', then all the features related to linearization and QP solver
-%    will be disabled here. 
+% [correctedCONFIG] = configCorrection(CONFIG) takes as input the structure
+% CONFIG containing all the configuration parameters. The output is the
+% same structure, but with all the possible configuration conficts
+% resolved. E.g., is the user sets the balancing controller to be 'joint
+% space', then all the features related to linearization and QP solver
+% will be disabled here. 
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -47,9 +47,9 @@ correctedCONFIG.figureCont          = 1;
 % reference trajectory using inverse kinematics
 if strcmp(correctedCONFIG.controller,'JointSpace') == 1
     
-correctedCONFIG.gains_tuning                         = 0;                          
-correctedCONFIG.use_QPsolver                         = 0;
-correctedCONFIG.jointRef_with_ikin                   = 1;
+correctedCONFIG.gains_tuning                        = 0;                          
+correctedCONFIG.use_QPsolver                        = 0;
+correctedCONFIG.jointRef_with_ikin                  = 1;
 end
 
 %% Gains tuning

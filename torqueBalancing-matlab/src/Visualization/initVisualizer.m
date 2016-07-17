@@ -126,7 +126,7 @@ end
 %% Joints positions and position error
 if CONFIG.visualize_joints_dynamics == 1 
       
-    tAss = 3./(sqrt(diag(CONFIG.gainsInit.KSdes))); 
+tAss              = 3./(sqrt(diag(CONFIG.gainsInit.KSdes))); 
 CONFIG.figureCont = visualizeJointDynamics(t,CONFIG,qj,qjRef,tAss);
 end
 

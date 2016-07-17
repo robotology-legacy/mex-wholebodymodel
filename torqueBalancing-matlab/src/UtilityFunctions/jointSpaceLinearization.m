@@ -97,8 +97,8 @@ intMomentumGains   = gainsInit.intMomentumGains;
 %% DEFINE THE LINEARIZED JOINT SPACE DYNAMICS
 Lambda             =  (Jj - Jb/Mb*Mbj)*invMbar;
 MultFirstTask      =  Jb/Mb*transpose(Jb)*pinvA;
-pinvLambda         =  pinv(Lambda,pinv_tol);
-%pinvLambda        =  Lambda'/(Lambda*Lambda' + pinv_damp*eye(size(Lambda,1)));
+% pinvLambda         =  pinv(Lambda,pinv_tol);
+pinvLambda       =  Lambda'/(Lambda*Lambda' + 0.01*eye(size(Lambda,1)));
 NullLambda         =  eye(ndof) - pinvLambda*Lambda;
 JG                 =  JH(:,7:end)-JH(:,1:6)*(eye(6)/Jb(1:6,1:6))*Jj(1:6,:);
 
@@ -122,6 +122,9 @@ if strcmp(mode,'stability')==1
     
 AStateOld     = [zeros(ndof) eye(ndof);
                     -KS           -KD];
+                
+        AStateDes     = [zeros(ndof) eye(ndof);
+                               -gainsInit.KSdes           -gainsInit.KDdes];
 
 eigAStateOld  = -real(eig(AStateOld));               
 
@@ -137,18 +140,49 @@ end
 if flag == 1
 
     disp('Warning: the linearized state dynamics is NOT asymptotically stable')
-    disp('Linearized system eigenvalues:')
-    disp(eig(AStateOld))
+
 else
     disp('The linearized state dynamics is asymptotically stable')
-    disp('Linearized system eigenvalues:')
-    disp(eig(AStateOld))
 end
+%     disp('Linearized system eigenvalues:')
+%     disp([eig(AStateOld) eig(AStateDes)])
+    
+   figure(26)
+   plot(real(eig(AStateDes)),imag(eig(AStateDes)),'ok')   
+   hold on
+
 end
 
 %% Parameters for visualization and gains tuning
 linearization.KS          = KS;
 linearization.KD          = KD;
+
+%% Two feet correction
+% gainsInit.KSdes = eye(ndof);
+% gainsInit.KDdes = 2*eye(ndof);
+
+if sum(feet_on_ground) == 2
+    
+Jc_base1    = Jc(1:6,1:6);
+Jc_base2    = Jc(7:end,1:6);
+Jc_joint1   = Jc(1:6,7:end);
+Jc_joint2   = Jc(7:end,7:end);
+
+AA     = (-Jc_base2*Jc_base1\Jc_joint1+Jc_joint2);
+pinvAA = pinv(AA,1e-5);
+NullAA = eye(ndof)-pinvAA*AA;
+
+gainsInit.KSdes= NullAA*gainsInit.KSdes;
+gainsInit.KDdes= NullAA*gainsInit.KDdes;
+% figure
+% image(gainsInit.KDdes,'CDataMapping','scaled')
+% colorbar
+% figure
+% image(gainsInit.KSdes,'CDataMapping','scaled')
+% colorbar
+end
+
+
 linearization.KDdes       = gainsInit.KDdes;
 linearization.KSdes       = gainsInit.KSdes;
 linearization.ACartesian  = -invMbar*pinvLambda*MultFirstTask;

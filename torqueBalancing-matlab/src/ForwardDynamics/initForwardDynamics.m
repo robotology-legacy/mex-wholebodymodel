@@ -79,7 +79,7 @@ if CONFIG.linearizationDebug  == 1
 
 % the initial configuration is changed by a small delta, but the references 
 % are not updated. In this way the robot will move to the reference position
-qjInit(1:13)       = qjInit(1:13)+5*pi/180;
+qjInit(1:13)       = qjInit(1:13)-1*pi/180;
 
 wbm_updateState(qjInit,dqjInit,[VelBaseInit;omegaBaseWorldInit]);
 
@@ -99,34 +99,20 @@ CONFIG.initForKinematics     = robotForKinematics(CONFIG.initState,CONFIG.initDy
 
 % the system is linearized around the initial position, to verify the stability
 CONFIG.linearization = jointSpaceLinearization(CONFIG,qjInit,'stability');
-CONFIG.gainsOpt      = gainsTuning (CONFIG.linearization,CONFIG,'debug');
+CONFIG.gainsOpt      = gainsTuning(CONFIG.linearization,CONFIG,'debug');
+% gainsOpt           = gainsTuning(CONFIG.linearization,CONFIG,'debug');
+% CONFIG.gainsOpt    = constrGainsInit(gainsOpt,CONFIG.linearization,CONFIG);
+pause
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Gains tuning procedure
-if CONFIG.gains_tuning == 1
- 
-CONFIG.vectorOfPoints = round(linspace(1,length(CONFIG.ikin.t),CONFIG.numberOfPoints));
- 
-for k = 1:length(CONFIG.vectorOfPoints)
-     
-linearization = jointSpaceLinearization(CONFIG,CONFIG.ikin.qj(:,CONFIG.vectorOfPoints(k)) ,'normal');
-% reset the world frame
-wbm_setWorldFrame(RotBaseInit,PosBaseInit,[0 0 -9.81]')
-% gains optimization (run in 'debug' mode for debugging)
-gainsOpt      = gainsTuning(linearization,CONFIG,'normal');
-% gains matrices vectorization
-CONFIG.gainsVec.impedances(:,k)        = gainsOpt.impedances(:);
-CONFIG.gainsVec.dampings(:,k)          = gainsOpt.dampings(:); 
-CONFIG.gainsVec.MomentumGains(:,k)     = gainsOpt.MomentumGains(:);
-CONFIG.gainsVec.intMomentumGains(:,k)  = gainsOpt.intMomentumGains(:); 
-CONFIG.gainsVec.KSdes                  = gainsOpt.KSdes;               
-CONFIG.gainsVec.KDdes                  = gainsOpt.KDdes;                  
-CONFIG.gainsVec.KSn                    = gainsOpt.KSn;                   
-CONFIG.gainsVec.KDn                    = gainsOpt.KDn; 
-CONFIG.gainsVec.CorrPosFeet            = gainsOpt.CorrPosFeet;
-end
-end
+% if CONFIG.gains_tuning == 1
+%  
+% linearization = jointSpaceLinearization(CONFIG,qjInit ,'normal');
+% % gains optimization (run in 'debug' mode for debugging)
+% gainsOpt      = gainsTuning(linearization,CONFIG,'normal');
+% end
  
 %% FORWARD DYNAMICS INTEGRATION
 CONFIG.wait       = waitbar(0,'Forward dynamics integration...');

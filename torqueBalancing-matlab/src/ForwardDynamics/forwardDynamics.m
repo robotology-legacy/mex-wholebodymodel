@@ -19,8 +19,8 @@ waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 %% Robot Configuration
 ndof                  = CONFIG.ndof;
-gains                 = CONFIG.gainsInit;
-% gains                 = CONFIG.gainsOpt;
+% gains               = CONFIG.gainsInit;
+gains                 = CONFIG.gainsOpt;
 qjInit                = CONFIG.qjInit;
 xCoMRef               = CONFIG.xCoMRef;
 
@@ -67,61 +67,14 @@ end
 %% CoM trajectory generator
 trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(xCoMRef,t,CONFIG);
 
-%% Linearization and gains tuning procedure 
-if CONFIG.gains_tuning == 1 
-    
-cont           = 0;
-gains          = CONFIG.gainsVec;
-vectorOfPoints = CONFIG.vectorOfPoints;
- 
-for k = 2:length(vectorOfPoints)
-  
-if t>=CONFIG.ikin.t(vectorOfPoints(k-1)) && t<=CONFIG.ikin.t(vectorOfPoints(k))
-    
-cont  = k;
-end
-end
-
-% define the scalar value for interpolation
-if (CONFIG.ikin.t(vectorOfPoints(cont))-CONFIG.ikin.t(vectorOfPoints(cont-1))) == 0
-
-delta = 0;
-
-else
-delta = (t-CONFIG.ikin.t(vectorOfPoints(cont-1)))/(CONFIG.ikin.t(vectorOfPoints(cont))-CONFIG.ikin.t(vectorOfPoints(cont-1)));
-end
-
-% gains matrix interpolation in the Lie group of symmetric positve definite
-% matrices
-Kpn = expm(delta*logm(reshape(gains.impedances(:,cont),[ndof,ndof]))+(1-delta)*logm(reshape(gains.impedances(:,cont-1),[ndof,ndof])));
-Kdn = expm(delta*logm(reshape(gains.dampings(:,cont),[ndof,ndof]))+(1-delta)*logm(reshape(gains.dampings(:,cont-1),[ndof,ndof])));
-Kpx = expm(delta*logm(reshape(gains.intMomentumGains(:,cont),[6,6]))+(1-delta)*logm(reshape(gains.intMomentumGains(:,cont-1),[6,6])));
-Kdx = expm(delta*logm(reshape(gains.MomentumGains(:,cont),[6,6]))+(1-delta)*logm(reshape(gains.MomentumGains(:,cont-1),[6,6])));
-  
-lin = jointSpaceLinearization(CONFIG,trajectory.JointReferences.qjRef ,'normal');
-% reset the world frame
-wbm_setWorldFrame(RotBase,PosBase,[0 0 -9.81]')
-
-gains.impedances        = Kpn;
-gains.dampings          = Kdn;
-gains.intMomentumGains  = Kpx;
-gains.MomentumGains     = Kdx;  
-
-gains.KSn = lin.ACartesian*Kpx*lin.BCartesian + lin.ANull*Kpn*lin.BNull;
-gains.KDn = lin.ACartesian*Kdx*lin.BCartesian + lin.ANull*Kdn*lin.BNull;
-visualization.gainTun   = gains;
-end
-
 %%%%%%%%%%%%%%% LINEARIZATION DEBUG AND STABILITY ANALYSIS %%%%%%%%%%%%%%%%
 if CONFIG.linearizationDebug  == 1
- 
-linearization            = jointSpaceLinearization(CONFIG,qj,'normal');
-% reset the world frame
-wbm_setWorldFrame(RotBase,PosBase,[0 0 -9.81]')
-
+    
 % linearized joint accelerations
-visualization.ddqjLin    = trajectory.JointReferences.ddqjRef-linearization.KS*(qj-trajectory.JointReferences.qjRef)...
-                          -linearization.KD*(dqj-trajectory.JointReferences.dqjRef);
+% visualization.ddqjLin    = trajectory.JointReferences.ddqjRef-CONFIG.linearization.KS*(qj-trajectory.JointReferences.qjRef)...
+%                           -CONFIG.linearization.KD*(dqj-trajectory.JointReferences.dqjRef);
+visualization.ddqjLin      = trajectory.JointReferences.ddqjRef-CONFIG.gainsOpt.KSn*(qj-trajectory.JointReferences.qjRef)...
+                            -CONFIG.gainsOpt.KDn*(dqj-trajectory.JointReferences.dqjRef);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

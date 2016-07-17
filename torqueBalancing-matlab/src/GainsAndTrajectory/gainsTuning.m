@@ -24,8 +24,8 @@ function gainsOpt = gainsTuning (linearization,CONFIG,mode)
 % Config parameters
 ndof                  = CONFIG.ndof;
 gainsInit             = CONFIG.gainsInit;
-KSdes                 = gainsInit.KSdes;
-KDdes                 = gainsInit.KDdes;
+KSdes                 = linearization.KSdes;
+KDdes                 = linearization.KDdes;
 ACartesian            = linearization.ACartesian;
 BCartesian            = linearization.BCartesian;
 ANull                 = linearization.ANull;
@@ -35,11 +35,9 @@ CONFIG.positDefToll   = 0.1;
 %% NONLINEAR LSQ OPTIMIZATION
 CONFIG.matrixSelector = 'position';
 [Kpx,Kpn] = kronVectorization(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
-% [Kpx,Kpn] = nonLinLeastSquares(ACartesian,BCartesian,ANull,BNull,KSdes,CONFIG);
 
 CONFIG.matrixSelector = 'velocity';
 [Kdx,Kdn] = kronVectorization(ACartesian,BCartesian,ANull,BNull,KDdes,CONFIG);
-% [Kdx,Kdn] = nonLinLeastSquares(ACartesian,BCartesian,ANull,BNull,KDdes,CONFIG);
 
 %% New stiffness and damping matrices
 KSn = ACartesian*Kpx*BCartesian + ANull*Kpn*BNull;
@@ -212,6 +210,44 @@ if flag(4) == 1
     
     disp('Warning: the gains matrix on joint velocity is not positive definite')   
 end
+
+AStateNew     = [zeros(ndof) eye(ndof);
+                  -KSn           -KDn];
+ 
+% disp('Tuned system eigenvalues:')
+% disp(eig(AStateNew))
+
+% figure
+% image(KSn,'CDataMapping','scaled')
+% colorbar
+% figure
+% image(KDn,'CDataMapping','scaled')
+% colorbar
+
+% % % % % % % % % % KSn(14:end,14:end)=ones(12);
+K1 = KSn;
+K1(1:13,1:13)=zeros(13);
+K1(14:end,14:end)=zeros(12);
+max(max(abs(K1)))
+
+figure(20)
+surf(KSn)
+figure(21)
+surf(KDn)
+figure(22)
+surf(Kpn)
+figure(23)
+surf(Kdn)
+figure(24)
+surf(Kpx)
+figure(25)
+surf(Kdx)
+figure(26)
+plot(real(eig(AStateNew)),imag(eig(AStateNew)),'or')
+
+AStateDes = [zeros(ndof) eye(ndof); -KSdes -KDdes];
+[sort(eig(AStateDes)) sort(eig(AStateNew))]
+
 end
 
 %% Gains matrices after optimization

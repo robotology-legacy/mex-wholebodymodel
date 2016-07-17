@@ -20,6 +20,8 @@ for k = 1:length(tAss)
     index(k) = sum(t>tAss(k))+1;
 end
 
+step = qjRef(:,end)-qj(:,1);
+
 %% Joints dynamics
 for k=1:5
   
@@ -31,8 +33,8 @@ hold on
 plot(tAss(k+3),qj(k+3,end-index(k+3)),'ok')
 hold on
 plot(t,qjRef(k+3,:),'k')
-plot(t,0.95.*qjRef(k+3,:),'-')
-plot(t,1.05.*qjRef(k+3,:),'-')
+plot(t,qjRef(k+3,:)+0.05*step(k+3),'-')
+plot(t,qjRef(k+3,:)-0.05*step(k+3),'-')
 grid on
 xlabel('Time [s]')
 ylabel('Angle [rad]')
@@ -48,8 +50,8 @@ hold on
 plot(tAss(k+3+5),qj(k+3+5,end-index(k+3+5)),'ok')
 hold on
 plot(t,qjRef(k+3+5,:),'k')
-plot(t,0.95.*qjRef(k+3+5,:),'-')
-plot(t,1.05.*qjRef(k+3+5,:),'-')
+plot(t,qjRef(k+3+5,:)+0.05*step(k+3+5),'-')
+plot(t,qjRef(k+3+5,:)-0.05*step(k+3+5),'-')
 grid on
 xlabel('Time [s]')
 ylabel('Angle [rad]')
@@ -105,8 +107,8 @@ hold on
 plot(tAss(k),qj(k,end-index(k)),'ok')
 hold on
 plot(t,qjRef(k,:),'k')
-plot(t,(qjRef(k,:)+0.05.*qjRef(k,:)),'g')
-plot(t,(qjRef(k,:)-0.05.*qjRef(k,:)),'g')
+plot(t,(qjRef(k,:)+0.05*step(k)),'g')
+plot(t,(qjRef(k,:)-0.05.*step(k)),'g')
 grid on
 xlabel('Time [s]')
 ylabel('Angle [rad]')
