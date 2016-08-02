@@ -1,4 +1,4 @@
-
+%% Utility function for visualizeForwardDynamics.m
 function R = roty(alpha)
    R = zeros(3, 3);
    R(2,2) =  1;

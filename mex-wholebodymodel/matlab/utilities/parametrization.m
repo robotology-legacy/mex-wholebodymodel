@@ -1,6 +1,6 @@
 function [T_bar,angles] = parametrization(rot_matr)
-%% parametrization
-%  Computes the Z-Y-X parametrization from a given rotation matrix
+%% PARAMETRIZATION
+%  Computes the Z-Y-X parametrization from a given rotation matrix.
 %  The outputs are:
 %  
 %  T_bar    [3x3] the matix which converts the angular velocity into the

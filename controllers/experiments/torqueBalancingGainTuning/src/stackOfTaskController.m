@@ -1,4 +1,4 @@
-function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE)
+function controlParam = stackOfTaskController(CONFIG,gains,trajectory,DYNAMICS,FORKINEMATICS,STATE)
 %STACKOFTASKCONTROLLER implements a momentum-based control algorithm to
 %                      control the robot iCub.
 %
@@ -24,12 +24,13 @@ function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FO
 pinv_tol            = CONFIG.pinv_tol;
 feet_on_ground      = CONFIG.feet_on_ground;
 ndof                = CONFIG.ndof;
+% pinv_damp         = CONFIG.pinv_damp;
 
 %% Gains
-impedances          = gain.impedances;
-dampings            = gain.dampings;
-MomentumGains       = gain.MomentumGains;
-intMomentumGains    = gain.intMomentumGains;
+impedances          = gains.impedances;
+dampings            = gains.dampings;
+MomentumGains       = gains.MomentumGains;
+intMomentumGains    = gains.intMomentumGains;
 
 %% Dynamics
 M                   = DYNAMICS.M;
@@ -115,6 +116,7 @@ JcMinv             = Jc/M;
 Lambda             = JcMinv*S;
 JcMinvJct          = JcMinv*transpose(Jc);
 pinvLambda         = pinv(Lambda,pinv_tol);
+%pinvLambda        = Lambda'/(Lambda*Lambda' + pinv_damp*eye(size(Lambda,1)));
 
 % multiplier of contact wrenches in tau0
 JBar               = transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));   
@@ -126,12 +128,8 @@ NullLambda         = eye(ndof)-pinvLambda*Lambda;
 Sigma              = -(pinvLambda*JcMinvJct + NullLambda*JBar);
 SigmaNA            =  Sigma*Nullfc;
 
-% Postural task correction    
-pinvLambdaDamp     =  Lambda'/(Lambda*Lambda' + CONFIG.pinv_damp*eye(size(Lambda,1)));
-NullLambdaDamp     =  eye(ndof)-pinvLambdaDamp*Lambda;
-posturalCorr       =  NullLambdaDamp*Mbar;
-impedances         =  impedances*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
-dampings           =  dampings*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
+% Postural task correction
+posturalCorr       =  CONFIG.linearization.BNull;
 
 tauModel           =  pinvLambda*(JcMinv*h - dJcNu) + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
                      + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
@@ -151,9 +149,7 @@ fcDes              = fcHDot + Nullfc*f0;
 
 %% Output parameters
 controlParam.fcHDot   = fcHDot;
-controlParam.HDotDes  = HDotDes;
 controlParam.fcDes    = fcDes;
-controlParam.f_grav   = f_grav;
 controlParam.tauModel = tauModel;
 controlParam.Sigma    = Sigma;
 controlParam.f0       = f0;

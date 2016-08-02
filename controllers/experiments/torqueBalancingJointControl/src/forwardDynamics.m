@@ -54,10 +54,10 @@ xCoM                  = FORKINEMATICS.xCoM;
 %% Joint limits check
 % jointLimitsCheck(qj,t);
 
-%% CoM and joint trajectory generator
-trajectory.JointReferences.ddqjRef = zeros(ndof,1);
-trajectory.JointReferences.dqjRef  = zeros(ndof,1);
-trajectory.JointReferences.qjRef   = qjInit;
+%% Interpolation of the joint reference trajectory with ikin
+trajectory.JointReferences         = interpInverseKinematics(t,CONFIG.ikin);
+
+%% CoM trajectory generator
 trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(xCoMRef,t,CONFIG);
 
 %% Balancing controller
@@ -81,7 +81,6 @@ visualization.poseFeet    = [LFootPoseEul;RFootPoseEul];
 visualization.H           = H;
 visualization.HRef        = [m*trajectory.desired_x_dx_ddx_CoM(:,2);zeros(3,1)];
 visualization.fc          = fc;
-visualization.f0          = controlParam.f0;
 visualization.tau         = tau;
 
 end

@@ -24,7 +24,7 @@ if sum(CONFIG.feet_on_ground) == 2
     gainsDAngMom        = 2*sqrt(gainsPAngMom);
 
 % impedances acting in the null space of the desired contact forces  
-    impTorso            = [ 30  30  20]; 
+    impTorso            = [ 35.6  30  20]; 
     impArms             = [ 10  10  10   5   5];
     impLeftLeg          = [ 35  40  10  30   5  10]; 
     impRightLeg         = [ 35  40  10  30   5  10];  
@@ -39,8 +39,8 @@ if  sum(CONFIG.feet_on_ground) == 1
      gainsDAngMom       = 2*sqrt(gainsPAngMom);
    
 % impedances acting in the null space of the desired contact forces 
-     impTorso           = [ 25   20   25]; 
-     impArms            = [ 15   10   15   10   15];
+     impTorso           = [ 53  16   33]; 
+     impArms            = [ 25   20   25   20   25];
 
 if CONFIG.feet_on_ground(1) == 1
     
@@ -66,6 +66,10 @@ gainsInit.impedances         = diag(gainsInit.impedances);
 gainsInit.dampings           = diag(gainsInit.dampings); 
 gainsInit.MomentumGains      = [gainsDCoM zeros(3); zeros(3) gainsDAngMom];
 gainsInit.intMomentumGains   = [gainsPCoM zeros(3); zeros(3) gainsPAngMom];
+
+% Desired shape for the state matrix of the linearized system, for gains tuning procedure
+gainsInit.KSdes              = gainsInit.impedances;
+gainsInit.KDdes              = 2*sqrt(gainsInit.KSdes);
 
 % Gains for feet correction to avoid numerical errors
 gainsInit.CorrPosFeet        = 5;

@@ -1,4 +1,4 @@
-function controlParam  = initController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE)
+function controlParam  = initController(gains,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE)
 %INITCONTROLLER is the initialization function for iCub balancing controllers
 %               in Matlab.
 %
@@ -14,7 +14,7 @@ function controlParam  = initController(gain,trajectory,DYNAMICS,FORKINEMATICS,C
 
 % ------------Initialization----------------
 %% Feet correction gains
-KCorrPos              = gain.CorrPosFeet;
+KCorrPos              = gains.CorrPosFeet;
 KCorrVel              = 2*sqrt(KCorrPos);
 
 %% Config parameters
@@ -43,7 +43,7 @@ DeltaPoseRFoot        = TRfoot*(RFootPoseEul-initForKinematics.RFootPoseEul);
 DeltaPoseLFoot        = TLfoot*(LFootPoseEul-initForKinematics.LFootPoseEul);
 
 %% BALANCING CONTROLLER
-controlParam          = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE); 
+controlParam          = stackOfTaskController(CONFIG,gains,trajectory,DYNAMICS,FORKINEMATICS,STATE); 
 
 if     use_QPsolver == 1 
 % Quadratic programming solver for the nullspace of contact forces  

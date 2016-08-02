@@ -3,11 +3,8 @@
 % This is the initialization script for torque balancing simulation of the robot 
 % iCub using Matlab. 
 % The user can set the parameters below to generate different simulations. 
-% The forward dynamics integration is available for both the robot balancing
-% on one foot and two feet, and for the robot standing or moving, following
-% a CoM trajectory. It is also possible to use a QP program to ensure the contact 
-% forces at feet are inside the friction cones. A linearization setup for both 
-% analysis and gains tuning purpose is available, too.
+% The integration is available for both the robot balancing on one foot and
+% two feet, and for the robot standing or moving, following a CoM trajectory.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -20,8 +17,7 @@ clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation 
 CONFIG.demo_movements                        = 1;                          %either 0 or 1
-CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left,right]              
-CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
+CONFIG.feet_on_ground                        = [1,0];                      %either 0 or 1; [left,right]           
 
 %% Visualization setup 
 % robot simulator
@@ -35,46 +31,31 @@ CONFIG.tStart                                = 0;
 CONFIG.tEnd                                  = 10;   
 CONFIG.sim_step                              = 0.01;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Visualize the inverse kinematics results
+CONFIG.visualize_ikin_results                = 1;                          %either 0 or 1  
+CONFIG.ikin_integration_step                 = 0.01; 
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 % ONLY FOR DEVELOPERS
-% tolerances for pseudoinverse and QP
+% tolerances for pseudoinverse, mass matrix and postural task correction
 CONFIG.pinv_tol           = 1e-8;
 CONFIG.pinv_damp          = 5e-6;
 CONFIG.reg_HessianQP      = 1e-3;
+CONFIG.massCorr           = 0;
 
 %% Forward dynamics integration setup
-% CONFIG.integrateWithFixedStep will use a Euler forward integrator instead
-% of ODE15s to integrate the forward dynamics. Use it only for debug 
-CONFIG.integrateWithFixedStep    = 0;                                      %either 0 or 1
+if CONFIG.demo_movements == 0 
 
-% The fixed step integration needs a desingularization of system mass matrix
-% to converge to a solution
-if CONFIG.integrateWithFixedStep == 1
-    
-CONFIG.massCorr = 0.05; 
-else 
-CONFIG.massCorr = 0;
-end
-
-% integration options
-if CONFIG.demo_movements == 0
-CONFIG.options                   = odeset('RelTol',1e-3,'AbsTol',1e-3);
+  CONFIG.options          = odeset('RelTol',1e-3,'AbsTol',1e-4);
 else
-CONFIG.options                   = odeset('RelTol',1e-6,'AbsTol',1e-6);
+  CONFIG.options          = odeset('RelTol',1e-6,'AbsTol',1e-6);
 end
-
-%% Visualization setup
-% this script modifies the default MATLAB options for figures and graphics
-plot_set
-
-% this is the figure counter. It is used to automatically adapt the figure
-% number in case new figures are added
-CONFIG.figureCont                = 1;
 
 %% Initialize the robot model
 wbm_modelInitialise('icubGazeboSim');
-CONFIG.ndof  = 25;
+plot_set
+CONFIG.figureCont = 1;
+CONFIG.ndof       = 25;
 
 %% Initial joints position [deg]
 leftArmInit  = [ -20  30  0  45  0]';          
@@ -105,7 +86,9 @@ CONFIG.qjInit = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(p
 
 %% %%%%%%%%%%%%%%%%%%%%% FORWARD DYNAMICS INTEGRATION %%%%%%%%%%%%%%%%%% %%
 addpath('./src');
-addpath('./../utilityMatlabFunctions');
-addpath('./../utilityMatlabFunctions/RobotFunctions');
-addpath('./../utilityMatlabFunctions/Visualization');
+addpath('./../../utilityMatlabFunctions/RobotFunctions');
+addpath('./../../utilityMatlabFunctions/Visualization');
+addpath('./../../utilityMatlabFunctions/InverseKinematics');
+addpath('./../../utilityMatlabFunctions/CentroidalTransformation');
 initForwardDynamics(CONFIG);
+

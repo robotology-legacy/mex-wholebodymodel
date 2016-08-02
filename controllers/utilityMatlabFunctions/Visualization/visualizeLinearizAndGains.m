@@ -1,11 +1,11 @@
-function figureCont = visualizeLinearizAndGains(t,CONFIG,ddqjNonLin,ddqjLin,gainTun)
+function figureCont = visualizeLinearizAndGains(t,CONFIG,ddqjNonLin,ddqjLin)
 %VISUALIZELINEARIZANDGAINS visualizes the results on the linearized joint space
 %                          dynamics of robot iCub.
 %
-%   figureCont = VISUALIZELINEARIZANDGAINS(t,CONFIG,ddqjNonLin,ddqjLin,gainTun)
+%   figureCont = VISUALIZELINEARIZANDGAINS(t,CONFIG,ddqjNonLin,ddqjLin)
 %   takes as input the integration time T, the structure CONFIG containing all
-%   the utility parameters, the joint linear and nonlinear accelerations and
-%   all the gains matrices (gainTun). It generates all the plots related to the
+%   the utility parameters, the joint linear and nonlinear accelerations. 
+%   It generates all the plots related to the
 %   stability analysis, it verifies the soundness of the linearization
 %   procedure and visualizes the gains matrices after optimization. The 
 %   output is a counter for the automatic correction of figures numbers in 
@@ -103,38 +103,57 @@ end
 figureCont = figureCont +1;
 end
 
-% %% Gains Tuning results
-% if CONFIG.gains_tuning == 1 && CONFIG.visualize_gains_tuning_results  == 1
-% 
-% % NEW GAINS MATRICES
-% figure(figureCont)
-% subplot(2,2,1) 
-% % image(gainTun.impedances,'CDataMapping','scaled')
-% % colorbar
-% surf(gainTun.impedances)
-% % zlim([-30 90])
-% % hold on
-% title('Opt Impedances')
-% subplot(2,2,2) 
-% % image(gainTun.dampings,'CDataMapping','scaled')
-% % colorbar
-% surf(gainTun.dampings)
-% zlim([-10 15])
-% % hold on
-% title('Opt Dampings')
-% % 
-% subplot(2,2,3)
-% % image(gainTun.intMomentumGains,'CDataMapping','scaled')
-% % colorbar
-% surf(gainTun.intMomentumGains)
-% % hold on
-% title('Opt Momentum Integral Gains')
-% subplot(2,2,4)
-% % image(gainTun.MomentumGains,'CDataMapping','scaled')
-% % colorbar
-% surf(gainTun.MomentumGains)
-% % hold on
-% title('Opt Momentum Gains')
-% end
+%% Gains Tuning results
+if CONFIG.gains_tuning == 1
+    
+ACartesian            = CONFIG.linearization.ACartesian;
+BCartesian            = CONFIG.linearization.BCartesian;
+ANull                 = CONFIG.linearization.ANull;
+BNull                 = CONFIG.linearization.BNull;
+KSo                   = ACartesian*CONFIG.gain.intMomentumGains*BCartesian + ANull*CONFIG.gain.impedances*BNull;
+KDo                   = ACartesian*CONFIG.gain.MomentumGains*BCartesian + ANull*CONFIG.gain.dampings*BNull;
+KSdes                 = CONFIG.gainsInit.KSdes;
+KDdes                 = CONFIG.gainsInit.KDdes;
+KSn                   = CONFIG.linearization.KS;
+KDn                   = CONFIG.linearization.KD;
+
+figure(figureCont)
+image(KSo,'CDataMapping','scaled')
+colorbar
+title('Optimized KS')
+figureCont = figureCont +1;
+
+figure(figureCont)
+image(KDo,'CDataMapping','scaled')
+colorbar
+title('Optimized KD')
+figureCont = figureCont +1;
+
+figure(figureCont)
+image(KSn,'CDataMapping','scaled')
+colorbar
+title('Kronecker KS')
+figureCont = figureCont +1;
+
+figure(figureCont)
+image(KDn,'CDataMapping','scaled')
+colorbar
+title('Kronecker KD')
+figureCont = figureCont +1;
+
+% state matrix verification
+ndof       = CONFIG.ndof;
+AStateKron = [zeros(ndof), eye(ndof); -KSn   -KDn];
+AStateDes  = [zeros(ndof), eye(ndof); -KSdes -KDdes];
+AStateOpt  = [zeros(ndof), eye(ndof); -KSo   -KDo];
+
+figure(figureCont)
+plot(real(eig(AStateKron)),imag(eig(AStateKron)),'or')
+hold on
+grid on
+plot(real(eig(AStateDes)),imag(eig(AStateDes)),'ok')
+plot(real(eig(AStateOpt)),imag(eig(AStateOpt)),'ob')
+title('Joint space eigenvalues')
+figureCont = figureCont +1;
 
 end

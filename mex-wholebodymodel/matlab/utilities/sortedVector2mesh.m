@@ -1,3 +1,4 @@
+%% Utility function for visualizeForwardDynamics.m
 
 function P = sortedVector2mesh(x,Dx)
     i1 = 1;

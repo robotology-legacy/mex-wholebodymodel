@@ -1,7 +1,7 @@
 function [dcm] = quaternion2dcm(quat)
 %QUATERNION2DCM Converts a quaternion (real/imaginary) to direction cosine matrix (aka Rotation matrix)
 %   Arguments :
-%   Normal Mode :
+%   Input :
 %               quat - (4 X 1) vector representing the quaternion with real/imaginary serialization
 %   Returns :
 %               dcm - Discrete Cosine Matrix (Rotation matrix 3 X 3)

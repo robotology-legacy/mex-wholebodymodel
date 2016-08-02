@@ -1,4 +1,4 @@
-function controlParam  = initController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE)
+function controlParam  = initController(gains,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE)
 %INITCONTROLLER is the initialization function for iCub balancing controllers
 %               in Matlab.
 %
@@ -14,13 +14,12 @@ function controlParam  = initController(gain,trajectory,DYNAMICS,FORKINEMATICS,C
 
 % ------------Initialization----------------
 %% Feet correction gains
-KCorrPos              = gain.CorrPosFeet;
+KCorrPos              = gains.CorrPosFeet;
 KCorrVel              = 2*sqrt(KCorrPos);
 
 %% Config parameters
 ndof                  = CONFIG.ndof;
 feet_on_ground        = CONFIG.feet_on_ground;
-use_QPsolver          = CONFIG.use_QPsolver;
 initForKinematics     = CONFIG.initForKinematics;
 S                     = [zeros(6,ndof);
                          eye(ndof,ndof)]; 
@@ -42,15 +41,10 @@ LFootPoseEul          = FORKINEMATICS.LFootPoseEul;
 DeltaPoseRFoot        = TRfoot*(RFootPoseEul-initForKinematics.RFootPoseEul);
 DeltaPoseLFoot        = TLfoot*(LFootPoseEul-initForKinematics.LFootPoseEul);
 
-%% BALANCING CONTROLLER
-controlParam          = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE); 
-
-if     use_QPsolver == 1 
-% Quadratic programming solver for the nullspace of contact forces  
-controlParam.fcDes    = QPSolver(controlParam,CONFIG,FORKINEMATICS);
-end
-
-controlParam.tau      = controlParam.tauModel + controlParam.Sigma*controlParam.fcDes;
+%% BALANCING CONTROLLERS
+% Centroidal coordinates transformation   
+centroidalDynamics    = centroidalConversion(DYNAMICS,FORKINEMATICS,STATE);
+controlParam          = jointSpaceController(CONFIG,gains,trajectory,centroidalDynamics,STATE);
 
 %% Feet pose correction
 % this will avoid numerical errors during the forward dynamics integration

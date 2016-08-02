@@ -5,7 +5,7 @@ function [] = initForwardDynamics(CONFIG)
 %            [] = INITFORWARDDYNAMICS(CONFIG) takes as input the structure
 %            CONFIG containing all the configuration parameters. It has no 
 %            output. The forward dynamics integration will be performed 
-%            following the options the user specified in the initialization 
+%            following the options the user specifies in the initialization 
 %            file.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
@@ -60,7 +60,11 @@ CONFIG.initState              = robotState(chiInit,CONFIG);
 %% Initial gains
 CONFIG.gainsInit              = gains(CONFIG);
 
+%% Joint references with inverse kinematics  
+[CONFIG.ikin,chiInit,CONFIG.figureCont]  = initInverseKinematics(CONFIG);
+
 %% Initial dynamics and forward kinematics
+CONFIG.initState              = robotState(chiInit,CONFIG);
 % Initial dynamics
 CONFIG.initDynamics           = robotDynamics(CONFIG.initState,CONFIG);
 % Initial forward kinematics
@@ -70,14 +74,8 @@ CONFIG.xCoMRef                = CONFIG.initForKinematics.xCoM;
 %% FORWARD DYNAMICS INTEGRATION
 CONFIG.wait       = waitbar(0,'Forward dynamics integration...');
 forwardDynFunc    = @(t,chi)forwardDynamics(t,chi,CONFIG);
-
-% Either fixed step integrator or ODE15s
-if CONFIG.integrateWithFixedStep == 1
   
-[t,chi]           = euleroForward(forwardDynFunc,chiInit,CONFIG.tEnd,CONFIG.tStart,CONFIG.sim_step);   
-else    
 [t,chi]           = ode15s(forwardDynFunc,CONFIG.tStart:CONFIG.sim_step:CONFIG.tEnd,chiInit,CONFIG.options);
-end
 
 delete(CONFIG.wait)       
  

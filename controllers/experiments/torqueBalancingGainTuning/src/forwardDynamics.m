@@ -19,7 +19,7 @@ waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 %% Robot Configuration
 ndof                  = CONFIG.ndof;
-gain                  = CONFIG.gainsInit;
+gain                  = CONFIG.gain;
 qjInit                = CONFIG.qjInit;
 xCoMRef               = CONFIG.xCoMRef;
 
@@ -54,12 +54,25 @@ xCoM                  = FORKINEMATICS.xCoM;
 %% Joint limits check
 % jointLimitsCheck(qj,t);
 
-%% CoM and joint trajectory generator
+%% Interpolation for joint reference trajectory with ikin
+if CONFIG.jointRef_with_ikin == 1
+trajectory.JointReferences         = interpInverseKinematics(t,CONFIG.ikin);
+else
 trajectory.JointReferences.ddqjRef = zeros(ndof,1);
 trajectory.JointReferences.dqjRef  = zeros(ndof,1);
 trajectory.JointReferences.qjRef   = qjInit;
+end
+
+%% CoM trajectory generator
 trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(xCoMRef,t,CONFIG);
 
+%% %%%%%%%%%%%%% LINEARIZATION DEBUG AND STABILITY ANALYSIS %%%%%%%%%%%% %%
+if CONFIG.linearizationDebug  == 1    
+% linearized joint accelerations
+visualization.ddqjLin    = trajectory.JointReferences.ddqjRef-CONFIG.linearization.KS*(qj-trajectory.JointReferences.qjRef)...
+                          -CONFIG.linearization.KD*(dqj-trajectory.JointReferences.dqjRef);
+end
+     
 %% Balancing controller
 controlParam    =  initController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE);
 tau             =  controlParam.tau;
@@ -74,6 +87,8 @@ dNu             = M\(Jc'*fc + [zeros(6,1); tau]-h);
 dchi            = [NuQuat;dNu];
 
 %% Parameters for visualization
+visualization.ddqjNonLin  = dNu(7:end);
+visualization.dqj         = dqj;
 visualization.qj          = qj;
 visualization.JointRef    = trajectory.JointReferences;
 visualization.xCoM        = xCoM;

@@ -23,11 +23,11 @@ if sum(CONFIG.feet_on_ground) == 2
     gainsPAngMom        = diag([5 10 5]);
     gainsDAngMom        = 2*sqrt(gainsPAngMom);
 
-% impedances acting in the null space of the desired contact forces  
-    impTorso            = [ 30  30  20]; 
+% impedances acting in the null space of the desired contact forces 
+    impTorso            = [ 40  40  40]; 
     impArms             = [ 10  10  10   5   5];
     impLeftLeg          = [ 35  40  10  30   5  10]; 
-    impRightLeg         = [ 35  40  10  30   5  10];  
+    impRightLeg         = [ 35  40  10  30   5  10];       
 end
 
 %% Parameters for one foot on the ground
@@ -39,8 +39,8 @@ if  sum(CONFIG.feet_on_ground) == 1
      gainsDAngMom       = 2*sqrt(gainsPAngMom);
    
 % impedances acting in the null space of the desired contact forces 
-     impTorso           = [ 25   20   25]; 
-     impArms            = [ 15   10   15   10   15];
+     impTorso           = [ 20   20   20]; 
+     impArms            = [ 15   15   45   5   5];
 
 if CONFIG.feet_on_ground(1) == 1
     
@@ -48,7 +48,7 @@ if CONFIG.feet_on_ground(1) == 1
      impRightLeg        = [ 20   20  20  10  10  10];   
 else
      impLeftLeg         = [ 20   20  20  10  10  10];
-     impRightLeg        = [ 30   30  25  30  10  10]; 
+     impRightLeg        = [ 70   70  65  30  10  10]; 
 end
 end
 

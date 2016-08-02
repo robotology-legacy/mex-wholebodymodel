@@ -6,7 +6,6 @@ It is recommended to install the `mex-wholebodymodel` throught the [`codyco-supe
 Once you installed the `codyco-superbuild`, the `mex-wholebodymodel` files should have been installed in
 `${CODYCO_SUPERBUILD_ROOT}/build/install/mex` and its subdirectories (for the `mex-wholebodymodel`, this directories are `mexwbi-wrappers` and `mexwbi-utilities`).
 To execute scripts that use `mex-wholebodymodel`, make sure that this directories are part of your [MATLAB search path](http://www.mathworks.com/help/matlab/ref/path.html).
-To add the required folders to your Matlab path, run the `startupMex.m` script in `${CODYCO_SUPERBUILD_ROOT}/main/mexWholeBodyModel`. 
 
 ## Examples 
 
@@ -14,12 +13,18 @@ To add the required folders to your Matlab path, run the `startupMex.m` script i
 An example on how to use mex-wholebodymodel to compute the dynamics quantities of 
 a rigid body is available at [examples/rigidBodyDynamics.m](examples/rigidBodyDynamics.m).
 
-## Balancing controllers
+## Matlab-src
 
-In [controllers](controllers/) the user can find two different simulations of whole-body controller implemented using the 
-mex-wholebodymodel interface. One uses the Stack of task approach while the other is a Joint Space controller. 
-For more information please check the relative Stack of Task controller [README](controllers/torqueBalancing) and
-the joint space controller [README](controllers/torqueBalancingJointControl).
+### Controllers simulations
+In [matlab-src/torqueBalancing_matlab](matlab-src/torqueBalancing_matlab/) the user can find two different
+simulations of whole-body controller implemented using the mex-wholebodymodel interface. One uses the Stack of task approach while 
+the other is a Joint Space controller. 
+For more information please check the relative [README_SoT](matlab-src/torqueBalancing_matlab/StackOfTask_balancing/) and
+[README_Jc](matlab-src/torqueBalancing_matlab/JointSpace_balancing/)
+
+### Joint space linearization
+In [matlab-src/jointSpaceLinearization](matlab-src/jointSpaceLinearization/) there is a program which linearize the joint space of the system, when balancing 
+on 1 foot, controlled with 'Stack of Task' approach. For further informations check the relative [README](matlab-src/jointSpaceLinearization/).
 
 ## Mex-wholebodymodel
 

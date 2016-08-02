@@ -4,7 +4,7 @@
 fprintf('Running kinEnergyConservation\n');
 
 % plot the kinematic energy ?
-params.plot = true;
+params.plot = false;
 
 % raise error on fail ? Normally true, useful to turn it to false for debug
 params.raiseErrorOnFail = true;
