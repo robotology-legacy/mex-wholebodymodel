@@ -10,3 +10,7 @@ To run a balancing simulation, open the script `initializeTorqueBalancing.m`. Th
 ### Visualize the result
 
 It is currently available a MATLAB iCub simulator to visualize the robot movements. Furthermore, the user can plot the forward dynamics integration results such that contact forces, control torques, the joint dynamics and CoP positions. 
+
+### Utility Functions
+
+Most of the functions required to run the simulation are inside the [utilityMatlabFunction](../utilityMatlabFunction/) folder. This folder is divided into subfolders according to the specific usage of the functions, e.g. all the functions related to robot dynamics, forward kinematics and state are inside the [utilityMatlabFunction/RobotFunctions](../utilityMatlabFunction/RobotFunctions) folder. 
