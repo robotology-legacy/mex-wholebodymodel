@@ -16,11 +16,11 @@ a rigid body is available at [examples/rigidBodyDynamics.m](examples/rigidBodyDy
 ## Matlab-src
 
 ### Controllers simulations
-In [matlab-src/controllers](matlab-src/controllers/) the user can find different
+In [controllers/](controllers/) the user can find different
 simulations of whole-body controller implemented using the mex-wholebodymodel interface. The official controller version is
-in the folder [matlab-src/controllers/torqueBalancing](matlab-src/controllers/torqueBalancing/), while in the folder
-[matlab-src/controllers/experiments](matlab-src/controllers/experiments/) other balancing controllers are implemented. 
-All the utility function for control are in [matlab-src/controllers/utilityMatlabFunctions](matlab-src/controllers/utilityMatlabFunctions/). For more informations about the balancing controller check the relative [README](matlab-src/controllers/torqueBalancing/).
+in the folder [controllers/torqueBalancing](controllers/torqueBalancing/), while in the folder
+[controllers/experiments](controllers/experiments/) other balancing controllers are implemented. 
+All the utility function for control are in [controllers/utilityMatlabFunctions](controllers/utilityMatlabFunctions/). For more informations about the balancing controller check the relative [README](controllers/torqueBalancing/).
 
 ## Mex-wholebodymodel
 This folder contains all the matlab and C++ utilities used for tests and controllers.
