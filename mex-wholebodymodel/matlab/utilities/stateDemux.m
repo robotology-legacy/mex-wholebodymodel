@@ -26,7 +26,9 @@ function [basePose,jointAngles,baseVelocity,jointsVelocity] = stateDemux(state,p
      elseif param.demux.baseOrientationType == 1
         
         % position + quaternions
+
         basePose    = [I_p_b; Q_b];    
     end        
+
 end
 

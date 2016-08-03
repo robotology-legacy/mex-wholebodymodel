@@ -1,5 +1,4 @@
 %% Utility function for visualizeForwardDynamics.m
-
 function P = fromMesh2sortedVector(x,y,z)
    x = x(:)';
    y = y(:)';
