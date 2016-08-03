@@ -15,7 +15,7 @@ An example on how to use mex-wholebodymodel to compute the dynamics quantities o
 a rigid body is available at [examples/rigidBodyDynamics.m](examples/rigidBodyDynamics.m).
 
 ## Controllers
-In [controllers/](controllers) the user can find different
+In [controllers](controllers/) the user can find different
 simulations of whole-body controller implemented using the mex-wholebodymodel interface. The official controller version is
 in the folder [controllers/torqueBalancing](controllers/torqueBalancing/), while in the folder
 [controllers/experiments](controllers/experiments/) other balancing controllers are implemented. 
