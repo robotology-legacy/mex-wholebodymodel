@@ -16,18 +16,13 @@ a rigid body is available at [examples/rigidBodyDynamics.m](examples/rigidBodyDy
 ## Matlab-src
 
 ### Controllers simulations
-In [matlab-src/torqueBalancing_matlab](matlab-src/torqueBalancing_matlab/) the user can find two different
-simulations of whole-body controller implemented using the mex-wholebodymodel interface. One uses the Stack of task approach while 
-the other is a Joint Space controller. 
-For more information please check the relative [README_SoT](matlab-src/torqueBalancing_matlab/StackOfTask_balancing/) and
-[README_Jc](matlab-src/torqueBalancing_matlab/JointSpace_balancing/)
-
-### Joint space linearization
-In [matlab-src/jointSpaceLinearization](matlab-src/jointSpaceLinearization/) there is a program which linearize the joint space of the system, when balancing 
-on 1 foot, controlled with 'Stack of Task' approach. For further informations check the relative [README](matlab-src/jointSpaceLinearization/).
+In [matlab-src/controllers](matlab-src/controllers/) the user can find different
+simulations of whole-body controller implemented using the mex-wholebodymodel interface. The official controller version is
+in the folder [matlab-src/controllers/torqueBalancing](matlab-src/controllers/torqueBalancing/), while in the folder
+[matlab-src/controllers/experiments](matlab-src/controllers/experiments/) other balancing controllers are implemented. 
+All the utility function for control are in [matlab-src/controllers/utilityMatlabFunctions](matlab-src/controllers/utilityMatlabFunctions/). For more informations about the balancing controller check the relative [README](matlab-src/controllers/torqueBalancing/).
 
 ## Mex-wholebodymodel
-
 This folder contains all the matlab and C++ utilities used for tests and controllers.
 
 ## Tests
