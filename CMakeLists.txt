@@ -59,3 +59,11 @@ enable_testing()
 
 add_subdirectory(tests)
 
+#STARTUP MEX-TOOLBOX
+# The following line is to properly configure the installation script of the Mex-toolbox
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/startup_Mex.m.in ${CMAKE_BINARY_DIR}/startup_Mex.m)
+# Install configuration files
+install(FILES ${CMAKE_BINARY_DIR}/startup_Mex.m DESTINATION ${CMAKE_INSTALL_PREFIX}/mex)
+
+
+
