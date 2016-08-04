@@ -28,8 +28,8 @@ for i = 1:ndof
         
         if j<i
             
-        u(g) = skewB(i,j);
-        g    = g+1;
+            u(g) = skewB(i,j);
+            g    = g+1;
         end
     end
 end
@@ -46,7 +46,7 @@ for i = 1:ndof
         if j<i
             
             Lomega(i,j)   = omega(g);
-            g             = g+1;           
+            g             = g+1;
         end
     end
 end

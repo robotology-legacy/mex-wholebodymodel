@@ -35,12 +35,12 @@ Mbj           =   M(1:6,7:end);
 
 C_cNu_c_dT    = invTt*CNu - M_c*dT*Nu;
 
-C_cNu_c       = [ zeros(3,1); 
-                  C_cNu_c_dT(4:6); 
-                  CNu_j-(Mbj')*(Mb\CNu_b)];
+C_cNu_c       = [ zeros(3,1);
+    C_cNu_c_dT(4:6);
+    CNu_j-(Mbj')*(Mb\CNu_b)];
 
 %new dT*Nu computation for Jacobian
-dTNu          = M_c\(CNu-C_cNu_c);  
+dTNu          = M_c\(CNu-C_cNu_c);
 
 Jc_c          = Jc*invT;
 dJcNu_c       = dJcNu - Jc*invT*dTNu;

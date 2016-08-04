@@ -16,7 +16,7 @@ function figureCont = visualizeJointDynamicsTuning(t,CONFIG,qj,qjRef,tAss)
 % setup parameters
 figureCont  = CONFIG.figureCont;
 
-for k = 1:length(tAss)   
+for k = 1:length(tAss)
     index(k) = sum(t>tAss(k))+1;
 end
 
@@ -26,92 +26,92 @@ step   = qjRef(:,end)-qj(:,1);
 
 %% Joints dynamics
 for k=1:5
-  
-% LEFT ARM    
-figure(figureCont)
-subplot(3,2,k)
-plot(t,qj(k+3,:))
-hold on
-plot(tAss(k+3),qj(k+3,end-index(k+3)),'ok')
-plot(t,qjRef(k+3,:),'k')
-plot(t,qjRef(k+3,:)+0.05*step(k+3),'--g')
-plot(t,qjRef(k+3,:)-0.05*step(k+3),'--g')
-grid on
-xlabel('Time [s]')
-ylabel('Angle [deg]')
-name = whatname('left_arm',k);
-title(name)
-legend('qj','qjRef')
-
-% RIGHT ARM
-figure(figureCont+1)
-subplot(3,2,k)
-plot(t,qj(k+3+5,:))
-hold on
-plot(tAss(k+3+5),qj(k+3+5,end-index(k+3+5)),'ok')
-plot(t,qjRef(k+3+5,:),'k')
-plot(t,qjRef(k+3+5,:)+0.05*step(k+3+5),'--g')
-plot(t,qjRef(k+3+5,:)-0.05*step(k+3+5),'--g')
-grid on
-xlabel('Time [s]')
-ylabel('Angle [deg]')
-name = whatname('right_arm',k);
-title(name)
-legend('qj','qjRef')
+    
+    % LEFT ARM
+    figure(figureCont)
+    subplot(3,2,k)
+    plot(t,qj(k+3,:))
+    hold on
+    plot(tAss(k+3),qj(k+3,end-index(k+3)),'ok')
+    plot(t,qjRef(k+3,:),'k')
+    plot(t,qjRef(k+3,:)+0.05*step(k+3),'--g')
+    plot(t,qjRef(k+3,:)-0.05*step(k+3),'--g')
+    grid on
+    xlabel('Time [s]')
+    ylabel('Angle [deg]')
+    name = whatname('left_arm',k);
+    title(name)
+    legend('qj','qjRef')
+    
+    % RIGHT ARM
+    figure(figureCont+1)
+    subplot(3,2,k)
+    plot(t,qj(k+3+5,:))
+    hold on
+    plot(tAss(k+3+5),qj(k+3+5,end-index(k+3+5)),'ok')
+    plot(t,qjRef(k+3+5,:),'k')
+    plot(t,qjRef(k+3+5,:)+0.05*step(k+3+5),'--g')
+    plot(t,qjRef(k+3+5,:)-0.05*step(k+3+5),'--g')
+    grid on
+    xlabel('Time [s]')
+    ylabel('Angle [deg]')
+    name = whatname('right_arm',k);
+    title(name)
+    legend('qj','qjRef')
 end
 
 figureCont = figureCont +2;
 
 for k=1:6
-
-% LEFT LEG
-figure(figureCont)
-subplot(3,2,k)
-plot(t,qj(k+13,:))
-hold on
-plot(tAss(k+13),qj(k+13,end-index(k+13)),'ok')
-plot(t,qjRef(k+13,:),'k')
-grid on
-xlabel('Time [s]')
-ylabel('Angle [deg]')
-name = whatname('left_leg',k);
-title(name)
-legend('qj','qjRef')
-
-% RIGHT LEG
-figure(figureCont+1)
-subplot(3,2,k)
-plot(t,qj(k+13+6,:))
-hold on
-plot(tAss(k+13+6),qj(k+13+6,end-index(k+13+6)),'ok')
-plot(t,qjRef(k+13+6,:),'k')
-grid on
-xlabel('Time [s]')
-ylabel('Angle [deg]')
-name = whatname('right_leg',k);
-title(name)
-legend('qj','qjRef')
+    
+    % LEFT LEG
+    figure(figureCont)
+    subplot(3,2,k)
+    plot(t,qj(k+13,:))
+    hold on
+    plot(tAss(k+13),qj(k+13,end-index(k+13)),'ok')
+    plot(t,qjRef(k+13,:),'k')
+    grid on
+    xlabel('Time [s]')
+    ylabel('Angle [deg]')
+    name = whatname('left_leg',k);
+    title(name)
+    legend('qj','qjRef')
+    
+    % RIGHT LEG
+    figure(figureCont+1)
+    subplot(3,2,k)
+    plot(t,qj(k+13+6,:))
+    hold on
+    plot(tAss(k+13+6),qj(k+13+6,end-index(k+13+6)),'ok')
+    plot(t,qjRef(k+13+6,:),'k')
+    grid on
+    xlabel('Time [s]')
+    ylabel('Angle [deg]')
+    name = whatname('right_leg',k);
+    title(name)
+    legend('qj','qjRef')
 end
 
 figureCont = figureCont +2;
 
 for k=1:3
     
-% TORSO
-figure(figureCont)
-subplot(3,1,k)
-plot(t,qj(k,:))
-hold on
-plot(tAss(k),qj(k,end-index(k)),'ok')
-plot(t,qjRef(k,:),'k')
-plot(t,(qjRef(k,:)+0.05*step(k)),'--g')
-plot(t,(qjRef(k,:)-0.05.*step(k)),'--g')
-grid on
-xlabel('Time [s]')
-ylabel('Angle [deg]')
-name = whatname('torso',k);
-title(name)
-legend('qj','qjRef')
+    % TORSO
+    figure(figureCont)
+    subplot(3,1,k)
+    plot(t,qj(k,:))
+    hold on
+    plot(tAss(k),qj(k,end-index(k)),'ok')
+    plot(t,qjRef(k,:),'k')
+    plot(t,(qjRef(k,:)+0.05*step(k)),'--g')
+    plot(t,(qjRef(k,:)-0.05.*step(k)),'--g')
+    grid on
+    xlabel('Time [s]')
+    ylabel('Angle [deg]')
+    name = whatname('torso',k);
+    title(name)
+    legend('qj','qjRef')
 end
 
 figureCont = figureCont +1;

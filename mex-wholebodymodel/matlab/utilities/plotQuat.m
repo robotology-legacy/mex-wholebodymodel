@@ -42,12 +42,12 @@ for ii=1:n
     set(orix,'xdata',[x(ii) x(ii)+R(1,1)],'ydata',[y(ii) y(ii)+R(2,1)],'zdata',[z(ii) z(ii)+R(3,1)],'erasemode','normal','LineWidth', 2,'color', 'blue');
     set(oriy,'xdata',[x(ii) x(ii)+R(1,2)],'ydata',[y(ii) y(ii)+R(2,2)],'zdata',[z(ii) z(ii)+R(3,2)],'erasemode','normal','LineWidth', 2,'color', 'green');
     set(oriz,'xdata',[x(ii) x(ii)+R(1,3)],'ydata',[y(ii) y(ii)+R(2,3)],'zdata',[z(ii) z(ii)+R(3,3)],'erasemode','normal','LineWidth', 2,'color', 'red');
-
-%   set(ori3,'xdata',[x(ii) x(ii)+rx(ii)],'ydata',[y(ii) y(ii)+ry(ii)],'zdata',[z(ii) z(ii)+rz(ii)]);
+    
+    %   set(ori3,'xdata',[x(ii) x(ii)+rx(ii)],'ydata',[y(ii) y(ii)+ry(ii)],'zdata',[z(ii) z(ii)+rz(ii)]);
     title(num2str(ii));
     
     pause(0.0005);
     
-%   pause;
-%   drawnow;
+    %   pause;
+    %   drawnow;
 end

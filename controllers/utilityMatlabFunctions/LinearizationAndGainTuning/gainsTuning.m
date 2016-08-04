@@ -1,5 +1,5 @@
 function [gainsOpt,KSn,KDn] = gainsTuning(linearization,CONFIG)
-%GAINSTUNING implements different algorithms to optimize the feedback control 
+%GAINSTUNING implements different algorithms to optimize the feedback control
 %            gains for the linearized joint space dynamics of iCub robot.
 %   GAINSTUNING implements two different algorithms: 'lsq' uses a nonlinear
 %   least square solver to optimize the gains, while 'kronecher' vectorizes
@@ -44,12 +44,12 @@ KDn = ACartesian*Kdx*BCartesian + ANull*Kdn*BNull;
 
 % new state matrix
 AStateNew     = [zeros(ndof) eye(ndof);
-                   -KSn          -KDn];
+    -KSn          -KDn];
 % state matrix verification
 AStateDes     = [zeros(ndof) eye(ndof);
-                -KSdes         -KDdes];
+    -KSdes         -KDdes];
 
-eigAStateDes       = -real(eig(AStateDes));                
+eigAStateDes       = -real(eig(AStateDes));
 eigAStateNew       = -real(eig(AStateNew));
 
 toleig             = 1e-5;
@@ -70,14 +70,13 @@ if sum(logicNewEig)>0
 end
 
 if flag(1) == 1
-
+    
     disp('Warning: the new linearized state dynamics after gains tuning is NOT asymptotically stable')
     
 elseif flag(2) == 1
     
     disp('Warning: your desired linearized state dynamics is NOT asymptotically stable')
     
-
 elseif sum(flag) == 0
     
     disp('The linearized state dynamics after gains tuning is asymptotically stable')
@@ -126,7 +125,7 @@ if sum(flag)  == 0
     disp('All the gains matrices are symmetric')
 end
 
-if flag(1) == 1   
+if flag(1) == 1
     
     disp('Warning: the gains matrix on centroidal momentum pose is not symmetric')
 end
@@ -200,19 +199,19 @@ end
 
 if flag(3) == 1
     
-    disp('Warning: the gains matrix on joint position is not positive definite')   
+    disp('Warning: the gains matrix on joint position is not positive definite')
 end
 
 if flag(4) == 1
     
-    disp('Warning: the gains matrix on joint velocity is not positive definite')   
+    disp('Warning: the gains matrix on joint velocity is not positive definite')
 end
 
 disp('Tuned system eigenvalues; Desired eigenvalues')
 disp([eig(AStateNew) eig(AStateDes)])
 
 %% Gains matrices after optimization
-gainsOpt.impedances             = Kpn; 
+gainsOpt.impedances             = Kpn;
 gainsOpt.dampings               = Kdn;
 gainsOpt.MomentumGains          = Kdx;
 gainsOpt.intMomentumGains       = Kpx;

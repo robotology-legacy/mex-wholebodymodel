@@ -19,13 +19,13 @@ function STATE = robotState(chi,CONFIG)
 
 % ------------Initialization----------------
 % Config parameters
-% CONFIG.demux.baseOrientationType sets the base orientation in stateDemux.m 
+% CONFIG.demux.baseOrientationType sets the base orientation in stateDemux.m
 % as positions + quaternions (1) or transformation matrix (0)
-CONFIG.demux.baseOrientationType = 1;   
+CONFIG.demux.baseOrientationType = 1;
 
 %% STATE DEMUX
 [basePose,qj,baseVelocity,dqj]   = stateDemux(chi,CONFIG);
- 
+
 % Base position and orientation (in quaternions)
 PosBase                          = basePose(1:3,:);
 quatBase                         = basePose(4:7,:);
@@ -33,7 +33,7 @@ quatBase                         = basePose(4:7,:);
 % Normalize quaternions to avoid numerical errors
 %quatBase                        = quatBase/norm(quatBase);
 
-% Base velocity; conversion of the base orientation into a rotation matrix; 
+% Base velocity; conversion of the base orientation into a rotation matrix;
 % state velocity
 VelBase                          = baseVelocity(1:3,:);
 omegaBaseWorld                   = baseVelocity(4:6,:);

@@ -2,13 +2,13 @@ function  controlParam = jointSpaceController(CONFIG,gains,trajectory,DYNAMICS,S
 %JOINTSPACECONTROLLER implemements a joint space balancing controller for
 %                     the robot iCub.
 %
-%   JOINTSPACECONTROLLER computes the control torques at joints reducing the 
-%   system to the joint space. It compensates for the gravity terms and 
+%   JOINTSPACECONTROLLER computes the control torques at joints reducing the
+%   system to the joint space. It compensates for the gravity terms and
 %   defines the desired control torques at joints oin order to follow a joint
 %   reference trajectory.
 %
 %   controlParam = JOINTSPACECONTROLLER(config, gains, trajectory, dynamics,
-%   state) takes as input the structure CONFIG, which contains all the 
+%   state) takes as input the structure CONFIG, which contains all the
 %   configuration parameters, the desired control gains, the reference
 %   trajectory, the robot dynamics and state.
 %   The output is the structure CONTROLPARAM which contains the desired
@@ -67,14 +67,14 @@ TauMatrix        = TauMatrix(7:end,7:end);
 
 %% Joint space controller
 if      sum(feet_on_ground) == 1
-
- tau             = TauMatrix\(CNuTilde + gTilde + dJcNuTilde + Mj*ddqjRef -impedances*qjTilde -dampings*dqjTilde);
-
-elseif  sum(feet_on_ground) == 2 
-
- pinvTauMatrix   = TauMatrix'/(TauMatrix*TauMatrix' + pinv_damp*eye(size(TauMatrix,1))); 
-%pinvTauMatrix   = pinv(TauMatrix,pinv_tol);
- tau             = pinvTauMatrix*(CNuTilde + gTilde + dJcNuTilde + Mj*ddqjRef -impedances*qjTilde -dampings*dqjTilde);
+    
+    tau             = TauMatrix\(CNuTilde + gTilde + dJcNuTilde + Mj*ddqjRef -impedances*qjTilde -dampings*dqjTilde);
+    
+elseif  sum(feet_on_ground) == 2
+    
+    pinvTauMatrix   = TauMatrix'/(TauMatrix*TauMatrix' + pinv_damp*eye(size(TauMatrix,1)));
+    %pinvTauMatrix  = pinv(TauMatrix,pinv_tol);
+    tau             = pinvTauMatrix*(CNuTilde + gTilde + dJcNuTilde + Mj*ddqjRef -impedances*qjTilde -dampings*dqjTilde);
 end
 
 controlParam.tau = tau;

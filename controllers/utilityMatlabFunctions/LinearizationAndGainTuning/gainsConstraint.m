@@ -8,7 +8,7 @@ vDamp         = log(diag(CONFIG.gainsInit.dampings));
 vMom          = log(diag(CONFIG.gainsInit.MomentumGains));
 vIntM         = log(diag(CONFIG.gainsInit.intMomentumGains));
 
-R1ini         = eye(6); 
+R1ini         = eye(6);
 R2ini         = eye(ndof);
 R3ini         = eye(6);
 R4ini         = eye(ndof);
@@ -46,7 +46,7 @@ L4  = diag(vL4);
 R4  = reshape(vR4,[ndof,ndof]);
 
 optimizedGains.intMomentumGains       = R1'*expm(L1)*R1;
-optimizedGains.impedances             = R2'*expm(L2)*R2; 
+optimizedGains.impedances             = R2'*expm(L2)*R2;
 optimizedGains.MomentumGains          = R3'*expm(L3)*R3;
 optimizedGains.dampings               = R4'*expm(L4)*R4;
 

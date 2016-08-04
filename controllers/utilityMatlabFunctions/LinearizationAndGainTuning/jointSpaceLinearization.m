@@ -1,12 +1,12 @@
-function linearization = jointSpaceLinearization(CONFIG,qjConfig)    
+function linearization = jointSpaceLinearization(CONFIG,qjConfig)
 %JOINTSPACELINEARIZATION linearizes the joint space dynamics of the iCub robot
 %                        around an equilibrium point.
 %   JOINTSPACELINEARIZATION assumes that the robot is balancing on one foot
 %   or two feet, and the feedback controller is momentum-based. The solution is
-%   analytical, i.e. it is not necessary to compute numerical derivatives. 
-%     
-%   linearization = JOINTSPACELINEARIZATION(config,qjConfig,mode) takes as an input the 
-%   robot dynamics through the structure CONFIG, and the joint configuration 
+%   analytical, i.e. it is not necessary to compute numerical derivatives.
+%
+%   linearization = JOINTSPACELINEARIZATION(config,qjConfig,mode) takes as an input the
+%   robot dynamics through the structure CONFIG, and the joint configuration
 %   around which the system is linearized, qjConfig. The variable MODE is a
 %   string, and can be either 'normal' mode or 'stability'. The only
 %   difference is that the 'stability' mode verifies the eigenvalues of the
@@ -22,16 +22,16 @@ function linearization = jointSpaceLinearization(CONFIG,qjConfig)
 %% Config parameters
 gainsInit          = CONFIG.gainsInit;
 pinv_tol           = CONFIG.pinv_tol;
-feet_on_ground     = CONFIG.feet_on_ground;     
+feet_on_ground     = CONFIG.feet_on_ground;
 ndof               = CONFIG.ndof;
 pinv_damp          = CONFIG.pinv_damp;
 
 %% Initialize the robot configuration
 if  feet_on_ground(1) == 1
-
+    
     [RotBase,PosBase] = wbm_getWorldFrameFromFixedLink('l_sole',qjConfig);
 else
-    [RotBase,PosBase] = wbm_getWorldFrameFromFixedLink('r_sole',qjConfig);    
+    [RotBase,PosBase] = wbm_getWorldFrameFromFixedLink('r_sole',qjConfig);
 end
 
 wbm_setWorldFrame(RotBase,PosBase,[0 0 -9.81]')
@@ -65,31 +65,31 @@ xCoM               = FORKINEMATICS.xCoM;
 
 if sum(feet_on_ground) == 1
     
-if feet_on_ground(1) == 1
-posFoot      = posLFoot;
-else
-posFoot      = posRFoot;
-end
-
-r            = posFoot - xCoM;
-A            = [eye(3)   zeros(3);
-                skew(r)  eye(3) ];
-pinvA        = eye(6)/A;
-
-else    
-Pr           = posRFoot - xCoM;  
-Pl           = posLFoot - xCoM;
-
-AL           = [ eye(3),  zeros(3);
-                 skew(Pl),  eye(3)];
-AR           = [ eye(3),  zeros(3);
-                 skew(Pr),  eye(3)];   
-A            = [AL, AR];
-pinvA        = pinv(A,pinv_tol);
-end
+    if feet_on_ground(1) == 1
+        posFoot      = posLFoot;
+    else
+        posFoot      = posRFoot;
+    end
     
+    r            = posFoot - xCoM;
+    A            = [eye(3)   zeros(3);
+        skew(r)  eye(3) ];
+    pinvA        = eye(6)/A;
+    
+else
+    Pr           = posRFoot - xCoM;
+    Pl           = posLFoot - xCoM;
+    
+    AL           = [ eye(3),  zeros(3);
+        skew(Pl),  eye(3)];
+    AR           = [ eye(3),  zeros(3);
+        skew(Pr),  eye(3)];
+    A            = [AL, AR];
+    pinvA        = pinv(A,pinv_tol);
+end
+
 %% Initial gains (before optimization)
-impedances         = gainsInit.impedances; 
+impedances         = gainsInit.impedances;
 dampings           = gainsInit.dampings;
 MomentumGains      = gainsInit.MomentumGains;
 intMomentumGains   = gainsInit.intMomentumGains;
@@ -113,11 +113,11 @@ KS     = invMbar*(-pinvLambda*MultFirstTask*intMomentumGains*JG + NullLambda*imp
 %% Damping matrix
 KD     = invMbar*(-pinvLambda*MultFirstTask*MomentumGains*JG + NullLambda*dampings*posturalCorr);
 
-%% Verify the state matrix  
+%% Verify the state matrix
 AStateOld     = [zeros(ndof) eye(ndof);
-                    -KS           -KD];
-                
-eigAStateOld  = -real(eig(AStateOld));               
+    -KS           -KD];
+
+eigAStateOld  = -real(eig(AStateOld));
 
 toleig          = 1e-5;
 flag            = 0;
@@ -129,9 +129,8 @@ if sum(logicEigOld)>0
 end
 
 if flag == 1
-
+    
     disp('Warning: the linearized state dynamics is NOT asymptotically stable')
-
 else
     disp('The linearized state dynamics is asymptotically stable')
 end
@@ -139,11 +138,11 @@ end
 %% Two feet correction
 if sum(feet_on_ground) == 2
     
-JjBar     = (eye(size(Jb,1))-Jb*pinv(Jb,pinv_tol))*Jj;
-NullJjBar = eye(ndof)-pinv(JjBar,pinv_tol)*JjBar;
-
-gainsInit.KSdes= NullJjBar*gainsInit.KSdes;
-gainsInit.KDdes= NullJjBar*gainsInit.KDdes;
+    JjBar     = (eye(size(Jb,1))-Jb*pinv(Jb,pinv_tol))*Jj;
+    NullJjBar = eye(ndof)-pinv(JjBar,pinv_tol)*JjBar;
+    
+    gainsInit.KSdes= NullJjBar*gainsInit.KSdes;
+    gainsInit.KDdes= NullJjBar*gainsInit.KDdes;
 end
 
 %% Parameters for visualization and gains tuning

@@ -1,7 +1,7 @@
 function ikin = integrateInverseKinematics(CONFIG,ChiInit)
 %INTEGRATEINVERSEKINEMATICS integrates the inverse kinematics of the robot iCub.
 %                           It uses a fixed step integrator.
-%                    
+%
 %   ikinParam = INTEGRATEINVERSEKINEMATICS(config,ChiInit) takes as input the
 %   structure CONFIG which contains all the utility parameters, and the
 %   initial state of the robot CHIINIT. The output is the structure IKIN,
@@ -28,14 +28,14 @@ CoMTrajectoryError  = zeros(18,dimTime);
 momentumError       = zeros(6,dimTime);
 
 if CONFIG.numConstraints == 2
-
-feetError           = zeros(12,dimTime);
-
+    
+    feetError           = zeros(12,dimTime);
+    
 elseif CONFIG.numConstraints == 1
-
-feetError           = zeros(6,dimTime);
+    
+    feetError           = zeros(6,dimTime);
 end
-   
+
 [dChiInit,visualizeIkinParam]   = inverseKinematics(t(1),ChiInit,CONFIG);
 
 ChiIkin(:,1)                    = ChiInit;
@@ -43,28 +43,28 @@ qj(:,1)                         = ChiInit(8:7+ndof);
 dqj(:,1)                        = ChiInit(14+ndof:end);
 ddqj(:,1)                       = dChiInit(14+ndof:end);
 CoMTrajectoryError(:,1)         = visualizeIkinParam.CoMTrajectoryError;
-feetError(:,1)                  = visualizeIkinParam.feetError;         
-momentumError(:,1)              = visualizeIkinParam.momentumError;      
+feetError(:,1)                  = visualizeIkinParam.feetError;
+momentumError(:,1)              = visualizeIkinParam.momentumError;
 
 %% Function to be integrated
 integratedFunction              = @(t,Chi) inverseKinematics(t,Chi,CONFIG);
 
 %% Euler forward integrator (fixed step)
 for kk = 2:dimTime
-
-% state at step k
-ChiIkin(:,kk)   = ChiIkin(:,kk-1) + tStep.*integratedFunction(t(kk-1),ChiIkin(:,kk-1));
- 
-% joint references and visualization parameters
-[dChiIkin,visualizeIkinParam] = inverseKinematics(t(kk),ChiIkin(:,kk),CONFIG); 
- 
-qj(:,kk)                      = ChiIkin(8:7+ndof,kk);
-dqj(:,kk)                     = ChiIkin(14+ndof:end,kk);
-ddqj(:,kk)                    = dChiIkin(14+ndof:end);
-
-CoMTrajectoryError(:,kk)      = visualizeIkinParam.CoMTrajectoryError;
-feetError(:,kk)               = visualizeIkinParam.feetError;         
-momentumError(:,kk)           = visualizeIkinParam.momentumError; 
+    
+    % state at step k
+    ChiIkin(:,kk)   = ChiIkin(:,kk-1) + tStep.*integratedFunction(t(kk-1),ChiIkin(:,kk-1));
+    
+    % joint references and visualization parameters
+    [dChiIkin,visualizeIkinParam] = inverseKinematics(t(kk),ChiIkin(:,kk),CONFIG);
+    
+    qj(:,kk)                      = ChiIkin(8:7+ndof,kk);
+    dqj(:,kk)                     = ChiIkin(14+ndof:end,kk);
+    ddqj(:,kk)                    = dChiIkin(14+ndof:end);
+    
+    CoMTrajectoryError(:,kk)      = visualizeIkinParam.CoMTrajectoryError;
+    feetError(:,kk)               = visualizeIkinParam.feetError;
+    momentumError(:,kk)           = visualizeIkinParam.momentumError;
 end
 
 %% Joint trajectory and visualization parameters
@@ -78,4 +78,4 @@ ikin.CoMTrajectoryError     = CoMTrajectoryError;
 ikin.momentumError          = momentumError;
 
 end
-    
+

@@ -9,5 +9,5 @@ function pinvDampA = pinvDamped(A,regDamp)
 %     end
 %     pinvDampA = A'/(U*S*V');
 
-    pinvDampA = A'/(A*A' + regDamp*eye(size(A,1)));
+pinvDampA = A'/(A*A' + regDamp*eye(size(A,1)));
 end

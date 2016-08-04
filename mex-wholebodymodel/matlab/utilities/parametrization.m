@@ -2,7 +2,7 @@ function [T_bar,angles] = parametrization(rot_matr)
 %% PARAMETRIZATION
 %  Computes the Z-Y-X parametrization from a given rotation matrix.
 %  The outputs are:
-%  
+%
 %  T_bar    [3x3] the matix which converts the angular velocity into the
 %                 Euler angles time derivative
 %
@@ -19,7 +19,7 @@ angles = [phi theta psi];
 %angles
 
 T_bar = [1     0           -sin(theta);
-         0  cos(phi)   sin(phi)*cos(theta) ;
-         0 -sin(phi)   cos(phi)*cos(theta)];
-         
+    0  cos(phi)   sin(phi)*cos(theta) ;
+    0 -sin(phi)   cos(phi)*cos(theta)];
+
 end

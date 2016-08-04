@@ -9,9 +9,9 @@ function [dChi, visualizeIkinParam] = inverseKinematics(t,Chi,CONFIG)
 %   [dChiIkin,visualizeIkinParam]=INVERSEKINEMATICS(t,Chi,config)
 %   takes as input the integration time T, the robot state CHI and the
 %   structure CONFIG which contains all the utility parameters. The output
-%   are the state derivative DCHI  [13+2ndof x 1] and the structure 
+%   are the state derivative DCHI  [13+2ndof x 1] and the structure
 %   which contains the parameters for visualization, VISUALIZEIKINPARAM.
-%   
+%
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
@@ -22,7 +22,7 @@ waitbar(t/CONFIG.tEnd,CONFIG.wait)
 % Config parameters
 pinv_tol          = CONFIG.pinv_tol;
 feet_on_ground    = CONFIG.feet_on_ground;
-ndof              = CONFIG.ndof;  
+ndof              = CONFIG.ndof;
 initState         = CONFIG.initState;
 initDynamics      = CONFIG.initDynamics;
 initForKin        = CONFIG.initForKin;
@@ -40,7 +40,7 @@ qj                = STATE.qj;
 RotBase           = STATE.RotBase;
 Nu                = STATE.Nu;
 dqj               = STATE.dqj;
-NuBase            = Nu(1:6);  
+NuBase            = Nu(1:6);
 
 % Dynamics parameters
 DYNAMICS          = robotDynamics(STATE,CONFIG);
@@ -80,24 +80,24 @@ desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG);
 
 %% ERRORS AT FEET, COM AND MOMENTUM
 % angular momentum integral
-deltaIntAng        = JhReduced(4:6,:)*(qj-qjInit); 
+deltaIntAng        = JhReduced(4:6,:)*(qj-qjInit);
 % CoM position
 deltaPosCoM        = xCoM - desired_x_dx_ddx_CoM(:,1);
 % feet pose
-deltaPoseRFoot     = TRfoot*(RFootPoseEul-initForKin.RFootPoseEul); 
+deltaPoseRFoot     = TRfoot*(RFootPoseEul-initForKin.RFootPoseEul);
 deltaPoseLFoot     = TLfoot*(LFootPoseEul-initForKin.LFootPoseEul);
 
 if     feet_on_ground(1) == 1 && feet_on_ground(2) == 0
-
-deltaPoseFeet      = deltaPoseLFoot;
-      
+    
+    deltaPoseFeet      = deltaPoseLFoot;
+    
 elseif feet_on_ground(1) == 0 && feet_on_ground(2) == 1
-     
-deltaPoseFeet      = deltaPoseRFoot;          
-
+    
+    deltaPoseFeet      = deltaPoseRFoot;
+    
 elseif feet_on_ground(1) == 1 && feet_on_ground(2) == 1
     
-deltaPoseFeet      = [deltaPoseLFoot;deltaPoseRFoot];    
+    deltaPoseFeet      = [deltaPoseLFoot;deltaPoseRFoot];
 end
 
 %% Velocity errors
@@ -106,13 +106,13 @@ deltaVelCoM        = JCoM*Nu - desired_x_dx_ddx_CoM(:,2);
 deltaAngMom        = JAng*Nu;
 
 %% STACK OF TASK INVERSE KINEMATICS
-% first task: not break the constraints at feet 
+% first task: not break the constraints at feet
 feetErrorDynamics  = -dJcNu -KPosFeet*deltaPoseFeet -KVelFeet*deltaVelFeet;
 NullFeet           =  eye(ndof+6) -pinv(Jc,pinv_tol)*Jc;
 
 % second task: generate a desired Momentum trajectory
 MomErrorDynamics   = -dJHNu +[m*desired_x_dx_ddx_CoM(:,3);zeros(3,1)] -KPosMom*[m*deltaPosCoM; deltaIntAng] ...
-                     -KVelMom*[m*deltaVelCoM; deltaAngMom] -JH*pinv(Jc,pinv_tol)*feetErrorDynamics;
+    -KVelMom*[m*deltaVelCoM; deltaAngMom] -JH*pinv(Jc,pinv_tol)*feetErrorDynamics;
 JMomTaks           =  JH*NullFeet;
 NullMom            =  eye(ndof+6) - pinv(JMomTaks,pinv_tol)*JMomTaks;
 
@@ -120,7 +120,7 @@ NullMom            =  eye(ndof+6) - pinv(JMomTaks,pinv_tol)*JMomTaks;
 JPost              = [zeros(ndof,6) eye(ndof)];
 
 postErrorDynamics  = -KVelPost*Nu(7:end) -KPosPost*(qj-initState.qj)...
-                     -JPost*pinv(Jc,pinv_tol)*feetErrorDynamics -JPost*NullFeet*pinv(JMomTaks,pinv_tol)*MomErrorDynamics;
+    -JPost*pinv(Jc,pinv_tol)*feetErrorDynamics -JPost*NullFeet*pinv(JMomTaks,pinv_tol)*MomErrorDynamics;
 JPostTask          =  JPost*NullFeet*NullMom;
 
 % accelerations from inverse kinematics

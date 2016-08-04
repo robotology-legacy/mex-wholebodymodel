@@ -14,12 +14,12 @@ function [qj,xTb,qjDot,vb]  = wbm_getState( varargin )
 % Author : Naveen Kuppuswamy (naveen.kuppuswamy@iit.it)
 % Genova, Dec 2014
 
-    switch(nargin)
-        case 0
-            [qj,xTbT,qjDot,vb]  = mexWholeBodyModel('get-state');
-            xTb = xTbT;
-        otherwise
-             disp('getState : Incorrect number of arguments, check docs');
-    end
+switch(nargin)
+    case 0
+        [qj,xTbT,qjDot,vb]  = mexWholeBodyModel('get-state');
+        xTb = xTbT;
+    otherwise
+        disp('getState : Incorrect number of arguments, check docs');
+end
 end
 

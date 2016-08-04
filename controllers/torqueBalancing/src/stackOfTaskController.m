@@ -2,8 +2,8 @@ function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FO
 %STACKOFTASKCONTROLLER implements a momentum-based control algorithm to
 %                      control the robot iCub.
 %
-%   STACKOFTASKCONTROLLER computes the desired control torques at joints 
-%   using a task-based approach. The first task is the control of robot's 
+%   STACKOFTASKCONTROLLER computes the desired control torques at joints
+%   using a task-based approach. The first task is the control of robot's
 %   momentum, while the second task is a postural task.
 %
 %   controlParam = STACKOFTASKCONTROLLER(config, gains, trajectory,
@@ -22,6 +22,7 @@ function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FO
 % ------------Initialization----------------
 %% Config parameters
 pinv_tol            = CONFIG.pinv_tol;
+pinv_damp           = CONFIG.pinv_damp;
 feet_on_ground      = CONFIG.feet_on_ground;
 ndof                = CONFIG.ndof;
 
@@ -67,38 +68,38 @@ dqjRef              = trajectory.JointReferences.dqjRef;
 qjRef               = trajectory.JointReferences.qjRef;
 qjTilde             = qj-qjRef;
 dqjTilde            = dqj-dqjRef;
-   
+
 % General parameters
 gravAcc             = 9.81;
 S                   = [zeros(6,ndof);
-                       eye(ndof,ndof)];
+    eye(ndof,ndof)];
 f_grav              = [zeros(2,1);
-                      -m*gravAcc;
-                       zeros(3,1)];
-                    
+    -m*gravAcc;
+    zeros(3,1)];
+
 %% Multiplier of contact wrenches at CoM
 posRFoot            = RFootPoseEul(1:3);
 posLFoot            = LFootPoseEul(1:3);
 distRF              = posRFoot - xCoM;       % Application point of the contact force on the right foot w.r.t. CoM
 distLF              = posLFoot - xCoM;       % Application point of the contact force on the left  foot w.r.t. CoM
 AL                  = [eye(3),     zeros(3);
-                       skew(distLF),eye(3)];
+    skew(distLF),eye(3)];
 AR                  = [eye(3),     zeros(3);
-                       skew(distRF),eye(3)];
-                   
+    skew(distRF),eye(3)];
+
 % One foot or two feet on ground selector
 if      sum(feet_on_ground) == 2
     
     A      = [AL,AR];
-    pinvA  = pinv(A,pinv_tol);   
-else    
-    if      feet_on_ground(1) == 1 
-    
-    A      = AL;
+    pinvA  = pinv(A,pinv_tol);
+else
+    if      feet_on_ground(1) == 1
+        
+        A      = AL;
     elseif  feet_on_ground(2) == 1
-
-    A      = AR;
-    end 
+        
+        A      = AR;
+    end
     pinvA  = eye(6)/A;
 end
 
@@ -117,7 +118,7 @@ JcMinvJct          = JcMinv*transpose(Jc);
 pinvLambda         = pinv(Lambda,pinv_tol);
 
 % multiplier of contact wrenches in tau0
-JBar               = transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));   
+JBar               = transpose(Jc(:,7:end)) - Mbj'/Mb*transpose(Jc(:,1:6));
 
 % nullspaces
 Nullfc             = eye(6*CONFIG.numConstraints)-pinvA*A;
@@ -126,15 +127,15 @@ NullLambda         = eye(ndof)-pinvLambda*Lambda;
 Sigma              = -(pinvLambda*JcMinvJct + NullLambda*JBar);
 SigmaNA            =  Sigma*Nullfc;
 
-% Postural task correction    
-pinvLambdaDamp     =  Lambda'/(Lambda*Lambda' + CONFIG.pinv_damp*eye(size(Lambda,1)));
+% Postural task correction
+pinvLambdaDamp     =  Lambda'/(Lambda*Lambda' + pinv_damp*eye(size(Lambda,1)));
 NullLambdaDamp     =  eye(ndof)-pinvLambdaDamp*Lambda;
 posturalCorr       =  NullLambdaDamp*Mbar;
 impedances         =  impedances*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
 dampings           =  dampings*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
 
 tauModel           =  pinvLambda*(JcMinv*h - dJcNu) + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
-                     + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
+    + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
 
 %% Desired contact forces computation
 fcHDot             = pinvA*(HDotDes - f_grav);
@@ -143,8 +144,8 @@ fcHDot             = pinvA*(HDotDes - f_grav);
 f0                 = zeros(6,1);
 
 if  sum(feet_on_ground) == 2
-
-f0                 = -pinv(SigmaNA,pinv_tol)*(tauModel+Sigma*fcHDot);
+    
+    f0                 = -pinv(SigmaNA,pinv_tol)*(tauModel+Sigma*fcHDot);
 end
 
 fcDes              = fcHDot + Nullfc*f0;

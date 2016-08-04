@@ -25,29 +25,29 @@ indexNext  = index+1;
 
 if time(indexNext) == t
     
-  % the current time step t is also inside the vector time 
-  JointReferences.qjRef   = ikin.qj(:,indexNext);
-  JointReferences.dqjRef  = ikin.dqj(:,indexNext);
-  JointReferences.ddqjRef = ikin.ddqj(:,indexNext);
+    % the current time step t is also inside the vector time
+    JointReferences.qjRef   = ikin.qj(:,indexNext);
+    JointReferences.dqjRef  = ikin.dqj(:,indexNext);
+    JointReferences.ddqjRef = ikin.ddqj(:,indexNext);
 else
-  
-  % t is between time(index) and time(indexNext). 
-  % it will be interpolated using a line
-  DeltaX        = time(indexNext)-time(index);        
-  DeltaYPos     = ikin.qj(:,indexNext)   - ikin.qj(:,index);
-  DeltaYVel     = ikin.dqj(:,indexNext)  - ikin.dqj(:,index);
-  DeltaYAcc     = ikin.ddqj(:,indexNext) - ikin.ddqj(:,index);
-  
-  % get the tangent of the line
-  mPos          = DeltaYPos./DeltaX;
-  mVel          = DeltaYVel./DeltaX;
-  mAcc          = DeltaYAcc./DeltaX;
-  
-  % interpolation
-  DeltaX0       = t - time(index);
-  
-  JointReferences.qjRef   = ikin.qj(:,index)     + mPos*DeltaX0;
-  JointReferences.dqjRef  = ikin.dqj(:,index)    + mVel*DeltaX0;
-  JointReferences.ddqjRef = ikin.ddqj(:,index)   + mAcc*DeltaX0;
-end  
+    
+    % t is between time(index) and time(indexNext).
+    % it will be interpolated using a line
+    DeltaX        = time(indexNext)-time(index);
+    DeltaYPos     = ikin.qj(:,indexNext)   - ikin.qj(:,index);
+    DeltaYVel     = ikin.dqj(:,indexNext)  - ikin.dqj(:,index);
+    DeltaYAcc     = ikin.ddqj(:,indexNext) - ikin.ddqj(:,index);
+    
+    % get the tangent of the line
+    mPos          = DeltaYPos./DeltaX;
+    mVel          = DeltaYVel./DeltaX;
+    mAcc          = DeltaYAcc./DeltaX;
+    
+    % interpolation
+    DeltaX0       = t - time(index);
+    
+    JointReferences.qjRef   = ikin.qj(:,index)     + mPos*DeltaX0;
+    JointReferences.dqjRef  = ikin.dqj(:,index)    + mVel*DeltaX0;
+    JointReferences.ddqjRef = ikin.ddqj(:,index)   + mAcc*DeltaX0;
+end
 end

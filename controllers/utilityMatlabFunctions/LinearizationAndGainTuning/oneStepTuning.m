@@ -1,5 +1,5 @@
 function [dLMom,dRMom,dLNull,dRNull,XMomentum,XNull,V,Vdot]   ...
-          = oneStepTuning(LMom,RMom,LNull,RNull,Xini,ROBOT_DOF_FOR_SIMULINK,KLMom,KOMom,KLNull,KONull,AMom,BMom,ANull,BNull)
+    = oneStepTuning(LMom,RMom,LNull,RNull,Xini,ROBOT_DOF_FOR_SIMULINK,KLMom,KOMom,KLNull,KONull,AMom,BMom,ANull,BNull)
 %% config parameters
 ndof       = size(ROBOT_DOF_FOR_SIMULINK,1);
 omegaNull  = (ndof*(ndof-1))/2;
@@ -30,7 +30,7 @@ B55 =  RNull*BNull;
 B66 =  BNull;
 
 % second term
-A77 =  2*Xini*ANull; 
+A77 =  2*Xini*ANull;
 A88 = -2*Xini*ANull*RNullt*expm(LambdaMatrNull);
 A99 = -2*Xini*ANull*RNullt*expm(LambdaMatrNull);
 
@@ -55,7 +55,7 @@ Bee =  RMom*BMom;
 Bff =  BMom;
 
 % second term
-Agg =  2*Xini*AMom; 
+Agg =  2*Xini*AMom;
 Ahh = -2*Xini*AMom*RMomt*expm(LambdaMatrMom);
 Aii = -2*Xini*AMom*RMomt*expm(LambdaMatrMom);
 
@@ -106,8 +106,8 @@ for i = 1:ndof
         
         if j<i
             
-        uNull(g) = skewBNull(i,j);
-        g        = g+1;
+            uNull(g) = skewBNull(i,j);
+            g        = g+1;
         end
     end
 end
@@ -125,7 +125,7 @@ for i = 1:ndof
         if j<i
             
             Lomega(i,j)   = omegaNull(g);
-            g             = g+1;           
+            g             = g+1;
         end
     end
 end
@@ -149,8 +149,8 @@ for i = 1:6
         
         if j<i
             
-        uMom(g) = skewBMom(i,j);
-        g       = g+1;
+            uMom(g) = skewBMom(i,j);
+            g       = g+1;
         end
     end
 end
@@ -168,7 +168,7 @@ for i = 1:6
         if j<i
             
             Lomega(i,j)   = omegaMom(g);
-            g             = g+1;           
+            g             = g+1;
         end
     end
 end

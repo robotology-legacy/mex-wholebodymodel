@@ -7,10 +7,10 @@ function [  ] = wbm_modelInitialiseFromURDF( varargin )
 % Author : Silvio Traversaro (silvio.traversaro@iit.it)
 % Genova, Nov 2015
 
-    switch(nargin)
-        case 1
-            mexWholeBodyModel('model-initialise-urdf',varargin{1});
-        otherwise
-            disp('modelInitialiseFromURDF : Incorrect number of arguments, check docs');
-    end
+switch(nargin)
+    case 1
+        mexWholeBodyModel('model-initialise-urdf',varargin{1});
+    otherwise
+        disp('modelInitialiseFromURDF : Incorrect number of arguments, check docs');
+end
 end

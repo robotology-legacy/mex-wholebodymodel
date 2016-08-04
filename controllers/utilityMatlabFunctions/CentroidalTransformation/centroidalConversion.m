@@ -1,9 +1,9 @@
 function centroidalDyn = centroidalConversion(DYNAMICS,FORKINEMATICS,STATE)
-%CENTROIDALCONVERSION applies the centroidal coordinates tranformation to the 
+%CENTROIDALCONVERSION applies the centroidal coordinates tranformation to the
 %                     system, i.e. the base dynamics now coincides with the
-%                     CoM dynamics. 
-%           
-%           centroidal = CENTROIDALCONVERSION(dynamics,forKinematics,state) 
+%                     CoM dynamics.
+%
+%           centroidal = CENTROIDALCONVERSION(dynamics,forKinematics,state)
 %           takes as an input the structures containing the robot dynamics,
 %           forward kinematics and state.
 %           The output is the structure CENTROIDALDYN which contains the robot

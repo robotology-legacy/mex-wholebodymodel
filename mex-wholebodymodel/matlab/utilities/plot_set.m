@@ -55,5 +55,5 @@ set(0,'DefaultLineLineWidth',2);
 % factoryLineMarkerSize: 6
 
 % set(0,'DefaultLineMarkerFaceColor','auto');
-  set(0,'DefaultLineMarkerSize',8);
+set(0,'DefaultLineMarkerSize',8);
 

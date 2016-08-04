@@ -1,11 +1,11 @@
 function [] = initForwardDynamics(CONFIG)
-%INITFORWARDDYNAMICS setup the forward dynamics integration of robot iCub 
+%INITFORWARDDYNAMICS setup the forward dynamics integration of robot iCub
 %                    in MATLAB.
 %
 %            [] = INITFORWARDDYNAMICS(CONFIG) takes as input the structure
-%            CONFIG containing all the configuration parameters. It has no 
-%            output. The forward dynamics integration will be performed 
-%            following the options the user specified in the initialization 
+%            CONFIG containing all the configuration parameters. It has no
+%            output. The forward dynamics integration will be performed
+%            following the options the user specified in the initialization
 %            file.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
@@ -18,18 +18,18 @@ feet_on_ground               = CONFIG.feet_on_ground;
 ndof                         = CONFIG.ndof;
 qjInit                       = CONFIG.qjInit;
 
-%% Contact constraints definition       
+%% Contact constraints definition
 if       feet_on_ground(1) == 1 && feet_on_ground(2) == 1
- 
-CONFIG.constraintLinkNames   = {'l_sole','r_sole'}; 
-
+    
+    CONFIG.constraintLinkNames   = {'l_sole','r_sole'};
+    
 elseif   feet_on_ground(1) == 1 && feet_on_ground(2) == 0
-   
-CONFIG.constraintLinkNames   = {'l_sole'}; 
- 
+    
+    CONFIG.constraintLinkNames   = {'l_sole'};
+    
 elseif   feet_on_ground(1) == 0 && feet_on_ground(2) == 1
-       
-CONFIG.constraintLinkNames   = {'r_sole'};
+    
+    CONFIG.constraintLinkNames   = {'r_sole'};
 end
 
 CONFIG.numConstraints        = length(CONFIG.constraintLinkNames);
@@ -44,10 +44,10 @@ wbm_updateState(qjInit,dqjInit,[VelBaseInit;omegaBaseWorldInit]);
 
 % Fixing the world reference frame w.r.t. the foot on ground position
 if  feet_on_ground(1) == 1
-
+    
     [RotBaseInit,PosBaseInit] = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
 else
-    [RotBaseInit,PosBaseInit] = wbm_getWorldFrameFromFixedLink('r_sole',qjInit);    
+    [RotBaseInit,PosBaseInit] = wbm_getWorldFrameFromFixedLink('r_sole',qjInit);
 end
 
 wbm_setWorldFrame(RotBaseInit,PosBaseInit,[0 0 -9.81]')
@@ -73,14 +73,14 @@ forwardDynFunc    = @(t,chi)forwardDynamics(t,chi,CONFIG);
 
 % Either fixed step integrator or ODE15s
 if CONFIG.integrateWithFixedStep == 1
-  
-[t,chi]           = euleroForward(forwardDynFunc,chiInit,CONFIG.tEnd,CONFIG.tStart,CONFIG.sim_step);   
-else    
-[t,chi]           = ode15s(forwardDynFunc,CONFIG.tStart:CONFIG.sim_step:CONFIG.tEnd,chiInit,CONFIG.options);
+    
+    [t,chi]           = euleroForward(forwardDynFunc,chiInit,CONFIG.tEnd,CONFIG.tStart,CONFIG.sim_step);
+else
+    [t,chi]           = ode15s(forwardDynFunc,CONFIG.tStart:CONFIG.sim_step:CONFIG.tEnd,chiInit,CONFIG.options);
 end
 
-delete(CONFIG.wait)       
- 
+delete(CONFIG.wait)
+
 %% VISUALIZATION
 CONFIG.figureCont = initVisualizer(t,chi,CONFIG);
 

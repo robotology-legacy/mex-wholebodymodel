@@ -8,15 +8,15 @@ dimState         = length(initialConditions);
 
 % variable to be integrated
 vectorOfGains         = zeros(dimState,dimTime);
-vectorOfGains(:,1)    = initialConditions; 
+vectorOfGains(:,1)    = initialConditions;
 
 %% Function to be integrated
 integratedFunction   = @(t,gainsVect) gainsDynamics(t,gainsVect,gainsKronecker,CONFIG);
 
 %% Euler forward integrator (fixed step)
 for kk = 2:dimTime
-% state at step k
-vectorOfGains(:,kk)   = vectorOfGains(:,kk-1) + tStep.*integratedFunction(t(kk-1),vectorOfGains(:,kk-1));
+    % state at step k
+    vectorOfGains(:,kk)   = vectorOfGains(:,kk-1) + tStep.*integratedFunction(t(kk-1),vectorOfGains(:,kk-1));
 end
 
 end

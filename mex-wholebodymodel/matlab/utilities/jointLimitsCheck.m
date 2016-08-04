@@ -2,7 +2,7 @@ function [] = jointLimitsCheck(qj,t)
 %JOINTLIMITSCHECK verifies the joints are inside the joint limits.
 %
 %                 [] = JOINTLIMITSCHECK(qj,t) take as an input the joint
-%                 positions qj and the current time step t. The output is 
+%                 positions qj and the current time step t. The output is
 %                 an error message only if a joint reaches the limits.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
@@ -17,9 +17,9 @@ res            = sum(res);
 
 if res == 0
 else
-disp('Joint limits reached at time:')    
-disp(t)
-error('Joint limits reached '); 
+    disp('Joint limits reached at time:')
+    disp(t)
+    error('Joint limits reached ');
 end
 
 end

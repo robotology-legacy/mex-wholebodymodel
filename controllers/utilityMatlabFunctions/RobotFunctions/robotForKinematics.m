@@ -2,11 +2,11 @@ function FORKINEMATICS = robotForKinematics(STATE,DYNAMICS)
 %ROBOTFORKINEMATICS uses the forward kinematics to define the pose and
 %                   velocity of some cartesian points, such as the CoM or
 %                   the contacts.
-%       forKinematics = ROBOTFORKINEMATICS(state,dynamics) takes as 
+%       forKinematics = ROBOTFORKINEMATICS(state,dynamics) takes as
 %       an input the current state of the robot, which is defined in the
-%       structure STATE and the structure DYNAMICS which contains the robot 
+%       structure STATE and the structure DYNAMICS which contains the robot
 %       dynamics.
-%       The output is the structure FORKINEMATICS which contains pose and 
+%       The output is the structure FORKINEMATICS which contains pose and
 %       velocity at CoM, feet, and so on.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)

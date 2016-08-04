@@ -1,8 +1,8 @@
 function  desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG)
-%TRAJECTORYGENERATOR generates a desired CoM trajectory. The default trajectory 
+%TRAJECTORYGENERATOR generates a desired CoM trajectory. The default trajectory
 %                    is a sinusoid in the Y direction.
 %
-%   desired_x_dx_ddx_CoM = GENERTRAJ(xCoMInit,t,config) takes as an input 
+%   desired_x_dx_ddx_CoM = GENERTRAJ(xCoMInit,t,config) takes as an input
 %   the initial CoM position, XCOMINIT, the current time T and the structure
 %   CONFIG which contains all the user-defined parameters.
 %
@@ -20,24 +20,24 @@ demo_movements             = CONFIG.demo_movements;
 
 % Initial parameters
 directionOfOscillation     = [0;0;0];
-referenceParams            = [0.0 0.0];   %referenceParams(1) = amplitude of ascillations in meters 
-                                          %referenceParams(2) = frequency of ascillations in Hertz
+referenceParams            = [0.0 0.0];   %referenceParams(1) = amplitude of ascillations in meters
+%referenceParams(2) = frequency of ascillations in Hertz
 
-noOscillationTime          = 0;           % If params.demo_movements = 1, the variable noOscillationTime is the time, in seconds, 
-                                          % that the robot waits before starting the left-and-right
-                                          
+noOscillationTime          = 0;           % If params.demo_movements = 1, the variable noOscillationTime is the time, in seconds,
+% that the robot waits before starting the left-and-right
+
 %% Trajectory definition
 if  demo_movements == 1
     
-if  sum(feet_on_ground) == 2
-   
-    directionOfOscillation = [0;1;0];
-    referenceParams        = [0.035 0.35];     
-else
+    if  sum(feet_on_ground) == 2
         
-    directionOfOscillation = [0;1;0];
-    referenceParams        = [0.015 0.15];    
-end
+        directionOfOscillation = [0;1;0];
+        referenceParams        = [0.035 0.35];
+    else
+        
+        directionOfOscillation = [0;1;0];
+        referenceParams        = [0.015 0.15];
+    end
 end
 
 %% Trajectory generation
@@ -45,15 +45,15 @@ frequency  = referenceParams(2);
 
 if t >= noOscillationTime
     
-Amplitude  = referenceParams(1);    
+    Amplitude  = referenceParams(1);
 else
-Amplitude  = 0;
+    Amplitude  = 0;
 end
- 
+
 xCoMDes    =  xCoMInit + Amplitude*sin(2*pi*frequency*t)*directionOfOscillation;
 dxCoMDes   =             Amplitude*2*pi*frequency*cos(2*pi*frequency*t)*directionOfOscillation;
 ddxCoMDes  =           - Amplitude*(2*pi*frequency)^2*sin(2*pi*frequency*t)*directionOfOscillation;
 
-desired_x_dx_ddx_CoM = [xCoMDes dxCoMDes ddxCoMDes]; 
+desired_x_dx_ddx_CoM = [xCoMDes dxCoMDes ddxCoMDes];
 
 end

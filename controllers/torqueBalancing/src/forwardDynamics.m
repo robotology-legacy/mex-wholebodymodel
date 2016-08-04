@@ -1,5 +1,5 @@
 function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
-%FORWARDDYNAMICS is the function that will be integrated in the forward 
+%FORWARDDYNAMICS is the function that will be integrated in the forward
 %                dynamics integrator.
 %
 %             [dchi,visualization] = FORWARDDYNAMICS(t,chi,config) takes
@@ -7,7 +7,7 @@ function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
 %             [13+2ndof x 1]; the structure CONFIG which contains the
 %             user-defined parameters.
 %             The output are the vector to be integrated, DCHI [13+2ndof x1]
-%             and the structure VISUALIZATION which contains all the parameters 
+%             and the structure VISUALIZATION which contains all the parameters
 %             used to generate the plots in the visualizer.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
@@ -61,16 +61,16 @@ trajectory.JointReferences.qjRef   = qjInit;
 trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(xCoMRef,t,CONFIG);
 
 %% Balancing controller
-controlParam    =  initController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE);
+controlParam    =  runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE);
 tau             =  controlParam.tau;
 fc              =  controlParam.fc;
 
 %% State derivative computation
-omegaWorldBase  = transpose(RotBase)*omegaBaseWorld;                               
-dquatBase       = quaternionDerivative(omegaWorldBase,quatBase);      
+omegaWorldBase  = transpose(RotBase)*omegaBaseWorld;
+dquatBase       = quaternionDerivative(omegaWorldBase,quatBase);
 NuQuat          = [VelBase;dquatBase;dqj];
 dNu             = M\(Jc'*fc + [zeros(6,1); tau]-h);
-% state derivative 
+% state derivative
 dchi            = [NuQuat;dNu];
 
 %% Parameters for visualization
