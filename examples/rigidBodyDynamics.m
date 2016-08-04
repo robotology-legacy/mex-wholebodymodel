@@ -17,11 +17,11 @@ wbm_modelInitialiseFromURDF('rigidBody.urdf');
 %% we set the state to some random values, just to show how to
 %% get the dynamics quantities
 w_R_b = eye(3,3); % rotation matrix that transforms a vector in the base frame to the world frame
-x_b = [1;2;3]; % position of the link frame origin wrt to the world frame
-qj = zeros(0,1);  % joint positions
-dqj = zeros(0,1); % joint velocities
-grav = [0;0;-9.8]; % gravity in world frame
-dx_b = [0.4;0.5;0.6]; % derivative in the position of the link frame origin wrt to the world frame
+x_b   = [1;2;3]; % position of the link frame origin wrt to the world frame
+qj    = zeros(0,1);  % joint positions
+dqj   = zeros(0,1); % joint velocities
+grav  = [0;0;-9.8]; % gravity in world frame
+dx_b  = [0.4;0.5;0.6]; % derivative in the position of the link frame origin wrt to the world frame
 omega_W = [0.4;0.5;0.2]; % angular velocity of base frame
 
 %% Set the state

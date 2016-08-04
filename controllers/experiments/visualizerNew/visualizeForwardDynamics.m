@@ -43,15 +43,11 @@ qj = xout(:,8:32);  % joint positions
 % time span vector of the simulation
 %tSpan   = linspace(  config.sim_start_time,  config.sim_start_time+config.sim_duration,  config.sim_duration/config.sim_step);
 
-
-
 [~,qjInit,~,~] = stateDemux(config.state0,config);
 
 [R,p] = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
 wbm_setWorldFrame(R,p,[ 0,0,-9.81]');
 wbm_updateState(qjInit,zeros(config.ndof,1),zeros(6,1));
-
-
 
 % the list of link/joint names that are used to construct the robot in the visualizer
 L = cell(15,1);
@@ -126,12 +122,9 @@ z = zeros(1,n_plot);
 pos = zeros(1,n_plot);
 xyzpairs = zeros(n_lin,6);
 
-
-
 % plot the position of the center of mass
 jj = n_plot;
 comPosition    = kin(:,1:3,jj);
-
 
 % Change axis of the inertial frame visualization differently
 % from that of the body frame
@@ -196,18 +189,18 @@ xyzpatch.faces    = zeros(6,4);
 
 % constant multipliers related to the sizes of the patches around the links to form the robot figure
 mult_patch = [0.07 , 0.03;
-    0.04 , 0.02;
-    0.03 , 0.02;
-    0.025, 0.02;
-    0.04 , 0.02;
-    0.03 , 0.02;
-    0.025, 0.02;
-    0.03 , 0.02;
-    0.025, 0.02;
-    0.02 , 0.02;
-    0.03 , 0.02;
-    0.025, 0.02;
-    0.02 , 0.02];
+              0.04 , 0.02;
+              0.03 , 0.02;
+              0.025, 0.02;
+              0.04 , 0.02;
+              0.03 , 0.02;
+              0.025, 0.02;
+              0.03 , 0.02;
+              0.025, 0.02;
+              0.02 , 0.02;
+              0.03 , 0.02;
+              0.025, 0.02;
+              0.02 , 0.02];
 
 %% PLOT LINES DEPICTING LINKS
 for jj=1:n_lin
@@ -228,13 +221,13 @@ for jj=1:n_lin
     
     % vertices for the patch
     xyzpatch.vertices = [xyzpairs(jj,2)+qq1(1) , xyzpairs(jj,4)+qq1(2) , xyzpairs(jj,6)+qq1(3);
-        xyzpairs(jj,2)+qq2(1) , xyzpairs(jj,4)+qq2(2) , xyzpairs(jj,6)+qq2(3);
-        xyzpairs(jj,2)+qq3(1) , xyzpairs(jj,4)+qq3(2) , xyzpairs(jj,6)+qq3(3);
-        xyzpairs(jj,2)+qq4(1) , xyzpairs(jj,4)+qq4(2) , xyzpairs(jj,6)+qq4(3);
-        xyzpairs(jj,1)+qq1(1) , xyzpairs(jj,3)+qq1(2) , xyzpairs(jj,5)+qq1(3);
-        xyzpairs(jj,1)+qq2(1) , xyzpairs(jj,3)+qq2(2) , xyzpairs(jj,5)+qq2(3);
-        xyzpairs(jj,1)+qq3(1) , xyzpairs(jj,3)+qq3(2) , xyzpairs(jj,5)+qq3(3);
-        xyzpairs(jj,1)+qq4(1) , xyzpairs(jj,3)+qq4(2) , xyzpairs(jj,5)+qq4(3)];
+                         xyzpairs(jj,2)+qq2(1) , xyzpairs(jj,4)+qq2(2) , xyzpairs(jj,6)+qq2(3);
+                         xyzpairs(jj,2)+qq3(1) , xyzpairs(jj,4)+qq3(2) , xyzpairs(jj,6)+qq3(3);
+                         xyzpairs(jj,2)+qq4(1) , xyzpairs(jj,4)+qq4(2) , xyzpairs(jj,6)+qq4(3);
+                         xyzpairs(jj,1)+qq1(1) , xyzpairs(jj,3)+qq1(2) , xyzpairs(jj,5)+qq1(3);
+                         xyzpairs(jj,1)+qq2(1) , xyzpairs(jj,3)+qq2(2) , xyzpairs(jj,5)+qq2(3);
+                         xyzpairs(jj,1)+qq3(1) , xyzpairs(jj,3)+qq3(2) , xyzpairs(jj,5)+qq3(3);
+                         xyzpairs(jj,1)+qq4(1) , xyzpairs(jj,3)+qq4(2) , xyzpairs(jj,5)+qq4(3)];
     
     % RELATED TO WORLD REFERENCE FRAME ISSUE (see line 44)
     %temp = xyzpatch.vertices(:,1);
@@ -242,14 +235,14 @@ for jj=1:n_lin
     %xyzpatch.vertices(:,3) = temp;
     %
     xyzpatch.faces = [ 1 2 3 4;
-        1 4 8 5;
-        5 8 7 6;
-        7 3 2 6;
-        2 6 5 1;
-        3 7 8 4];
+                       1 4 8 5;
+                       5 8 7 6;
+                       7 3 2 6;
+                       2 6 5 1;
+                       3 7 8 4];
     
     lnkpatch(jj) = patch('vertices',xyzpatch.vertices,'faces',xyzpatch.faces,...
-        'FaceAlpha',0.2,'FaceColor',robotColor);
+                         'FaceAlpha',0.2,'FaceColor',robotColor);
 end
 
 %% FEET PATCHES
@@ -265,17 +258,17 @@ qq3 = -orthlnk1-orthlnk2;
 qq4 =  orthlnk1-orthlnk2;
 
 xyzpatch.vertices = [xyzpairs(4,2)+qq1(1)      , xyzpairs(4,4)+qq1(2) , xyzpairs(4,6)+qq1(3);
-    xyzpairs(4,2)+qq2(1)      , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
-    xyzpairs(4,2)+qq3(1)      , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
-    xyzpairs(4,2)+qq4(1)      , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3);
-    xyzpairs(4,2)+qq1(1)+0.03 , xyzpairs(4,4)+qq1(2) , xyzpairs(4,6)+qq1(3);
-    xyzpairs(4,2)+qq2(1)+0.03 , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
-    xyzpairs(4,2)+qq3(1)+0.03 , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
-    xyzpairs(4,2)+qq4(1)+0.03 , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3)];
+                     xyzpairs(4,2)+qq2(1)      , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
+                     xyzpairs(4,2)+qq3(1)      , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
+                     xyzpairs(4,2)+qq4(1)      , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3);
+                     xyzpairs(4,2)+qq1(1)+0.03 , xyzpairs(4,4)+qq1(2) , xyzpairs(4,6)+qq1(3);
+                     xyzpairs(4,2)+qq2(1)+0.03 , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
+                     xyzpairs(4,2)+qq3(1)+0.03 , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
+                     xyzpairs(4,2)+qq4(1)+0.03 , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3)];
 
 
 lnkpatch(jj) = patch('vertices',xyzpatch.vertices,'faces',xyzpatch.faces,'FaceAlpha',0.2,...
-    'FaceColor',robotColor);
+                     'FaceColor',robotColor);
 
 % left foot patch
 jj=n_lin+2;
@@ -286,16 +279,16 @@ qq3 = -orthlnk1-orthlnk2;
 qq4 =  orthlnk1-orthlnk2;
 
 xyzpatch.vertices = [xyzpairs(7,2)+qq1(1)      , xyzpairs(7,4)+qq1(2) , xyzpairs(7,6)+qq1(3);
-    xyzpairs(7,2)+qq2(1)      , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
-    xyzpairs(7,2)+qq3(1)      , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
-    xyzpairs(7,2)+qq4(1)      , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3);
-    xyzpairs(7,2)+qq1(1)+0.03 , xyzpairs(7,4)+qq1(2) , xyzpairs(7,6)+qq1(3);
-    xyzpairs(7,2)+qq2(1)+0.03 , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
-    xyzpairs(7,2)+qq3(1)+0.03 , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
-    xyzpairs(7,2)+qq4(1)+0.03 , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3)];
+                     xyzpairs(7,2)+qq2(1)      , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
+                     xyzpairs(7,2)+qq3(1)      , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
+                     xyzpairs(7,2)+qq4(1)      , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3);
+                     xyzpairs(7,2)+qq1(1)+0.03 , xyzpairs(7,4)+qq1(2) , xyzpairs(7,6)+qq1(3);
+                     xyzpairs(7,2)+qq2(1)+0.03 , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
+                     xyzpairs(7,2)+qq3(1)+0.03 , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
+                     xyzpairs(7,2)+qq4(1)+0.03 , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3)];
 
 lnkpatch(jj) = patch('vertices',xyzpatch.vertices,'faces',xyzpatch.faces,'FaceAlpha',0.2,...
-    'FaceColor',robotColor);
+                     'FaceColor',robotColor);
 %% PLOT THRUSTS
 F   = 0.01;
 delta = 5*pi/180;
@@ -405,9 +398,9 @@ for ii=2:n % the visualization instance
         if config.plotComTrajectories
             if num_gigure == 1
                 handlerTrajectoryCom     = config.plot_objs{num_gigure}(1+size(config.jets.frames,1)+n_plot+n_lin+n_plot:...
-                    size(config.jets.frames,1)+n_plot+n_lin+n_plot+length(temp));
+                                                                        size(config.jets.frames,1)+n_plot+n_lin+n_plot+length(temp));
                 handlerTrajectoryComDes  = config.plot_objs{num_gigure}(1+size(config.jets.frames,1)+n_plot+n_lin+n_plot+length(temp):...
-                    size(config.jets.frames,1)+n_plot+n_lin+n_plot+2*length(temp));
+                                                                        size(config.jets.frames,1)+n_plot+n_lin+n_plot+2*length(temp));
                 j2 = 1;
                 for j = max(stepI+1,ii-DeltaI+1):stepI:ii
                     set(handlerTrajectoryCom(j2),'xdata',comPosition(j-stepI:j,1),...
@@ -467,13 +460,13 @@ for ii=2:n % the visualization instance
             
             
             xyzpatch.vertices = [xyzpairs(jj,2)+qq1(1) , xyzpairs(jj,4)+qq1(2) , xyzpairs(jj,6)+qq1(3);
-                xyzpairs(jj,2)+qq2(1) , xyzpairs(jj,4)+qq2(2) , xyzpairs(jj,6)+qq2(3);
-                xyzpairs(jj,2)+qq3(1) , xyzpairs(jj,4)+qq3(2) , xyzpairs(jj,6)+qq3(3);
-                xyzpairs(jj,2)+qq4(1) , xyzpairs(jj,4)+qq4(2) , xyzpairs(jj,6)+qq4(3);
-                xyzpairs(jj,1)+qq1(1) , xyzpairs(jj,3)+qq1(2) , xyzpairs(jj,5)+qq1(3);
-                xyzpairs(jj,1)+qq2(1) , xyzpairs(jj,3)+qq2(2) , xyzpairs(jj,5)+qq2(3);
-                xyzpairs(jj,1)+qq3(1) , xyzpairs(jj,3)+qq3(2) , xyzpairs(jj,5)+qq3(3);
-                xyzpairs(jj,1)+qq4(1) , xyzpairs(jj,3)+qq4(2) , xyzpairs(jj,5)+qq4(3)];
+                                 xyzpairs(jj,2)+qq2(1) , xyzpairs(jj,4)+qq2(2) , xyzpairs(jj,6)+qq2(3);
+                                 xyzpairs(jj,2)+qq3(1) , xyzpairs(jj,4)+qq3(2) , xyzpairs(jj,6)+qq3(3);
+                                 xyzpairs(jj,2)+qq4(1) , xyzpairs(jj,4)+qq4(2) , xyzpairs(jj,6)+qq4(3);
+                                 xyzpairs(jj,1)+qq1(1) , xyzpairs(jj,3)+qq1(2) , xyzpairs(jj,5)+qq1(3);
+                                 xyzpairs(jj,1)+qq2(1) , xyzpairs(jj,3)+qq2(2) , xyzpairs(jj,5)+qq2(3);
+                                 xyzpairs(jj,1)+qq3(1) , xyzpairs(jj,3)+qq3(2) , xyzpairs(jj,5)+qq3(3);
+                                 xyzpairs(jj,1)+qq4(1) , xyzpairs(jj,3)+qq4(2) , xyzpairs(jj,5)+qq4(3)];
             
             set(lnkpatch(jj),'vertices',xyzpatch.vertices);
         end
@@ -494,13 +487,13 @@ for ii=2:n % the visualization instance
         qq4 =  orthlnk1-orthlnk2;
         
         xyzpatch.vertices = [xyzpairs(4,2)+qq1(1)      , xyzpairs(4,4)+qq1(2) , xyzpairs(4,6)+qq1(3);
-            xyzpairs(4,2)+qq2(1)      , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
-            xyzpairs(4,2)+qq3(1)      , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
-            xyzpairs(4,2)+qq4(1)      , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3);
-            xyzpairs(4,2)+qq1(1)-0.04 , xyzpairs(4,4)+qq1(2) , xyzpairs(4,6)+qq1(3);
-            xyzpairs(4,2)+qq2(1)-0.04 , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
-            xyzpairs(4,2)+qq3(1)-0.04 , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
-            xyzpairs(4,2)+qq4(1)-0.04 , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3)];
+                             xyzpairs(4,2)+qq2(1)      , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
+                             xyzpairs(4,2)+qq3(1)      , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
+                             xyzpairs(4,2)+qq4(1)      , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3);
+                             xyzpairs(4,2)+qq1(1)-0.04 , xyzpairs(4,4)+qq1(2) , xyzpairs(4,6)+qq1(3);
+                             xyzpairs(4,2)+qq2(1)-0.04 , xyzpairs(4,4)+qq2(2) , xyzpairs(4,6)+qq2(3);
+                             xyzpairs(4,2)+qq3(1)-0.04 , xyzpairs(4,4)+qq3(2) , xyzpairs(4,6)+qq3(3);
+                             xyzpairs(4,2)+qq4(1)-0.04 , xyzpairs(4,4)+qq4(2) , xyzpairs(4,6)+qq4(3)];
         
         set(lnkpatch(jj),'vertices',xyzpatch.vertices);
         
@@ -518,20 +511,19 @@ for ii=2:n % the visualization instance
         qq4 =  orthlnk1-orthlnk2;
         
         xyzpatch.vertices = [xyzpairs(7,2)+qq1(1)      , xyzpairs(7,4)+qq1(2) , xyzpairs(7,6)+qq1(3);
-            xyzpairs(7,2)+qq2(1)      , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
-            xyzpairs(7,2)+qq3(1)      , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
-            xyzpairs(7,2)+qq4(1)      , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3);
-            xyzpairs(7,2)+qq1(1)-0.04 , xyzpairs(7,4)+qq1(2) , xyzpairs(7,6)+qq1(3);
-            xyzpairs(7,2)+qq2(1)-0.04 , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
-            xyzpairs(7,2)+qq3(1)-0.04 , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
-            xyzpairs(7,2)+qq4(1)-0.04 , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3)];
+                             xyzpairs(7,2)+qq2(1)      , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
+                             xyzpairs(7,2)+qq3(1)      , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
+                             xyzpairs(7,2)+qq4(1)      , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3);
+                             xyzpairs(7,2)+qq1(1)-0.04 , xyzpairs(7,4)+qq1(2) , xyzpairs(7,6)+qq1(3);
+                             xyzpairs(7,2)+qq2(1)-0.04 , xyzpairs(7,4)+qq2(2) , xyzpairs(7,6)+qq2(3);
+                             xyzpairs(7,2)+qq3(1)-0.04 , xyzpairs(7,4)+qq3(2) , xyzpairs(7,6)+qq3(3);
+                             xyzpairs(7,2)+qq4(1)-0.04 , xyzpairs(7,4)+qq4(2) , xyzpairs(7,6)+qq4(3)];
         
         
         set(lnkpatch(jj),'vertices',xyzpatch.vertices);
         
         %% UPDATE TEXT INFO ON IMAGES
-        
-        
+     
         drawnow;
     end
     % to update the visualizer speed to keep it close to real simulation time

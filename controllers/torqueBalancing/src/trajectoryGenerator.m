@@ -21,10 +21,10 @@ demo_movements             = CONFIG.demo_movements;
 % Initial parameters
 directionOfOscillation     = [0;0;0];
 referenceParams            = [0.0 0.0];   %referenceParams(1) = amplitude of ascillations in meters
-%referenceParams(2) = frequency of ascillations in Hertz
+                                          %referenceParams(2) = frequency of ascillations in Hertz
 
 noOscillationTime          = 0;           % If params.demo_movements = 1, the variable noOscillationTime is the time, in seconds,
-% that the robot waits before starting the left-and-right
+                                          % that the robot waits before starting the left-and-right
 
 %% Trajectory definition
 if  demo_movements == 1

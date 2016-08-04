@@ -54,7 +54,7 @@ Nullfeet               = eye(ndof+6) - pinvJc*Jc;
 % Define the second task for state velocities: follow a desired momentum dynamics
 pinvJH                 = pinv(JH*Nullfeet,pinv_tol);
 CentroidalErrDynamics  = [m*(desired_x_dx_ddx_CoM(:,3)+desired_x_dx_ddx_CoM(:,2)-(xCoM-desired_x_dx_ddx_CoM(:,1)));...
-    zeros(3,1)] - JH*pinvJc*feetErrorDynamics;
+                          zeros(3,1)] - JH*pinvJc*feetErrorDynamics;
 NullH                  = eye(ndof+6) - pinvJH*(JH*Nullfeet);
 
 % Define the third task for joints velocities: follow a desired joints trajectory

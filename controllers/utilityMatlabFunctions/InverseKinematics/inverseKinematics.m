@@ -112,7 +112,7 @@ NullFeet           =  eye(ndof+6) -pinv(Jc,pinv_tol)*Jc;
 
 % second task: generate a desired Momentum trajectory
 MomErrorDynamics   = -dJHNu +[m*desired_x_dx_ddx_CoM(:,3);zeros(3,1)] -KPosMom*[m*deltaPosCoM; deltaIntAng] ...
-    -KVelMom*[m*deltaVelCoM; deltaAngMom] -JH*pinv(Jc,pinv_tol)*feetErrorDynamics;
+                             -KVelMom*[m*deltaVelCoM; deltaAngMom] -JH*pinv(Jc,pinv_tol)*feetErrorDynamics;
 JMomTaks           =  JH*NullFeet;
 NullMom            =  eye(ndof+6) - pinv(JMomTaks,pinv_tol)*JMomTaks;
 
@@ -120,7 +120,7 @@ NullMom            =  eye(ndof+6) - pinv(JMomTaks,pinv_tol)*JMomTaks;
 JPost              = [zeros(ndof,6) eye(ndof)];
 
 postErrorDynamics  = -KVelPost*Nu(7:end) -KPosPost*(qj-initState.qj)...
-    -JPost*pinv(Jc,pinv_tol)*feetErrorDynamics -JPost*NullFeet*pinv(JMomTaks,pinv_tol)*MomErrorDynamics;
+                     -JPost*pinv(Jc,pinv_tol)*feetErrorDynamics -JPost*NullFeet*pinv(JMomTaks,pinv_tol)*MomErrorDynamics;
 JPostTask          =  JPost*NullFeet*NullMom;
 
 % accelerations from inverse kinematics

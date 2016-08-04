@@ -43,15 +43,15 @@ for i = 1 : numberOfEquations
 end
 
 CFoot = [ 0         , 0, -torsionalFrictionCoefficient,               0,               0, 1;
-    0         , 0, -torsionalFrictionCoefficient,               0,               0,-1;
-    0         , 0,                              -1,             0,               0, 0;
-    0         , 0,                   footSize(1,1),             0,               1, 0;
-    0         , 0,                  -footSize(1,2),             0,              -1, 0;
-    0         , 0,                   footSize(2,1),            -1,               0, 0;
-    0         , 0,                  -footSize(2,2),             1,               0, 0];
+          0         , 0, -torsionalFrictionCoefficient,               0,               0,-1;
+          0         , 0,                              -1,             0,               0, 0;
+          0         , 0,                   footSize(1,1),             0,               1, 0;
+          0         , 0,                  -footSize(1,2),             0,              -1, 0;
+          0         , 0,                   footSize(2,1),            -1,               0, 0;
+          0         , 0,                  -footSize(2,2),             1,               0, 0];
 
 CFoot       =  [ Aineq ;
-    CFoot ];
+                 CFoot ];
 
 dConstraints = [zeros(size(Aineq,1), 1); zeros(7,1)];
 

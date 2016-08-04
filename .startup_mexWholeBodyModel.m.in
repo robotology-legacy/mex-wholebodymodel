@@ -1,10 +1,10 @@
-%% startup_Mex.m
+%% startup_mexWholeBodyModel.m
 %  Run this script only once to permanently add the required folders for using mexWholebodymodel toolbox  to your 
 %  MATLAB path. 
 
 fprintf('\nmexWholeBodyModel Toolbox\n');
 
-installDir = '@CMAKE_BINARY_DIR@/install';
+installDir = '@CMAKE_INSTALL_PREFIX@';
 mexDir     = [installDir, filesep, 'mex'];
 mexWrapDir = [mexDir, filesep, 'mexwbi-wrappers'];
 mexUtDir   = [mexDir, filesep, 'mexwbi-utilities'];
@@ -38,7 +38,7 @@ fprintf('Saving paths to %s\n\n', [fileDir, filesep, 'pathdef.m']);
 
 if (~savepath([fileDir, filesep, 'pathdef.m']))
     fprintf(['A file called pathdef.m has been created in your %s folder.\n', ...
-        'This should be enough to permanentely add all the Mex-Toolbox to ', ...
+        'This should be enough to permanentely add all the mexWholeBodyModel-Toolbox to ', ...
         'your MATLAB installation.\n'], fileDir);
 else
     disp('There was an error generating pathdef.m To proceed please manually add the contents of variables mexDir, mexUtDir, mexWrapDir to your matlabpath');

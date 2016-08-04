@@ -70,7 +70,7 @@ trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(xCoMRef,t,CONFIG);
 if CONFIG.linearizationDebug  == 1
     % linearized joint accelerations
     visualization.ddqjLin    = trajectory.JointReferences.ddqjRef-CONFIG.linearization.KS*(qj-trajectory.JointReferences.qjRef)...
-        -CONFIG.linearization.KD*(dqj-trajectory.JointReferences.dqjRef);
+                              -CONFIG.linearization.KD*(dqj-trajectory.JointReferences.dqjRef);
 end
 
 %% Balancing controller

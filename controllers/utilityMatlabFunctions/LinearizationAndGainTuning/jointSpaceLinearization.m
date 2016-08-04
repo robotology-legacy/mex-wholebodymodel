@@ -73,7 +73,7 @@ if sum(feet_on_ground) == 1
     
     r            = posFoot - xCoM;
     A            = [eye(3)   zeros(3);
-        skew(r)  eye(3) ];
+                    skew(r)  eye(3) ];
     pinvA        = eye(6)/A;
     
 else
@@ -81,9 +81,9 @@ else
     Pl           = posLFoot - xCoM;
     
     AL           = [ eye(3),  zeros(3);
-        skew(Pl),  eye(3)];
+                     skew(Pl),  eye(3)];
     AR           = [ eye(3),  zeros(3);
-        skew(Pr),  eye(3)];
+                     skew(Pr),  eye(3)];
     A            = [AL, AR];
     pinvA        = pinv(A,pinv_tol);
 end

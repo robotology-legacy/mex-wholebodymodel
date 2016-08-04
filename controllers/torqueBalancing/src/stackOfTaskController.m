@@ -72,10 +72,10 @@ dqjTilde            = dqj-dqjRef;
 % General parameters
 gravAcc             = 9.81;
 S                   = [zeros(6,ndof);
-    eye(ndof,ndof)];
+                       eye(ndof,ndof)];
 f_grav              = [zeros(2,1);
-    -m*gravAcc;
-    zeros(3,1)];
+                      -m*gravAcc;
+                       zeros(3,1)];
 
 %% Multiplier of contact wrenches at CoM
 posRFoot            = RFootPoseEul(1:3);
@@ -83,9 +83,9 @@ posLFoot            = LFootPoseEul(1:3);
 distRF              = posRFoot - xCoM;       % Application point of the contact force on the right foot w.r.t. CoM
 distLF              = posLFoot - xCoM;       % Application point of the contact force on the left  foot w.r.t. CoM
 AL                  = [eye(3),     zeros(3);
-    skew(distLF),eye(3)];
+                       skew(distLF),eye(3)];
 AR                  = [eye(3),     zeros(3);
-    skew(distRF),eye(3)];
+                       skew(distRF),eye(3)];
 
 % One foot or two feet on ground selector
 if      sum(feet_on_ground) == 2
@@ -135,7 +135,7 @@ impedances         =  impedances*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
 dampings           =  dampings*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
 
 tauModel           =  pinvLambda*(JcMinv*h - dJcNu) + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
-    + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
+                      + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
 
 %% Desired contact forces computation
 fcHDot             = pinvA*(HDotDes - f_grav);
@@ -145,7 +145,7 @@ f0                 = zeros(6,1);
 
 if  sum(feet_on_ground) == 2
     
-    f0                 = -pinv(SigmaNA,pinv_tol)*(tauModel+Sigma*fcHDot);
+    f0             = -pinv(SigmaNA,pinv_tol)*(tauModel+Sigma*fcHDot);
 end
 
 fcDes              = fcHDot + Nullfc*f0;

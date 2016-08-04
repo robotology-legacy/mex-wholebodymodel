@@ -1,6 +1,5 @@
 function [] = kinEnergyConservationTest( params )
 rng(0)
-
 clear wholeBodyModel;
 
 %% initialise mexWholeBodyModel
@@ -21,10 +20,10 @@ params.ndof = size(jlMin,1);
 %% random initial conditions inside
 
 deltaJl = jlMax - jlMin;
-qjInit=jlMin + rand(params.ndof,1) .* deltaJl ;
-maxVel = 10;
+qjInit  = jlMin + rand(params.ndof,1) .* deltaJl ;
+maxVel  = 10;
 
-dqjInit =maxVel*(0.5*ones(params.ndof,1)-1*rand(params.ndof,1));
+dqjInit = maxVel*(0.5*ones(params.ndof,1)-1*rand(params.ndof,1));
 
 params.qjInit = qjInit;
 params.dqjInit = dqjInit;
@@ -45,7 +44,7 @@ wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit
 [qj,T_bInit,dqj,vb] = wbm_getState();
 [Ptemp,Rtemp] = frame2posrot(T_bInit);
 params.chiInit = [T_bInit;params.qjInit;...
-    params.dx_bInit;params.omega_bInit;params.dqjInit];
+                  params.dx_bInit;params.omega_bInit;params.dqjInit];
 
 %% contact constraints (no constraint, free floating system)
 params.constraintLinkNames = {};

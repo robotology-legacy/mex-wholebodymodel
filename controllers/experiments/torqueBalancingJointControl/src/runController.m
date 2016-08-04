@@ -22,7 +22,7 @@ ndof                  = CONFIG.ndof;
 feet_on_ground        = CONFIG.feet_on_ground;
 initForKinematics     = CONFIG.initForKinematics;
 S                     = [zeros(6,ndof);
-    eye(ndof,ndof)];
+                         eye(ndof,ndof)];
 
 %% Dynamics
 dJcNu                 = DYNAMICS.dJcNu;

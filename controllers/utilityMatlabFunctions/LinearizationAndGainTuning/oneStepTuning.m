@@ -1,5 +1,5 @@
 function [dLMom,dRMom,dLNull,dRNull,XMomentum,XNull,V,Vdot]   ...
-    = oneStepTuning(LMom,RMom,LNull,RNull,Xini,ROBOT_DOF_FOR_SIMULINK,KLMom,KOMom,KLNull,KONull,AMom,BMom,ANull,BNull)
+          = oneStepTuning(LMom,RMom,LNull,RNull,Xini,ROBOT_DOF_FOR_SIMULINK,KLMom,KOMom,KLNull,KONull,AMom,BMom,ANull,BNull)
 %% config parameters
 ndof       = size(ROBOT_DOF_FOR_SIMULINK,1);
 omegaNull  = (ndof*(ndof-1))/2;

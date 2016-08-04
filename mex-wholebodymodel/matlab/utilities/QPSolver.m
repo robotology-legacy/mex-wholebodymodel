@@ -47,7 +47,7 @@ numberOfPoints               = 4;
 forceFrictionCoefficient     = 1;
 torsionalFrictionCoefficient = 2/150;
 footSize                     = [-0.1 0.1;       % xMin, xMax
-    -0.1 0.1];      % yMin, yMax
+                                -0.1 0.1];      % yMin, yMax
 fZmin                        = 10;
 
 % the QP solver will search a solution f0 that satisfies the inequality Aineq_f F(f0) < bineq_f
@@ -78,7 +78,7 @@ if     sum(feet_on_ground) == 1
     gradientQP1Foot           = -A'*(HDotDes-f_grav);
     
     [fcDes, ~, exitFlag, iter, lambda, auxOutput] = qpOASES(HessianMatrixQP1Foot, gradientQP1Foot, ConstraintsMatrixQP1Foot,...
-        [], [], [], bVectorConstraintsQP1Foot);
+                                                            [], [], [], bVectorConstraintsQP1Foot);
     
 elseif sum(feet_on_ground) == 2
     
@@ -88,7 +88,7 @@ elseif sum(feet_on_ground) == 2
     gradientQP2Feet           = SigmaNA'*(tauModel + Sigma*fcHDot);
     
     [f0, ~, exitFlag, iter, lambda, auxOutput]    = qpOASES(HessianMatrixQP2Feet, gradientQP2Feet, ConstraintsMatrixQP2Feet,...
-        [], [], [], bVectorConstraintsQp2Feet);
+                                                            [], [], [], bVectorConstraintsQp2Feet);
     
     fcDes                     = fcHDot   + Nullfc*f0;
 end

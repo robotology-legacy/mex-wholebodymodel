@@ -44,10 +44,10 @@ KDn = ACartesian*Kdx*BCartesian + ANull*Kdn*BNull;
 
 % new state matrix
 AStateNew     = [zeros(ndof) eye(ndof);
-    -KSn          -KDn];
+                 -KSn          -KDn];
 % state matrix verification
 AStateDes     = [zeros(ndof) eye(ndof);
-    -KSdes         -KDdes];
+                -KSdes         -KDdes];
 
 eigAStateDes       = -real(eig(AStateDes));
 eigAStateNew       = -real(eig(AStateNew));

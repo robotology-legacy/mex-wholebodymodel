@@ -4,7 +4,6 @@ close all;
 %% initialise mexWholeBodyModel
 wbm_modelInitialise('icubGazeboSim');
 
-
 %% setup params
 params.ndof = 25;
 param.dampingCoeff = 0.5;
@@ -42,13 +41,10 @@ wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
 fprintf('Prior rotation \n');
 disp(rot);
 
-
 fprintf('Prior rotation check (R^T*R)\n');
 disp(rot'*rot);
 
-
 wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
-
 
 [qj,T_b_Got,dqj,vb] = wbm_getState();
 

@@ -26,7 +26,7 @@ figureCont = CONFIG.figureCont;
 BackGroundColor = [0 0 0];
 GridColor       = [1 1 1];
 figure_main     = figure('Name', 'iCub Simulator', 'NumberTitle', 'off',...
-    'Position', [500,800,1200,650],'Color',BackGroundColor);
+                         'Position', [500,800,1200,650],'Color',BackGroundColor);
 
 sizeFig         = [10 26 800 600];
 
@@ -40,7 +40,7 @@ set(figure_main, 'BackingStore', 'off');
 CONFIG.plot_main   = zeros(1,4);
 
 plot_pos          = [0.51,0.05,0.45,1;
-    0.01,0.05,0.45,1];
+                     0.01,0.05,0.45,1];
 
 for ii=1:2
     
