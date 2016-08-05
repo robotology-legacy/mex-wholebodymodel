@@ -14,11 +14,11 @@ if exist(mexDir, 'dir')
 end
 
 if exist(mexUtDir, 'dir')
-    addpath(mexDir);
+    addpath(mexUtDir);
 end
 
 if exist(mexWrapDir, 'dir')
-    addpath(mexDir);
+    addpath(mexWrapDir);
 end
 
 fileDir               = userpath;
