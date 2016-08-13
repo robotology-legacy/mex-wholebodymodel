@@ -3,13 +3,16 @@ function sim_config = initSimConfig_iCub(scn_mode)
         scn_mode = 'LightScn'; % default scene for the simulation.
     end
 
-    % List of link and frame names that are deduced from their 'parent joints' of the
-    % iCub-Robot model with the exception of the first and the last link, the 'root_link'
-    % and the 'com', they don't have any parent joints.
+    % List of link and frame names that are deduced from their 'parent joints' or
+    % 'parent links' of the iCub-Robot model. The only exceptions are the first
+    % and the last link, the 'root_link' and the 'com', they don't have any parent
+    % joints or parent links.
     % The link names 'r_gripper' and 'l_gripper' are aliases for the link frames
-    % 'r_hand_dh_frame' and 'l_hand_dh_frame', where their origins are placed on the axis
-    % of their parent joints. The link names are describing the "virtual joints" that are
-    % used to construct the dynamic model of the iCub-Robot in the visualizer.
+    % 'r_hand_dh_frame' and 'l_hand_dh_frame', where their origins are placed on
+    % the axis of their parent joints. In general, the link names are describing
+    % the "virtual joints" that are used to construct the dynamic model of the
+    % iCub-Robot in the visualizer.
+    %
     % Further details about the definitions of the joint, link and frame names are
     % available in the iCub Model Naming Conventions under,
     %    <http://wiki.icub.org/wiki/ICub_Model_naming_conventions>.
@@ -27,11 +30,11 @@ function sim_config = initSimConfig_iCub(scn_mode)
                                                                        %             | (* ... link; ** ... link frame)
 
     % Set of joint-pair indexes to describe the configuration of the iCub-robot's
-    % skeleton. Each pair of joints is connected with a rigid link (edge) to form
-    % a kinematic chain of the robot. The index-pairs denotes the index-position
-    % of the given joint names in the above joint name list. The index-set is used
-    % to create a set of position parameters that describes the full configuration
-    % of the robot system.
+    % skeleton (connectivity graph). Each pair of joints is connected with a rigid
+    % link (edge) to form a kinematic chain of the robot. The index-pairs denotes
+    % the index-position of the given joint names in the above joint name list.
+    % The index-set is used to create a set of position parameters that describes
+    % the full configuration of the robot system.
     %
     % Joint pair indexes for the x, y and z-positions (translations) in the 3D-space:
     %                       x1 x2   y1 y2   z1 z2
@@ -51,19 +54,21 @@ function sim_config = initSimConfig_iCub(scn_mode)
 
     % List with constant scale factors to define the sizes of the shapes (patches) for
     % the links (edges) of the robot's skeleton. They form the shape of the robot's body:
-    shape_geom.size_sf = [0.07   0.03;
-                          0.04   0.02;
-                          0.03   0.02;
-                          0.025  0.02;
-                          0.04   0.02;
-                          0.03   0.02;
-                          0.025  0.02;
-                          0.03   0.02;
-                          0.025  0.02;
-                          0.02   0.02;
-                          0.03   0.02;
-                          0.025  0.02;
-                          0.02   0.02];
+    %                       x:     y:    jnt-idx:
+    %                      wid    hgt
+    shape_geom.size_sf = [0.07   0.03;  %  1
+                          0.04   0.02;  %  2
+                          0.03   0.02;  %  3
+                          0.025  0.02;  %  4
+                          0.04   0.02;  %  5
+                          0.03   0.02;  %  6
+                          0.025  0.02;  %  7
+                          0.03   0.02;  %  8
+                          0.025  0.02;  %  9
+                          0.02   0.02;  % 10
+                          0.03   0.02;  % 11
+                          0.025  0.02;  % 12
+                          0.02   0.02]; % 13
 
     % Connection matrix to define which vertices are to connect for creating the shapes
     % of the links or the shapes of the feets. Each row represents one polygon (rectangle):

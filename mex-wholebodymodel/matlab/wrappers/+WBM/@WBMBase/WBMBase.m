@@ -198,6 +198,55 @@ classdef WBMBase < handle
             end
         end
 
+        % function M_x = cartesianInertia(obj, varargin) % does not work for floating-base robots.
+        %     % wf_R_rootLnk = varargin{1}
+        %     % wf_p_rootLnk = varargin{2}
+        %     % q_j          = varargin{3}
+        %     switch nargin
+        %         case 5 % normal modes:
+        %             urdf_link_name = varargin{1,4};
+        %         case 4
+        %             % use the default link frame ...
+        %             urdf_link_name = obj.mwbm_model.urdf_link_name;
+        %         case 2 % optimized modes:
+        %             % urdf_link_name = varargin{1}
+        %             M = mexWholeBodyModel('mass-matrix');
+        %             J = mexWholeBodyModel('jacobian', varargin{1,1});
+
+        %             J_inv  = 1\J; % faster & numerically more stable than inv(J) ...
+        %             J_invt = J_inv.';
+
+        %             M_x = J_invt * M * J_inv;
+        %             return
+        %         case 1
+        %             M = mexWholeBodyModel('mass-matrix');
+        %             J = mexWholeBodyModel('jacobian', obj.mwbm_model.urdf_link_name);
+
+        %             J_inv  = 1\J;
+        %             J_invt = J_inv.';
+
+        %             M_x = J_invt * M * J_inv;
+        %             return
+        %         otherwise
+        %             error('WBMBase::cartesianInertia: %s', WBM.wbmErrorMsg.WRONG_ARG);
+        %     end
+        %     wf_R_rlnk_arr = reshape(varargin{1,1}, 9, 1);
+        %     M = mexWholeBodyModel('mass-matrix', wf_R_rlnk_arr, varargin{1,2}, varargin{1,3});
+        %     J = mexWholeBodyModel('jacobian', wf_R_rlnk_arr, varargin{1,2}, varargin{1,3}, urdf_link_name); % instead of J use J_analytical with derivative of euler angles?
+
+        %     J_inv  = 1\J;     % (6 x n)
+        %     J_invt = J_inv.'; % (n x 6)
+
+        %     M_x = (J_invt * M) * J_inv; % this can only be calculated, if J(q) is an element of R^(n x n),
+        %                                 % i.e. J must be a nonsingular square matrix.
+        %                                 % Works this only at the end-link of fixed robots, i.e. only for fixed robot arms?
+        %     % alternative calculation:
+        %     % J_t = J.';   % (n x 6)
+        %     % M_inv = 1\M; % (n x n)
+        %     % M_x = 1\((J * M_inv) * J_t); % inv(J * inv(M) * J.') = inv(J).' * M * inv(J)
+        %                                    % (6 x n) * (n x n) * (n x 6) = (6 x 6) ~= (n x n)!
+        % end
+
         function [jl_lower, jl_upper] = getJointLimits(~)
             [jl_lower, jl_upper] = mexWholeBodyModel('joint-limits');
         end
@@ -206,7 +255,7 @@ classdef WBMBase < handle
             resv = ~((q_j > obj.mwbm_model.jlim.lwr) & (q_j < obj.mwbm_model.jlim.upr));
         end
 
-        function tau_gen = inverseDynamics(obj, varargin) % not implemented yet in C++!
+        function tau_ctrl = inverseDynamics(obj, varargin) % not implemented yet in C++!
             % wf_R_rootLnk = varargin{1}
             % wf_p_rootLnk = varargin{2}
             % q_j          = varargin{3}
@@ -220,22 +269,47 @@ classdef WBMBase < handle
                 case 8
                     % use the default link frame name ...
                     urdf_link_name = obj.mwbm_model.urdf_link_name;
-                case 3 % optimized modes:
+                % case 3 % optimized modes:
+                %     % dq_j           = varargin{1}
+                %     % urdf_link_name = varargin{2}
+                %     tau    = mexWholeBodyModel('inverse-dynamics', varargin{1,2});
+                %     tau_fr = frictionForces(obj, varargin{1,1});
+                %     tau_fr = vertcat(zeros(6,1), tau_fr);
+
+                %     tau_gen = tau + tau_fr;
+                %     return
+                case 5 % optimized modes:
+                    % (*) Note: The same dq_j is already stored inside of the mex-subroutine, since before
+                    %           using the optimized mode, the function "setState" must be called for updating
+                    %           the state values q_j, dq_j and v_b.
+
                     % dq_j           = varargin{1}
-                    % urdf_link_name = varargin{2}
-                    tau    = mexWholeBodyModel('inverse-dynamics', varargin{1,2});
+                    % ddq_j          = varargin{2}
+                    % dv_b           = varargin{3}
+                    % urdf_link_name = varargin{4}
+                    tau    = mexWholeBodyModel('inverse-dynamics', varargin{1,2}, varargin{1,3}, varargin{1,4}); % (*)
                     tau_fr = frictionForces(obj, varargin{1,1});
                     tau_fr = vertcat(zeros(6,1), tau_fr);
 
-                    tau_gen = tau + tau_fr;
+                    tau_ctrl = tau + tau_fr;
                     return
-                case 2
-                    % dq_j = varargin{1}
-                    tau    = mexWholeBodyModel('inverse-dynamics', obj.mwbm_model.urdf_link_name);
+                % case 2
+                %     % dq_j = varargin{1}
+                %     tau    = mexWholeBodyModel('inverse-dynamics', obj.mwbm_model.urdf_link_name);
+                %     tau_fr = frictionForces(obj, varargin{1,1});
+                %     tau_fr = vertcat(zeros(6,1), tau_fr);
+
+                %     tau_gen = tau + tau_fr;
+                %     return
+                case 4
+                    % dq_j  = varargin{1}
+                    % ddq_j = varargin{2}
+                    % dv_b  = varargin{3}
+                    tau    = mexWholeBodyModel('inverse-dynamics', varargin{1,2}, varargin{1,3}, obj.mwbm_model.urdf_link_name); % (*)
                     tau_fr = frictionForces(obj, varargin{1,1});
                     tau_fr = vertcat(zeros(6,1), tau_fr);
 
-                    tau_gen = tau + tau_fr;
+                    tau_ctrl = tau + tau_fr;
                     return
             otherwise
                 error('WBMBase::inverseDynamics: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -246,7 +320,7 @@ classdef WBMBase < handle
             tau_fr = frictionForces(obj, varargin{1,4});
             tau_fr = vertcat(zeros(6,1), tau_fr);
 
-            tau_gen = tau + tau_fr;
+            tau_ctrl = tau + tau_fr;
         end
 
         function J = jacobian(obj, varargin)
@@ -349,6 +423,28 @@ classdef WBMBase < handle
             end
         end
 
+        function tau_gen = generalizedForces(~, varargin)
+            % wf_R_rootLnk = varargin{1}
+            % wf_p_rootLnk = varargin{2}
+            % q_j          = varargin{3}
+            % dq_j         = varargin{4}
+            % v_b          = varargin{5}
+            % f_c          = varargin{6}
+            % Jc_t         = varargin{7}
+            switch nargin
+                case 8 % normal mode:
+                    wf_R_rlnk_arr = reshape(varargin{1,1}, 9, 1);
+                    C_qv = mexWholeBodyModel('generalised-forces', wf_R_rlnk_arr, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
+                case 3 % optimized mode:
+                    % f_c  = varargin{1}
+                    % Jc_t = varargin{2}
+                    C_qv = mexWholeBodyModel('generalised-forces');
+                otherwise
+                    error('WBMBase::generalizedForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+            tau_gen = C_qv - Jc_t*f_c;
+        end
+
         function tau_c = coriolisCentrifugalForces(~, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
             switch nargin
                 case 6
@@ -400,6 +496,25 @@ classdef WBMBase < handle
             tau_fr =  tau_vf + tau_cf;                            % friction torques
         end
 
+        function [M, C_qv, h_c] = wholeBodyDynamics(~, wf_R_rootLnk, wf_p_rootLnk, q_j, dq_j, v_b)
+            switch nargin
+                case 6
+                    % normal mode:
+                    wf_R_rlnk_arr = reshape(wf_R_rootLnk, 9, 1);
+
+                    M    = mexWholeBodyModel('mass-matrix', wf_R_rlnk_arr, wf_p_rootLnk, q_j);
+                    C_qv = mexWholeBodyModel('generalised-forces', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b);
+                    h_c  = mexWholeBodyModel('centroidal-momentum', wf_R_rlnk_arr, wf_p_rootLnk, q_j, dq_j, v_b); % = omega
+                case 1
+                    % optimized mode:
+                    M    = mexWholeBodyModel('mass-matrix');
+                    C_qv = mexWholeBodyModel('generalised-forces');
+                    h_c  = mexWholeBodyModel('centroidal-momentum'); % = omega
+                otherwise
+                    error('WBMBase::wholeBodyDynamics: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+        end
+
         function set.urdfLinkName(obj, new_link_name)
             if isempty(new_link_name)
                 error('WBMBase::set.urdfLinkName: %s', WBM.wbmErrorMsg.EMPTY_STRING);
@@ -445,6 +560,19 @@ classdef WBMBase < handle
             g_wf = obj.mwbm_model.g_wf;
         end
 
+        function set.ndof(obj, ndof)
+            if (obj.mwbm_model.ndof > 0)
+                error('WBMBase::set.ndof: %s', WBM.wbmErrorMsg.VALUE_IS_INIT);
+            end
+            obj.mwbm_model.ndof = ndof;
+
+            if isempty(obj.mwbm_model.frict_coeff.v)
+                % initialize the friction vectors with zeros (no friction) ...
+                obj.mwbm_model.frict_coeff.v = zeros(ndof,1);
+                obj.mwbm_model.frict_coeff.c = obj.mwbm_model.frict_coeff.v;
+            end
+        end
+
         function ndof = get.ndof(obj)
             ndof = obj.mwbm_model.ndof;
         end
@@ -453,9 +581,11 @@ classdef WBMBase < handle
             if ~isstruct(frict_coeff)
                 error('WBMBase::set.frict_coeff: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            if ( ~iscolumn(frict_coeff.v) || ~iscolumn(frict_coeff.c) )
+            if ( (size(frict_coeff.v,1) ~= obj.mwbm_model.ndof) || ...
+                 (size(frict_coeff.c,1) ~= obj.mwbm_model.ndof) )
                 error('WBMBase::set.frict_coeff: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
+
             % update the friction coefficients ...
             obj.mwbm_model.frict_coeff.v = frict_coeff.v;
             obj.mwbm_model.frict_coeff.c = frict_coeff.c;
@@ -520,9 +650,9 @@ classdef WBMBase < handle
                 error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             % verify ndof ...
-            if (robot_model.ndof == 0)
-                error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.VALUE_IS_ZERO);
-            end
+            % if (robot_model.ndof == 0)
+            %     error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.VALUE_IS_ZERO);
+            % end
             if (robot_model.ndof > obj.MAX_NUM_JOINTS)
                 error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.MAX_NUM_LIMIT);
             end
@@ -531,26 +661,28 @@ classdef WBMBase < handle
             obj.mwbm_model.ndof           = robot_model.ndof;
             obj.mwbm_model.urdf_link_name = robot_model.urdf_link_name;
 
-            if ~isempty(robot_model.frict_coeff.v)
-                if (size(robot_model.frict_coeff.v,1) ~= robot_model.ndof)
-                    error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-                end
-
-                obj.mwbm_model.frict_coeff.v = robot_model.frict_coeff.v;
-                if ~isempty(obj.mwbm_model.frict_coeff.c)
-                    if (size(robot_model.frict_coeff.c,1) ~= robot_model.ndof)
+            if (robot_model.ndof > 0)
+                if ~isempty(robot_model.frict_coeff.v)
+                    if (size(robot_model.frict_coeff.v,1) ~= robot_model.ndof)
                         error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
                     end
 
-                    obj.mwbm_model.frict_coeff.c = robot_model.frict_coeff.c;
+                    obj.mwbm_model.frict_coeff.v = robot_model.frict_coeff.v;
+                    if ~isempty(obj.mwbm_model.frict_coeff.c)
+                        if (size(robot_model.frict_coeff.c,1) ~= robot_model.ndof)
+                            error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                        end
+
+                        obj.mwbm_model.frict_coeff.c = robot_model.frict_coeff.c;
+                    else
+                        % viscous friction only: set the Coulomb friction to 0.
+                        obj.mwbm_model.frict_coeff.c = zeros(robot_model.ndof,1);
+                    end
                 else
-                    % viscous friction only: set the Coulomb friction to 0.
-                    obj.mwbm_model.frict_coeff.c = zeros(robot_model.ndof,1);
+                    % frictionless model: set both coefficient vectors to 0.
+                    obj.mwbm_model.frict_coeff.v = zeros(robot_model.ndof,1);
+                    obj.mwbm_model.frict_coeff.c = obj.mwbm_model.frict_coeff.v;
                 end
-            else
-                % frictionless model: set both coefficient vectors to 0.
-                obj.mwbm_model.frict_coeff.v = zeros(robot_model.ndof,1);
-                obj.mwbm_model.frict_coeff.c = obj.mwbm_model.frict_coeff.v;
             end
 
             % Initialize the mex-WholeBodyModel for a floating base robot,
@@ -569,7 +701,7 @@ classdef WBMBase < handle
                     obj.initModel(model_name);
                 end
             end
-            % set the joint limits for the robot model ...
+            % buffer the joint limits of the robot model for fast access ...
             [obj.mwbm_model.jlim.lwr, obj.mwbm_model.jlim.upr] = obj.getJointLimits();
         end
 

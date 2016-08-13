@@ -22,15 +22,14 @@ function [dstvChi, C_qv] = fastForwardDynamics(t, stvChi, fhCtrlTrqs, robot_mode
     M    = wbm_massMatrix();
     C_qv = wbm_generalisedBiasForces();
 
-    % compute for each contact constraint the Jacobian and the corresponding
-    % derivative Jacobian:
+    % compute for each contact constraint the Jacobian and the derivative Jacobian:
     m = 6*nCstrs;
     n = 6 + ndof;
     Jc = zeros(m,n);
     dJcdq = zeros(m,1);
     for i = 1:nCstrs % parallelizable?
-        Jc(6*i-5:6*i,1:n)  = wbm_jacobian(robot_config.cstr_link_names{i});
-        dJcdq(6*i-5:6*i,1) = wbm_djdq(robot_config.cstr_link_names{i});
+        Jc(6*i-5:6*i,1:n)  = wbm_jacobian(robot_config.cstr_link_names{1,i});
+        dJcdq(6*i-5:6*i,1) = wbm_djdq(robot_config.cstr_link_names{1,i});
     end
 
     % get the current control torque vector ...
@@ -41,7 +40,7 @@ function [dstvChi, C_qv] = fastForwardDynamics(t, stvChi, fhCtrlTrqs, robot_mode
     JcMinv    =  Jc / M;
     JcMinvJct =  JcMinv * Jc_t;
     tau_fr    =  calcFrictionForces(stp.dq_j, vfrict_coeff, cfrict_coeff); % damped torques
-    tau_gen   =  vertcat(zeros(6,1), tau + tau_fr); % generalized force tau_gen = tau - tau_fr
+    tau_gen   =  vertcat(zeros(6,1), tau + tau_fr); % generalized force tau_gen = tau + (-tau_fr)
     % calculate the contact (constraint) forces ...
     f_c = JcMinvJct \ (JcMinv*(C_qv - tau_gen) - dJcdq);
 
@@ -51,7 +50,9 @@ function [dstvChi, C_qv] = fastForwardDynamics(t, stvChi, fhCtrlTrqs, robot_mode
     omega_b = R_b * omega_w;
     dqt_b   = WBM.utilities.dQuat(stp.qt_b, omega_b);
 
+    % velocities:
     dx = vertcat(stp.dx_b, dqt_b, stp.dq_j);
+    % joint acceleration q_ddot:
     dv = M \ (Jc_t*f_c + tau_gen - C_qv);
     %dv = M \ (Jc.'*f_c + tau_gen - C_qv); % cause Jc.'*f_c round-off errors?
 

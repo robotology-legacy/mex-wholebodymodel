@@ -1,14 +1,15 @@
 % namespaces:
 import WBM.*
 import WBM.utilities.*
-import WBM.Robot.iCub.*
+import WBM.Robot.iCub_arms_torso_free.*
 
 
 %% Initialization of the WBM for the iCub-Robot:
-wf2fixLnk   = true; % set the world frame to a fixed link
-wbm_icub    = initRobot_iCub(wf2fixLnk);
-icub_model  = wbm_icub.robot_model;
-icub_config = wbm_icub.robot_config;
+wf2fixLnk        = true; % set the world frame to a fixed link
+[wbm_icub, ndof] = initRobot_iCub_atf(wf2fixLnk);
+wbm_icub.ndof    = ndof;
+icub_model       = wbm_icub.robot_model;
+icub_config      = wbm_icub.robot_config;
 
 %% State variable:
 %  Create the initial condition of the state variable "chi" for the integration of the
@@ -36,24 +37,22 @@ ctrlTrqs.fhTau = @(t)zeros(size(g_init(7:len,1))); % torque function handle
 %  of the system. It evaluates the right side of the nonlinear first-order ODEs of the
 %  form chi' = f(t,chi) and returns a vector of rates of change (vector of derivatives)
 %  that will be integrated by the solver.
-%fhFwdDyn = @(t, chi)WBM.utilities.fastForwardDynamics(t, chi, ctrlTrqs.fhTau, ...
-%                                                      wbm_icub.robot_model, wbm_icub.robot_config);
-fhFwdDyn = @(t, chi)wbm_icub.forwardDynamics(t, chi, ctrlTrqs.fhTau); % optional
+
+%fhFwdDyn = @(t, chi)forwardDynamics(t, chi, ctrlTrqs.fhTau,  );
+
+fhFwdDyn = @(t, chi)WBM.utilities.fastForwardDynamics(t, chi, ctrlTrqs.fhTau, ...
+                                                      wbm_icub.robot_model, wbm_icub.robot_config);
 
 % specifying the time interval of the integration ...
 sim_time.start = 0.0;
-sim_time.end   = 2.0; %1.5;
+sim_time.end   = 2.0;
 sim_time.step  = 0.01;
 tspan = sim_time.start:sim_time.step:sim_time.end;
 
 disp('Start the numerical integration...');
 
-ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);         % setup the error tolerances ...
+ode_options = odeset('RelTol', 1e-3, 'AbsTol', 1e-4);         % setup the error tolerances ...
 [t, chi]    = ode15s(fhFwdDyn, tspan, chi_init, ode_options); % ODE-Solver
-% or, optional:
-%[t, chi] = fastIntForwardDynamics(ctrlTrqs.fhTau, tspan, chi_init, wbm_icub.robot_model, ...
-%                                  wbm_icub.robot_config, ode_options);
-%[t, chi] = wbm_icub.intForwardDynamics(ctrlTrqs.fhTau, tspan, chi_init, ode_options);
 
 save('testTrajectory.mat', 't', 'chi', 'chi_init', 'ctrlTrqs', 'icub_model', 'icub_config');
 disp('Numerical integration finished.');
@@ -64,8 +63,8 @@ fprintf('Number of integrations: %d\n', nSteps);
 %% iCub-Simulator:
 
 % setup the window and plot parameters for the WBM-simulator:
-sim_config = initSimConfig_iCub();           % shows the simulation with a light scene as default ...
-%sim_config = initSimConfig_iCub('DarkScn'); % optional, shows the simulation with a dark scene ...
+sim_config = initSimConfig_iCub_atf(icub_model.urdf_robot);            % shows the simulation with a light scene as default ...
+%sim_config = initSimConfig_iCub_atf(icub_model.urdf_robot, 'DarkScn'); % optional, shows the simulation with a dark scene ...
 sim_config = wbm_icub.setupSimulation(sim_config);
 x_out = wbm_icub.getPositionsData(chi);
 % show and repeat the simulation 10 times ...
@@ -74,18 +73,3 @@ wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:
 wbm_icub.plotCoMTrajectory(chi);
-
-% alternatively, or if you have to plot other parameter values, use e.g.:
-%stp = wbm_icub.getStateParams(chi);
-
-%figure('Name', 'iCub - CoM-trajectory:', 'NumberTitle', 'off');
-
-%plot3(stp.x_b(1:nSteps,1), stp.x_b(1:nSteps,2), stp.x_b(1:nSteps,3), 'Color', 'b');
-%hold on;
-%plot3(stp.x_b(1,1), stp.x_b(1,2), stp.x_b(1,3), 'Marker', 'o', 'MarkerEdgeColor', 'r');
-
-%grid on;
-%axis square;
-%xlabel('x_{xb}');
-%ylabel('y_{xb}');
-%zlabel('z_{xb}');

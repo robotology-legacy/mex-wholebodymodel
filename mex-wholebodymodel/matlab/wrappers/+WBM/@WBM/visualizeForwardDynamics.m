@@ -42,10 +42,10 @@ function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
     fwd_kin.hJnt_dp = zeros(1,nJnts);
     % joint pair (link) translations (xyz-positions):
     fwd_kin.jnt_pair_pos = zeros(nLnks,6);
-    % forward kin. roto-translation (in VQS-form):
+    % forward kin. VQ-Transformation (in VQS-form):
     fwd_kin.vqT = zeros(nSteps,7,nJnts);
 
-    % calculate the forward kinematic roto-translation of each joint in the
+    % calculate the forward kinematic VQ-Transformation of each joint in the
     % joint name list of the robot:
     fwd_kin.vqT(1:nSteps,1:7,1) = vqT_b; % use the base data instead the forward kin. of the 'root_link' ...
     for i = 1:nSteps % for each time step ...
@@ -53,7 +53,7 @@ function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
         vqT = squeeze(vqT_b(i,1:7).');
 
         for j = 2:nJnts
-            fwd_kin.vqT(i,1:7,j) = obj.computeFKinRotoTranslation(sim_config.robot_body.joint_lnk_names{j,1}, q, vqT);
+            fwd_kin.vqT(i,1:7,j) = obj.computeFKinVQTransformation(sim_config.robot_body.joint_lnk_names{j,1}, q, vqT);
         end
     end
 

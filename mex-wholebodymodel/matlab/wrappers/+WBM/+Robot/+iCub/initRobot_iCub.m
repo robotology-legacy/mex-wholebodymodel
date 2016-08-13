@@ -2,7 +2,7 @@ function wbm_icub = initRobot_iCub(wf2fixLnk)
     %% Base (default) model parameters:
     icub_model = WBM.wbmBaseRobotModel;
     icub_model.ndof          = 25;
-    icub_model.urdf_robot    = 'icubGazeboSim';
+    icub_model.urdf_robot    = 'icubGazeboSim'; % default robot model.
     %icub_model.urdfLinkName  = 'l_sole';
     icub_model.wf_R_rootLnk  = eye(3,3);
     icub_model.wf_p_rootLnk  = zeros(3,1);
@@ -12,7 +12,7 @@ function wbm_icub = initRobot_iCub(wf2fixLnk)
 
     %% Base robot config:
     icub_config = WBM.wbmHumanoidConfig;
-    % icub_config.nCstrs          = 2;
+    %icub_config.nCstrs          = 2;
     icub_config.cstr_link_names = {'l_sole', 'r_sole'};
     %icub_config.nPlds = 0;
     %icub_config.payload_links = [];

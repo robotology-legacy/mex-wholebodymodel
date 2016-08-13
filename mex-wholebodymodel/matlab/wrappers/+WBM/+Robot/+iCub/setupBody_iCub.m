@@ -8,7 +8,8 @@ function icub_body = setupBody_iCub()
     chain_names = {'ROBOT_TORSO'; 'ROBOT_LEFT_ARM'; 'ROBOT_RIGHT_ARM'; 'ROBOT_LEFT_LEG'; 'ROBOT_RIGHT_LEG'};
 
     % Chains (lists with all joints of each chain):
-    % Note: The joint names must be the same as defined in configuration file in [1,2].
+    % Note: The joint names must be named as defined in the naming convention [2] and
+    %       must be set in the same order as defined in the configuration file in [1].
     %                                                                                                                 joint-idx:
     %                                                                                                                  bgn  end
     robot_torso_joints     = {'torso_yaw'; 'torso_roll'; 'torso_pitch'};                                             %   1..3,

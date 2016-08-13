@@ -3,7 +3,9 @@ Legend of abbreviations and acronyms which are used for the variable names:
     H         ...  homogeneous transformation (matrix)
     R         ...  rotation (matrix)
     T         ...  transformation (matrix)
+    adj       ...  adjacency (matrix)
     arr       ...  array
+    atf       ...  arms and torso free
     b         ...  base
     bf        ...  base frame
     bgn       ...  begin
@@ -62,6 +64,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     pl        ...  payload
     plds      ...  payloads
     pos       ...  position(s)
+    pris      ...  prismatic
     prop      ...  propert(y/ies)
     pt        ...  point
     q_j       ...  joint angle(s)
@@ -71,6 +74,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     rax       ...  rotation axis
     ref       ...  reference
     resv      ...  result vector (boolean)
+    rev       ...  revolute
     ridx      ...  row index(es)
     rlnk      ...  root link OR reference link
     rpts      ...  repeats
