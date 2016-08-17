@@ -104,8 +104,15 @@ end
 CONFIG.qjInit = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
 
 %% %%%%%%%%%%%%%%%%%%%%% FORWARD DYNAMICS INTEGRATION %%%%%%%%%%%%%%%%%% %%
-addpath('./src');
-addpath('./../utilityMatlabFunctions');
-addpath('./../utilityMatlabFunctions/RobotFunctions');
-addpath('./../utilityMatlabFunctions/Visualization');
+% Add the required paths
+codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
+utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/utilityMatlabFunctions'];
+robot_root   = [utility_root, filesep, '/RobotFunctions'];
+plots_root   = [utility_root, filesep, '/Visualization'];
+src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing/src'];
+addpath(utility_root);
+addpath(robot_root);
+addpath(plots_root);
+addpath(src_root);
+
 initForwardDynamics(CONFIG);
