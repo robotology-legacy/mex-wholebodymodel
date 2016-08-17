@@ -44,7 +44,6 @@ v = [dx_b;omega_W;dqj];
 %reconstructing rotation of root to world from the quaternion
 %[~,T_b,~,~] = wholeBodyModel('get-state');
 
-
 w_R_b = quaternion2dcm(qt_b);
 
 wbm_setWorldFrame(w_R_b,x_b,[0 0 0]');
@@ -73,7 +72,6 @@ end
 
 %% control torque
 tau = param.tau(t);
-
 
 %% Contact forces computation
 JcMinv = Jc/M;

@@ -1,10 +1,8 @@
-%% plot_set
+%% PLOT_SET
 % This function is to set the figures options for controllers as the user desires.
 %
 %% Setup figure parameters
 % set(0,'DefaultFigureWindowStyle','Docked');
-
-%commandwindow
 
 %% AXES
 
@@ -32,7 +30,7 @@ set(0,'DefaultTextFontSize',16);
 % factoryLineLineWidth: 0.5000
 
 set(0,'DefaultLineLineWidth',2);
-%
+
 %% GRID
 
 % factoryAxesGridLineStyle: ':'
@@ -57,5 +55,5 @@ set(0,'DefaultLineLineWidth',2);
 % factoryLineMarkerSize: 6
 
 % set(0,'DefaultLineMarkerFaceColor','auto');
-  set(0,'DefaultLineMarkerSize',8);
+set(0,'DefaultLineMarkerSize',8);
 

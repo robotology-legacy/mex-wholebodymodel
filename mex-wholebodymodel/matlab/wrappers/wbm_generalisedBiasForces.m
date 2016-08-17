@@ -9,18 +9,18 @@ function [ Cqv ] = wbm_generalisedBiasForces( varargin )
 %                     qj - joint angles (NumDoF x 1)
 %                     dqj - joint velocities (NumDoF x 1)
 %                     vxb - floating base velocity (6 x 1)
-%   Returns :   Cqv - Generalised bias forces (6+NumDoF x 1) 
+%   Returns :   Cqv - Generalised bias forces (6+NumDoF x 1)
 %
 % Author : Naveen Kuppuswamy (naveen.kuppuswamy@iit.it)
 % Genova, Dec 2014
 
-    switch(nargin)
-        case 0 
-            Cqv = mexWholeBodyModel('generalised-forces');
-        case 5
-            Cqv = mexWholeBodyModel('generalised-forces',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4},varargin{5});
-        otherwise
-            disp('generalisedBiasForces : Incorrect number of arguments, check docs');
-    end       
+switch(nargin)
+    case 0
+        Cqv = mexWholeBodyModel('generalised-forces');
+    case 5
+        Cqv = mexWholeBodyModel('generalised-forces',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4},varargin{5});
+    otherwise
+        disp('generalisedBiasForces : Incorrect number of arguments, check docs');
+end
 end
 
