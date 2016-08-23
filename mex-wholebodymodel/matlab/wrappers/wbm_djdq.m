@@ -1,7 +1,7 @@
 function [ dJdq ] = wbm_djdq( varargin )
 %WBM_DJDQ computes the product of derivative of Jacobian wrt to state
 %(DJ/dq) and the derivative of state for a desired link. Used for providing external contact contraints
-%   Arguments : 
+%   Arguments :
 %       Optimised Mode  : link_name - string matching URDF name of the link (frame)
 %       Normal Mode : R - rotation from rootLink to world frame (3 x 3)
 %                     p - translation from rootLink to world frame (3 x 1)
@@ -14,15 +14,15 @@ function [ dJdq ] = wbm_djdq( varargin )
 % Author : Naveen Kuppuswamy (naveen.kuppuswamy@iit.it)
 % Genovas, Dec 2014
 
-    switch(nargin)
-        case 1 
-            dJdq = mexWholeBodyModel('djdq',varargin{1}); 
-        case 6  
-            dJdq = mexWholeBodyModel('djdq',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4},varargin{5},varargin{6});
-        otherwise
-            disp('djdq : Incorrect number of arguments, check docs');        
-    end
-        
+switch(nargin)
+    case 1
+        dJdq = mexWholeBodyModel('djdq',varargin{1});
+    case 6
+        dJdq = mexWholeBodyModel('djdq',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4},varargin{5},varargin{6});
+    otherwise
+        disp('djdq : Incorrect number of arguments, check docs');
+end
+
 
 end
 

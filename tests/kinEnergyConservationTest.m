@@ -1,6 +1,5 @@
 function [] = kinEnergyConservationTest( params )
     rng(0)
-
     clear wholeBodyModel;
 
     %% initialise mexWholeBodyModel
@@ -21,10 +20,10 @@ function [] = kinEnergyConservationTest( params )
     %% random initial conditions inside
 
     deltaJl = jlMax - jlMin;
-    qjInit=jlMin + rand(params.ndof,1) .* deltaJl ;
-    maxVel = 10;
+    qjInit  = jlMin + rand(params.ndof,1) .* deltaJl ;
+    maxVel  = 10;
 
-    dqjInit =maxVel*(0.5*ones(params.ndof,1)-1*rand(params.ndof,1));
+    dqjInit = maxVel*(0.5*ones(params.ndof,1)-1*rand(params.ndof,1));
 
     params.qjInit = qjInit;
     params.dqjInit = dqjInit;
@@ -45,7 +44,7 @@ function [] = kinEnergyConservationTest( params )
     [qj,T_bInit,dqj,vb] = wbm_getState();
     [Ptemp,Rtemp] = frame2posrot(T_bInit);
     params.chiInit = [T_bInit;params.qjInit;...
-        params.dx_bInit;params.omega_bInit;params.dqjInit];
+                      params.dx_bInit;params.omega_bInit;params.dqjInit];
 
     %% contact constraints (no constraint, free floating system)
     params.constraintLinkNames = {};
@@ -66,20 +65,20 @@ function [] = kinEnergyConservationTest( params )
     %% plot results
     ndof = params.ndof;
 
-params.demux.baseOrientationType = 1;  % sets the base orientation in stateDemux.m as positions + quaternions (1) or transformation matrix (0)
-[basePose,qj,baseVelocity,dqj]   = stateDemux(chi,params);
+    params.demux.baseOrientationType = 1;  % sets the base orientation in stateDemux.m as positions + quaternions (1) or transformation matrix (0)
+    [basePose,qj,baseVelocity,dqj]   = stateDemux(chi,params);
 
-% position and orientation
-x_b     = basePose(1:3,:);
+    % position and orientation
+    x_b     = basePose(1:3,:);
 
-% normalize quaternions to avoid numerical errors
-% qt_b = qt_b/norm(qt_b);
+    % normalize quaternions to avoid numerical errors
+    % qt_b = qt_b/norm(qt_b);
 
-qt_b    = basePose(4:7,:);
+    qt_b    = basePose(4:7,:);
 
-% linear and angular velocity
-dx_b    = baseVelocity(1:3,:);
-omega_W = baseVelocity(4:6,:);
+    % linear and angular velocity
+    dx_b    = baseVelocity(1:3,:);
+    omega_W = baseVelocity(4:6,:);
 
     x = [x_b' qt_b' qj'];
     v = [dx_b' omega_W' dqj' ];
@@ -109,6 +108,7 @@ omega_W = baseVelocity(4:6,:);
     %     title(['Kinetic Energy for ',robotDisplayName]);
     % end
 
+
     kinEnergyMaxErrRel = max(abs(kinEnergy-kinEnergy(1)))/kinEnergy(1);
 
     fprintf('Relative error for energy for model %s: %f\n',robotDisplayName,kinEnergyMaxErrRel);
@@ -117,73 +117,73 @@ omega_W = baseVelocity(4:6,:);
         WBMAssertEqual(kinEnergyMaxErrRel,0,'Kinetic energy is not constant',params.relTol);
     end
 
-%     figure;
-%     plot(t,dqj);
-%     xlabel('Time t(sec)');
-%     ylabel('dqj (rad/sec)');
-%     title('Joint velocities ');
-%
-%     figure;
-%     plot(t,dx_b);
-%     xlabel('Time t(sec)');
-%     ylabel('(m/sec)');
-%     title('Floating Base translation velocities');
-%
-%
-%     figure;
-%     plot(t,omega_W);
-%     xlabel('Time t(sec)');
-%     ylabel(' (m/sec)');
-%     title('Floating Base rotational velocities');
-%
-%     ddx_b = chiDot(:,1:3);
-%     domega_b = chiDot(:,4:6);
-%     ddqj = chiDot(:,7:7+ndof);
-%
-%     figure;
-%     plot(t,ddqj);
-%     xlabel('Time t(sec)');
-%     ylabel('(rad/sec^2)');
-%     title('Joint accelerations ');
-%
-%     figure;
-%     plot(t,ddx_b);
-%     xlabel('Time t(sec)');
-%     ylabel('(m/sec^2)');
-%     title(' Floating Base translation acceleration ');
-%
-%     figure;
-%     plot(t,domega_b);
-%     xlabel('Time t(sec)');
-%     ylabel('(m/sec^2)');
-%     title('Floating Base angular acceleration');
-%
-%     figure;
-%     plot(t,gOut);
-%     xlabel('Time t(sec)');
-%     ylabel('mixed units');
-%     title('g');
-%
-%     figure;
-%     plot(t,hOut);
-%     xlabel('Time t(sec)');
-%     ylabel('mixed units');
-%     title('h');
-%
-%     figure(1);
-%
-%     figure;
-%     plot(t,fc);
-%     xlabel('Time t(sec)');
-%     ylabel('mixed units');
-%     title('fc');
-%
-%     plot3(x_b(:,1),x_b(:,2),x_b(:,3));hold on;
-%     plot3(x_b(1,1),x_b(1,2),x_b(1,3),'ro');
-%     grid on;
-%     axis square;
-%     xlabel('X(m)');
-%     ylabel('Y(m)');
-%     zlabel('Z(m)');
+    % figure;
+    % plot(t,dqj);
+    % xlabel('Time t(sec)');
+    % ylabel('dqj (rad/sec)');
+    % title('Joint velocities ');
+
+    % figure;
+    % plot(t,dx_b);
+    % xlabel('Time t(sec)');
+    % ylabel('(m/sec)');
+    % title('Floating Base translation velocities');
+
+
+    % figure;
+    % plot(t,omega_W);
+    % xlabel('Time t(sec)');
+    % ylabel(' (m/sec)');
+    % title('Floating Base rotational velocities');
+
+    % ddx_b = chiDot(:,1:3);
+    % domega_b = chiDot(:,4:6);
+    % ddqj = chiDot(:,7:7+ndof);
+
+    % figure;
+    % plot(t,ddqj);
+    % xlabel('Time t(sec)');
+    % ylabel('(rad/sec^2)');
+    % title('Joint accelerations ');
+
+    % figure;
+    % plot(t,ddx_b);
+    % xlabel('Time t(sec)');
+    % ylabel('(m/sec^2)');
+    % title(' Floating Base translation acceleration ');
+
+    % figure;
+    % plot(t,domega_b);
+    % xlabel('Time t(sec)');
+    % ylabel('(m/sec^2)');
+    % title('Floating Base angular acceleration');
+
+    % figure;
+    % plot(t,gOut);
+    % xlabel('Time t(sec)');
+    % ylabel('mixed units');
+    % title('g');
+
+    % figure;
+    % plot(t,hOut);
+    % xlabel('Time t(sec)');
+    % ylabel('mixed units');
+    % title('h');
+
+    % figure(1);
+
+    % figure;
+    % plot(t,fc);
+    % xlabel('Time t(sec)');
+    % ylabel('mixed units');
+    % title('fc');
+
+    % plot3(x_b(:,1),x_b(:,2),x_b(:,3));hold on;
+    % plot3(x_b(1,1),x_b(1,2),x_b(1,3),'ro');
+    % grid on;
+    % axis square;
+    % xlabel('X(m)');
+    % ylabel('Y(m)');
+    % zlabel('Z(m)');
 
 end

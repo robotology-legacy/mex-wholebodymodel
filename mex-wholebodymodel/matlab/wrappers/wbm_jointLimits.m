@@ -1,7 +1,7 @@
 function [jl_lower,jl_upper]  = wbm_jointLimits( varargin )
 %WBM_JOINTLIMITS Obtains the joint limits for the chosen robot
 %
-%   Arguments : 
+%   Arguments :
 %       Optimised Mode : No arguments
 %       Normal Mode :  No arguments
 %   Returns :   jl_lower - lower joint limits (NumDoF x 1)
@@ -10,11 +10,11 @@ function [jl_lower,jl_upper]  = wbm_jointLimits( varargin )
 % Author : Naveen Kuppuswamy (naveen.kuppuswamy@iit.it)
 % Genova, Dec 2014
 
-    switch(nargin)
-        case 0
-            [jl_lower,jl_upper]  = mexWholeBodyModel('joint-limits');
-        otherwise
-             disp('jointLimits : Incorrect number of arguments, check docs'); 
-    end
+switch(nargin)
+    case 0
+        [jl_lower,jl_upper]  = mexWholeBodyModel('joint-limits');
+    otherwise
+        disp('jointLimits : Incorrect number of arguments, check docs');
+end
 end
 

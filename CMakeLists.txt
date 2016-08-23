@@ -59,3 +59,11 @@ enable_testing()
 
 add_subdirectory(tests)
 
+#STARTUP mexWholeBodyModel-TOOLBOX
+# The following line is to properly configure the installation script of the mexWholeBodyModel-toolbox
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/.startup_mexWholeBodyModel.m.in ${CMAKE_BINARY_DIR}/startup_mexWholeBodyModel.m)
+# Install configuration files
+install(FILES ${CMAKE_BINARY_DIR}/startup_mexWholeBodyModel.m DESTINATION mex)
+
+
+
