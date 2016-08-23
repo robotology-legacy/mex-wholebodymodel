@@ -11,8 +11,8 @@ function [jnt_names, ndof] = getJointNamesFromURDF(urdf_file_name, jnt_type)
     end
 
     % Try to convert the URDF-file of the robot model into a Matlab structure for easy access to the data:
-    % Note: This function uses an open 3rd-party method of Wouter Falkena
-    %       from the Delft University of Technology.
+    % Note: This function uses an open 3rd-party method of Wouter Falkena from the
+    %       Delft University of Technology.
     %       Source: <https://www.mathworks.com/matlabcentral/fileexchange/28518-xml2struct>
     try
         xml_tree = xml2struct(urdf_file_name);

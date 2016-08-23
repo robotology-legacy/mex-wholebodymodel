@@ -89,13 +89,15 @@ Legend of abbreviations and acronyms which are used for the variable names:
     stv       ...  state vector
     stvqT     ...  state vector-quaternion transformation [VQS-Transformation of the current state vector] (vector) (*)
     sz        ...  size(s)
-    tp        ...  (tool)tip
     tr        ...  translation(s) OR trace
     trans     ...  translation(s)
+    trq       ...  torque
     trqs      ...  torques
+    tt        ...  tool-tip
     ul        ...  upper limit(s)
     upr       ...  upper
     v         ...  vector
+    veT       ...  vector-Euler-angles transformation (vector)
     vel       ...  velocit(y/ies)
     vfrict    ...  viscous friction
     vpos      ...  vector position [translation] (vector)

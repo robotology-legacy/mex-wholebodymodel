@@ -1,19 +1,23 @@
-function dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
+function dstvChi = forwardDynamicsExt(obj, t, stvChi, fhTrqControl, foot_conf)
     % get the state parameters from the current state vector "stvChi" ...
     stp = WBM.utilities.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
 
     omega_w = stp.omega_b;
     v_b = vertcat(stp.dx_b, omega_w);
-    %v   = vertcat(stp.dx_b, omega_w, stp.dq_j);
+    nu  = vertcat(v_b, stp.dq_j);
 
-    % update the state for the optimized mode (precautionary) ...
+    % update the state for the optimized mode ...
     obj.setState(stp.q_j, stp.dq_j, v_b);
 
-    % get the current control torque vector ...
-    [tau,~] = fhTrqControl(t);
+    M    = mexWholeBodyModel('mass-matrix');
+    C_qv = mexWholeBodyModel('generalised-forces');
+    [Jc, dJcdq] = contactJacobians(obj);
 
-    % reconstruct the rotation from the 'base' to the 'world'
-    % of the quaternion part of the transformation vector vqT_b:
+    % get the current control torques from the torque controller:
+    [tau,~] = fhTrqControl(t, M, C_qv, stp, nu, Jc, dJcdq, foot_conf);
+
+    % reconstruct the rotation from the 'base' to the 'world' of
+    % the quaternion part of the transformation vector vqT_b:
     vqT_b   = obj.stvqT;
     [~,R_b] = WBM.utilities.frame2posRotm(vqT_b);
 
@@ -26,8 +30,7 @@ function dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
     % velocities:
     dx = vertcat(stp.dx_b, dqt_b, stp.dq_j);
     % joint acceleration dv:
-    [dv,~] = jointAccelerations(obj, stp.dq_j, tau); % optimized mode
+    [dv,~] = jointAccelerationsExt(obj, M, C_qv, stp.dq_j, nu, tau, Jc, dJcdq, foot_conf); % optimized mode
 
     dstvChi = vertcat(dx, dv);
-    %kinEnergy = 0.5*v.'*M*v;
 end

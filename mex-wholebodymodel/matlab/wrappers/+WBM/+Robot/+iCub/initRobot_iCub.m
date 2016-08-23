@@ -1,12 +1,12 @@
 function wbm_icub = initRobot_iCub(wf2fixLnk)
     %% Base (default) model parameters:
     icub_model = WBM.wbmBaseRobotModel;
-    icub_model.ndof          = 25;
-    icub_model.urdf_robot    = 'icubGazeboSim'; % default robot model.
-    %icub_model.urdfLinkName  = 'l_sole';
-    icub_model.wf_R_rootLnk  = eye(3,3);
-    icub_model.wf_p_rootLnk  = zeros(3,1);
-    icub_model.g_wf          = [0; 0; -9.81];
+    icub_model.ndof         = 25;
+    icub_model.urdf_robot   = 'icubGazeboSim'; % default robot model.
+    %icub_model.urdfLinkName = 'l_sole';
+    icub_model.wf_R_b       = eye(3,3);
+    icub_model.wf_p_b       = zeros(3,1);
+    icub_model.g_wf         = [0; 0; -9.81];
     %icub_model.frict_coeff.v = repmat(0.75, icub_model.ndof, 1); % optional
     %icub_model.frict_coeff.c = repmat(0.1, icub_model.ndof, 1);
 

@@ -6,8 +6,8 @@ function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
         vis_ctrl.drawSkel  = true;
         vis_ctrl.drawBody  = true;
         % use the default visualization speed value ...
-        % (note: use another speed value in order to make the visualization speed
-        %        close to real-time when the simulation time step is changed.)
+        % Note: Use another speed value in order to make the visualization speed
+        %       close to real-time when the simulation time step is changed.
         vis_speed = 1.0;
     elseif isstruct(vis_ctrl)
         vis_speed = vis_ctrl.vis_speed;
@@ -30,7 +30,7 @@ function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
 
     nJnts  = sim_config.robot_body.nJoints; % number of nodes (virtual joints) to be plotted
     nLnks  = sim_config.robot_body.nLinks;  % number of edges (virtual links) to be plotted
-    nFeets = sim_config.robot_body.nFeets;  % number of feets of the robot's body
+    nFeets = sim_config.robot_body.nFeets;  % number of feet of the robot's body
 
     %% Forward Kinematics of the robot's skeleton (joints):
 
@@ -386,7 +386,7 @@ function hRobotShape = updateRobotBody(hRobotShape, nLnks, new_jnt_pair_pos, nFe
         hRobotShape(1,i) = updateLinkShapePos(hRobotShape(1,i), new_jnt_pair_pos(i,1:6), size_sf(i,1:2));
     end
 
-    % update the positions of the feets ...
+    % update the positions of the feet ...
     for i = 1:nFeets
         jnt_idx = foot_geom.joints(i);
         hRobotShape(1,nLnks+i) = updateFootPos(hRobotShape(1,nLnks+i), new_jnt_pair_pos(jnt_idx,1:6), ...

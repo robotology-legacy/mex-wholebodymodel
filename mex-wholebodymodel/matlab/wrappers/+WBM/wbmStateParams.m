@@ -1,6 +1,6 @@
 classdef wbmStateParams
     properties
-        % postions & orientation:
+        % positions & orientation:
         x_b@double  matrix
         qt_b@double matrix
         q_j@double  matrix

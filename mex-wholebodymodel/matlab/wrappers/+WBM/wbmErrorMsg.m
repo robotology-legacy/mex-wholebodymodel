@@ -17,7 +17,7 @@ classdef wbmErrorMsg
         UNKNOWN_JNT_TYPE  = 'Unknown joint type!';
         UNKNOWN_LNK_NAME  = 'Unknown link name!';
         VALUE_IS_INIT     = 'The value is already initialized!';
-        VALUE_IS_ZERO     = 'The value cannot be zero!';
+        VALUE_LTE_ZERO    = 'The value must be greater than zero!';
         WRONG_ARG         = 'Wrong number of input arguments!';
         WRONG_ARR_SIZE    = 'Wrong array size!';
         WRONG_DATA_TYPE   = 'Wrong data type!';

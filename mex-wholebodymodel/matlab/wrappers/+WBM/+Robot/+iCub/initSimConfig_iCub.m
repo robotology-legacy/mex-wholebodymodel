@@ -71,7 +71,7 @@ function sim_config = initSimConfig_iCub(scn_mode)
                           0.02   0.02]; % 13
 
     % Connection matrix to define which vertices are to connect for creating the shapes
-    % of the links or the shapes of the feets. Each row represents one polygon (rectangle):
+    % of the links or the shapes of the feet. Each row represents one polygon (rectangle):
     shape_geom.faces = uint8([1 2 3 4;
                               1 4 8 5;
                               5 8 7 6;
@@ -82,7 +82,7 @@ function sim_config = initSimConfig_iCub(scn_mode)
     % Joint indices of those joints, where the left and the right foot is connected to:
     foot_geom.joints = uint8([4 7]);
 
-    % Base size values for the feets of the robot:
+    % Base size values for the feet of the robot:
     foot_geom.base_sz.width  = 0.025;
     foot_geom.base_sz.height = 0.015;
     %foot_geom.base_sz = [0.025 0.015]; % optional

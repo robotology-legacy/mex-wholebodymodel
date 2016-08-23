@@ -64,7 +64,7 @@ function sim_config = initSimConfig_iCub_atf(urdf_file_name, scn_mode)
     % This function reads out all necessary data from the given URDF-file.
     % It generates the joint-link name list, the joint-pair index list for creating
     % the connectivity graph (skeleton), the complete shape-size list for the
-    % robot hull and it returns a joint-index pair for placing the feets on the
+    % robot hull and it returns a joint-index pair for placing the feet on the
     % right position.
     %
     sf = 0.03; % default scale factor for the shape sizes of the links.
@@ -72,7 +72,7 @@ function sim_config = initSimConfig_iCub_atf(urdf_file_name, scn_mode)
     [joint_lnk_names,~, joint_pair_idx,~, shape_geom.size_sf, foot_geom.joints] = WBM.utilities.getSimConfigFromURDF(urdf_file_name, link_shape_sizes, sf);
 
     % Connection matrix to define which vertices are to connect for creating the shapes
-    % of the links or the shapes of the feets. Each row represents one polygon (rectangle):
+    % of the links or the shapes of the feet. Each row represents one polygon (rectangle):
     shape_geom.faces = uint8([1 2 3 4;
                               1 4 8 5;
                               5 8 7 6;
@@ -80,7 +80,7 @@ function sim_config = initSimConfig_iCub_atf(urdf_file_name, scn_mode)
                               2 6 5 1;
                               3 7 8 4]);
 
-    % Base size values for the feets of the robot:
+    % Base size values for the feet of the robot:
     foot_geom.base_sz.width  = 0.03; %0.025;
     foot_geom.base_sz.height = 0.015;
 

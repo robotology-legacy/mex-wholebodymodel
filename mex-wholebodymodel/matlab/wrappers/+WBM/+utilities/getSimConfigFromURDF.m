@@ -9,8 +9,8 @@ function [jnt_lnk_names, nLnks, jnt_pair_idx, nJntPairs, shp_size_sf, foot_jnt_i
     end
 
     % Try to convert the URDF-file of the robot model into a Matlab structure for easy access to the data:
-    % Note: This function uses an open 3rd-party method of Wouter Falkena
-    %       from the Delft University of Technology.
+    % Note: This function uses an open 3rd-party method of Wouter Falkena from the
+    %       Delft University of Technology.
     %       Source: <https://www.mathworks.com/matlabcentral/fileexchange/28518-xml2struct>
     try
         xml_tree = xml2struct(urdf_file_name);
@@ -68,7 +68,7 @@ function [jnt_lnk_names, nLnks, jnt_pair_idx, nJntPairs, shp_size_sf, foot_jnt_i
         [res, idx] = find((jnt_adj(i,1:nJntLnks) > 0), 1);
         if res
             % store the indices for the joint-positions ...
-            % joints 1 & 2:                 x1  x2  y1  y2  z1  z2
+            % joints 1 & 2:               x1  x2  y1  y2  z1  z2
             jnt_pair_idx(i,1:6) = horzcat(i, idx, i, idx, i, idx);
             %jnt_pair_idx(i,1:6) = horzcat(idx, i, idx, i, idx, i);
         end
@@ -102,7 +102,7 @@ function [jnt_lnk_names, nLnks, jnt_pair_idx, nJntPairs, shp_size_sf, foot_jnt_i
         error('getSimConfigFromURDF: The model has more edges than vertices! Verify the URDF-file!');
     end
 
-    % get the indices of those joints, where the feets are connected to them:
+    % get the indices of those joints, where the feet are connected to them:
     foot_jnt_idx = uint8(zeros(1,2));
     foot_jnt_idx(1,1) = find(strcmp(jnt_lnk_names, 'l_sole'), 1);
     foot_jnt_idx(1,2) = find(strcmp(jnt_lnk_names, 'r_sole'), 1);
