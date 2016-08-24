@@ -26,7 +26,7 @@ CONFIG.visualiser.computeKinematics = true;
 CONFIG.visualiser.saveKinematics    = false;
 CONFIG.visualiser.timeStep          = 0.05;
 CONFIG.plotComTrajectories          = true;
-CONFIG.visualiser.useSavedData      = true;
+CONFIG.visualiser.useSavedData      = false;
 
 %% Use recorded data
 if CONFIG.visualiser.useSavedData
@@ -86,7 +86,7 @@ for i = 1:length(t)
 end
 
 %% Visualize the robot simulation
-visualizeForwardDynamics_new(robotConfiguration_t,t,CONFIG,references);
+visualizeForwardDynamics(robotConfiguration_t,t,CONFIG,references);
 figureCont = figureCont +1;
 
 end
