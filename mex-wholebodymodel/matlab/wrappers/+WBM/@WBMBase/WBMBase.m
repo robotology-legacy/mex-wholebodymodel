@@ -629,18 +629,18 @@ classdef WBMBase < handle
             [ow_p_b, ow_R_b] = WBM.utilities.frame2posRotm(ow_vqT_b);
             ow_H_b = WBM.utilities.posRotm2tform(ow_p_b, ow_R_b);
 
-            % get the transformation values from the reference link to the
-            % old world:
+            % get the transformation values from the reference link (contact link)
+            % to the old world:
             if (nargin == 2)
-                ow_vqT_lnk = obj.forwardKinematics(urdf_link_name);
+                ow_vqT_rlnk = obj.forwardKinematics(urdf_link_name);
             else
-                ow_vqT_lnk = obj.forwardKinematics(ow_R_b, ow_p_b, q_j, urdf_link_name);
+                ow_vqT_rlnk = obj.forwardKinematics(ow_R_b, ow_p_b, q_j, urdf_link_name);
             end
 
-            % compute the hom. transformation matrix H from the base to
+            % compute the homogeneous transformation matrix H from the base to
             % the new world:
-            ow_H_lnk = WBM.utilities.frame2tform(ow_vqT_lnk);
-            nw_H_b   = ow_H_lnk \ ow_H_b;
+            ow_H_rlnk = WBM.utilities.frame2tform(ow_vqT_rlnk);
+            nw_H_b    = ow_H_rlnk \ ow_H_b;
 
             % extract the translation and the rotation values ...
             [nw_p_b, nw_R_b] = WBM.utilities.tform2posRotm(nw_H_b);

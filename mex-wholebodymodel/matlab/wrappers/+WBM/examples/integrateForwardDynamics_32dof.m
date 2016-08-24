@@ -1,12 +1,12 @@
 % namespaces:
 import WBM.*
 import WBM.utilities.*
-import WBM.Robot.iCub_arms_torso_free.*
+import WBM.Robot.iCub_32dof.*
 
 
 %% Initialization of the WBM for the iCub-Robot:
 wf2fixLnk        = true; % set the world frame to a fixed link
-[wbm_icub, ndof] = initRobot_iCub_atf(wf2fixLnk);
+[wbm_icub, ndof] = initRobot_iCub_32dof(wf2fixLnk);
 wbm_icub.ndof    = ndof;
 icub_model       = wbm_icub.robot_model;
 icub_config      = wbm_icub.robot_config;
@@ -30,9 +30,9 @@ g_init  = wbm_icub.generalizedBiasForces(R_b, p_b, qj_init, zeros(icub_model.ndo
 len = size(g_init,1);
 
 % Function handle (fh) for the torque controller function:
-% Note: This function handle has only a very simple dummy-function as controller.
-%       It is advisable for complex scenarios and also for avoiding integration
-%       errors to use a real controller function instead.
+% Note: This function handle has only a very simple dummy-function as controller
+%       which works in this case. It is advisable for complex scenarios and also
+%		for avoiding integration errors to use a real controller function instead.
 fhTrqControl = @(t, M, C_qv, stp, nu, Jc, dJcdq, foot_conf)zeroTrqsController(size(g_init(7:len,1)));
 
 % configuration structure for the feet:
@@ -70,12 +70,12 @@ fprintf('Number of integrations: %d\n', nSteps);
 %% iCub-Simulator:
 
 % setup the window and plot parameters for the WBM-simulator:
-sim_config = initSimConfig_iCub_atf(icub_model.urdf_robot);             % shows the simulation with a light scene as default.
+sim_config = initSimConfig_iCub_32dof(icub_model.urdf_robot);           % shows the simulation with a light scene as default.
 %sim_config = initSimConfig_iCub_atf(icub_model.urdf_robot, 'DarkScn'); % optional, shows the simulation with a dark scene.
 sim_config = wbm_icub.setupSimulation(sim_config);
 x_out = wbm_icub.getPositionsData(chi);
 % show and repeat the simulation 10 times ...
-nRpts = 1;
+nRpts = 3;
 wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:

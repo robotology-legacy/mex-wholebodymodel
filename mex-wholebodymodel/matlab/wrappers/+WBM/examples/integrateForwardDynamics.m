@@ -28,12 +28,11 @@ g_init = wbm_icub.generalizedBiasForces(R_b, p_b, icub_config.init_state_params.
                                         zeros(icub_model.ndof,1), zeros(6,1));
 len = size(g_init,1);
 
-% function handle (fh) for the torque controller function:
+% Function handle (fh) for the torque controller function:
 % Note: This function handle has only a very simple dummy-function as controller
-%       which works in this case. For more complex scenarios a real controller
-%       function is needed.
+%       which works in this case. It is advisable for complex scenarios and also
+%       for avoiding integration errors to use a real controller function instead.
 fhTrqControl = @(t)zeroTrqsController(size(g_init(7:len,1)));
-%fhTrqControl = @(t)zeros(size(g_init(7:len,1)));
 
 %% ODE-Solver:
 %  Setup the function handle of the form f(t,chi) where chi refers to the dynamic state
@@ -79,6 +78,7 @@ wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 %% Plot the results -- CoM-trajectory:
 wbm_icub.plotCoMTrajectory(chi);
 
+% get the visualization-data from the forward dynamics integration for plots and animations:
 vis_data = wbm_icub.getFwdDynVisualizationData(chi, fhTrqControl);
 
 % alternatively, or if you have to plot other parameter values, use e.g.:

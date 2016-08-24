@@ -1026,23 +1026,16 @@ classdef WBM < WBM.WBMBase
                 error('WBM::initConfig: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             % further error checks ...
-            if ~isrow(robot_config.cstr_link_names)
-                error('WBM::initConfig: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
-            end
-            nCstrs = robot_config.nCstrs;
+            nCstrs = robot_config.nCstrs; % by default 0, when value is not given ...
             if (nCstrs > 0)
                 if (nCstrs ~= size(robot_config.cstr_link_names,2))
+                    % the list is not a row vector or the sizes are different ...
                     error('WBM::initConfig: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
                 end
             else
+                % the length is not given, try to get it ...
                 nCstrs = size(robot_config.cstr_link_names,2);
             end
-
-            % nCstrs = size(robot_config.cstr_link_names,2);
-            % if ( ~isrow(robot_config.cstr_link_names) || ...
-            %      ((robot_config.nCstrs > 0) && (nCstrs ~= robot_config.nCstrs)) )
-            %     error('WBM::initConfig: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
-            % end
 
             if isempty(robot_config.init_state_params)
                 error('WBM::initConfig: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);

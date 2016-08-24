@@ -1,12 +1,12 @@
-function [wbm_icub, ndof] = initRobot_iCub_atf(wf2fixLnk)
-    %% Initialize the model of the iCub-Robot with an arms and torso free configuration:
+function [wbm_icub, ndof] = initRobot_iCub_32dof(wf2fixLnk)
+    %% Initialize the model of the iCub-Robot with 32 degrees of freedom:
     %  Source for the joint configurations,
     %       [1] Yarp-WholeBodyInterface: <https://github.com/robotology/yarp-wholebodyinterface/blob/master/app/robots/icubGazeboSim/yarpWholeBodyInterface.ini>
 
     %% Base (default) model parameters:
     icub_model = WBM.wbmBaseRobotModel;
     %icub_model.ndof         = 0; % unknown at the moment
-    icub_model.urdf_robot   = which('model_arms_torso_free.urdf');
+    icub_model.urdf_robot   = which('model32dof.urdf');
     %icub_model.urdfLinkName = 'l_sole';
     icub_model.wf_R_b       = eye(3,3);
     icub_model.wf_p_b       = zeros(3,1);
@@ -22,8 +22,8 @@ function [wbm_icub, ndof] = initRobot_iCub_atf(wf2fixLnk)
     % Setup the body of the iCub-Robot with the initial body (joint) positions (in degrees):
     [icub_config.body, joint_names_body] = WBM.Robot.iCub_arms_torso_free.setupBody_iCub_atf();
     icub_config.jpos_torso     = [0; 0; 0];
-    icub_config.jpos_left_arm  = [0; 30; 0; 45; 0; 0; 0];
-    icub_config.jpos_left_leg  = [25.5; 0.1; 0; -18.5; -5.5; -0.1];
+    icub_config.jpos_left_arm  = [0; 0; 0; 0; 0; 0; 0];
+    icub_config.jpos_left_leg  = [0; 0; 0; 0; 0; 0];
     icub_config.jpos_right_arm = icub_config.jpos_left_arm;
     icub_config.jpos_right_leg = icub_config.jpos_left_leg;
 

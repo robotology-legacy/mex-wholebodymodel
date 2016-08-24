@@ -33,9 +33,8 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
         dJcdq(6*i-5:6*i,1) = wbm_djdq(cstr_link);
     end
 
-    % get the current control torque vector ...
+    % get the current control torques ...
     [tau,~] = fhTrqControl(t);
-    %tau = fhTrqControl(t);
 
     % Computation of the contact (constraint) force vector:
     % Further details about the formula see,

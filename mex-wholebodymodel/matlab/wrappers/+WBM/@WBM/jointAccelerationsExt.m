@@ -86,7 +86,7 @@ function [ddq_j, acc_data] = jointAccelerationsExt(obj, varargin)
         veT_feet_diff = (fk.new.veT.l_foot - fk.init.veT.l_foot);
     end
     % else, both feet are not fixed onto the ground, either the robot
-    % is lifted into the air or is jumping [or is flying ;-) ] ...
+    % is lifted into the air or is jumping (or is flying ;-) ) ...
 
     % Calculation of the contact force vector for a closed-loop control system with
     % velocity and position correction for the feet (position-regulation system):
