@@ -1,13 +1,9 @@
 function qj_init = initJointsFromNameList(jnt_name_list, ndof, jnt_names_body, qj_init_body)
-    nJnts_body = size(jnt_names_body,1);
-
-    if ~iscolumn(jnt_name_list)
-        error('initJointsFromNameList: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
     if (size(jnt_name_list,1) ~= ndof)
         error('initJointsFromNameList: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
     end
 
+    nJnts_body = size(jnt_names_body,1);
     if (nJnts_body ~= size(qj_init_body,1))
         % the data-arrays have not the same length ...
         error('initJointsFromNameList: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
