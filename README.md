@@ -5,8 +5,9 @@ Matlab MEX interface to the wholeBodyModel C++ interface, implemented to be able
 It is recommended to install the `mex-wholebodymodel` throught the [`codyco-superbuild`](https://github.com/robotology/codyco-superbuild/).
 Once you installed the `codyco-superbuild`, the `mex-wholebodymodel` files should have been installed in
 `${CODYCO_SUPERBUILD_ROOT}/build/install/mex` and its subdirectories (for the `mex-wholebodymodel`, this directories are `mexwbi-wrappers` and `mexwbi-utilities`).
-To execute scripts that use `mex-wholebodymodel`, make sure that this directories are part of your [MATLAB search path](http://www.mathworks.com/help/matlab/ref/path.html). To this purpose, run only once the script `startup_mexWholeBodyModel.m` in 
-`${CODYCO_SUPERBUILD_ROOT}/build/install/mex`. This should be enough to premanently add the required directories to your MATLAB path.
+To execute scripts that use `mex-wholebodymodel`, make sure that this directories are part of your [MATLAB search path](http://www.mathworks.com/help/matlab/ref/path.html). 
+To this purpose, run only once the script `startup_mexWholeBodyModel.m` in `${CODYCO_SUPERBUILD_ROOT}/build/install/mex`. 
+This should be enough to premanently add the required directories to your MATLAB path.
 
 ## Examples 
 
@@ -19,7 +20,8 @@ In [controllers](controllers/) the user can find different
 simulations of whole-body controller implemented using the mex-wholebodymodel interface. The official controller version is
 in the folder [controllers/torqueBalancing](controllers/torqueBalancing/), while in the folder
 [controllers/experiments](controllers/experiments/) other balancing controllers are implemented. 
-All the utility function for control are in [controllers/utilityMatlabFunctions](controllers/utilityMatlabFunctions/). For more informations about the balancing controller check the relative [README](controllers/torqueBalancing/).
+All the utility functions for control are in [controllers/utilitiesForTorqueBalancing](controllers/utilitiesForTorqueBalancing/).
+For more informations about the balancing controller check the relative [README](controllers/torqueBalancing/).
 
 ## Mex-wholebodymodel
 This folder contains all the matlab and C++ utilities used for tests and controllers.

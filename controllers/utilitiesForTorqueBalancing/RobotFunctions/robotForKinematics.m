@@ -47,14 +47,14 @@ PoseLFootEul                     = [posLfoot; oriLfoot'];
 PoseRFootEul                     = [posRfoot; oriRfoot'];
 
 %% Define the output structure
-FORKINEMATICS.xCoM                     = xCoM;
-FORKINEMATICS.dxCoM                    = dxCoM;
-FORKINEMATICS.LFootPoseQuat            = PoseLFootQuat;
-FORKINEMATICS.RFootPoseQuat            = PoseRFootQuat;
-FORKINEMATICS.LFootPoseEul             = PoseLFootEul;
-FORKINEMATICS.RFootPoseEul             = PoseRFootEul;
-FORKINEMATICS.VelFeet                  = VelFeet;
-FORKINEMATICS.TLfoot                   = [eye(3) zeros(3) ; zeros(3) TLfootOri];
-FORKINEMATICS.TRfoot                   = [eye(3) zeros(3) ; zeros(3) TRfootOri];
+FORKINEMATICS.xCoM               = xCoM;
+FORKINEMATICS.dxCoM              = dxCoM;
+FORKINEMATICS.LFootPoseQuat      = PoseLFootQuat;
+FORKINEMATICS.RFootPoseQuat      = PoseRFootQuat;
+FORKINEMATICS.LFootPoseEul       = PoseLFootEul;
+FORKINEMATICS.RFootPoseEul       = PoseRFootEul;
+FORKINEMATICS.VelFeet            = VelFeet;
+FORKINEMATICS.TLfoot             = [eye(3) zeros(3) ; zeros(3) TLfootOri];
+FORKINEMATICS.TRfoot             = [eye(3) zeros(3) ; zeros(3) TRfootOri];
 
 end

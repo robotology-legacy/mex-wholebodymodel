@@ -1,11 +1,11 @@
 function STATE = robotState(chi,CONFIG)
 %ROBOTSTATE demux the current state of the robot to get the base pose, base
-%           velocity, joint pose and joint velocity.
+%           velocity, joint position and joint velocity.
 %
 %         state = ROBOTSTATE(chi,config) takes as an input the vector that
 %         comes from integration, CHI [13+2ndof x 1], and the structure CONFIG
 %         which contains all the user defined parametes. The output is
-%         the structure state which contains the following variables:
+%         the structure STATE which contains the following variables:
 %
 % PosBase        the cartesian position of the base (R^3)
 % quatBase       the quaternion describing the orientation of the base (global parametrization of SO(3))

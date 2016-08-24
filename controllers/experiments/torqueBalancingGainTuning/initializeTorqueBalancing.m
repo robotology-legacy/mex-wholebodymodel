@@ -123,10 +123,18 @@ end
 CONFIG.qjInit = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
 
 %% %%%%%%%%%%%%%%%%%%%%% FORWARD DYNAMICS INTEGRATION %%%%%%%%%%%%%%%%%% %%
-addpath('./src');
-addpath('./../../utilityMatlabFunctions');
-addpath('./../../utilityMatlabFunctions/LinearizationAndGainTuning');
-addpath('./../../utilityMatlabFunctions/RobotFunctions');
-addpath('./../../utilityMatlabFunctions/InverseKinematics');
-addpath('./../../utilityMatlabFunctions/Visualization');
+codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
+utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/utilitiesForTorqueBalancing'];
+robot_root   = [utility_root, filesep, '/RobotFunctions'];
+plots_root   = [utility_root, filesep, '/Visualization'];
+ikin_root    = [utility_root, filesep, '/InverseKinematics'];
+gain_root    = [utility_root, filesep, '/LinearizationAndGainTuning'];
+src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/experiments/torqueBalancingGainTuning/src'];
+addpath(utility_root);
+addpath(robot_root);
+addpath(plots_root);
+addpath(ikin_root);
+addpath(gain_root);
+addpath(src_root);
+
 initForwardDynamics(CONFIG);

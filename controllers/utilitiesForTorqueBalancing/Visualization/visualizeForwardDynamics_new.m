@@ -1,32 +1,35 @@
-function visualizeForwardDynamics(xout,tSpan,config,references,jetsIntensities)
-%% visualize_forwardDyn
-%   Visualize the simulation results obtained from integration
-%   of the forward dynamics of the iCub.
+function visualizeForwardDynamics_new( varargin )
+%VISUALIZEFORWARDDYNAMICS visualizes the forward dynamics of robot iCub in MATLAB.
 %
-%   visualize_forwardDyn(XOUT,PARAMETERS) visualizes the motion
-%   of the robot. XOUT is the output vector of the integration carried
-%   out in the forward dynamics part, containing the position and the
-%   orientation of the base and the joint positions in the first 32
-%   elements of its row vectors along a time span. PARAMETERS is the
-%   struct variable which contains constant parameters related to the
-%   simulation environment, robot, controller etc.
+%   VISUALIZEFORWARDDYNAMICS generates a simulation from the forward dynamics
+%   integration of the iCub robot. There are two simulations. The one on the
+%   left is performed considering the robot not attached to the ground, i.e.
+%   free floating. The one on the right is performed considering also the
+%   contacts the robot exerts with the environment, i.e. it is a constrained
+%   floating base system.
 %
 
+% ------------Initialization----------------
 text.color    = [1 1 1];
 text.fontSize = 22;
+xout          = varargin{1};
+tSpan         = varargin{2};
+CONFIG        = varargin{3};
+references    = varargin{4};
 
-[xout,tSpan,comDes,jetsIntensities] = resizeData(xout,tSpan,squeeze(references(:,1,:))',jetsIntensities,config);
-
-
-config.plotThusts = false;
 if nargin == 5
-    config.plotThusts = true;
+    jetsIntensities        = varargin{5};
+    CONFIG.plotThusts      = true;
     % the list of link names that are used for identifying the jets positions
-    config.jets.frames     = cell(4,1);
-    config.jets.frames{1}  = 'l_hand_dh_frame';
-    config.jets.frames{2}  = 'r_hand_dh_frame';
-    config.jets.frames{3}  = 'l_foot_dh_frame';
-    config.jets.frames{4}  = 'r_foot_dh_frame';
+    CONFIG.jets.frames     = cell(4,1);
+    CONFIG.jets.frames{1}  = 'l_hand_dh_frame';
+    CONFIG.jets.frames{2}  = 'r_hand_dh_frame';
+    CONFIG.jets.frames{3}  = 'l_foot_dh_frame';
+    CONFIG.jets.frames{4}  = 'r_foot_dh_frame';
+    [xout,tSpan,comDes,jetsIntensities] = resizeData(xout,tSpan,squeeze(references(:,1,:))',CONFIG,jetsIntensities);
+elseif nargin == 4
+    CONFIG.plotThusts                   = false;
+    [xout,tSpan,comDes,~]               = resizeData(xout,tSpan,squeeze(references(:,1,:))',CONFIG);    
 end
 
 robotColor  = [1 0.4 1];
@@ -35,22 +38,28 @@ thrustColor = [1 0 0];
 n  = size(xout,1); % number of instances of the simulation results
 q  = xout(:,1:7);  % first 3 elements provide the position and next 4 elements provide the orientation of the base
 
-q_noBpos = q;
+q_noBpos         = q;
 q_noBpos(:,1:3)  = repmat([0 0 0.7],size(q(:,1:3),1),1);
-
-qj = xout(:,8:32);  % joint positions
+qj               = xout(:,8:32);  % joint positions
 
 % time span vector of the simulation
-%tSpan   = linspace(  config.sim_start_time,  config.sim_start_time+config.sim_duration,  config.sim_duration/config.sim_step);
+%tSpan           = linspace(config.sim_start_time, config.sim_start_time+config.sim_duration, config.sim_duration/config.sim_step);
 
-[~,qjInit,~,~] = stateDemux(config.state0,config);
+ndof             = CONFIG.ndof;
 
-[R,p] = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
+if CONFIG.visualiser.useSavedData
+    [~,qjInit,~,~]   = stateDemux(CONFIG.state0,CONFIG);
+else
+    [~,qjInit,~,~]   = stateDemux([xout(1,:)';zeros(6+ndof,1)],CONFIG);
+end
+
+[R,p]            = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
+
 wbm_setWorldFrame(R,p,[ 0,0,-9.81]');
-wbm_updateState(qjInit,zeros(config.ndof,1),zeros(6,1));
+wbm_updateState(qjInit,zeros(CONFIG.ndof,1),zeros(6,1));
 
 % the list of link/joint names that are used to construct the robot in the visualizer
-L = cell(15,1);
+L     = cell(15,1);
 L{1}  = 'root_link'   ;
 L{2}  = 'r_hip_1'     ;
 L{3}  = 'r_lower_leg' ;
@@ -67,71 +76,70 @@ L{13} = 'l_elbow_1'   ;
 L{14} = 'l_gripper'   ;
 L{15} = 'com'         ;
 
-
 % RELATED TO WORLD REFERENCE FRAME ISSUE
 % since for now the world reference frame is that of the codyco_balancing_world,
 % the z-axis is the vertical axis for the robot.
-xaxis = 'xdata';
-yaxis = 'ydata';
-zaxis = 'zdata';
+xaxis  = 'xdata';
+yaxis  = 'ydata';
+zaxis  = 'zdata';
 
-n_plot = 15; % number of points to be plotted (virtual joints)
+n_plot = 15;  % number of points to be plotted (virtual joints)
 n_lin  = 13;  % number of lines to be plotted (virtual links)
 
 kin        = zeros(size(xout,1),7,n_plot);
-kin_noBpos =  zeros(size(xout,1),7,n_plot);
+kin_noBpos = zeros(size(xout,1),7,n_plot);
 
-if config.visualiser.computeKinematics
+if CONFIG.visualiser.computeKinematics
     for jj=1:n_plot
         for ii=1:n % at each instance
-            [pB,R] = frame2posrot(squeeze(q(ii,:)'));
+            [pB,R]               = frame2posrot(squeeze(q(ii,:)'));
             [pB_noBpos,R_noBpos] = frame2posrot(squeeze(q_noBpos(ii,:)'));
-            kin(ii,:,jj) = (wbm_forwardKinematics(R,pB,qj(ii,:)',L{jj}))'; % forward kinematics for the list of joints/links
-            kin_noBpos(ii,:,jj) = (wbm_forwardKinematics(R_noBpos,pB_noBpos,qj(ii,:)',L{jj}))'; % forward kinematics for the list of joints/links
+            kin(ii,:,jj)         = (wbm_forwardKinematics(R,pB,qj(ii,:)',L{jj}))'; % forward kinematics for the list of joints/links
+            kin_noBpos(ii,:,jj)  = (wbm_forwardKinematics(R_noBpos,pB_noBpos,qj(ii,:)',L{jj}))'; % forward kinematics for the list of joints/links
         end
     end
 else
-    load(config.fileName,'kin','kin_noBpos');
+    load(CONFIG.fileName,'kin','kin_noBpos');
 end
-if config.visualiser.saveKinematics
-    save([config.fileName '_kinematics'],'kin','kin_noBpos');
+
+if CONFIG.visualiser.saveKinematics
+    save([CONFIG.fileName '_kinematics'],'kin','kin_noBpos');
 end
 
 kin(:,:,1)= q; %use base data instead of fwdkin rootlink
 
 % clear and reset the plots
 for ii=2:-1:1
-    axes(config.plot_main(ii));
+    axes(CONFIG.plot_main(ii));
     grid on
     axis([-0.5 0.5 -0.42 0.58 0 1]);
     set(gca,'XGrid','off','YGrid','off','ZGrid','off','XTick', [],'YTick', [],'ZTick', []);
     set(gca,'LineWidth',5);
-    set(gca, 'drawmode', 'fast');
+%   set(gca, 'drawmode', 'fast');
     cla;
     drawnow
 end
 
-axes(config.plot_main(1));
+axes(CONFIG.plot_main(1));
 
 %% INITIAL PLOTS
-
 % allocate memory
-x = zeros(1,n_plot);
-y = zeros(1,n_plot);
-z = zeros(1,n_plot);
-pos = zeros(1,n_plot);
+x        = zeros(1,n_plot);
+y        = zeros(1,n_plot);
+z        = zeros(1,n_plot);
+pos      = zeros(1,n_plot);
 xyzpairs = zeros(n_lin,6);
 
 % plot the position of the center of mass
-jj = n_plot;
+jj             = n_plot;
 comPosition    = kin(:,1:3,jj);
 
 % Change axis of the inertial frame visualization differently
 % from that of the body frame
-axes(config.plot_main(1));
+axes(CONFIG.plot_main(1));
 minimumAxisVariation = [1 1 1];
-maxComPos = max(comPosition)+minimumAxisVariation/2;
-minComPos = min(comPosition)-minimumAxisVariation/2;
+maxComPos            = max(comPosition)+minimumAxisVariation/2;
+minComPos            = min(comPosition)-minimumAxisVariation/2;
 
 axesInertial = zeros(3,1);
 for indexSetAxis = 1:3
@@ -145,26 +153,25 @@ for indexSetAxis = 1:3
 end
 
 axis(axesInertial);
-%%
+
+%% Plot joints, base and CoM
 % plot the base position
-x(1)=kin(1,1,1);
-y(1)=kin(1,2,1);
-z(1)=kin(1,3,1);
-pos(1)=plot3(x(1),y(1),z(1),'w*');
+x(1)   = kin(1,1,1);
+y(1)   = kin(1,2,1);
+z(1)   = kin(1,3,1);
+pos(1) = plot3(x(1),y(1),z(1),'w*');
 % plot the joints and CoM
 for jj=2:n_plot
     [Ptemp,~] = frame2posrot(kin(1,:,jj)');
-    x(jj) = Ptemp(1);
-    y(jj) = Ptemp(2);
-    z(jj) = Ptemp(3);
-    col = 'w*';
+    x(jj)     = Ptemp(1);
+    y(jj)     = Ptemp(2);
+    z(jj)     = Ptemp(3);
+    col       = 'w*';
     if jj == n_plot
         col = 'r*';
     end
-    pos(jj)=plot3(x(jj),y(jj),z(jj),col);
+    pos(jj) = plot3(x(jj),y(jj),z(jj),col);
 end
-
-%% RELATED TO WORLD REFERENCE FRAME ISSUE (see line 44)
 
 % define the pairs between the joints that will form the links
 xyzpairs( 1,:) = [ x(1)  x(8)  y(1)  y(8)  z(1)  z(8)];
@@ -182,8 +189,8 @@ xyzpairs(12,:) = [x(13) x(12) y(13) y(12) z(13) z(12)];
 xyzpairs(13,:) = [x(13) x(14) y(13) y(14) z(13) z(14)];
 
 % allocate memory
-lin         = zeros(1,n_lin);
-lnkpatch    = zeros(1,n_lin);
+lin               = zeros(1,n_lin);
+lnkpatch          = zeros(1,n_lin);
 xyzpatch.vertices = zeros(8,3);
 xyzpatch.faces    = zeros(6,4);
 
@@ -205,7 +212,8 @@ mult_patch = [0.07 , 0.03;
 %% PLOT LINES DEPICTING LINKS
 for jj=1:n_lin
     
-    lin(jj) = line(xaxis,xyzpairs(jj,1:2),yaxis,xyzpairs(jj,3:4),zaxis,xyzpairs(jj,5:6),'erasemode','normal','linewidth',3,'color','red');
+%   lin(jj) = line(xaxis,xyzpairs(jj,1:2),yaxis,xyzpairs(jj,3:4),zaxis,xyzpairs(jj,5:6),'erasemode','normal','linewidth',3,'color','red');
+    lin(jj) = line(xaxis,xyzpairs(jj,1:2),yaxis,xyzpairs(jj,3:4),zaxis,xyzpairs(jj,5:6),'linewidth',3,'color','red');
     
     % for the patches (to determine the orientation of the patch to be applied to the links)
     vectlnk  = [xyzpairs(jj,2)-xyzpairs(jj,1),xyzpairs(jj,4)-xyzpairs(jj,3),xyzpairs(jj,6)-xyzpairs(jj,5)];
@@ -214,10 +222,10 @@ for jj=1:n_lin
     orthlnk2 = mult_patch(jj,2)*orthlnk(:,2);
     
     % offsets in the direction orthogonal to the link
-    qq1      = orthlnk1+orthlnk2;
+    qq1      =  orthlnk1+orthlnk2;
     qq2      = -orthlnk1+orthlnk2;
     qq3      = -orthlnk1-orthlnk2;
-    qq4      = orthlnk1-orthlnk2;
+    qq4      =  orthlnk1-orthlnk2;
     
     % vertices for the patch
     xyzpatch.vertices = [xyzpairs(jj,2)+qq1(1) , xyzpairs(jj,4)+qq1(2) , xyzpairs(jj,6)+qq1(3);
@@ -289,19 +297,19 @@ xyzpatch.vertices = [xyzpairs(7,2)+qq1(1)      , xyzpairs(7,4)+qq1(2) , xyzpairs
 
 lnkpatch(jj) = patch('vertices',xyzpatch.vertices,'faces',xyzpatch.faces,'FaceAlpha',0.2,...
                      'FaceColor',robotColor);
+           
 %% PLOT THRUSTS
-F   = 0.01;
+F     = 0.01;
 delta = 5*pi/180;
-nT = 2;
-tCy = 0:0.01:tan(delta);
+nT    = 2;
+tCy   = 0:0.01:tan(delta);
 [xT, yT, zT] = cylinder(1.2*F.*(1+tCy));
 Coord_Thrust = roty(-pi/2)*fromMesh2sortedVector(xT,yT,zT);
 xT = sortedVector2mesh(Coord_Thrust(1,:),nT);
 yT = sortedVector2mesh(Coord_Thrust(2,:),nT);
 zT = sortedVector2mesh(Coord_Thrust(3,:),nT);
 
-
-if config.plotThusts
+if CONFIG.plotThusts
     handlerThrust(1)  = surf(xT,yT,zT);
     colormap(thrustColor)
     set(handlerThrust(1),'EdgeColor',thrustColor,'LineStyle','none');
@@ -312,18 +320,17 @@ if config.plotThusts
     set(handlerThrust(3),'EdgeColor',thrustColor,'LineStyle','none');
     handlerThrust(4)  = surf(xT,yT,zT);
     set(handlerThrust(4),'EdgeColor',thrustColor,'LineStyle','none');
-    %%
     % store axes objects' handles to a vector
-    config.plot_objs{1}=[lnkpatch';lin';pos';handlerThrust'];
+    CONFIG.plot_objs{1}=[lnkpatch';lin';pos';handlerThrust'];
     
 else
-    config.plot_objs{1}=[lnkpatch';lin';pos'];
+    CONFIG.plot_objs{1}=[lnkpatch';lin';pos'];
 end
 
-if config.plotComTrajectories
+if CONFIG.plotComTrajectories
     DeltaI = 50;
-    stepI = 1;
-    temp =  1:stepI:DeltaI;
+    stepI  = 1;
+    temp   = 1:stepI:DeltaI;
     
     colorComTrajectory    = copper(length(temp));
     colorComDesTrajectory = bone(length(temp));
@@ -332,19 +339,19 @@ if config.plotComTrajectories
         handlerTrajectoryCom(j)   = plot3([0 0],[0 0],[0 0],'-','Color',colorComTrajectory(j,:),'Linewidth',1);
         handlerTrajectoryComDes(j)= plot3([0 0],[0 0],[0 0],'-','Color',colorComDesTrajectory(j,:),'Linewidth',1);
     end
-    config.plot_objs{1} = [config.plot_objs{1};handlerTrajectoryCom';handlerTrajectoryComDes'];
+    CONFIG.plot_objs{1} = [CONFIG.plot_objs{1};handlerTrajectoryCom';handlerTrajectoryComDes'];
 end
 
 % copy all objects to other axes with different views
-axes(config.plot_main(2));
-config.plot_objs{2} = copyobj(config.plot_objs{1},config.plot_main(2));
+axes(CONFIG.plot_main(2));
+CONFIG.plot_objs{2} = copyobj(CONFIG.plot_objs{1},CONFIG.plot_main(2));
 
 %% WRITE INFO ON IMAGES
 % text.time   = text(0.5,0.4,['$t = 0  [s]$'],'Color',text.color ,'Interpreter','LaTex','FontSize',text.fontSize);
 
 %% SETTINGS FOR MAKING VIDEO
-if config.visualiser.makeVideo
-    aviobj = VideoWriter(config.visualiser.video.filename);%,'fps',1000/di);
+if CONFIG.visualiser.makeVideo
+    aviobj         = VideoWriter(CONFIG.visualiser.video.filename);%,'fps',1000/di);
     aviobj.Quality = 100;
     open(aviobj)
 else
@@ -356,27 +363,27 @@ for ii=2:n % the visualization instance
     %%The following for accounts for the two figures
     tic;  % visualizer step timer start (to setting the visualizer speed)
     
-    for num_gigure=2:-1:1
+    for num_figure=2:-1:1
         % Retrieving the handlers for the ithe figure
-        lnkpatch       = config.plot_objs{num_gigure}(1:n_plot);
+        lnkpatch       = CONFIG.plot_objs{num_figure}(1:n_plot);
         
-        lin            = config.plot_objs{num_gigure}(1+n_plot:n_plot+n_lin);
+        lin            = CONFIG.plot_objs{num_figure}(1+n_plot:n_plot+n_lin);
         
-        pos            = config.plot_objs{num_gigure}(1+n_plot+n_lin:n_plot+n_lin+n_plot);
+        pos            = CONFIG.plot_objs{num_figure}(1+n_plot+n_lin:n_plot+n_lin+n_plot);
         
         %% UPDATING THRUST FORCES
-        if config.plotThusts
-            handlerThrust  = config.plot_objs{num_gigure}(1+n_plot+n_lin+n_plot:size(config.jets.frames,1)+n_plot+n_lin+n_plot);
-            for ithJet = 1:size(config.jets.frames,1);
-                ith_axis = abs(config.jets.axes(ithJet));
-                ith_dir  = sign(config.jets.axes(ithJet));
-                if num_gigure == 1
+        if CONFIG.plotThusts
+            handlerThrust  = CONFIG.plot_objs{num_figure}(1+n_plot+n_lin+n_plot:size(CONFIG.jets.frames,1)+n_plot+n_lin+n_plot);
+            for ithJet = 1:size(CONFIG.jets.frames,1);
+                ith_axis = abs(CONFIG.jets.axes(ithJet));
+                ith_dir  = sign(CONFIG.jets.axes(ithJet));
+                if num_figure == 1
                     [w_p_b,w_R_b] = frame2posrot(squeeze(q(ii,:)'));
                 else
                     [w_p_b,w_R_b] = frame2posrot(squeeze(q_noBpos(ii,:)'));
                 end
                 
-                kinTmp = (wbm_forwardKinematics(w_R_b,w_p_b,qj(ii,:)',config.jets.frames{ithJet}))'; % forward kinematics for the list of joints/links
+                kinTmp = (wbm_forwardKinematics(w_R_b,w_p_b,qj(ii,:)',CONFIG.jets.frames{ithJet}))'; % forward kinematics for the list of joints/links
                 
                 [w_p_link,w_R_link] = frame2posrot(kinTmp);
                 
@@ -393,14 +400,22 @@ for ii=2:n % the visualization instance
                 set(handlerThrust(ithJet), 'xdata', xTM, 'ydata', yTM, 'zdata', zTM);
             end
         end
-        
+      
         %% UPDATING COM TRAJECTORIES
-        if config.plotComTrajectories
-            if num_gigure == 1
-                handlerTrajectoryCom     = config.plot_objs{num_gigure}(1+size(config.jets.frames,1)+n_plot+n_lin+n_plot:...
-                                                                        size(config.jets.frames,1)+n_plot+n_lin+n_plot+length(temp));
-                handlerTrajectoryComDes  = config.plot_objs{num_gigure}(1+size(config.jets.frames,1)+n_plot+n_lin+n_plot+length(temp):...
-                                                                        size(config.jets.frames,1)+n_plot+n_lin+n_plot+2*length(temp));
+        if CONFIG.plotComTrajectories
+            if num_figure == 1
+
+                if nargin == 5
+                    handlerTrajectoryCom     = CONFIG.plot_objs{num_figure}(1+size(CONFIG.jets.frames,1)+n_plot+n_lin+n_plot:...
+                                                                            size(CONFIG.jets.frames,1)+n_plot+n_lin+n_plot+length(temp));
+                    handlerTrajectoryComDes  = CONFIG.plot_objs{num_figure}(1+size(CONFIG.jets.frames,1)+n_plot+n_lin+n_plot+length(temp):...
+                                                                            size(CONFIG.jets.frames,1)+n_plot+n_lin+n_plot+2*length(temp));
+                else
+                    handlerTrajectoryCom     = CONFIG.plot_objs{num_figure}(1+n_plot+n_lin+n_plot:...
+                                                                            n_plot+n_lin+n_plot+length(temp));
+                    handlerTrajectoryComDes  = CONFIG.plot_objs{num_figure}(1+n_plot+n_lin+n_plot+length(temp):...
+                                                                            n_plot+n_lin+n_plot+2*length(temp));
+                end
                 j2 = 1;
                 for j = max(stepI+1,ii-DeltaI+1):stepI:ii
                     set(handlerTrajectoryCom(j2),'xdata',comPosition(j-stepI:j,1),...
@@ -413,11 +428,11 @@ for ii=2:n % the visualization instance
                 end
             end
         end
-        
+     
         %% UPDATING MAIN BODY
         % Update joint position (* in the plots) and CoM
         for jj=1:n_plot
-            if num_gigure == 1
+            if num_figure == 1
                 kin_tmp = kin(ii,:,jj);
             else
                 kin_tmp = kin_noBpos(ii,:,jj);
@@ -470,6 +485,7 @@ for ii=2:n % the visualization instance
             
             set(lnkpatch(jj),'vertices',xyzpatch.vertices);
         end
+       
         
         %% UPDATE FEET
         % right foot
@@ -521,21 +537,20 @@ for ii=2:n % the visualization instance
         
         
         set(lnkpatch(jj),'vertices',xyzpatch.vertices);
-        
+      
         %% UPDATE TEXT INFO ON IMAGES
-     
         drawnow;
     end
     % to update the visualizer speed to keep it close to real simulation time
-    if toc() < config.visualiser.timeStep  && toc() > 0.01
-        pause(config.visualiser.timeStep-toc());
+    if toc() < CONFIG.visualiser.timeStep  && toc() > 0.01
+        pause(CONFIG.visualiser.timeStep-toc());
     end
-    if config.visualiser.makeVideo == 1 && ii > 2
-        saveFramesForVideo(config.visualiser.video.filename,config.figure_main,aviobj,1);
+    if CONFIG.visualiser.makeVideo == 1 && ii > 2
+        saveFramesForVideo(CONFIG.visualiser.video.filename,CONFIG.figure_main,aviobj,1);
     end
 end
-if config.visualiser.makeVideo == 1
-    saveFramesForVideo(config.visualiser.video.filename,config.figure_main,aviobj,90);
+if CONFIG.visualiser.makeVideo == 1
+    saveFramesForVideo(CONFIG.visualiser.video.filename,CONFIG.figure_main,aviobj,90);
     close(aviobj);
 end
 

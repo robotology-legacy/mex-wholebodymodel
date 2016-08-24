@@ -18,7 +18,6 @@ end
 params.ndof = size(jlMin,1);
 
 %% random initial conditions inside
-
 deltaJl = jlMax - jlMin;
 qjInit  = jlMin + rand(params.ndof,1) .* deltaJl ;
 maxVel  = 10;
@@ -32,7 +31,6 @@ params.dx_bInit = 2.5*rand(3,1) - 5*ones(3,1); %zeros(3,1);
 params.omega_bInit = 2.5*rand(3,1) - 5*ones(3,1);%zeros(3,1);
 params.dampingCoeff = 0;
 
-
 fprintf('fwdDynKinEnergyTest: Random Initial configuration\n');
 disp(params.qjInit');
 fprintf('fwdDynKinEnergyTest: Random Initial velocity\n');
@@ -42,9 +40,9 @@ wbm_setWorldFrame(eye(3),[0 0 0]',[0 0 0]');
 wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit]);
 
 [qj,T_bInit,dqj,vb] = wbm_getState();
-[Ptemp,Rtemp] = frame2posrot(T_bInit);
-params.chiInit = [T_bInit;params.qjInit;...
-                  params.dx_bInit;params.omega_bInit;params.dqjInit];
+[Ptemp,Rtemp]       = frame2posrot(T_bInit);
+params.chiInit      = [T_bInit;params.qjInit;...
+                       params.dx_bInit;params.omega_bInit;params.dqjInit];
 
 %% contact constraints (no constraint, free floating system)
 params.constraintLinkNames = {};
@@ -55,7 +53,7 @@ params.tau = @(t)zeros(params.ndof,1);
 %% setup integration
 forwardDynFunc = @(t,chi)forwardDynamics_kinEnergyTest(t,chi,params);
 tStart = 0;
-tEnd = params.simulationLengthInSecs;
+tEnd   = params.simulationLengthInSecs;
 
 %% integrate forward dynamics
 disp('starting integration');
@@ -73,21 +71,20 @@ x_b     = basePose(1:3,:);
 
 % normalize quaternions to avoid numerical errors
 % qt_b = qt_b/norm(qt_b);
-
 qt_b    = basePose(4:7,:);
 
 % linear and angular velocity
 dx_b    = baseVelocity(1:3,:);
 omega_W = baseVelocity(4:6,:);
 
-x = [x_b' qt_b' qj'];
-v = [dx_b' omega_W' dqj' ];
+x         = [x_b' qt_b' qj'];
+v         = [dx_b' omega_W' dqj' ];
 kinEnergy = zeros(length(t),1);
-chiDot = zeros(length(t),size(chi,2));
-hOut = zeros(length(t),ndof+6);
-gOut = zeros(length(t),ndof+6);
+chiDot    = zeros(length(t),size(chi,2));
+hOut      = zeros(length(t),ndof+6);
+gOut      = zeros(length(t),ndof+6);
+fc        = zeros(length(t),ndof+6);
 
-fc = zeros(length(t),ndof+6);
 wbm_setWorldFrame(eye(3),[0 0 0]', [0 0 0]');
 
 for tCnt = 1:length(t)

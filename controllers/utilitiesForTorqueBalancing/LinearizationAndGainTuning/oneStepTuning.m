@@ -138,7 +138,6 @@ skewOmegaNull  = Lomega-Uomega;
 kCorr          = 1;
 dRNull         = RNull*skewOmegaNull +kCorr*(eye(ndof)-RNull*RNullt)*RNull;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Omega for the skew-symm matrix on momentum
 g             = 1;
 uMom          = zeros(omegaMom,1);

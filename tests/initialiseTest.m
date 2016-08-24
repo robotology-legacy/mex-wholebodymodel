@@ -20,6 +20,5 @@ wbm_modelInitialiseFromURDF('twoLinks.urdf');
 WBMAssertEqual(min,[-2],'Error in getting lower joint limits from urdf file');
 WBMAssertEqual(max,[2],'Error in getting lower joint limits from urdf file');
 
-
 fprintf('initialiseTest completed successfully\n');
 

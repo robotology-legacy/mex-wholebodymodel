@@ -69,7 +69,6 @@ for i=1:numConstraints
     dJcDq(6*(i-1)+1:6*i,:) = wbm_djdq(param.constraintLinkNames{i});
 end
 
-
 %% control torque
 tau = param.tau(t);
 
@@ -85,14 +84,15 @@ fc = (JcMinvJct)\(JcMinv*(h-[tau+tauDamp;zeros(6,1)])-dJcDq);
 % expressed in the world frame to the obtain angular velocity in body frame omega_b.
 % This is then used in the quaternion derivative computation.
 
-b_R_w = w_R_b';
+b_R_w   = w_R_b';
 omega_b = b_R_w*omega_W;
-dqt_b = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
-
-dx = [dx_b;dqt_b;dqj];
-dv = M\(Jc'*fc + [tau+tauDamp; zeros(6,1)]-h);
-dchi = [dx;dv];
+dqt_b   = quaternionDerivative(omega_b, qt_b);%,param.QuaternionDerivativeParam);
+   
+dx        = [dx_b;dqt_b;dqj];
+dv        = M\(Jc'*fc + [tau+tauDamp; zeros(6,1)]-h);
+dchi      = [dx;dv];
 kinEnergy = 0.5*v'*M*v;
-%dchi = zeros(size(dchi));
+%dchi     = zeros(size(dchi));
+
 end
 
