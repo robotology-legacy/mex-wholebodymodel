@@ -20,7 +20,7 @@ clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation
 CONFIG.demo_movements                        = 0;                          %either 0 or 1
-CONFIG.feet_on_ground                        = [0,1];                      %either 0 or 1; [left,right]
+CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left,right]
 
 %% QP solver and gains tuning procedure
 CONFIG.use_QPsolver                          = 0;                          %either 0 or 1

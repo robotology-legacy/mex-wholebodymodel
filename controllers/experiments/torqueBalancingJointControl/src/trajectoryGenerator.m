@@ -43,17 +43,33 @@ end
 %% Trajectory generation
 frequency  = referenceParams(2);
 
-if t >= noOscillationTime
+if size(t,1)==1 && size(t,2)==1
     
-    Amplitude  = referenceParams(1);
+    if t >= noOscillationTime
+    
+        Amplitude  = referenceParams(1);
+    else
+        Amplitude  = 0;
+    end
+
+    xCoMDes    =  xCoMInit + Amplitude*sin(2*pi*frequency*t)*directionOfOscillation;
+    dxCoMDes   =             Amplitude*2*pi*frequency*cos(2*pi*frequency*t)*directionOfOscillation;
+    ddxCoMDes  =           - Amplitude*(2*pi*frequency)^2*sin(2*pi*frequency*t)*directionOfOscillation;
+
+    desired_x_dx_ddx_CoM = [xCoMDes dxCoMDes ddxCoMDes];
 else
-    Amplitude  = 0;
-end
+    for k = 1:length(t)
+         if t(k) >= noOscillationTime
+    
+            Amplitude  = referenceParams(1);
+         else
+            Amplitude  = 0;
+         end
 
-xCoMDes    =  xCoMInit + Amplitude*sin(2*pi*frequency*t)*directionOfOscillation;
-dxCoMDes   =             Amplitude*2*pi*frequency*cos(2*pi*frequency*t)*directionOfOscillation;
-ddxCoMDes  =           - Amplitude*(2*pi*frequency)^2*sin(2*pi*frequency*t)*directionOfOscillation;
+    xCoMDes    =  xCoMInit + Amplitude*sin(2*pi*frequency*t(k))*directionOfOscillation;
+    dxCoMDes   =             Amplitude*2*pi*frequency*cos(2*pi*frequency*t(k))*directionOfOscillation;
+    ddxCoMDes  =           - Amplitude*(2*pi*frequency)^2*sin(2*pi*frequency*t(k))*directionOfOscillation;
 
-desired_x_dx_ddx_CoM = [xCoMDes dxCoMDes ddxCoMDes];
-
+    desired_x_dx_ddx_CoM(:,:,k) = [xCoMDes dxCoMDes ddxCoMDes]; 
+    end
 end

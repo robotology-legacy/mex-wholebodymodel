@@ -24,7 +24,8 @@ initState                        = CONFIG.initState;
 %% ROBOT SIMULATOR
 if CONFIG.visualize_robot_simulator == 1
     
-    CONFIG.figureCont = visualizeSimulation(t,chi,CONFIG);
+    references        = trajectoryGenerator(CONFIG.xCoMRef,t,CONFIG);
+    CONFIG.figureCont = visualizeSimulation(t,chi,CONFIG, references);
 end
 
 %% FORWARD DYNAMICS (basic parameters)

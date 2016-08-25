@@ -17,7 +17,7 @@ clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation
 CONFIG.demo_movements                        = 1;                          %either 0 or 1
-CONFIG.feet_on_ground                        = [1,0];                      %either 0 or 1; [left,right]
+CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left,right]
 
 %% Visualization setup
 % robot simulator

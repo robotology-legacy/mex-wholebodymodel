@@ -26,6 +26,7 @@ if CONFIG.linearizationDebug  == 1
         
         % LEFT ARM
         figure(figureCont)
+        set(gcf,'numbertitle','off','name','Larm acc')
         subplot(3,2,k)
         plot(t,ddqjLin(k+3,:))
         hold on
@@ -39,6 +40,7 @@ if CONFIG.linearizationDebug  == 1
         
         % RIGHT ARM
         figure(figureCont+1)
+        set(gcf,'numbertitle','off','name','Rarm acc')
         subplot(3,2,k)
         plot(t,ddqjLin(k+3+5,:))
         hold on
@@ -57,6 +59,7 @@ if CONFIG.linearizationDebug  == 1
         
         % LEFT LEG
         figure(figureCont)
+        set(gcf,'numbertitle','off','name','Lleg acc')
         subplot(3,2,k)
         plot(t,ddqjLin(k+13,:))
         hold on
@@ -70,6 +73,7 @@ if CONFIG.linearizationDebug  == 1
         
         % RIGHT LEG
         figure(figureCont+1)
+        set(gcf,'numbertitle','off','name','Rleg acc')
         subplot(3,2,k)
         plot(t,ddqjLin(k+13+6,:))
         hold on
@@ -88,6 +92,7 @@ if CONFIG.linearizationDebug  == 1
         
         % TORSO
         figure(figureCont)
+        set(gcf,'numbertitle','off','name','Torso acc') 
         subplot(3,1,k)
         plot(t,ddqjLin(k,:))
         hold on
@@ -118,24 +123,28 @@ if CONFIG.gains_tuning == 1
     KDn                   = CONFIG.linearization.KD;
     
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Opt KS')
     image(KSo,'CDataMapping','scaled')
     colorbar
     title('Optimized KS')
     figureCont = figureCont +1;
     
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Opt KD')
     image(KDo,'CDataMapping','scaled')
     colorbar
     title('Optimized KD')
     figureCont = figureCont +1;
     
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Kron KS')
     image(KSn,'CDataMapping','scaled')
     colorbar
     title('Kronecker KS')
     figureCont = figureCont +1;
     
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Kron KD')
     image(KDn,'CDataMapping','scaled')
     colorbar
     title('Kronecker KD')
@@ -148,6 +157,7 @@ if CONFIG.gains_tuning == 1
     AStateOpt  = [zeros(ndof), eye(ndof); -KSo   -KDo];
     
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Js eigen')
     plot(real(eig(AStateKron)),imag(eig(AStateKron)),'or')
     hold on
     grid on

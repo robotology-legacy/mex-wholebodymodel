@@ -23,6 +23,7 @@ for k=1:5
     
     % LEFT ARM
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Larm pos')
     subplot(3,2,k)
     plot(t,qj(k+3,:))
     hold on
@@ -36,6 +37,7 @@ for k=1:5
     
     % RIGHT ARM
     figure(figureCont+1)
+    set(gcf,'numbertitle','off','name','Rarm pos')
     subplot(3,2,k)
     plot(t,qj(k+3+5,:))
     hold on
@@ -54,6 +56,7 @@ for k=1:6
     
     % LEFT LEG
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Lleg pos')
     subplot(3,2,k)
     plot(t,qj(k+13,:))
     hold on
@@ -67,6 +70,7 @@ for k=1:6
     
     % RIGHT LEG
     figure(figureCont+1)
+    set(gcf,'numbertitle','off','name','Rleg pos')
     subplot(3,2,k)
     plot(t,qj(k+13+6,:))
     hold on
@@ -85,6 +89,7 @@ for k=1:3
     
     % TORSO
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Torso pos')
     subplot(3,1,k)
     plot(t,qj(k,:))
     hold on

@@ -32,6 +32,7 @@ for k = 1:3
     
     % POSITION
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','CoM error pos')
     subplot(3,1,k)
     plot(t,CoMTrajectoryError(k,:),'b')
     hold on
@@ -44,6 +45,7 @@ for k = 1:3
     
     % VELOCITY
     figure(figureCont+1)
+    set(gcf,'numbertitle','off','name','CoM error vel')
     subplot(3,1,k)
     plot(t,CoMTrajectoryError(k+3,:),'b')
     hold on
@@ -56,6 +58,7 @@ for k = 1:3
     
     % ACCELERATION
     figure(figureCont+2)
+    set(gcf,'numbertitle','off','name','CoM error acc')
     subplot(3,1,k)
     plot(t,CoMTrajectoryError(k+6,:),'b')
     hold on
@@ -82,6 +85,7 @@ if     CONFIG.numConstraints == 1
     for k=1:6
         
         figure(figureCont)
+        set(gcf,'numbertitle','off','name','Foot error')
         subplot(3,2,k)
         plot(t,feetError(k,:))
         grid on
@@ -103,6 +107,7 @@ elseif CONFIG.numConstraints  == 2
     for k=1:6
         
         figure(figureCont)
+        set(gcf,'numbertitle','off','name','Lfoot error')
         subplot(3,2,k)
         plot(t,feetError(k,:))
         grid on
@@ -111,6 +116,7 @@ elseif CONFIG.numConstraints  == 2
         ylabel(titYFeet(k))
         
         figure(figureCont+1)
+        set(gcf,'numbertitle','off','name','Rfoot error')
         subplot(3,2,k)
         plot(t,feetError(k+6,:))
         grid on
@@ -124,6 +130,7 @@ end
 
 %% Momentum error
 figure(figureCont)
+set(gcf,'numbertitle','off','name','H error')
 subplot(2,1,1)
 hold all
 grid on
