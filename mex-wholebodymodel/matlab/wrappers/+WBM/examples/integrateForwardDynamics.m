@@ -1,7 +1,7 @@
 % namespaces:
 import WBM.*
 import WBM.utilities.*
-import WBM.Robot.iCub.*
+import WBM.RobotModel.iCub.*
 
 
 %% Initialization of the WBM for the iCub-Robot:
@@ -61,8 +61,8 @@ ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);         % setup the error 
 save('testTrajectory.mat', 't', 'chi', 'chi_init', 'fhTrqControl', 'icub_model', 'icub_config');
 disp('Numerical integration finished.');
 
-nSteps = size(chi,1);
-fprintf('Number of integrations: %d\n', nSteps);
+noi = size(chi,1);
+fprintf('Number of integrations: %d\n', noi);
 
 %% iCub-Simulator:
 
@@ -86,7 +86,7 @@ vis_data = wbm_icub.getFwdDynVisualizationData(chi, fhTrqControl);
 
 %figure('Name', 'iCub - CoM-trajectory:', 'NumberTitle', 'off');
 
-%plot3(stp.x_b(1:nSteps,1), stp.x_b(1:nSteps,2), stp.x_b(1:nSteps,3), 'Color', 'b');
+%plot3(stp.x_b(1:noi,1), stp.x_b(1:noi,2), stp.x_b(1:noi,3), 'Color', 'b');
 %hold on;
 %plot3(stp.x_b(1,1), stp.x_b(1,2), stp.x_b(1,3), 'Marker', 'o', 'MarkerEdgeColor', 'r');
 

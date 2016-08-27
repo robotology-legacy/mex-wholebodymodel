@@ -70,7 +70,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         end
 
         function delete(obj)
-            obj.delete();
+            delete(obj);
         end
 
         function [vqT_b, q_j, v_b, dq_j] = getState(obj)
@@ -168,20 +168,18 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             wf_H_lnk = WBM.utilities.frame2tform(vqT_lnk);
         end
 
-        % function wf_vqT_lnk = T0_n(obj, lnk_name, q_j, stFltb) % ?? computes the forward kinematics for the end-effector? do we need it?
-        %     if ~exist('stFltb', 'var')
-        %         stFltb = obj.mwbm_icub.getFloatingBaseState();
-        %     end
-        %     wf_vqT_lnk = obj.mwbm_icub.forwardKinematics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, lnk_name);
-        % end
-
-        function wf_H_lnk = linkFrame(obj, jnt_idx, q_j, stFltb) % link transformation matrix
+        function wf_H_lnk = linkFrame(obj, lnk_name, q_j, stFltb) % link transformation matrix
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-
-            lnk_name = obj.mwbm_icub.robot_body.getJointNames(jnt_idx);
             wf_H_lnk = obj.mwbm_icub.transformationMatrix(stFltb.wf_R_b, stFltb.wf_p_b, q_j, lnk_name);
+        end
+
+        function wf_H_tt = toolFrame(obj, t_idx, q_j, stFltb) % tool-tip transformation matrix
+            if ~exist('stFltb', 'var')
+                stFltb = obj.mwbm_icub.getFloatingBaseState();
+            end
+            wf_H_tt = obj.mwbm_icub.toolFrame(stFltb.wf_R_b, stFltb.wf_p_b, q_j, t_idx);
         end
 
         function M = massMatrix(obj, q_j, stFltb)
@@ -237,10 +235,6 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         end
 
         % function tau_pl = payloadForces(obj, q_j, dq_j, stFltb)
-
-        % end
-
-        % function gravjac()
 
         % end
 

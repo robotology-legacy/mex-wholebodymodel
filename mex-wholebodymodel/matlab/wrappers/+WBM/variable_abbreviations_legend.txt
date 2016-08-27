@@ -50,7 +50,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     m...      ...  "member", 'm' declares that this variable is a private member variable, e.g. "mwbm", "mstv", etc.
     mult      ...  multiplier(s)
     ndof      ...  number degrees of freedom
-    noi       ...  number of iterations
+    noi       ...  number of iterations OR number of integrations
     nw        ...  new world
     o         ...  orthogonal
     ofs       ...  offset(s)
@@ -97,7 +97,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ul        ...  upper limit(s)
     upr       ...  upper
     v         ...  vector
-    veT       ...  vector-Euler-angles transformation (vector)
+    veT       ...  vector-Euler-angles transformation [translation with Euler angles] (vector)
     vel       ...  velocit(y/ies)
     vfrict    ...  viscous friction
     vpos      ...  vector position [translation] (vector)
@@ -106,7 +106,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     vtx       ...  vert(ex/ices)
     w         ...  world
     wbm       ...  whole body model
-    wf        ...  world frame
+    wf, WF    ...  world frame
     wf_T_b    ...  transformation FROM the 'base' TO the 'world frame'
     wid       ...  width
 

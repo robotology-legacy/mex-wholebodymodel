@@ -5,9 +5,9 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         comment@char    % general comment (annotation)
         wbm_info@struct % general information about whole body model of the robot.
         wbm_params@WBM.wbmBaseRobotParams
-        %model3d
         plotopt3d@WBM.absSimConfig
         ctrl_link@char        % current kinematic link of the robot that is controlled by the system.
+        ee_link@char          % kinematic link of the current end-effector that is controlled by the system.
         gravity@double vector % gravity vector (direction of the gravity)
         base@double    matrix % base transform of the robot (pose of the robot)
         tool@double    matrix % tool transform (from the end-effector to the tool-tip)
@@ -18,16 +18,17 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
     end
 
     properties(Access = protected)
-        mwbm@IWBM
+        mwbm@WBM.Interfaces.IWBM
         mwbm_info = struct( 'robot_name',  '', ...
                             'robot_manuf', '', ...
                             'comment',     '' );
-        mctrl_link@char
+        mlink_ctrl@char
+        mlink_ee@char
     end
 
     methods
         function obj = MultChainTree(robot_wbm, ctrl_link, comment)
-            if ~isa(robot_wbm, 'IWBM')
+            if ~isa(robot_wbm, 'WBM.Interfaces.IWBM')
                 error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             if isempty(ctrl_link)
@@ -35,7 +36,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             end
 
             obj.mwbm = robot_wbm;
-            obj.mctrl_link = ctrl_link;
+            obj.mlink_ctrl = ctrl_link;
 
             % get some informations about the WBM of the robot ...
             obj.mwbm_info.robot_name  = robot_wbm.robot_name;
@@ -69,20 +70,25 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             tau_ctrl = obj.mwbm.inverseDyn(q_j, dq_j, ddq_j);
         end
 
-        function [t, stmChi] = fdyn(obj, fhCtrlTrqs, tspan, stvChi_0, ode_opt)
+        function [t, stmChi] = fdyn(obj, tspan, fhCtrlTrqs, stvChi_0, ode_opt)
             [t, stmChi] = obj.mwbm.forwardDyn(fhCtrlTrqs, tspan, stvChi_0, ode_opt);
         end
 
         function wf_H_lnk = fkine(obj, q_j)
-            wf_H_lnk = obj.mwbm.forwardKin(obj.mctrl_link, q_j);
+            wf_H_lnk = obj.mwbm.forwardKin(obj.mlink_ctrl, q_j);
         end
 
         function wf_H_lnk = A(obj, jnt_idx, q_j)
             wf_H_lnk = obj.mwbm.linkFrame(jnt_idx, q_j);
         end
 
+        function wf_H_ee = T0_n(obj, q_j) % computes the forward kinematics of the current end-effector.
+            vqT_ee = obj.mwbm.forwardKin(obj.mlink_ee, q_j);
+            wf_H_ee = WBM.utilities.frame2tform(vqT_ee);
+        end
+
         function dJ = jacob_dot(obj, q_j, dq_j)
-            dJ = obj.mwbm.jacobianDot(q_j, obj.mctrl_link, dq_j);
+            dJ = obj.mwbm.jacobianDot(obj.mlink_ctrl, q_j, dq_j);
         end
 
         function J_0 = jacob0(obj, q_j, varargin)
@@ -92,15 +98,15 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             opt.rot   = false;
             opt = tb_optparse(opt, varargin);
 
-            J_0 = obj.mwbm.jacobian(q_j, obj.mctrl_link);
+            J_0 = obj.mwbm.jacobian(obj.mlink_ctrl, q_j);
 
-            if opt.rpy % why do we make there a block-diagonale?
-                wf_H_lnk = obj.mwbm.forwardKin(obj.mctrl_link, q_j);
+            if opt.rpy
+                wf_H_lnk = obj.mwbm.forwardKin(obj.mlink_ctrl, q_j);
                 B_inv = WBM.utilities.tform2angRateTF(wf_H_lnk, 'ZYX'); % use the RPY (ZYX) euler-angles
 
                 J_0 = blkdiag(eye(3,3), B_inv) * J_0;
             elseif opt.eul
-                wf_H_lnk = obj.mwbm.forwardKin(obj.mctrl_link, q_j);
+                wf_H_lnk = obj.mwbm.forwardKin(obj.mlink_ctrl, q_j);
                 B_inv = WBM.utilities.tform2angRateTF(wf_H_lnk, 'ZYZ'); % use the ZYZ euler-angles
 
                 J_0 = blkdiag(eye(3,3), B_inv) * J_0;
@@ -113,9 +119,9 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             end
         end
 
-        % function J_n = jacobn(obj, q_j) % Jacobian in the ee-frame. Makes sense for a robot arm. But for a humanoid?
-        %     J_n = mwbm.jacobianTool(obj, q_j);
-        % end
+        function J_ee = jacobn(obj, q_j) % Jacobian of the current ee-frame.
+            J_ee = obj.mwbm.jacobian(obj.mlink_ee, q_j);
+        end
 
         function M = inertia(obj, q_j)
             M = obj.mwbm.massMatrix(q_j);
@@ -173,15 +179,26 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             sim_config = obj.mwbm.sim_config;
         end
 
-        function set.ctrl_link(obj, link_name)
-            if isempty(link_name)
+        function set.ctrl_link(obj, lnk_name)
+            if isempty(lnk_name)
                 error('MultChainTree::set.ctrl_link: %s', WBM.wbmErrorMsg.EMPTY_STRING);
             end
-            obj.mctrl_link = link_name;
+            obj.mlink_ctrl = lnk_name;
         end
 
-        function link_name = get.ctrl_link(obj)
-            link_name = obj.mctrl_link;
+        function lnk_name = get.ctrl_link(obj)
+            lnk_name = obj.mlink_ctrl;
+        end
+
+        function set.ee_link(obj, lnk_name)
+            if isempty(lnk_name)
+                error('MultChainTree::set.ee_link: %s', WBM.wbmErrorMsg.EMPTY_STRING);
+            end
+            obj.mlink_ee = lnk_name;
+        end
+
+        function lnk_name = get.ee_link(obj)
+            lnk_name = obj.mlink_ee;
         end
 
         function set.gravity(obj, g_wf)

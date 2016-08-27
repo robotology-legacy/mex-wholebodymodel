@@ -4,7 +4,7 @@ function dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
 
     omega_w = stp.omega_b;
     v_b = vertcat(stp.dx_b, omega_w);
-    %v   = vertcat(stp.dx_b, omega_w, stp.dq_j);
+    %v   = vertcat(v_b, stp.dq_j);
 
     % update the state for the optimized mode (precautionary) ...
     obj.setState(stp.q_j, stp.dq_j, v_b);

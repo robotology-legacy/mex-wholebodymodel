@@ -1,7 +1,7 @@
 classdef WBMBase < handle
     properties(Dependent)
         % public properties for fast get/set methods:
-        urdfLinkName@char
+        fixed_link@char
         wf_R_b@double matrix
         wf_p_b@double vector
         g_wf@double   vector
@@ -61,15 +61,15 @@ classdef WBMBase < handle
                 % Optimized mode: use the default (URDF) robot model which
                 % is defined in the environment variable YARP_ROBOT_NAME
                 % of the WB-Toolbox ...
-                obj.mwbm_model.urdf_robot = getenv('YARP_ROBOT_NAME');
+                obj.mwbm_model.urdf_robot_name = getenv('YARP_ROBOT_NAME');
                 mexWholeBodyModel('model-initialise');
                 return
             end
             % else, use the model name of the robot that is supported by the
             % WB-Toolbox (the URDF-file(s) must exist in the directory of
             % the WB-Toolbox) ...
-            obj.mwbm_model.urdf_robot = urdf_model_name;
-            mexWholeBodyModel('model-initialise', obj.mwbm_model.urdf_robot);
+            obj.mwbm_model.urdf_robot_name = urdf_model_name;
+            mexWholeBodyModel('model-initialise', obj.mwbm_model.urdf_robot_name);
         end
 
         function initModelURDF(obj, urdf_file_name)
@@ -80,8 +80,8 @@ classdef WBMBase < handle
                 error('WBMBase::initModelURDF: %s', WBM.wbmErrorMsg.FILE_NOT_EXIST);
             end
 
-            obj.mwbm_model.urdf_robot = urdf_file_name;
-            mexWholeBodyModel('model-initialise-urdf', obj.mwbm_model.urdf_robot);
+            obj.mwbm_model.urdf_robot_name = urdf_file_name;
+            mexWholeBodyModel('model-initialise-urdf', obj.mwbm_model.urdf_robot_name);
         end
 
         function setWorldFrame(obj, wf_R_b, wf_p_b, g_wf)
@@ -134,11 +134,11 @@ classdef WBMBase < handle
             % compute the base world frame (WF) from the default contact (constraint) link:
             if exist('q_j', 'var')
                 % normal mode:
-                [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(obj.mwbm_model.urdf_link_name, q_j);
+                [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(obj.mwbm_model.urdf_fixed_link, q_j);
                 return
             end
             % else, optimized mode:
-            [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(obj.mwbm_model.urdf_link_name);
+            [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(obj.mwbm_model.urdf_fixed_link);
         end
 
         function setState(~, q_j, dq_j, v_b)
@@ -170,13 +170,13 @@ classdef WBMBase < handle
                     urdf_link_name = varargin{1,4};
                 case 4
                     % use the default link frame ...
-                    urdf_link_name = obj.mwbm_model.urdf_link_name;
+                    urdf_link_name = obj.mwbm_model.urdf_fixed_link;
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
                     wf_H_lnk = mexWholeBodyModel('rototranslation-matrix', varargin{1,1});
                     return
                 case 1
-                    wf_H_lnk = mexWholeBodyModel('rototranslation-matrix', obj.mwbm_model.urdf_link_name);
+                    wf_H_lnk = mexWholeBodyModel('rototranslation-matrix', obj.mwbm_model.urdf_fixed_link);
                     return
                 otherwise
                     error('WBMBase::transformationMatrix: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -251,13 +251,13 @@ classdef WBMBase < handle
                     urdf_link_name = varargin{1,4};
                 case 4
                     % use the default link frame ...
-                    urdf_link_name = obj.mwbm_model.urdf_link_name;
+                    urdf_link_name = obj.mwbm_model.urdf_fixed_link;
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
                     J = mexWholeBodyModel('jacobian', varargin{1,1});
                     return
                 case 1
-                    J = mexWholeBodyModel('jacobian', obj.mwbm_model.urdf_link_name);
+                    J = mexWholeBodyModel('jacobian', obj.mwbm_model.urdf_fixed_link);
                     return
                 otherwise
                     error('WBMBase::jacobian: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -276,13 +276,13 @@ classdef WBMBase < handle
                 case 7 % normal modes:
                     urdf_link_name = varargin{1,6};
                 case 6
-                    urdf_link_name = obj.mwbm_model.urdf_link_name; % default link name ...
+                    urdf_link_name = obj.mwbm_model.urdf_fixed_link; % default link name ...
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
                     dJ = mexWholeBodyModel('djdq', varargin{1,1});
                     return
                 case 1
-                    dJ = mexWholeBodyModel('djdq', obj.mwbm_model.urdf_link_name);
+                    dJ = mexWholeBodyModel('djdq', obj.mwbm_model.urdf_fixed_link);
                     return
                 otherwise
                     error('WBMBase::dJdq: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -313,13 +313,13 @@ classdef WBMBase < handle
                 case 5 % normal modes:
                     urdf_link_name = varargin{1,4};
                 case 4
-                    urdf_link_name = obj.mwbm_model.urdf_link_name; % default link name ...
+                    urdf_link_name = obj.mwbm_model.urdf_fixed_link; % default link name ...
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
                     wf_vqT_lnk = mexWholeBodyModel('forward-kinematics', varargin{1,1});
                     return
                 case 1
-                    wf_vqT_lnk = mexWholeBodyModel('forward-kinematics', obj.mwbm_model.urdf_link_name);
+                    wf_vqT_lnk = mexWholeBodyModel('forward-kinematics', obj.mwbm_model.urdf_fixed_link);
                     return
                 otherwise
                     error('WBMBase::forwardKinematics: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -348,15 +348,17 @@ classdef WBMBase < handle
             % q_j    = varargin{3}
             % dq_j   = varargin{4}
             % v_b    = varargin{5}
-            % f_c    = varargin{6}
-            % Jc_t   = varargin{7}
             switch nargin
                 case 8 % normal mode:
+                    f_c  = varargin{1,6};
+                    Jc_t = varargin{1,7};
+
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
                     C_qv = mexWholeBodyModel('generalised-forces', wf_R_b_arr, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
                 case 3 % optimized mode:
-                    % f_c  = varargin{1}
-                    % Jc_t = varargin{2}
+                    f_c  = varargin{1,1};
+                    Jc_t = varargin{1,2};
+
                     C_qv = mexWholeBodyModel('generalised-forces');
                 otherwise
                     error('WBMBase::generalizedForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -434,16 +436,16 @@ classdef WBMBase < handle
             end
         end
 
-        function set.urdfLinkName(obj, new_link_name)
-            if isempty(new_link_name)
-                error('WBMBase::set.urdfLinkName: %s', WBM.wbmErrorMsg.EMPTY_STRING);
+        function set.fixed_link(obj, lnk_name)
+            if isempty(lnk_name)
+                error('WBMBase::set.fixed_link: %s', WBM.wbmErrorMsg.EMPTY_STRING);
             end
             % update the default link name ...
-            obj.mwbm_model.urdf_link_name = new_link_name;
+            obj.mwbm_model.urdf_fixed_link = lnk_name;
         end
 
-        function lnk_name = get.urdfLinkName(obj)
-            lnk_name = obj.mwbm_model.urdf_link_name;
+        function lnk_name = get.fixed_link(obj)
+            lnk_name = obj.mwbm_model.urdf_fixed_link;
         end
 
         function set.wf_R_b(obj, new_rotm)
@@ -527,13 +529,13 @@ classdef WBMBase < handle
                 prec = 2;
             end
 
-            [strPath, strName, ext] = fileparts(obj.mwbm_model.urdf_robot);
+            [strPath, strName, ext] = fileparts(obj.mwbm_model.urdf_robot_name);
             if ~isempty(ext)
-                strURDFname = sprintf([' URDF filename:       %s\n' ...
-                                       ' path:                %s'], ...
+                strURDFname = sprintf([' URDF filename:     %s\n' ...
+                                       ' path:              %s'], ...
                                       strcat(strName, ext), strPath);
             else
-                strURDFname = sprintf(' URDF robot model:    %s', strName);
+                strURDFname = sprintf(' URDF robot model:  %s', strName);
             end
 
             if ~any(obj.mwbm_model.frict_coeff.v,1) % if frict_coeff.v = 0:
@@ -546,15 +548,15 @@ classdef WBMBase < handle
             end
 
             strParams = sprintf(['WBM Parameters:\n\n' ...
-                                 ' #DoFs:               %d\n' ...
+                                 ' #DoFs:             %d\n' ...
                                  '%s\n' ...
-                                 ' URDF ref. link name: %s\n\n' ...
-                                 ' R (root link to world frame):  %s\n' ...
-                                 ' p (root link to world frame):  %s\n' ...
-                                 ' g (world frame):               %s\n\n' ...
+                                 ' fixed link to WF:  %s\n' ...
+                                 ' R (base to WF):    %s\n' ...
+                                 ' p (base to WF):    %s\n' ...
+                                 ' g (WF):            %s\n\n' ...
                                  ' joint friction coefficients:\n%s\n'], ...
                                 obj.mwbm_model.ndof, strURDFname, ...
-                                obj.mwbm_model.urdf_link_name, ...
+                                obj.mwbm_model.urdf_fixed_link, ...
                                 mat2str(obj.mwbm_model.wf_R_b, prec), ...
                                 mat2str(obj.mwbm_model.wf_p_b, prec), ...
                                 mat2str(obj.mwbm_model.g_wf, prec), strFrictions);
@@ -574,8 +576,8 @@ classdef WBMBase < handle
             end
 
             obj.mwbm_model = WBM.wbmBaseRobotModel;
-            obj.mwbm_model.ndof           = robot_model.ndof;
-            obj.mwbm_model.urdf_link_name = robot_model.urdf_link_name;
+            obj.mwbm_model.ndof            = robot_model.ndof;
+            obj.mwbm_model.urdf_fixed_link = robot_model.urdf_fixed_link;
 
             if (robot_model.ndof > 0)
                 if ~isempty(robot_model.frict_coeff.v)
@@ -603,15 +605,15 @@ classdef WBMBase < handle
 
             % Initialize the mex-WholeBodyModel for a floating base robot,
             % using Unified Robot Description Format (URDF):
-            if isempty(robot_model.urdf_robot)
+            if isempty(robot_model.urdf_robot_name)
                 % optimized mode:
                 obj.initModel(); % use the default (URDF) model ...
             else
                 % normal mode:
-                [~,model_name, ext] = fileparts(robot_model.urdf_robot);
+                [~,model_name, ext] = fileparts(robot_model.urdf_robot_name);
                 if ~isempty(ext)
                     % use directly a specific URDF-file for the robot model ...
-                    obj.initModelURDF(robot_model.urdf_robot);
+                    obj.initModelURDF(robot_model.urdf_robot_name);
                 else
                     % set the model name of the robot which is supported by the WB-Toolbox ...
                     obj.initModel(model_name);

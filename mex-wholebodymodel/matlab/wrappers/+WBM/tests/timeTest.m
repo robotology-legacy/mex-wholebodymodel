@@ -6,10 +6,10 @@ import WBM.utilities.*
 %% First initialization of the WBM:
 % base model:
 icub_model = wbmBaseRobotModel;
-icub_model.ndof       = 25;
-icub_model.urdf_robot = 'icubGazeboSim';
-icub_model.wf_R_b     = eye(3,3);
-icub_model.g_wf       = [0; 0; -9.81];
+icub_model.ndof            = 25;
+icub_model.urdf_robot_name = 'icubGazeboSim';
+icub_model.wf_R_b          = eye(3,3);
+icub_model.g_wf            = [0; 0; -9.81];
 % base robot config:
 icub_config = wbmHumanoidConfig;
 icub_config.nCstrs          = 2;
@@ -76,7 +76,7 @@ fprintf('\n\nStarting optimized mode trial\n-----------------------------\n');
 % base model:
 icub_model = wbmBaseRobotModel;
 icub_model.ndof         = 25;
-icub_model.urdf_robot   = 'icubGazeboSim';
+icub_model.urdf_robot_name   = 'icubGazeboSim';
 icub_model.wf_R_b = eye(3,3);
 icub_model.g_wf         = [0; 0; 9.81];
 % base robot config:

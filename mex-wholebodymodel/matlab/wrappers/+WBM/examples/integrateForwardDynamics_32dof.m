@@ -1,7 +1,7 @@
 % namespaces:
 import WBM.*
 import WBM.utilities.*
-import WBM.Robot.iCub_32dof.*
+import WBM.RobotModel.iCub_32dof.*
 
 
 %% Initialization of the WBM for the iCub-Robot:
@@ -64,18 +64,18 @@ ode_options = odeset('RelTol', 1e-3, 'AbsTol', 1e-4);         % setup the error 
 
 disp('Numerical integration finished.');
 
-nSteps = size(chi,1);
-fprintf('Number of integrations: %d\n', nSteps);
+noi = size(chi,1);
+fprintf('Number of integrations: %d\n', noi);
 
 %% iCub-Simulator:
 
 % setup the window and plot parameters for the WBM-simulator:
-sim_config = initSimConfig_iCub_32dof(icub_model.urdf_robot);           % shows the simulation with a light scene as default.
-%sim_config = initSimConfig_iCub_atf(icub_model.urdf_robot, 'DarkScn'); % optional, shows the simulation with a dark scene.
+sim_config = initSimConfig_iCub_32dof(icub_model.urdf_robot_name);           % shows the simulation with a light scene as default.
+%sim_config = initSimConfig_iCub_atf(icub_model.urdf_robot_name, 'DarkScn'); % optional, shows the simulation with a dark scene.
 sim_config = wbm_icub.setupSimulation(sim_config);
 x_out = wbm_icub.getPositionsData(chi);
 % show and repeat the simulation 10 times ...
-nRpts = 3;
+nRpts = 2;
 wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:

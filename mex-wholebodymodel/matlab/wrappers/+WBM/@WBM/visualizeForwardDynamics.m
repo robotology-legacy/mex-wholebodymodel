@@ -37,23 +37,23 @@ function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
     % Create a data structure for the forward kinematics + memory allocation:
     %
     % forward kinematic translation vector (xyz-position) of the joints:
-    fwd_kin.vJntPos = zeros(nJnts,3);
+    fkin.vJntPos = zeros(nJnts,3);
     % 3D data-points of the forward kin. translations (positions) of the joints:
-    fwd_kin.hJnt_dp = zeros(1,nJnts);
+    fkin.hJnt_dp = zeros(1,nJnts);
     % joint pair (link) translations (xyz-positions):
-    fwd_kin.jnt_pair_pos = zeros(nLnks,6);
+    fkin.jnt_pair_pos = zeros(nLnks,6);
     % forward kin. VQ-Transformation (in VQS-form):
-    fwd_kin.vqT = zeros(nSteps,7,nJnts);
+    fkin.vqT = zeros(nSteps,7,nJnts);
 
-    % calculate the forward kinematic VQ-Transformation of each joint in the
+    % calculate the forward kinematics (VQ-Transformations) of each joint in the
     % joint name list of the robot:
-    fwd_kin.vqT(1:nSteps,1:7,1) = vqT_b; % use the base data instead the forward kin. of the 'root_link' ...
+    fkin.vqT(1:nSteps,1:7,1) = vqT_b; % use the base data instead the forward kin. of the 'root_link' ...
     for i = 1:nSteps % for each time step ...
         q   = q_j(i,1:ndof).';
         vqT = squeeze(vqT_b(i,1:7).');
 
         for j = 2:nJnts
-            fwd_kin.vqT(i,1:7,j) = obj.computeFKinVQTransformation(sim_config.robot_body.joint_lnk_names{j,1}, q, vqT);
+            fkin.vqT(i,1:7,j) = obj.computeFKinVQTransformation(sim_config.robot_body.joint_lnk_names{j,1}, q, vqT);
         end
     end
 
@@ -76,7 +76,7 @@ function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
     end
 
     for i = 1:nJnts-1
-        [fwd_kin.vJntPos(i,1:3), fwd_kin.hJnt_dp(1,i)] = plotFKinJointPos((fwd_kin.vqT(1,1:7,i)).', plot_prop);
+        [fkin.vJntPos(i,1:3), fkin.hJnt_dp(1,i)] = plotFKinJointPos((fkin.vqT(1,1:7,i)).', plot_prop);
     end
     % draw the position of the center of mass (CoM):
     plot_prop = sim_config.robot_body.draw_prop.com;
@@ -84,17 +84,17 @@ function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
         plot_prop.marker = 'none';
         plot_prop.color  = 'none';
     end
-    [fwd_kin.vJntPos(nJnts,1:3), fwd_kin.hJnt_dp(1,nJnts)] = plotFKinJointPos((fwd_kin.vqT(1,1:7,nJnts)).', plot_prop);
-    hSimRobot(1:nGObjs,1) = fwd_kin.hJnt_dp(1,1:nJnts); % store the graphics objects ...
+    [fkin.vJntPos(nJnts,1:3), fkin.hJnt_dp(1,nJnts)] = plotFKinJointPos((fkin.vqT(1,1:7,nJnts)).', plot_prop);
+    hSimRobot(1:nGObjs,1) = fkin.hJnt_dp(1,1:nJnts); % store the graphics objects ...
 
     % create a position parameter matrix from the defined joint pairs (links) to describe a full
     % configuration of the robot's skeleton:
-    fwd_kin.jnt_pair_pos = getLinkPositions(fwd_kin.vJntPos, sim_config.robot_body.joint_pair_idx, nLnks);
+    fkin.jnt_pair_pos = getLinkPositions(fkin.vJntPos, sim_config.robot_body.joint_pair_idx, nLnks);
 
     if vis_ctrl.drawSkel
         % draw the skeleton of the robot:
         lnk_draw_prop = sim_config.robot_body.draw_prop.links;
-        body.hLnk_lns = createRobotSkeleton(nLnks, fwd_kin.jnt_pair_pos, lnk_draw_prop);
+        body.hLnk_lns = createRobotSkeleton(nLnks, fkin.jnt_pair_pos, lnk_draw_prop);
 
         idx1   = nJnts + 1;
         idx2   = nJnts + nLnks;
@@ -105,11 +105,11 @@ function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
     if vis_ctrl.drawBody
         % create the shape for the animated body of the robot:
         % geometry and draw properties ...
-        shape_geom = sim_config.robot_body.shape_geom;
-        foot_geom  = sim_config.robot_body.foot_geom;
+        shape_geom    = sim_config.robot_body.shape_geom;
+        foot_geom     = sim_config.robot_body.foot_geom;
         shp_draw_prop = sim_config.robot_body.draw_prop.shape;
 
-        body.hShape = createRobotBody(nLnks, fwd_kin.jnt_pair_pos, nFeets, foot_geom, shape_geom, shp_draw_prop);
+        body.hShape = createRobotBody(nLnks, fkin.jnt_pair_pos, nFeets, foot_geom, shape_geom, shp_draw_prop);
 
         nShpElem = nLnks + nFeets;
         idx3     = nGObjs + 1;
@@ -153,22 +153,22 @@ function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
         tic; % visualization step timer start (needed for adapting the visualization speed)
 
         % update the forward kinematic translations (positions) ...
-        new_fk_pos = (squeeze(fwd_kin.vqT(t,1:7,1:nJnts))).';
-        [fwd_kin.vJntPos, fwd_kin.hJnt_dp] = updateFKinJointPositions(fwd_kin.vJntPos, fwd_kin.hJnt_dp, new_fk_pos, nJnts);
-        hSimRobot(1:nJnts,1) = fwd_kin.hJnt_dp(1,1:nJnts);
+        new_fk_pos = (squeeze(fkin.vqT(t,1:7,1:nJnts))).';
+        [fkin.vJntPos, fkin.hJnt_dp] = updateFKinJointPositions(fkin.vJntPos, fkin.hJnt_dp, new_fk_pos, nJnts);
+        hSimRobot(1:nJnts,1) = fkin.hJnt_dp(1,1:nJnts);
 
         % update the position parameter matrix for the links of the robot ...
-        fwd_kin.jnt_pair_pos = getLinkPositions(fwd_kin.vJntPos, sim_config.robot_body.joint_pair_idx, nLnks);
+        fkin.jnt_pair_pos = getLinkPositions(fkin.vJntPos, sim_config.robot_body.joint_pair_idx, nLnks);
 
         if vis_ctrl.drawSkel
             % update the edges (links) of the skeleton with the respect to the new joint positions ...
-            body.hLnk_lns = updateRobotSkeleton(body.hLnk_lns, nLnks, fwd_kin.jnt_pair_pos);
+            body.hLnk_lns = updateRobotSkeleton(body.hLnk_lns, nLnks, fkin.jnt_pair_pos);
             hSimRobot(idx1:idx2,1) = body.hLnk_lns(1,1:nLnks);
         end
 
         if vis_ctrl.drawBody
             % update the shape positions for the corresponding links of the robot ...
-            body.hShape = updateRobotBody(body.hShape, nLnks, fwd_kin.jnt_pair_pos, nFeets, foot_geom, shape_geom.size_sf);
+            body.hShape = updateRobotBody(body.hShape, nLnks, fkin.jnt_pair_pos, nFeets, foot_geom, shape_geom.size_sf);
             hSimRobot(idx3:nGObjs,1) = body.hShape(1,1:nShpElem);
         end
 
@@ -268,10 +268,10 @@ function shape_vtx = getLnkShapeVertices(jnt_pair_pos, size_sf)
 
     % calculate the offsets in the direction orthogonal to the link ...
     ofs = zeros(4,3);
-    ofs(1,1:3) = on_sc_vec_1 + on_sc_vec_2;
+    ofs(1,1:3) =  on_sc_vec_1 + on_sc_vec_2;
     ofs(2,1:3) = -on_sc_vec_1 + on_sc_vec_2;
     ofs(3,1:3) = -on_sc_vec_1 - on_sc_vec_2;
-    ofs(4,1:3) = on_sc_vec_1 - on_sc_vec_2;
+    ofs(4,1:3) =  on_sc_vec_1 - on_sc_vec_2;
 
     % compute the vertices of each patch which are around the link ...
     idx = 1;
