@@ -13,16 +13,16 @@ function DYNAMICS = robotDynamics(STATE,CONFIG)
 
 % ------------Initialization----------------
 % Config parameters
-ndof           = CONFIG.ndof;
-massCorr       = CONFIG.massCorr;
+ndof            = CONFIG.ndof;
+massCorr        = CONFIG.massCorr;
 
 % State parameters
-RotBase        = STATE.RotBase;
-PosBase        = STATE.PosBase;
-qj             = STATE.qj;
-dqj            = STATE.dqj;
-VelBase        = STATE.VelBase;
-omegaBaseWorld = STATE.omegaBaseWorld;
+RotBase         = STATE.RotBase;
+PosBase         = STATE.PosBase;
+qj              = STATE.qj;
+dqj             = STATE.dqj;
+VelBase         = STATE.VelBase;
+omegaBaseWorld  = STATE.omegaBaseWorld;
 
 %% ROBOT DYNAMICS
 % mass matrix
@@ -46,8 +46,8 @@ dJcNu                            = zeros(6*CONFIG.numConstraints,1);
 
 for i=1:CONFIG.numConstraints
     
-    Jc(6*(i-1)+1:6*i,:)              = wbm_jacobian(RotBase,PosBase,qj,CONFIG.constraintLinkNames{i});
-    dJcNu(6*(i-1)+1:6*i,:)           = wbm_djdq(RotBase,PosBase,qj,dqj,[VelBase;omegaBaseWorld],CONFIG.constraintLinkNames{i});
+    Jc(6*(i-1)+1:6*i,:)          = wbm_jacobian(RotBase,PosBase,qj,CONFIG.constraintLinkNames{i});
+    dJcNu(6*(i-1)+1:6*i,:)       = wbm_djdq(RotBase,PosBase,qj,dqj,[VelBase;omegaBaseWorld],CONFIG.constraintLinkNames{i});
 end
 
 % centroidal momentum Jacobian
@@ -56,16 +56,16 @@ JHJoint                          = zeros(6,ndof);
 
 for ii = 1:6
     
-    NuBaseJH                         = zeros(6,1);
-    NuBaseJH(ii)                     = 1;
-    JHBase(:,ii)                     = wbm_centroidalMomentum(RotBase, PosBase, qj, zeros(ndof,1), NuBaseJH);
+    NuBaseJH                     = zeros(6,1);
+    NuBaseJH(ii)                 = 1;
+    JHBase(:,ii)                 = wbm_centroidalMomentum(RotBase, PosBase, qj, zeros(ndof,1), NuBaseJH);
 end
 
 for ii = 1:ndof
     
-    dqjJH                            = zeros(ndof,1);
-    dqjJH(ii)                        = 1;
-    JHJoint(:,ii)                    = wbm_centroidalMomentum(RotBase, PosBase, qj, dqjJH, zeros(6,1));
+    dqjJH                        = zeros(ndof,1);
+    dqjJH(ii)                    = 1;
+    JHJoint(:,ii)                = wbm_centroidalMomentum(RotBase, PosBase, qj, dqjJH, zeros(6,1));
 end
 
 JH                               = [JHBase JHJoint];

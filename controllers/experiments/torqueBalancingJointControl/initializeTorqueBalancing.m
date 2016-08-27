@@ -17,7 +17,7 @@ clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation
 CONFIG.demo_movements                        = 1;                          %either 0 or 1
-CONFIG.feet_on_ground                        = [1,0];                      %either 0 or 1; [left,right]
+CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left,right]
 
 %% Visualization setup
 % robot simulator
@@ -85,10 +85,19 @@ end
 CONFIG.qjInit = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
 
 %% %%%%%%%%%%%%%%%%%%%%% FORWARD DYNAMICS INTEGRATION %%%%%%%%%%%%%%%%%% %%
-addpath('./src');
-addpath('./../../utilityMatlabFunctions/RobotFunctions');
-addpath('./../../utilityMatlabFunctions/Visualization');
-addpath('./../../utilityMatlabFunctions/InverseKinematics');
-addpath('./../../utilityMatlabFunctions/CentroidalTransformation');
+codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
+utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/utilitiesForTorqueBalancing'];
+robot_root   = [utility_root, filesep, '/RobotFunctions'];
+plots_root   = [utility_root, filesep, '/Visualization'];
+ikin_root    = [utility_root, filesep, '/InverseKinematics'];
+centr_root   = [utility_root, filesep, '/CentroidalTransformation'];
+src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/experiments/torqueBalancingJointControl/src'];
+addpath(utility_root);
+addpath(robot_root);
+addpath(plots_root);
+addpath(ikin_root);
+addpath(centr_root);
+addpath(src_root);
+
 initForwardDynamics(CONFIG);
 

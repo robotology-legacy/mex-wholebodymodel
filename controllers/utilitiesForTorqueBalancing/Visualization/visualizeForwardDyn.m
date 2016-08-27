@@ -21,6 +21,7 @@ figureCont = CONFIG.figureCont;
 
 %% CoM trajectory
 figure(figureCont)
+set(gcf,'numbertitle','off','name','CoM traj')
 plot3(xCoM(1,:),xCoM(2,:),xCoM(3,:));
 hold on
 plot3(xCoM(1,1),xCoM(2,1),xCoM(3,1),'ro');
@@ -37,6 +38,7 @@ figureCont = figureCont +1;
 if CONFIG.feet_on_ground(1) == 1
     
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Lfoot errors')
     subplot(1,2,1)
     hold all
     grid on
@@ -56,6 +58,7 @@ if CONFIG.feet_on_ground(1) == 1
 else
     
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Rfoot errors')
     subplot(1,2,1)
     hold all
     grid on
@@ -78,6 +81,7 @@ figureCont = figureCont +1;
 
 %% Contact forces
 figure(figureCont)
+set(gcf,'numbertitle','off','name','Contact forces')
 hold all
 grid on
 plot(t,fc)
@@ -90,6 +94,7 @@ figureCont = figureCont +1;
 if sum(CONFIG.feet_on_ground) == 2
     
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','f null')
     hold all
     grid on
     plot(t,f0)
@@ -102,6 +107,7 @@ end
 
 %% Control torques
 figure(figureCont)
+set(gcf,'numbertitle','off','name','Norm of torques')
 hold on
 grid on
 plot(t,normTau)
@@ -115,6 +121,7 @@ figureCont = figureCont +1;
 if sum(CONFIG.feet_on_ground) == 2
     
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Feet CoP')
     subplot(1,2,1)
     plot(CoP(1,:),CoP(2,:))
     hold on
@@ -140,6 +147,7 @@ if sum(CONFIG.feet_on_ground) == 2
     
 else
     figure(figureCont)
+    set(gcf,'numbertitle','off','name','Foot CoP')
     plot(CoP(1,:),CoP(2,:))
     hold on
     grid on
@@ -155,6 +163,7 @@ figureCont = figureCont +1;
 
 %% Centroidal momentum error
 figure(figureCont)
+set(gcf,'numbertitle','off','name','H error')
 subplot(2,1,1)
 hold all
 grid on

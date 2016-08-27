@@ -1,5 +1,5 @@
 function name = whatname(name_group,k)
-% WHATNAME is used to insert titles in the joints plots. It assign the
+% WHATNAME is used to insert titles in the joints plots. It assigns the
 % titles according to the joints configuration in yarpRobotInterface.ini
 
 %% Torso

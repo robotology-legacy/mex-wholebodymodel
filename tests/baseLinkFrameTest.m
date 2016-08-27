@@ -54,7 +54,6 @@ disp(rotGot);
 %fprintf('Post position \n');
 %disp(posGot);
 
-
 WBMAssertEqual(posGot,pos);
 WBMAssertEqual(rotGot,rot);
 % fprintf('Post conversion rotation check (R^T*R)\n');
