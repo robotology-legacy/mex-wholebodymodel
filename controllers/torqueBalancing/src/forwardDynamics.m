@@ -2,19 +2,18 @@ function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
 %FORWARDDYNAMICS is the function that will be integrated in the forward
 %                dynamics integrator.
 %
-%             [dchi,visualization] = FORWARDDYNAMICS(t,chi,config) takes
-%             as input the current time step, T; the robot state, CHI
-%             [13+2ndof x 1]; the structure CONFIG which contains the
-%             user-defined parameters.
-%             The output are the vector to be integrated, DCHI [13+2ndof x1]
-%             and the structure VISUALIZATION which contains all the parameters
-%             used to generate the plots in the visualizer.
+%   [dchi,visualization] = FORWARDDYNAMICS(t,chi,CONFIG) takes as input the
+%   current time step, t; the robot state, chi [13+2*ndof x 1]; the structure
+%   CONFIG which contains the user-defined parameters.
+%   The output are the vector to be integrated, dchi [13+2*ndof x1] and the
+%   structure visualization which contains all the parameters used to generate 
+%   the plots in the visualizer.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 
 % ------------Initialization----------------
-% waitbar
+% update the waitbar
 waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 %% Robot Configuration
@@ -25,7 +24,7 @@ xCoMRef               = CONFIG.xCoMRef;
 
 %% Robot State
 STATE                 = robotState(chi,CONFIG);
-RotBase               = STATE.RotBase;
+R_b                   = STATE.RotBase;
 omegaBaseWorld        = STATE.omegaBaseWorld;
 quatBase              = STATE.quatBase;
 VelBase               = STATE.VelBase;
@@ -34,7 +33,7 @@ qj                    = STATE.qj;
 PosBase               = STATE.PosBase;
 
 %% Set the robot state (for wbm functions)
-wbm_setWorldFrame(RotBase,PosBase,[0 0 -9.81]')
+wbm_setWorldFrame(R_b,PosBase,[0 0 -9.81]')
 wbm_updateState(qj,dqj,[VelBase;omegaBaseWorld]);
 
 %% Robot Dynamics
@@ -66,7 +65,7 @@ tau             =  controlParam.tau;
 fc              =  controlParam.fc;
 
 %% State derivative computation
-omegaWorldBase  = transpose(RotBase)*omegaBaseWorld;
+omegaWorldBase  = transpose(R_b)*omegaBaseWorld;
 dquatBase       = quaternionDerivative(omegaWorldBase,quatBase);
 NuQuat          = [VelBase;dquatBase;dqj];
 dNu             = M\(Jc'*fc + [zeros(6,1); tau]-h);
