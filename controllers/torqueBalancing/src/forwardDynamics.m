@@ -25,16 +25,16 @@ xCoMRef               = CONFIG.xCoMRef;
 %% Robot State
 STATE                 = robotState(chi,CONFIG);
 R_b                   = STATE.RotBase;
-omegaBaseWorld        = STATE.omegaBaseWorld;
-quatBase              = STATE.quatBase;
-VelBase               = STATE.VelBase;
+w_omega_b             = STATE.omegaBaseWorld;
+q_b                   = STATE.quatBase;
+v_b                   = STATE.VelBase;
 dqj                   = STATE.dqj;
 qj                    = STATE.qj;
-PosBase               = STATE.PosBase;
+x_b                   = STATE.PosBase;
 
 %% Set the robot state (for wbm functions)
-wbm_setWorldFrame(R_b,PosBase,[0 0 -9.81]')
-wbm_updateState(qj,dqj,[VelBase;omegaBaseWorld]);
+wbm_setWorldFrame(R_b,x_b,[0 0 -9.81]')
+wbm_updateState(qj,dqj,[v_b;w_omega_b]);
 
 %% Robot Dynamics
 DYNAMICS              = robotDynamics(STATE,CONFIG);
@@ -53,24 +53,24 @@ xCoM                  = FORKINEMATICS.xCoM;
 %% Joint limits check
 % jointLimitsCheck(qj,t);
 
-%% CoM and joint trajectory generator
+%% CoM and joints trajectory generator
 trajectory.JointReferences.ddqjRef = zeros(ndof,1);
 trajectory.JointReferences.dqjRef  = zeros(ndof,1);
 trajectory.JointReferences.qjRef   = qjInit;
 trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(xCoMRef,t,CONFIG);
 
-%% Balancing controller
+%% Torque balancing controller
 controlParam    =  runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE);
 tau             =  controlParam.tau;
 fc              =  controlParam.fc;
 
-%% State derivative computation
-omegaWorldBase  = transpose(R_b)*omegaBaseWorld;
-dquatBase       = quaternionDerivative(omegaWorldBase,quatBase);
-NuQuat          = [VelBase;dquatBase;dqj];
-dNu             = M\(Jc'*fc + [zeros(6,1); tau]-h);
+%% State derivative (dchi) computation
+b_omega_w       = transpose(R_b)*w_omega_b;
+dq_b            = quaternionDerivative(b_omega_w,q_b);
+nu_q            = [v_b;dq_b;dqj];
+dnu             = M\(Jc'*fc + [zeros(6,1); tau]-h);
 % state derivative
-dchi            = [NuQuat;dNu];
+dchi            = [nu_q;dnu];
 
 %% Parameters for visualization
 visualization.qj          = qj;
