@@ -8,6 +8,8 @@ and this project does not adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - All the functions take in input the complete state, including the base pose with respect to the world, 
   see [Issue 27](https://github.com/robotology/mex-wholebodymodel/issues/27).
+- Please note that a bug occured before [Pull Request](https://github.com/robotology/mex-wholebodymodel/pull/57) that inverted
+  the rotation passed (when passing the full state) to the `wbm_forwardKinematics`,`wbm_massMatrix`, `wbm_jacobian`, `wbm_centrodialMomentum`, `wbm_djdq`. 
 
 ### Removed
 - Removed `wbm_setWorldLink`, its behavior can be emulated with the `wbm_getWorldFrameFromFixedLink` and the new interfaces that take the complete
