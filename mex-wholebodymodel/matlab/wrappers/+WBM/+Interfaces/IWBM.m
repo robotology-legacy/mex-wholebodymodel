@@ -19,7 +19,7 @@ classdef (Abstract) IWBM < handle
 
         initRobotFcn(obj, fhInitRobotWBM, wf2fixLnk)
 
-        initBaseRobotParams(obj, base_params)
+        initBaseRobotParams(obj, robot_params)
 
         [vqT_b, q_j, v_b, dq_j] = getState(obj)
 
@@ -39,7 +39,9 @@ classdef (Abstract) IWBM < handle
 
         tau_g = gravityForces(obj, q_j, stFltb)
 
-        tau_ctrl = inverseDyn(obj, q_j, dq_j, ddq_j, stFltb)
+        tau_ctrl = inverseDyn(obj, q_j, dq_j, ddq_j, dv_b, stFltb)
+
+        tau_ctrl = inverseHybridDyn(obj, q_j, dq_j, ddq_j, stFltb)
 
         [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, foot_conf)
 

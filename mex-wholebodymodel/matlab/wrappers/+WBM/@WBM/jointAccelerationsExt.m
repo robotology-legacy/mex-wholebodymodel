@@ -20,14 +20,14 @@ function [ddq_j, acc_data] = jointAccelerationsExt(obj, varargin)
             fk_new_vqT.l_sole = mexWholeBodyModel('forward-kinematics', 'l_sole');
             fk_new_vqT.r_sole = mexWholeBodyModel('forward-kinematics', 'r_sole');
         case 8 % normal mode:
-            % wf_R_b     = varargin{1}
-            wf_p_b       = varargin{1,2};
-            q_j          = varargin{1,3};
-            dq_j         = varargin{1,4};
-            v_b          = varargin{1,5};
-            tau          = varargin{1,6};
-            foot_conf    = varargin{1,7};
-            nu           = vertcat(v_b, dq_j); % velocities vector
+            % wf_R_b  = varargin{1}
+            wf_p_b    = varargin{1,2};
+            q_j       = varargin{1,3};
+            dq_j      = varargin{1,4};
+            v_b       = varargin{1,5};
+            tau       = varargin{1,6};
+            foot_conf = varargin{1,7};
+            nu        = vertcat(v_b, dq_j); % mixed generalized velocity
 
             % initial transformation vectors of the feet:
             fk_init_veT.l_foot = foot_conf.veT_init.l_sole;
@@ -77,8 +77,8 @@ function [ddq_j, acc_data] = jointAccelerationsExt(obj, varargin)
     % check which foot is on the ground and calculate the error (difference) between
     % the initial and the new feet-transformations (position & orientation):
     if (foot_conf.ground.left && foot_conf.ground.right)
-        % error    =          current transf.   -    desired transf.
-        %                     (curr. motion)          (ref. motion)
+        % error    =           current transf.   -    desired transf.
+        %                      (curr. motion)          (ref. motion)
         delta_feet = vertcat( (fk_new_veT.l_foot - fk_init_veT.l_foot), ...
                               (fk_new_veT.r_foot - fk_init_veT.r_foot) );
 

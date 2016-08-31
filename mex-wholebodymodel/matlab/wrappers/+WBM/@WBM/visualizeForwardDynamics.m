@@ -53,7 +53,7 @@ function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
         vqT = squeeze(vqT_b(i,1:7).');
 
         for j = 2:nJnts
-            fkin.vqT(i,1:7,j) = obj.computeFKinVQTransformation(sim_config.robot_body.joint_lnk_names{j,1}, q, vqT);
+            fkin.vqT(i,1:7,j) = obj.fkinVQTransformation(sim_config.robot_body.joint_lnk_names{j,1}, q, vqT);
         end
     end
 

@@ -3,8 +3,8 @@ function dstvChi = forwardDynamicsExt(obj, t, stvChi, fhTrqControl, foot_conf)
     stp = WBM.utilities.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
 
     omega_w = stp.omega_b;
-    v_b = vertcat(stp.dx_b, omega_w);
-    nu  = vertcat(v_b, stp.dq_j);
+    v_b = vertcat(stp.dx_b, omega_w); % generalized base velocity
+    nu  = vertcat(v_b, stp.dq_j);     % mixed generalized velocity
 
     % update the state for the optimized mode ...
     obj.setState(stp.q_j, stp.dq_j, v_b);

@@ -67,7 +67,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function tau_ctrl = invdyn(obj, q_j, dq_j, ddq_j)
-            tau_ctrl = obj.mwbm.inverseDyn(q_j, dq_j, ddq_j);
+            tau_ctrl = obj.mwbm.inverseHybridDyn(q_j, dq_j, ddq_j);
         end
 
         function [t, stmChi] = fdyn(obj, tspan, fhCtrlTrqs, stvChi_0, ode_opt)
@@ -92,6 +92,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function J_0 = jacob0(obj, q_j, varargin)
+            % options:
             opt.rpy   = false;
             opt.eul   = false;
             opt.trans = false;
@@ -101,20 +102,30 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             J_0 = obj.mwbm.jacobian(obj.mlink_ctrl, q_j);
 
             if opt.rpy
+                % compute the analytical Jacobian with the Euler rotation rate in ZYX (RPY) order:
                 wf_H_lnk = obj.mwbm.forwardKin(obj.mlink_ctrl, q_j);
-                B_inv = WBM.utilities.tform2angRateTF(wf_H_lnk, 'ZYX'); % use the RPY (ZYX) euler-angles
+                B_inv = WBM.utilities.tform2angRateTF(wf_H_lnk, 'ZYX');
+                if (rcond(B_inv) < eps)
+                    error('MultChainTree::jacob0: %s', WBM.wbmErrorMsg.SINGULAR_MAT);
+                end
 
                 J_0 = blkdiag(eye(3,3), B_inv) * J_0;
             elseif opt.eul
+                % compute the analytical Jacobian with the Euler rotation rate in ZYZ order:
                 wf_H_lnk = obj.mwbm.forwardKin(obj.mlink_ctrl, q_j);
-                B_inv = WBM.utilities.tform2angRateTF(wf_H_lnk, 'ZYZ'); % use the ZYZ euler-angles
+                B_inv = WBM.utilities.tform2angRateTF(wf_H_lnk, 'ZYZ');
+                if (rcond(B_inv) < eps)
+                    error('MultChainTree::jacob0: %s', WBM.wbmErrorMsg.SINGULAR_MAT);
+                end
 
                 J_0 = blkdiag(eye(3,3), B_inv) * J_0;
             end
 
             if opt.trans
+                % return the translational sub-matrix of the Jacobian:
                 J_0 = J_0(1:3,1:6);
             elseif opt.rot
+                % return the rotational sub-matrix of the Jacobian:
                 J_0 = J_0(4:6,1:6);
             end
         end
@@ -126,10 +137,6 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         function M = inertia(obj, q_j)
             M = obj.mwbm.massMatrix(q_j);
         end
-
-        % function gravjac()
-
-        % end
 
         function resv = islimit(obj, q_j)
             resv = obj.mwbm.islimit(q_j);

@@ -45,8 +45,6 @@ classdef (Abstract) IMultChainTree < handle
 
         M = inertia(obj, q_j)
 
-        % function gravjac()
-
         resv = islimit(obj, q_j)
 
         plot3d(obj, x_out, sim_tstep, vis_ctrl)

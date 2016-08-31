@@ -3,8 +3,8 @@ function dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
     stp = WBM.utilities.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
 
     omega_w = stp.omega_b;
-    v_b = vertcat(stp.dx_b, omega_w);
-    %v   = vertcat(v_b, stp.dq_j);
+    v_b = vertcat(stp.dx_b, omega_w); % generalized base velocity
+    %nu  = vertcat(v_b, stp.dq_j);
 
     % update the state for the optimized mode (precautionary) ...
     obj.setState(stp.q_j, stp.dq_j, v_b);
@@ -29,5 +29,5 @@ function dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
     [dv,~] = jointAccelerations(obj, stp.dq_j, tau); % optimized mode
 
     dstvChi = vertcat(dx, dv);
-    %kinEnergy = 0.5*v.'*M*v;
+    %kinEnergy = 0.5*nu.'*M*v;
 end

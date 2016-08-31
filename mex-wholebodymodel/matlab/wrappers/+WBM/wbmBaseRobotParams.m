@@ -1,7 +1,7 @@
 classdef wbmBaseRobotParams
     properties
-        robot_model@WBM.wbmBaseRobotModel
-        robot_config@WBM.wbmBaseRobotConfig
+        model@WBM.wbmBaseRobotModel
+        config@WBM.wbmBaseRobotConfig
         wf2fixLnk@logical scalar
     end
 end

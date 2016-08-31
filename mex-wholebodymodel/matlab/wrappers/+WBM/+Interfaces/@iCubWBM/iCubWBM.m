@@ -36,10 +36,10 @@ classdef iCubWBM < WBM.Interfaces.IWBM
 
             switch nargin
                 % init the mex-WholeBodyModel for the iCub-Robot:
-                case 2
-                    obj.mwbm_icub = WBM.WBM(robot_model, robot_config);
                 case 3
                     obj.mwbm_icub = WBM.WBM(robot_model, robot_config, wf2fixLnk);
+                case 2
+                    obj.mwbm_icub = WBM.WBM(robot_model, robot_config);
             end
             % else, do nothing ...
         end
@@ -62,11 +62,11 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             obj.mwbm_icub = fhInitRobotWBM(wf2fixLnk);
         end
 
-        function initBaseRobotParams(obj, base_params)
-            if ~isa(base_params, 'WBM.wbmBaseRobotParams')
+        function initBaseRobotParams(obj, robot_params)
+            if ~isa(robot_params, 'WBM.wbmBaseRobotParams')
                 error('iCubWBM::initBaseRobotParams: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            obj.mwbm_icub = WBM.WBM(base_params.robot_model, base_params.robot_config, base_params.wf2fixLnk);
+            obj.mwbm_icub = WBM.WBM(robot_params.model, robot_params.config, robot_params.wf2fixLnk);
         end
 
         function delete(obj)
@@ -128,22 +128,18 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             tau_g = obj.mwbm_icub.gravityForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j);
         end
 
-        function tau_ctrl = inverseDyn(obj, q_j, dq_j, ddq_j, stFltb)
+        function tau_ctrl = inverseDyn(obj, q_j, dq_j, ddq_j, dv_b, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
+            tau_ctrl = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b, ddq_j, dv_b);
+        end
 
-            M      = obj.mwbm_icub.massMatrix(stFltb.wf_R_b, stFltb.wf_p_b, q_j);
-            tau_c  = obj.mwbm_icub.coriolisCentrifugalForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b);
-            tau_g  = obj.mwbm_icub.gravityForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j);
-            tau_fr = obj.mwbm_icub.frictionForces(dq_j);
-            tau_fr = vertcat(zeros(6,1), tau_fr);
-
-            tau_ctrl = M*ddq_j + tau_c*dq_j + tau_g + tau_fr;
-
-            % at the moment the implementation in C++ is not finished in the mex-WBM:
-            %dv_b = ones(6,1); % dummy ...
-            %tau_ctrl = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, ddq_j, dv_b);
+        function tau_ctrl = inverseHybridDyn(obj, q_j, dq_j, ddq_j, stFltb)
+            if ~exist('stFltb', 'var')
+                stFltb = obj.mwbm_icub.getFloatingBaseState();
+            end
+            tau_ctrl = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b, ddq_j);
         end
 
         function [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, foot_conf)
@@ -294,7 +290,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         end
 
         function robot_params = get.robot_params(obj)
-            robot_params = obj.mwbm_icub.base_robot_params;
+            robot_params = obj.mwbm_icub.robot_params;
         end
 
         function set.sim_config(obj, sim_config)
@@ -318,7 +314,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             end
 
             [p_b, R_b] = WBM.utilities.tform2posRotm(tform);
-            obj.mwbm_icub.updateWorldFrame(R_b, p_b);
+            obj.mwbm_icub.setInitWorldFrame(R_b, p_b);
             obj.mbase_tform = tform;
         end
 
@@ -361,7 +357,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
 
         function set.gravity(obj, g_wf)
             obj.mwbm_icub.g_wf = g_wf;
-            obj.mwbm_icub.updateWorldFrame();
+            obj.mwbm_icub.setInitWorldFrame();
         end
 
         function g_wf = get.gravity(obj)

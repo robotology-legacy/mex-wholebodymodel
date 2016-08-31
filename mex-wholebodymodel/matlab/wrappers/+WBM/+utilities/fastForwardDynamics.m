@@ -8,7 +8,7 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
     stp = WBM.utilities.fastGetStateParams(stvChi, robot_config.stvLen, ndof);
 
     omega_w = stp.omega_b;
-    v_b = vertcat(stp.dx_b, omega_w);
+    v_b = vertcat(stp.dx_b, omega_w); % generalized base velocity
     %v = vertcat(v_b, stp.dq_j);
 
     % update the state for the optimized mode (precautionary) ...

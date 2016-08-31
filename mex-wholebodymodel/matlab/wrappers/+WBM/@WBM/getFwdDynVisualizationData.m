@@ -50,7 +50,7 @@ end
 function fdyn_data = getFDynData(obj, t, stvChi, fhTrqControl)
     % get the current state parameters ...
     stp = WBM.utilities.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
-    v_b = vertcat(stp.dx_b, stp.omega_b); % base velocities
+    v_b = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
 
     % update the state for the optimized mode ...
     setState(obj, stp.q_j, stp.dq_j, v_b);
@@ -67,8 +67,8 @@ end
 function fdyn_data = getFDynDataExt(obj, t, stvChi, fhTrqControl, foot_conf)
     % get the state parameters ...
     stp = WBM.utilities.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
-    v_b = vertcat(stp.dx_b, stp.omega_b); % base velocities
-    nu  = vertcat(v_b, stp.dq_j);         % velocities
+    v_b = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
+    nu  = vertcat(v_b, stp.dq_j);         % mixed generalized velocity
 
     % update the state ...
     setState(obj, stp.q_j, stp.dq_j, v_b);

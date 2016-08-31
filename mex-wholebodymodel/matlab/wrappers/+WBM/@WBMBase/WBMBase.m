@@ -29,8 +29,8 @@ classdef WBMBase < handle
 
             obj.initWBM(robot_model);
             % set the world frame (WF) to the initial parameters ...
-            obj.updateWorldFrame(robot_model.wf_R_b, robot_model.wf_p_b, ...
-                                 robot_model.g_wf);
+            obj.setInitWorldFrame(robot_model.wf_R_b, robot_model.wf_p_b, ...
+                                  robot_model.g_wf);
         end
 
         % Copy-function:
@@ -97,34 +97,38 @@ classdef WBMBase < handle
             mexWholeBodyModel('set-world-frame', wf_R_b_arr, wf_p_b, g_wf);
         end
 
-        function updateWorldFrame(obj, wf_R_b, wf_p_b, g_wf)
+        function setInitWorldFrame(obj, wf_R_b, wf_p_b, g_wf)
+            % setup the world frame with the initial parameters, or update it with the new values:
             switch nargin
                 case 4
-                    % replace all old default parameters with the new values ...
+                    % replace all old initial parameters with the new values ...
                     obj.mwbm_model.wf_R_b = wf_R_b;
                     obj.mwbm_model.wf_p_b = wf_p_b;
                     obj.mwbm_model.g_wf   = g_wf;
                 case 3
-                    % replace only the orientation and translation ...
+                    % replace only the orientation and the translation ...
                     obj.mwbm_model.wf_R_b = wf_R_b;
                     obj.mwbm_model.wf_p_b = wf_p_b;
+
+                    obj.setWorldFrame(obj.mwbm_model.wf_R_b, obj.mwbm_model.wf_p_b);
+                    return
                 case 2
-                    error('WBMBase::updateWorldFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                    error('WBMBase::setInitWorldFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            % update the world frame with the new (or previously changed) parameters ...
+            % if nargin = 1, update the world frame with the individual changed values from outside ...
             obj.setWorldFrame(obj.mwbm_model.wf_R_b, obj.mwbm_model.wf_p_b, ...
                               obj.mwbm_model.g_wf);
         end
 
-        function [wf_p_b, wf_R_b] = getWorldFrameFromFixedLink(obj, urdf_link_name, q_j)
+        function [wf_p_b, wf_R_b] = getWorldFrameFromFixedLink(obj, urdf_fixed_link, q_j)
             % compute the base world frame (WF) from a given contact (constraint) link:
             switch nargin
                 case 3
                     % normal mode: compute the WF for a specific joint configuration (positions)
-                    [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(urdf_link_name, q_j);
+                    [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(urdf_fixed_link, q_j);
                 case 2
                     % optimized mode: compute the WF with the current joint configuration
-                    [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(urdf_link_name);
+                    [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(urdf_fixed_link);
                 otherwise
                     error('WBMBase::getWorldFrameFromFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -207,40 +211,7 @@ classdef WBMBase < handle
             resv = ~((q_j > obj.mwbm_model.jlim.lwr) & (q_j < obj.mwbm_model.jlim.upr));
         end
 
-        function tau_ctrl = inverseDynamics(obj, varargin) % not implemented yet in C++!
-            % wf_R_b = varargin{1}
-            % wf_p_b = varargin{2}
-            % q_j    = varargin{3}
-            % dq_j   = varargin{4}
-            % v_b    = varargin{5}
-            % ddq_j  = varargin{6}
-            % dv_b   = varargin{7}
-            switch nargin
-                case 8 % normal mode:
-                    wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-                    tau    = mexWholeBodyModel('inverse-dynamics', wf_R_b_arr, varargin{1,2}, varargin{1,3}, ...
-                                               varargin{1,4}, varargin{1,5}, varargin{1,6},  varargin{1,7});
-                    tau_fr = frictionForces(obj, varargin{1,4}); % friction torques (negative values)
-                    tau_fr = vertcat(zeros(6,1), tau_fr);
-
-                    tau_ctrl = tau + tau_fr;
-                case 5 % optimized mode:
-                    % dq_j  = varargin{1}
-                    % ddq_j = varargin{2}
-                    % dv_b  = varargin{3}
-
-                    % Note: The same vector dq_j is already stored inside of the mex-subroutine. Because
-                    %       before any function can be used in optimized mode, the function "setState"
-                    %       must be called previously to update the state parameters q_j, dq_j and v_b.
-                    tau    = mexWholeBodyModel('inverse-dynamics', varargin{1,2}, varargin{1,3});
-                    tau_fr = frictionForces(obj, varargin{1,1});
-                    tau_fr = vertcat(zeros(6,1), tau_fr);
-
-                    tau_ctrl = tau + tau_fr;
-            otherwise
-                error('WBMBase::inverseDynamics: %s', WBM.wbmErrorMsg.WRONG_ARG);
-            end
-        end
+        tau_ctrl = inverseDynamics(obj, varargin) % not completely implemented in C++!
 
         function J = jacobian(obj, varargin)
             % wf_R_b = varargin{1}

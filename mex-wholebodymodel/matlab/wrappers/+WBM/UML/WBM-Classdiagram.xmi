@@ -54,15 +54,15 @@
 					<ownedParameter xmi:id="AAAAAAFPy50lVEitGA0=" name="wf_p_b" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFT8URoMYUwa+0=" name="g_wf" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFRpoG35yT47ac=" name="updateWorldFrame" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFRpoG35yT47ac=" name="setInitWorldFrame" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFSxZho2d0CrnU=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFU6BxzkzD88rM=" name="updateWorldFrame" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFU6BxzkzD88rM=" name="setInitWorldFrame" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFU6Bz4MTu7KAw=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFU6Bz4Mju8ApQ=" name="wf_R_b" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFU6Bz4Nzu9yd4=" name="wf_p_b" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFRXKqD2Im1YQM=" name="updateWorldFrame" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFRXKqD2Im1YQM=" name="setInitWorldFrame" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFRXKrV5IoNV+w=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFRXKrV5ooOtfU=" name="wf_R_b" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFRXKrV5ooPNfk=" name="wf_p_b" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
@@ -426,8 +426,8 @@
 				<ownedAttribute xmi:id="AAAAAAFRaD3PBNLhqTM=" name="stvqT" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<ownedAttribute xmi:id="AAAAAAFTHRJsYY0kVKY=" name="robot_body" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFTEtPLL2v34jE=" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<ownedAttribute xmi:id="AAAAAAFRaD3RU9MC8YM=" name="robot_config" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFQEwAzGd2d/ak=" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
-				<ownedAttribute xmi:id="AAAAAAFVJQuCbydDvkc=" name="base_robot_params" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFU4lbNqN7G23E=" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
-				<ownedAttribute xmi:id="AAAAAAFUXhg4g/naWoo=" name="robot_init_state" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFQABVa+gl+WMM=" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAFVJQuCbydDvkc=" name="base_params" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFU4lbNqN7G23E=" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAFUXhg4g/naWoo=" name="init_state" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFQABVa+gl+WMM=" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<ownedAttribute xmi:id="AAAAAAFVcwcRIISyj74=" name="MAX_NUM_TOOLS" visibility="public" isStatic="true" isLeaf="true" type="integer_id" isReadOnly="true" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<ownedAttribute xmi:id="AAAAAAFVJqkBrt/duNo=" name="mwf2fixLnk" visibility="protected" isStatic="false" isLeaf="false" type="logical_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<ownedOperation xmi:id="AAAAAAFPyz+c7Ee6t14=" name="WBM" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
@@ -448,18 +448,18 @@
 				<ownedOperation xmi:id="AAAAAAFSxhX9LOxh3S0=" name="delete" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFSxhYkQOyD6AI=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFRpoeCmi7g3yI=" name="setWorldFrameFromFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFRpoeCmi7g3yI=" name="setWorldFrameAtFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFRpofJ4y9TN8Q=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFSxhbRXO1rTwE=" name="urdf_link_name" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFRAQ1hV4cnR98=" name="setWorldFrameFromFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFRAQ1hV4cnR98=" name="setWorldFrameAtFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFRAQ3ZHIgUW5o=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFRAQ3ZHYgVY+c=" name="urdf_link_name" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFRAQ3ZHogWfbE=" name="q_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFRAQ3ZHogXFgQ=" name="dq_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFSxhcaXu3dqQ8=" name="v_b" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFQ2Fbfxik+VcM=" name="setWorldFrameFromFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFQ2Fbfxik+VcM=" name="setWorldFrameAtFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFQ2IOsgyuIVfc=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFQ2IOshCuJ79o=" name="urdf_link_name" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFQ2IOshCuKDvo=" name="q_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
@@ -467,16 +467,16 @@
 					<ownedParameter xmi:id="AAAAAAFQ2IOshSuMPKo=" name="v_b" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFSxhb1wu2khMw=" name="g_wf" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFU6++joZN2u+s=" name="setWorldFrameFromDfltFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFU6++joZN2u+s=" name="updateWorldFrameFromDfltFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFU6/GeB7ss5rE=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFU6+/L1pVHYzc=" name="setWorldFrameFromDfltFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFU6+/L1pVHYzc=" name="updateWorldFrameFromDfltFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFU6/E4oblvLs8=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFU6/E4oblwWoc=" name="q_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFU6/E4pblx2MQ=" name="dq_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFU6/E4qLlyJRI=" name="v_b" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFU6+/e/pZAr08=" name="setWorldFrameFromDfltFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFU6+/e/pZAr08=" name="updateWorldFrameFromDfltFixedLink" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFU6/EZarfqRkk=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFU6/EZarfrhg8=" name="q_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFU6/EZbrfsjnQ=" name="dq_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
@@ -486,7 +486,7 @@
 				<ownedOperation xmi:id="AAAAAAFRJdwjwwjGZU8=" name="updateInitVQTransformation" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFSxheP7e4WVGA=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFUCgsI3A8AJNE=" name="computeFKinVQTransformation" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFUCgsI3A8AJNE=" name="fkinVQTransformation" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFUCgsvgw8rU3s=" name="wf_vqT_lnk" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFUCgsvgw8sh4A=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFUCgsvgw8tbsk=" name="urdf_link_name" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
@@ -738,13 +738,13 @@
 					<ownedParameter xmi:id="AAAAAAFVPpH7iPxvqlo=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFVPpH7iPxwWdU=" name="stmChi" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFRRJYHMUGvoZ4=" name="getVelocities" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFRRJYHMUGvoZ4=" name="getMixedVelocities" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFRRJZC6kHR4Jw=" name="v_b" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFSxh0zIvVoUpE=" name="dq_j" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFSxh0zIvVpLxA=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFVOtKFHrwEw+M=" name="stChi" visibility="public" isStatic="false" isLeaf="false" type="vector_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFRSbbreVF6WFw=" name="getVelocities" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFRSbbreVF6WFw=" name="getMixedVelocities" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFRSbx3k1eqd/k=" name="v_b" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFSxh1/J/Wt1ys=" name="dq_j" visibility="public" isStatic="false" isLeaf="false" type="matrix_id" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFSxh1/J/WuTKg=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
@@ -784,15 +784,15 @@
 					<ownedParameter xmi:id="AAAAAAFSxiM7b/g62zo=" name="robot_config" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFQEwAzGd2d/ak=" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFSxiM7b/g7lwY=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFVJQxcXCtmC0g=" name="get.base_robot_params" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFVJQxcXCtmC0g=" name="get.base_params" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFVJQ2NpyvH+FA=" name="base_params" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFU4lbNqN7G23E=" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFVJQ2NpyvIy+Y=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFUXipWHI9eYpw=" name="set.robot_init_state" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFUXipWHI9eYpw=" name="set.init_state" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFUXkOhpJMT3PY=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFUXkOhpZMUkMc=" name="stInit" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFQABVa+gl+WMM=" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>
-				<ownedOperation xmi:id="AAAAAAFUXipawY+jR24=" name="get.robot_init_state" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
+				<ownedOperation xmi:id="AAAAAAFUXipawY+jR24=" name="get.init_state" visibility="public" isStatic="false" isLeaf="false" concurrency="sequential" isQuery="false" isAbstract="false" xmi:type="uml:Operation">
 					<ownedParameter xmi:id="AAAAAAFUXkRIv5OreW0=" name="stInit" visibility="public" isStatic="false" isLeaf="false" type="AAAAAAFQABVa+gl+WMM=" isReadOnly="false" isOrdered="false" isUnique="false" direction="out" xmi:type="uml:Parameter"/>
 					<ownedParameter xmi:id="AAAAAAFUXkRIv5OsTNc=" name="obj" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" direction="in" xmi:type="uml:Parameter"/>
 				</ownedOperation>

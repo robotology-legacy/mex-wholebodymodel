@@ -6,8 +6,8 @@ classdef WBM < WBM.WBMBase
         stvqT@double      vector
         robot_body@WBM.wbmBody
         robot_config@WBM.wbmBaseRobotConfig
-        base_robot_params@WBM.wbmBaseRobotParams
-        robot_init_state@WBM.wbmStateParams
+        robot_params@WBM.wbmBaseRobotParams
+        init_state@WBM.wbmStateParams
     end
 
     properties(Constant)
@@ -40,7 +40,7 @@ classdef WBM < WBM.WBMBase
                 if (obj.mwbm_config.nCstrs > 0)
                     % set the world frame (WF) at the initial VQ-Transformation from
                     % the chosen fixed link, i.e. the first entry of the constraint list:
-                    obj.setWorldFrameFromFixedLink(obj.mwbm_config.cstr_link_names{1});
+                    obj.setWorldFrameAtFixedLink(obj.mwbm_config.cstr_link_names{1});
                 else
                     error('WBM::WBM: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
                 end
@@ -59,48 +59,48 @@ classdef WBM < WBM.WBMBase
             delete@WBM.WBMBase(obj);
         end
 
-        function setWorldFrameFromFixedLink(obj, urdf_link_name, q_j, dq_j, v_b, g_wf)
+        function setWorldFrameAtFixedLink(obj, urdf_fixed_link, q_j, dq_j, v_b, g_wf)
             if (nargin < 6)
                 switch nargin
                     case 5
                         % use the default gravity vector ...
                         g_wf = obj.mwbm_model.g_wf;
                     case 2
-                        % use the initial state values ...
+                        % use the initial state values (possibly changed from outside) ...
                         v_b  = vertcat(obj.mwbm_config.init_state_params.dx_b, obj.mwbm_config.init_state_params.omega_b);
                         q_j  = obj.mwbm_config.init_state_params.q_j;
                         dq_j = obj.mwbm_config.init_state_params.dq_j;
                         g_wf = obj.mwbm_model.g_wf;
                     otherwise
-                        error('WBM::setWorldFrameFromFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                        error('WBM::setWorldFrameAtFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
                 end
             end
-            obj.fixed_link = urdf_link_name; % replace the old default link with the new link ...
+            obj.fixed_link = urdf_fixed_link; % replace the old default fixed link with the new fixed link ...
 
             obj.setState(q_j, dq_j, v_b); % update the robot state (important for initializations) ...
-            [p_b, R_b] = obj.getWorldFrameFromFixedLink(urdf_link_name); % use optimized mode
+            [p_b, R_b] = obj.getWorldFrameFromFixedLink(urdf_fixed_link); % use optimized mode
             obj.setWorldFrame(R_b, p_b, g_wf);
         end
 
-        function setWorldFrameFromDfltFixedLink(obj, q_j, dq_j, v_b, g_wf)
+        function updateWorldFrameFromDfltFixedLink(obj, q_j, dq_j, v_b, g_wf)
             if (nargin < 5)
                 switch nargin
                     case 4
                         % use the default gravity values ...
                         g_wf = obj.mwbm_model.g_wf;
                     case 1
-                        % use the initial state values ...
+                        % use the initial state values (possibly changed from outside) ...
                         v_b  = vertcat(obj.mwbm_config.init_state_params.dx_b, obj.mwbm_config.init_state_params.omega_b);
                         q_j  = obj.mwbm_config.init_state_params.q_j;
                         dq_j = obj.mwbm_config.init_state_params.dq_j;
                         g_wf = obj.mwbm_model.g_wf;
                     otherwise
-                        error('WBM::setWorldFrameFromDfltFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                        error('WBM::updateWorldFrameFromDfltFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
                 end
             end
-            obj.setState(q_j, dq_j, v_b); % update state (for initializations, else precautionary) ...
+            obj.setState(q_j, dq_j, v_b); % update state ...
             [p_b, R_b] = obj.getWorldFrameFromDfltFixedLink(); % optimized mode
-            obj.setWorldFrame(R_b, p_b, g_wf);
+            obj.setWorldFrame(R_b, p_b, g_wf); % update the world frame with the new values ...
         end
 
         function updateInitVQTransformation(obj)
@@ -109,10 +109,10 @@ classdef WBM < WBM.WBMBase
             obj.mwbm_config.init_state_params.qt_b = vqT_init(4:7,1); % orientation (quaternion)
         end
 
-        function wf_vqT_lnk = computeFKinVQTransformation(obj, urdf_link_name, q_j, vqT, g_wf)
-            % calculate the forward kinematic vector-quaternion transf. of a specified link frame:
+        function wf_vqT_lnk = fkinVQTransformation(obj, urdf_link_name, q_j, vqT, g_wf)
+            % computes the forward kinematic vector-quaternion transf. of a specified link frame:
             if (nargin < 4)
-                error('WBM::computeFKinVQTransformation: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('WBM::fkinVQTransformation: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
 
             % get the VQ-Transformation form the base state ...
@@ -853,13 +853,13 @@ classdef WBM < WBM.WBMBase
             stmPos = stmChi(1:m,1:cutp);      % m -by- [x_b, qt_b, q_j]
         end
 
-        function [v_b, dq_j] = getVelocities(obj, stChi)
+        function [v_b, dq_j] = getMixedVelocities(obj, stChi)
             len   = obj.mwbm_config.stvLen;
             ndof  = obj.mwbm_model.ndof;
 
             if iscolumn(stChi)
                 if (size(stChi,1) ~= len)
-                   error('WBM::getVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                   error('WBM::getMixedVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
                 end
 
                 % extract the velocities ...
@@ -869,7 +869,7 @@ classdef WBM < WBM.WBMBase
             elseif ismatrix(stChi)
                 [m, n] = size(stChi);
                 if (n ~= len)
-                    error('WBM::getVelocities: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+                    error('WBM::getMixedVelocities: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
                 end
 
                 v_b  = stChi(1:m,ndof+8:ndof+13); % m -by- [dx_b; omega_b]
@@ -877,7 +877,7 @@ classdef WBM < WBM.WBMBase
                 return
             end
             % else ...
-            error('WBM::getVelocities: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+            error('WBM::getMixedVelocities: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
         end
 
         function v_b = getBaseVelocities(obj, stChi)
@@ -931,21 +931,21 @@ classdef WBM < WBM.WBMBase
             robot_config = obj.mwbm_config;
         end
 
-        function base_params = get.base_robot_params(obj)
-            base_params = WBM.wbmBaseRobotParams;
-            base_params.robot_model  = obj.mwbm_model;
-            base_params.robot_config = obj.mwbm_config;
-            base_params.wf2fixLnk    = obj.mwf2fixLnk;
+        function robot_params = get.robot_params(obj)
+            robot_params = WBM.wbmBaseRobotParams;
+            robot_params.model     = obj.mwbm_model;
+            robot_params.config    = obj.mwbm_config;
+            robot_params.wf2fixLnk = obj.mwf2fixLnk;
         end
 
-        function set.robot_init_state(obj, stInit)
+        function set.init_state(obj, stInit)
             if ~obj.checkInitStateDimensions(stInit)
-                error('WBM::set.robot_init_state: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
+                error('WBM::set.init_state: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
             end
             obj.mwbm_config.init_state_params = stInit;
         end
 
-        function stInit = get.robot_init_state(obj)
+        function stInit = get.init_state(obj)
             stInit = obj.mwbm_config.init_state_params;
         end
 

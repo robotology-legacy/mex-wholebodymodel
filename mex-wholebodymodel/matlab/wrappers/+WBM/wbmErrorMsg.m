@@ -11,6 +11,7 @@ classdef wbmErrorMsg
         MAX_NUM_LIMIT     = 'Value exceeds the maximum number!';
         NAME_NOT_EXIST    = 'The name does not exist in the list!'
         NOT_HOMOG_MAT     = 'Matrix is not homogeneous!';
+        SINGULAR_MAT      = 'Singular matrix!';
         STRING_MISMATCH   = 'String mismatch!';
         UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';
         UNKNOWN_EXC       = 'Unknown exception!';
