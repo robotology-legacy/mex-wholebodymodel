@@ -26,6 +26,7 @@
 // library includes
 #include <wbi/wbiUtil.h>
 #include <wbi/iWholeBodyModel.h>
+#include <Eigen/Core>
 
 //local includes
 #include "mexwholebodymodelsettings.h"
