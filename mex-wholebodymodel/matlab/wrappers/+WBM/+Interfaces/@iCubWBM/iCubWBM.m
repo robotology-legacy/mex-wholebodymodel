@@ -128,18 +128,18 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             tau_g = obj.mwbm_icub.gravityForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j);
         end
 
-        function tau_ctrl = inverseDyn(obj, q_j, dq_j, ddq_j, dv_b, stFltb)
+        function tau_j = inverseDyn(obj, q_j, dq_j, ddq_j, dv_b, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            tau_ctrl = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b, ddq_j, dv_b);
+            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b, ddq_j, dv_b);
         end
 
-        function tau_ctrl = inverseHybridDyn(obj, q_j, dq_j, ddq_j, stFltb)
+        function tau_j = inverseHybridDyn(obj, q_j, dq_j, ddq_j, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            tau_ctrl = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b, ddq_j);
+            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b, ddq_j);
         end
 
         function [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, foot_conf)

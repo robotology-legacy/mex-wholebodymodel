@@ -1,4 +1,4 @@
-function tau_ctrl = inverseDynamics(obj, varargin) % not completely implemented in C++!
+function tau_j = inverseDynamics(obj, varargin) % not completely implemented in C++!
     % wf_R_b = varargin{1}
     % wf_p_b = varargin{2}
     % q_j    = varargin{3}
@@ -14,7 +14,7 @@ function tau_ctrl = inverseDynamics(obj, varargin) % not completely implemented 
             tau_fr = frictionForces(obj, varargin{1,4}); % friction torques (negative values)
             tau_fr = vertcat(zeros(6,1), tau_fr);
 
-            tau_ctrl = tau + tau_fr;
+            tau_j = tau + tau_fr;
             return
         case 7
             % if dv_b, the acceleration (linear & angular acceleration)
@@ -27,8 +27,6 @@ function tau_ctrl = inverseDynamics(obj, varargin) % not completely implemented 
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
             M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, p_b, q_j);
             C_qv = mexWholeBodyModel('generalised-forces', wf_R_b_arr, p_b, q_j, dq_j, varargin{1,5});
-            tau_fr = frictionForces(obj, dq_j);
-            tau_fr = vertcat(zeros(6,1), tau_fr);
         case 4 % optimized modes:
             % dq_j  = varargin{1}
             % ddq_j = varargin{2}
@@ -41,7 +39,7 @@ function tau_ctrl = inverseDynamics(obj, varargin) % not completely implemented 
             tau_fr = frictionForces(obj, varargin{1,1});
             tau_fr = vertcat(zeros(6,1), tau_fr);
 
-            tau_ctrl = tau + tau_fr;
+            tau_j = tau + tau_fr;
             return
         case 3
             % if dv_b is not given or unknown ...
@@ -50,24 +48,26 @@ function tau_ctrl = inverseDynamics(obj, varargin) % not completely implemented 
 
             M      = mexWholeBodyModel('mass-matrix');
             C_qv   = mexWholeBodyModel('generalised-forces');
-            tau_fr = frictionForces(obj, dq_j);
-            tau_fr = vertcat(zeros(6,1), tau_fr);
     otherwise
         error('WBMBase::inverseDynamics: %s', WBM.wbmErrorMsg.WRONG_ARG);
     end
+
+    tau_fr = frictionForces(obj, dq_j);
+    tau_fr = vertcat(zeros(6,1), tau_fr);
+
     %% Generalized floating-base acceleration:
     %
     %  In general the equation of motion is given as follows:
     %
-    %       tau_ctrl = M * ddq_j + C(q_j, dq_j) + tau_fr,
+    %       tau_j = M * ddq_j + C(q_j, dq_j) + tau_fr,
     %
     %  where C(q_j, dq_j) denotes the generalized bias force.
     %  In contrast to the fixed-based system, the equation of motion for a
     %  floating-base system is given as follows:
     %
-    %       |    0     |   | M_00      M_01 |   | dv_b  |   | h_0 |   |   0    |
-    %       |          | = |                | * |       | + |     | + |        |
-    %       | tau_ctrl |   | M_01^T    M_11 |   | ddq_j |   | h_1 |   | tau_fr |
+    %       |   0   |   | M_00      M_01 |   | dv_b  |   | h_0 |   |   0    |
+    %       |       | = |                | * |       | + |     | + |        |
+    %       | tau_j |   | M_01^T    M_11 |   | ddq_j |   | h_1 |   | tau_fr |
     %
     %  where M is the (n+6)x(n+6) mass matrix, h = (h_0, h_1)^T is a (n+6)x1 vector
     %  representing the generalized bias forces (Coriolis, centrifugal and gravity forces)
@@ -84,7 +84,7 @@ function tau_ctrl = inverseDynamics(obj, varargin) % not completely implemented 
     dv_b  = generalizedBaseAcceleration(M, C_qv, ddq_j, obj.mwbm_model.ndof);
     ddq_j = vertcat(dv_b, ddq_j); % mixed generalized acceleration
 
-    tau_ctrl = M*ddq_j + C_qv + tau_fr;
+    tau_j = M*ddq_j + C_qv + tau_fr;
 end
 %% END of inverseDynamics.
 

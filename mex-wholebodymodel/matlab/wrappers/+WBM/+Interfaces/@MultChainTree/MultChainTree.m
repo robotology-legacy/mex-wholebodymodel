@@ -66,8 +66,8 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             tau_g = obj.mwbm.gravityForces(q_j);
         end
 
-        function tau_ctrl = invdyn(obj, q_j, dq_j, ddq_j)
-            tau_ctrl = obj.mwbm.inverseHybridDyn(q_j, dq_j, ddq_j);
+        function tau_j = invdyn(obj, q_j, dq_j, ddq_j)
+            tau_j = obj.mwbm.inverseHybridDyn(q_j, dq_j, ddq_j);
         end
 
         function [t, stmChi] = fdyn(obj, tspan, fhCtrlTrqs, stvChi_0, ode_opt)

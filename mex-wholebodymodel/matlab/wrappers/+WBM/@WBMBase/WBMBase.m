@@ -211,7 +211,7 @@ classdef WBMBase < handle
             resv = ~((q_j > obj.mwbm_model.jlim.lwr) & (q_j < obj.mwbm_model.jlim.upr));
         end
 
-        tau_ctrl = inverseDynamics(obj, varargin) % not completely implemented in C++!
+        tau_j = inverseDynamics(obj, varargin) % not completely implemented in C++!
 
         function J = jacobian(obj, varargin)
             % wf_R_b = varargin{1}

@@ -27,7 +27,7 @@ classdef (Abstract) IMultChainTree < handle
 
         tau_g = gravload(obj, q_j)
 
-        tau_ctrl = invdyn(obj, q_j, dq_j, ddq_j)
+        tau_j = invdyn(obj, q_j, dq_j, ddq_j)
 
         [t, stmChi] = fdyn(obj, tspan, fhCtrlTrqs, stvChi_0, ode_opt)
 
