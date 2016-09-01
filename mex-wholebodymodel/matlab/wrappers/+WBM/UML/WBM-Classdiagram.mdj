@@ -24878,13 +24878,13 @@
 									"showShadow": true,
 									"containerChangeable": false,
 									"containerExtending": false,
-									"left": 1406,
-									"top": 2834,
+									"left": 1302,
+									"top": 2836,
 									"width": 35,
 									"height": 13,
 									"autoResize": false,
-									"alpha": -4.700693595057867,
-									"distance": 513.0350865194309,
+									"alpha": -4.699423732664131,
+									"distance": 617.0518616777686,
 									"hostEdge": {
 										"$ref": "AAAAAAFUMuhiZqhaZGA="
 									},
