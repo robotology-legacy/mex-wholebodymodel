@@ -55,7 +55,7 @@ function tau_j = inverseDynamics(obj, varargin) % not completely implemented in 
     tau_fr = frictionForces(obj, dq_j);
     tau_fr = vertcat(zeros(6,1), tau_fr);
 
-    %% Generalized floating-base acceleration:
+    %% Generalized floating-base acceleration for a hybrid-dynamics system:
     %
     %  In general the equation of motion is given as follows:
     %
