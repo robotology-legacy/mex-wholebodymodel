@@ -82,7 +82,7 @@ classdef WBM < WBM.WBMBase
             obj.setWorldFrame(R_b, p_b, g_wf);
         end
 
-        function updateWorldFrameFromDfltFixedLink(obj, q_j, dq_j, v_b, g_wf)
+        function updateWorldFrameAtDfltFixedLink(obj, q_j, dq_j, v_b, g_wf)
             if (nargin < 5)
                 switch nargin
                     case 4
@@ -95,7 +95,7 @@ classdef WBM < WBM.WBMBase
                         dq_j = obj.mwbm_config.init_state_params.dq_j;
                         g_wf = obj.mwbm_model.g_wf;
                     otherwise
-                        error('WBM::updateWorldFrameFromDfltFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                        error('WBM::updateWorldFrameAtDfltFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
                 end
             end
             obj.setState(q_j, dq_j, v_b); % update state ...

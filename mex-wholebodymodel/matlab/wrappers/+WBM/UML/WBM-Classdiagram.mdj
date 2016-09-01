@@ -9122,7 +9122,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+updateWorldFrameFromDfltFixedLink(obj)",
+											"text": "+updateWorldFrameAtDfltFixedLink(obj)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5
 										},
@@ -9150,7 +9150,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+updateWorldFrameFromDfltFixedLink(obj, q_j: vector, dq_j: vector, v_b: vector)",
+											"text": "+updateWorldFrameAtDfltFixedLink(obj, q_j: vector, dq_j: vector, v_b: vector)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5
 										},
@@ -9178,7 +9178,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+updateWorldFrameFromDfltFixedLink(obj, q_j: vector, dq_j: vector, v_b: vector, g_wf: vector)",
+											"text": "+updateWorldFrameAtDfltFixedLink(obj, q_j: vector, dq_j: vector, v_b: vector, g_wf: vector)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5
 										},
@@ -29510,7 +29510,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "updateWorldFrameFromDfltFixedLink",
+							"name": "updateWorldFrameAtDfltFixedLink",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -29542,7 +29542,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "updateWorldFrameFromDfltFixedLink",
+							"name": "updateWorldFrameAtDfltFixedLink",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -29622,7 +29622,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "updateWorldFrameFromDfltFixedLink",
+							"name": "updateWorldFrameAtDfltFixedLink",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
