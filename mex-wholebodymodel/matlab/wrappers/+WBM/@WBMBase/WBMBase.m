@@ -12,8 +12,8 @@ classdef WBMBase < handle
     end
 
     properties(Constant)
-        DFLT_ROBOT_MODEL = 'icubGazeboSim';
-        MAX_NUM_JOINTS   = 35;
+        DF_ROBOT_MODEL = 'icubGazeboSim';
+        MAX_NUM_JOINTS = 35;
     end
 
     properties(Access = protected)
@@ -120,7 +120,7 @@ classdef WBMBase < handle
                               obj.mwbm_model.g_wf);
         end
 
-        function [wf_p_b, wf_R_b] = getWorldFrameFromFixedLink(obj, urdf_fixed_link, q_j)
+        function [wf_p_b, wf_R_b] = getWorldFrameFromFixLnk(obj, urdf_fixed_link, q_j)
             % compute the base world frame (WF) from a given contact (constraint) link:
             switch nargin
                 case 3
@@ -130,11 +130,11 @@ classdef WBMBase < handle
                     % optimized mode: compute the WF with the current joint configuration
                     [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(urdf_fixed_link);
                 otherwise
-                    error('WBMBase::getWorldFrameFromFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                    error('WBMBase::getWorldFrameFromFixLnk: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
         end
 
-        function [wf_p_b, wf_R_b] = getWorldFrameFromDfltFixedLink(obj, q_j)
+        function [wf_p_b, wf_R_b] = getWorldFrameFromDfltFixLnk(obj, q_j)
             % compute the base world frame (WF) from the default contact (constraint) link:
             if exist('q_j', 'var')
                 % normal mode:
@@ -162,7 +162,7 @@ classdef WBMBase < handle
 
             stFltb.wf_R_b = R_b; % orientation of the base (in axis-angle representation)
             stFltb.wf_p_b = p_b; % cartesian position of the base
-            stFltb.wf_v_b = v_b; % cartesian velocity and the rotational velocity of the base
+            stFltb.v_b    = v_b; % cartesian velocity and the rotational velocity of the base
         end
 
         function wf_H_lnk = transformationMatrix(obj, varargin)

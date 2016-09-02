@@ -85,7 +85,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            ddq_j = obj.mwmbm_icub.jointAcceleration(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stp.wf_v_b, tau);
+            ddq_j = obj.mwmbm_icub.jointAcceleration(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, tau);
         end
 
         function ddq_j = jointAccelerationsExt(obj, q_j, dq_j, tau, stFltb)
@@ -93,14 +93,14 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
             ddq_j = obj.mwmbm_icub.jointAccelerationsExt(stFltb.wf_R_b, stFltb.wf_p_b, q_j, ...
-                                                         dq_j, stp.wf_v_b, tau, obj.mfoot_conf);
+                                                         dq_j, stFltb.v_b, tau, obj.mfoot_conf);
         end
 
         function tau_c = coriolisForces(obj, q_j, dq_j, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            tau_c = obj.mwbm_icub.coriolisCentrifugalForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b);
+            tau_c = obj.mwbm_icub.coriolisCentrifugalForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function tau_fr = frictionForces(obj, dq_j)
@@ -111,14 +111,14 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            C_qv = obj.mwbm_icub.generalizedBiasForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b);
+            C_qv = obj.mwbm_icub.generalizedBiasForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function tau_gen = generalizedForces(obj, q_j, dq_j, f_c, Jc_t, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            tau_gen = obj.mwbm_icub.generalizedForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b, f_c, Jc_t);
+            tau_gen = obj.mwbm_icub.generalizedForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, f_c, Jc_t);
         end
 
         function tau_g = gravityForces(obj, q_j, stFltb)
@@ -132,14 +132,14 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b, ddq_j, dv_b);
+            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, ddq_j, dv_b);
         end
 
         function tau_j = inverseHybridDyn(obj, q_j, dq_j, ddq_j, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b, ddq_j);
+            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, ddq_j);
         end
 
         function [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, foot_conf)
@@ -189,14 +189,14 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            h_c = obj.mwbm_icub.centroidalMomentum(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b);
+            h_c = obj.mwbm_icub.centroidalMomentum(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function [M, C_qv, h_c] = wholeBodyDyn(obj, q_j, dq_j, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            [M, C_qv, h_c] = obj.mwbm_icub.wholeBodyDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b);
+            [M, C_qv, h_c] = obj.mwbm_icub.wholeBodyDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function J = jacobian(obj, lnk_name, q_j, stFltb)
@@ -210,7 +210,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            dJ = obj.mwbm_icub.dJdq(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.wf_v_b, lnk_name);
+            dJ = obj.mwbm_icub.dJdq(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, lnk_name);
         end
 
         function J_tt = jacobianTool(obj, q_j, stFltb) % Jacobian matrix in tool-frame

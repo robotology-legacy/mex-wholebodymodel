@@ -11,8 +11,8 @@ classdef WBM < WBM.WBMBase
     end
 
     properties(Constant)
-        DFLT_STIFFNESS = 2.5; % default control gain value for the position correction.
-        MAX_NUM_TOOLS  = 2;
+        DF_STIFFNESS  = 2.5; % default control gain for the position correction.
+        MAX_NUM_TOOLS = 2;
     end
 
     properties(Access = protected)
@@ -40,7 +40,7 @@ classdef WBM < WBM.WBMBase
                 if (obj.mwbm_config.nCstrs > 0)
                     % set the world frame (WF) at the initial VQ-Transformation from
                     % the chosen fixed link, i.e. the first entry of the constraint list:
-                    obj.setWorldFrameAtFixedLink(obj.mwbm_config.cstr_link_names{1});
+                    obj.setWorldFrameAtFixLnk(obj.mwbm_config.cstr_link_names{1});
                 else
                     error('WBM::WBM: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
                 end
@@ -59,7 +59,7 @@ classdef WBM < WBM.WBMBase
             delete@WBM.WBMBase(obj);
         end
 
-        function setWorldFrameAtFixedLink(obj, urdf_fixed_link, q_j, dq_j, v_b, g_wf)
+        function setWorldFrameAtFixLnk(obj, urdf_fixed_link, q_j, dq_j, v_b, g_wf)
             if (nargin < 6)
                 switch nargin
                     case 5
@@ -72,17 +72,17 @@ classdef WBM < WBM.WBMBase
                         dq_j = obj.mwbm_config.init_state_params.dq_j;
                         g_wf = obj.mwbm_model.g_wf;
                     otherwise
-                        error('WBM::setWorldFrameAtFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                        error('WBM::setWorldFrameAtFixLnk: %s', WBM.wbmErrorMsg.WRONG_ARG);
                 end
             end
             obj.fixed_link = urdf_fixed_link; % replace the old default fixed link with the new fixed link ...
 
             obj.setState(q_j, dq_j, v_b); % update the robot state (important for initializations) ...
-            [p_b, R_b] = obj.getWorldFrameFromFixedLink(urdf_fixed_link); % use optimized mode
+            [p_b, R_b] = obj.getWorldFrameFromFixLnk(urdf_fixed_link); % use optimized mode
             obj.setWorldFrame(R_b, p_b, g_wf);
         end
 
-        function updateWorldFrameAtDfltFixedLink(obj, q_j, dq_j, v_b, g_wf)
+        function updateWorldFrameFromFixLnk(obj, q_j, dq_j, v_b, g_wf)
             if (nargin < 5)
                 switch nargin
                     case 4
@@ -95,11 +95,11 @@ classdef WBM < WBM.WBMBase
                         dq_j = obj.mwbm_config.init_state_params.dq_j;
                         g_wf = obj.mwbm_model.g_wf;
                     otherwise
-                        error('WBM::updateWorldFrameAtDfltFixedLink: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                        error('WBM::updateWorldFrameFromFixLnk: %s', WBM.wbmErrorMsg.WRONG_ARG);
                 end
             end
             obj.setState(q_j, dq_j, v_b); % update state ...
-            [p_b, R_b] = obj.getWorldFrameFromDfltFixedLink(); % optimized mode
+            [p_b, R_b] = obj.getWorldFrameFromDfltFixLnk(); % optimized mode
             obj.setWorldFrame(R_b, p_b, g_wf); % update the world frame with the new values ...
         end
 
@@ -265,7 +265,7 @@ classdef WBM < WBM.WBMBase
                     qj_init        = varargin{1,1};
                     feet_on_ground = varargin{1,2};
 
-                    k_p = obj.DFLT_STIFFNESS; % use the default stiffness value ...
+                    k_p = obj.DF_STIFFNESS; % use the default stiffness value ...
                     k_v = 2*sqrt(k_p); % (3)
                 otherwise
                     error('WBM::initFootBalanceConfig: %s', WBM.wbmErrorMsg.WRONG_ARG);
