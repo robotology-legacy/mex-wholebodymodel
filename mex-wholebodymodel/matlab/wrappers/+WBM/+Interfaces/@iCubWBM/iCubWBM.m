@@ -152,8 +152,9 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             [t, stmChi] = obj.mwbm_icub.intForwardDynamics(fhTrqControl, tspan, stvChi_0, ode_opt);
         end
 
-        function visualizeForwardDyn(obj, x_out, sim_tstep, vis_ctrl)
-            obj.mwbm_icub.visualizeForwardDynamics(x_out, obj.msim_config, sim_tstep, vis_ctrl);
+        function visualizeForwardDyn(obj, stmChi, sim_tstep, vis_ctrl)
+            pos_out = obj.mwbm_icub.getPositionsData(stmChi);
+            obj.mwbm_icub.visualizeForwardDynamics(pos_out, obj.msim_config, sim_tstep, vis_ctrl);
         end
 
         function wf_H_lnk = forwardKin(obj, lnk_name, q_j, stFltb)

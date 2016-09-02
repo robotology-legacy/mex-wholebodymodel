@@ -45,7 +45,7 @@ classdef (Abstract) IWBM < handle
 
         [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, foot_conf)
 
-        visualizeForwardDyn(obj, x_out, sim_tstep, vis_ctrl)
+        visualizeForwardDyn(obj, stmChi, sim_tstep, vis_ctrl)
 
         wf_H_lnk = forwardKin(obj, lnk_name, q_j, stFltb)
 
