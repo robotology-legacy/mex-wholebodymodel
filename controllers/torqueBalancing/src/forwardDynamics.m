@@ -2,19 +2,18 @@ function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
 %FORWARDDYNAMICS is the function that will be integrated in the forward
 %                dynamics integrator.
 %
-%             [dchi,visualization] = FORWARDDYNAMICS(t,chi,config) takes
-%             as input the current time step, T; the robot state, CHI
-%             [13+2ndof x 1]; the structure CONFIG which contains the
-%             user-defined parameters.
-%             The output are the vector to be integrated, DCHI [13+2ndof x1]
-%             and the structure VISUALIZATION which contains all the parameters
-%             used to generate the plots in the visualizer.
+%   [dchi,visualization] = FORWARDDYNAMICS(t,chi,CONFIG) takes as input the
+%   current time step, t; the robot state, chi [13+2*ndof x 1]; the structure
+%   CONFIG which contains the user-defined parameters.
+%   The output are the vector to be integrated, dchi [13+2*ndof x1] and the
+%   structure visualization which contains all the parameters used to generate 
+%   the plots in the visualizer.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 
 % ------------Initialization----------------
-% waitbar
+% update the waitbar
 waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 %% Robot Configuration
@@ -25,17 +24,17 @@ xCoMRef               = CONFIG.xCoMRef;
 
 %% Robot State
 STATE                 = robotState(chi,CONFIG);
-RotBase               = STATE.RotBase;
-omegaBaseWorld        = STATE.omegaBaseWorld;
-quatBase              = STATE.quatBase;
-VelBase               = STATE.VelBase;
+R_b                   = STATE.RotBase;
+w_omega_b             = STATE.omegaBaseWorld;
+q_b                   = STATE.quatBase;
+v_b                   = STATE.VelBase;
 dqj                   = STATE.dqj;
 qj                    = STATE.qj;
-PosBase               = STATE.PosBase;
+x_b                   = STATE.PosBase;
 
 %% Set the robot state (for wbm functions)
-wbm_setWorldFrame(RotBase,PosBase,[0 0 -9.81]')
-wbm_updateState(qj,dqj,[VelBase;omegaBaseWorld]);
+wbm_setWorldFrame(R_b,x_b,[0 0 -9.81]')
+wbm_updateState(qj,dqj,[v_b;w_omega_b]);
 
 %% Robot Dynamics
 DYNAMICS              = robotDynamics(STATE,CONFIG);
@@ -54,24 +53,24 @@ xCoM                  = FORKINEMATICS.xCoM;
 %% Joint limits check
 % jointLimitsCheck(qj,t);
 
-%% CoM and joint trajectory generator
+%% CoM and joints trajectory generator
 trajectory.JointReferences.ddqjRef = zeros(ndof,1);
 trajectory.JointReferences.dqjRef  = zeros(ndof,1);
 trajectory.JointReferences.qjRef   = qjInit;
 trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(xCoMRef,t,CONFIG);
 
-%% Balancing controller
+%% Torque balancing controller
 controlParam    =  runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE);
 tau             =  controlParam.tau;
 fc              =  controlParam.fc;
 
-%% State derivative computation
-omegaWorldBase  = transpose(RotBase)*omegaBaseWorld;
-dquatBase       = quaternionDerivative(omegaWorldBase,quatBase);
-NuQuat          = [VelBase;dquatBase;dqj];
-dNu             = M\(Jc'*fc + [zeros(6,1); tau]-h);
+%% State derivative (dchi) computation
+b_omega_w       = transpose(R_b)*w_omega_b;
+dq_b            = quaternionDerivative(b_omega_w,q_b);
+nu_q            = [v_b;dq_b;dqj];
+dnu             = M\(Jc'*fc + [zeros(6,1); tau]-h);
 % state derivative
-dchi            = [NuQuat;dNu];
+dchi            = [nu_q;dnu];
 
 %% Parameters for visualization
 visualization.qj          = qj;
