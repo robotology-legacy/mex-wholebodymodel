@@ -77,7 +77,7 @@ if CONFIG.integrateWithFixedStep == 1
     
     CONFIG.massCorr = 0.05;
 else
-    CONFIG.massCorr = 0;
+    CONFIG.massCorr = 0.1;
 end
 
 % integration options

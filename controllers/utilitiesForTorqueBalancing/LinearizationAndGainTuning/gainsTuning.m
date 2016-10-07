@@ -220,6 +220,6 @@ gainsOpt.KSdes                  = KSdes;
 gainsOpt.KDdes                  = KDdes;
 gainsOpt.KSn                    = KSn;
 gainsOpt.KDn                    = KDn;
-
+save('KSn','KSn')
 end
 

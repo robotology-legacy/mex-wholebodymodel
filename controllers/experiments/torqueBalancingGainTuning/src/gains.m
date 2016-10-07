@@ -53,7 +53,8 @@ if  sum(CONFIG.feet_on_ground) == 1
 end
 
 %% Definition of the impedances and dampings vectors
-gainsInit.impedances    = [impTorso,impArms,impArms,impLeftLeg,impRightLeg];
+% gainsInit.impedances    = [impTorso,impArms,impArms,impLeftLeg,impRightLeg];
+gainsInit.impedances = 40.*ones(ndof,1)';
 gainsInit.dampings      = 2*sqrt(gainsInit.impedances);
 
 if (size(gainsInit.impedances,2) ~= ndof)
