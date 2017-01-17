@@ -86,7 +86,7 @@ CONFIG.qjInit = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(p
 
 %% %%%%%%%%%%%%%%%%%%%%% FORWARD DYNAMICS INTEGRATION %%%%%%%%%%%%%%%%%% %%
 codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
-utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/utilitiesForTorqueBalancing'];
+utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/utilityMatlabFunctions'];
 robot_root   = [utility_root, filesep, '/RobotFunctions'];
 plots_root   = [utility_root, filesep, '/Visualization'];
 ikin_root    = [utility_root, filesep, '/InverseKinematics'];
