@@ -25,7 +25,7 @@ CONFIG.use_QPsolver                          = 0;                          %eith
 
 %% Visualization setup
 % robot simulator
-CONFIG.visualize_robot_simulator             = 1;                          %either 0 or 1
+CONFIG.visualize_robot_simulator             = 0;                          %either 0 or 1
 % forward dynamics integration results
 CONFIG.visualize_integration_results         = 1;                          %either 0 or 1
 CONFIG.visualize_joints_dynamics             = 1;                          %either 0 or 1
@@ -74,6 +74,7 @@ plot_set
 CONFIG.figureCont                = 1;
 
 %% Initialize the robot model
+% wbm_modelInitialiseFromURDF('model/bigman_torqueBalancing.urdf');
 wbm_modelInitialise('bigman');
 CONFIG.ndof  = 25;
 
