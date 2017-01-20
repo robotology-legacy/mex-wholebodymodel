@@ -17,7 +17,7 @@ feet_on_ground               = CONFIG.feet_on_ground;
 ndof                         = CONFIG.ndof;
 qjInit                       = CONFIG.qjInit;
 dqjInit                      = zeros(ndof,1);
-v_bInit                      = zeros(3,1);
+dx_bInit                     = zeros(3,1);
 w_omega_bInit                = zeros(3,1);
 
 %% Contact constraints definition
@@ -36,22 +36,22 @@ end
 
 CONFIG.numConstraints = length(CONFIG.constraintLinkNames);
 
-%% Update the initial conditions
-wbm_updateState(qjInit,dqjInit,[v_bInit;w_omega_bInit]);
+%% Configure the model using initial conditions
+wbm_updateState(qjInit,dqjInit,[dx_bInit;w_omega_bInit]);
 
 % fixing the world reference frame w.r.t. the foot on ground position
 if  feet_on_ground(1) == 1
     
-    [R_bInit,x_bInit] = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
+    [w_R_bInit,x_bInit] = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
 else
-    [R_bInit,x_bInit] = wbm_getWorldFrameFromFixedLink('r_sole',qjInit);
+    [w_R_bInit,x_bInit] = wbm_getWorldFrameFromFixedLink('r_sole',qjInit);
 end
 
-wbm_setWorldFrame(R_bInit,x_bInit,[0 0 -9.81]')
+wbm_setWorldFrame(w_R_bInit,x_bInit,[0 0 -9.81]')
 
-% initial floating base pose; initial robot state
-[~,BasePoseInit,~,~]          = wbm_getState();
-chiInit                       = [BasePoseInit; qjInit; v_bInit; w_omega_bInit; dqjInit];
+% initial state (floating base + joints)
+[~,basePoseInit,~,~]          = wbm_getState();
+chiInit                       = [basePoseInit; qjInit; dx_bInit; w_omega_bInit; dqjInit];
 
 %% Initial gains
 % the initial gains are defined before the numerical integration
@@ -64,12 +64,10 @@ CONFIG.initState              = robotState(chiInit,CONFIG);
 CONFIG.initDynamics           = robotDynamics(CONFIG.initState,CONFIG);
 % initial forward kinematics
 CONFIG.initForKinematics      = robotForKinematics(CONFIG.initState,CONFIG.initDynamics);
-% CoM initial position
-CONFIG.xCoMRef                = CONFIG.initForKinematics.xCoM;
 
 %% Forward dynamics integration
-CONFIG.wait       = waitbar(0,'Forward dynamics integration...');
-forwardDynFunc    = @(t,chi)forwardDynamics(t,chi,CONFIG);
+CONFIG.wait           = waitbar(0,'Forward dynamics integration...');
+forwardDynFunc        = @(t,chi)forwardDynamics(t,chi,CONFIG);
 
 % either fixed step integrator or ODE15s
 if CONFIG.integrateWithFixedStep == 1
@@ -80,7 +78,7 @@ end
 
 delete(CONFIG.wait)
 
-%% Visualize integration results; robot simulator
-CONFIG.figureCont = initVisualizer(t,chi,CONFIG);
+%% Visualize integration results and robot simulator
+CONFIG.figureCont     = initVisualizer(t,chi,CONFIG);
 
 end

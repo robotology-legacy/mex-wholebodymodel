@@ -2,9 +2,9 @@ function gainsInit = gains(CONFIG)
 %GAINS generates the initial gains matrices for both the momentum task 
 %(primary task in SoT controller) and the postural task.
 %
-%   gains = GAINS(config) takes as an input the structure CONFIG, which
-%   contains all the utility parameters. The output is the structure 
-%   GAINSINIT, which contains the initial gains matrices.
+% gains = GAINS(CONFIG) takes as an input the structure CONFIG, which
+% contains all the utility parameters. The output is the structure 
+% gainsInit, which contains the initial gains matrices.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -12,7 +12,7 @@ function gainsInit = gains(CONFIG)
 
 % ------------Initialization----------------
 % Config parameters
-ndof                    = CONFIG.ndof;
+ndof = CONFIG.ndof;
 
 %% Gains for two feet on ground
 if sum(CONFIG.feet_on_ground) == 2
@@ -45,17 +45,17 @@ if  sum(CONFIG.feet_on_ground) == 1
     
     if CONFIG.feet_on_ground(1) == 1
         
-        impLeftLeg         = [ 15   15  15  15  5  5];
-        impRightLeg        = [ 10   10  15  15  5  5];
+        impLeftLeg     = [ 15   15  15  15  5  5];
+        impRightLeg    = [ 10   10  15  15  5  5];
     else
-        impLeftLeg         = [ 10   10  15  15  5  5];
-        impRightLeg        = [ 15   15  15  15  5  5];
+        impLeftLeg     = [ 10   10  15  15  5  5];
+        impRightLeg    = [ 15   15  15  15  5  5];
     end
 end
 
 %% Definition of the impedances and dampings vectors
-gainsInit.impedances    = [impTorso,impArms,impArms,impLeftLeg,impRightLeg];
-gainsInit.dampings      = 2*sqrt(gainsInit.impedances);
+gainsInit.impedances   = [impTorso,impArms,impArms,impLeftLeg,impRightLeg];
+gainsInit.dampings     = 2*sqrt(gainsInit.impedances);
 
 if (size(gainsInit.impedances,2) ~= ndof)
     
@@ -69,6 +69,6 @@ gainsInit.MomentumGains      = [gainsDCoM zeros(3); zeros(3) gainsDAngMom];
 gainsInit.intMomentumGains   = [gainsPCoM zeros(3); zeros(3) gainsPAngMom];
 
 % gains for feet correction to avoid numerical intrgration errors
-gainsInit.CorrPosFeet        = 5;
+gainsInit.CorrPosFeet        = 10;
 
 end

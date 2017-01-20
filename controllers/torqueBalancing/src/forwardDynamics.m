@@ -32,6 +32,8 @@ dqj                   = STATE.dqj;
 qj                    = STATE.qj;
 x_b                   = STATE.PosBase;
 
+% CoM initial position
+CONFIG.xCoMRef                = CONFIG.initForKinematics.xCoM;
 %% Set the robot state (for wbm functions)
 wbm_setWorldFrame(R_b,x_b,[0 0 -9.81]')
 wbm_updateState(qj,dqj,[v_b;w_omega_b]);
