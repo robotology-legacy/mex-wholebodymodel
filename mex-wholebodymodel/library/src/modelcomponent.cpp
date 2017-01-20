@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
- * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -27,7 +27,12 @@
 
 using namespace mexWBIComponent;
 
-ModelComponent::ModelComponent(const unsigned int args, const unsigned int altArgs, const unsigned int rets) : numArgs(args), numRets(rets), numAltArgs(altArgs)
+ModelState *ModelComponent::modelState = 0;
+wbi::iWholeBodyModel *ModelComponent::robotModel = 0;
+
+wbi::Frame ModelComponent::wf_H_b = wbi::Frame();
+
+ModelComponent::ModelComponent(const unsigned int nArgs, const unsigned int nAltArgs, const unsigned int nRets) : numArgs(nArgs), numRets(nRets), numAltArgs(nAltArgs)
 {
   modelState = ModelState::getInstance();
   robotModel = modelState->robotModel();
@@ -35,12 +40,11 @@ ModelComponent::ModelComponent(const unsigned int args, const unsigned int altAr
 
 ModelComponent::~ModelComponent()
 {
-  //deleteObject(&modelState);
 }
 
 ModelComponent *ModelComponent::getInstance()
 {
-  return NULL;
+  return 0;
 }
 
 const unsigned int ModelComponent::numReturns()
@@ -63,11 +67,12 @@ bool ModelComponent::reorderMatrixInRowMajor(const double *srcMat, double *destM
   // store the values of the matrix-array in row-major order (*):
   // 2D row-major:  offset = i_row*nCols + i_col
   int idx = 0;
-  for(int i=0; i < nRows; i++)
-    for(int j=0; j < nCols; j++)
+  for(int i=0; i < nRows; i++) {
+    for(int j=0; j < nCols; j++) {
       *(destMat + idx++) = *(srcMat + (j*nRows + i)); // srcMat is in column-major
       // destMat: idx = (i*nCols + j)
-
+    }
+  }
   return true;
 }
 
@@ -76,11 +81,12 @@ bool ModelComponent::reorderMatrixInColMajor(const double *srcMat, double *destM
   // store the values of the matrix-array in column-major order (*):
   // 2D column-major:  offset = i_col*nRows + i_row
   int idx = 0;
-  for(int i=0; i < nCols; i++)
-    for(int j=0; j < nRows; j++)
+  for(int i=0; i < nCols; i++) {
+    for(int j=0; j < nRows; j++) {
       *(destMat + idx++) = *(srcMat + (j*nCols + i)); // srcMat is in row-major
       // destMat: idx = (i*nRows + j)
-
+    }
+  }
   return true;
 }
 

@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -17,8 +18,8 @@
  * Public License for more details
  */
 
-#ifndef MODELINITIALISEURDF_H
-#define MODELINITIALISEURDF_H
+#ifndef MODELINITIALIZEURDF_H
+#define MODELINITIALIZEURDF_H
 
 // global includes
 
@@ -29,29 +30,29 @@
 
 namespace mexWBIComponent
 {
-  class ModelInitialiseURDF : public ModelComponent
+  class ModelInitializeURDF : public ModelComponent
   {
     public:
-      static ModelInitialiseURDF *getInstance();
+      static ModelInitializeURDF *getInstance();
 
       /**
        * Delete the (static) instance of this component,
-       * and set the instance pointer to NULL.
+       * and set the instance pointer to 0.
        */
       static void deleteInstance();
 
-      virtual bool allocateReturnSpace(int, mxArray *[]);
-      virtual bool compute(int, const mxArray *[]);
-      virtual bool computeFast(int, const mxArray *[]);
+      virtual bool allocateReturnSpace(int nlhs, mxArray **plhs);
+      virtual bool compute(int nrhs, const mxArray **prhs);
+      virtual bool computeFast(int nrhs, const mxArray **prhs);
 
-      virtual ~ModelInitialiseURDF();
+      virtual ~ModelInitializeURDF();
 
     private:
-      ModelInitialiseURDF();
+      ModelInitializeURDF();
 
-      static ModelInitialiseURDF *modelInitialiseURDF;
+      static ModelInitializeURDF *modelInitializeURDF;
   };
 
 }
 
-#endif // MODELINITIALISEURDF_H
+#endif // MODELINITIALIZEURDF_H

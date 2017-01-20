@@ -1,4 +1,4 @@
-function tau_j = inverseDynamics(obj, varargin) % not completely implemented in C++!
+function tau_j = inverseDynamics(obj, varargin)
     % wf_R_b = varargin{1}
     % wf_p_b = varargin{2}
     % q_j    = varargin{3}
@@ -26,7 +26,7 @@ function tau_j = inverseDynamics(obj, varargin) % not completely implemented in 
 
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
             M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, p_b, q_j);
-            C_qv = mexWholeBodyModel('generalised-forces', wf_R_b_arr, p_b, q_j, dq_j, varargin{1,5});
+            c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, p_b, q_j, dq_j, varargin{1,5});
         case 4 % optimized modes:
             % dq_j  = varargin{1}
             % ddq_j = varargin{2}
@@ -46,8 +46,8 @@ function tau_j = inverseDynamics(obj, varargin) % not completely implemented in 
             dq_j  = varargin{1,1};
             ddq_j = varargin{1,2};
 
-            M      = mexWholeBodyModel('mass-matrix');
-            C_qv   = mexWholeBodyModel('generalised-forces');
+            M    = mexWholeBodyModel('mass-matrix');
+            c_qv = mexWholeBodyModel('generalized-forces');
     otherwise
         error('WBMBase::inverseDynamics: %s', WBM.wbmErrorMsg.WRONG_ARG);
     end
@@ -81,18 +81,18 @@ function tau_j = inverseDynamics(obj, varargin) % not completely implemented in 
     %   [3] Dynamics of Tree-Type Robotic Systems, S. V. Shah & S. K. Saha & J. K. Dutt,
     %       Intelligent Systems, Control and Automation: Science and Engineering, volume 62, Springer, 2012,
     %       p. 119, eq. (7.1) & (7.2).
-    dv_b  = generalizedBaseAcceleration(M, C_qv, ddq_j, obj.mwbm_model.ndof);
+    dv_b  = generalizedBaseAcceleration(M, c_qv, ddq_j, obj.mwbm_model.ndof);
     ddq_j = vertcat(dv_b, ddq_j); % mixed generalized acceleration
 
-    tau_j = M*ddq_j + C_qv + tau_fr;
+    tau_j = M*ddq_j + c_qv + tau_fr;
 end
 %% END of inverseDynamics.
 
 
-function dv_b = generalizedBaseAcceleration(M, C_qv, ddq_j, ndof)
+function dv_b = generalizedBaseAcceleration(M, c_qv, ddq_j, ndof)
     n = ndof + 6;
 
-    h_0  = C_qv(1:6,1);
+    h_0  = c_qv(1:6,1);
     M_00 = M(1:6,1:6);
     M_01 = M(1:6,7:n);
 

@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
- * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -34,9 +34,9 @@ namespace mexWBIComponent
     public:
       static ModelComponent *getInstance();
 
-      virtual bool allocateReturnSpace(int, mxArray**) = 0;
-      virtual bool compute(int, const mxArray**) = 0;
-      virtual bool computeFast(int, const mxArray**) = 0;
+      virtual bool allocateReturnSpace(int nlhs, mxArray **plhs) = 0;
+      virtual bool compute(int nrhs, const mxArray **prhs) = 0;
+      virtual bool computeFast(int nrhs, const mxArray **prhs) = 0;
 
       const unsigned int numReturns();
       const unsigned int numArguments();
@@ -45,7 +45,7 @@ namespace mexWBIComponent
       virtual ~ModelComponent();
 
     protected:
-      ModelComponent(const unsigned int, const unsigned int, const unsigned int);
+      ModelComponent(const unsigned int nArgs, const unsigned int nAltArgs, const unsigned int nRets);
 
       /* Internal function used to reorder double* matrix
        * elements (since MATLAB is column-major ordered
@@ -54,11 +54,11 @@ namespace mexWBIComponent
       bool reorderMatrixInRowMajor(const double *srcMat, double *destMat, int nRows = 3, int nCols = 3);
       bool reorderMatrixInColMajor(const double *srcMat, double *destMat, int nRows = 3, int nCols = 3);
 
-      ModelState *modelState;
-      wbi::iWholeBodyModel *robotModel;
+      static ModelState *modelState;
+      static wbi::iWholeBodyModel *robotModel;
 
-      Eigen::Matrix4d H_w2b;
-      wbi::Frame world_H_rootLink;
+      // frame transformation (from base to world frame):
+      static wbi::Frame wf_H_b;
 
       const unsigned int numArgs;
       const unsigned int numRets;
@@ -68,3 +68,4 @@ namespace mexWBIComponent
 }
 
 #endif // MODELCOMPONENT_H
+

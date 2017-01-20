@@ -33,7 +33,7 @@ len = size(g_init,1);
 % Note: This function handle has only a very simple dummy-function as controller.
 %       It is advisable for complex scenarios and also for avoiding integration
 %       errors to use a real controller function instead.
-fhTrqControl = @(t, M, C_qv, stp, nu, Jc, dJcdq, foot_conf)zeroTrqsController(size(g_init(7:len,1)));
+fhTrqControl = @(t, M, c_qv, stp, nu, Jc, djcdq, foot_conf)zeroTrqsController(size(g_init(7:len,1)));
 
 % configuration structure for the feet:
 % Note: This configuration is needed for the extended forward dynamics function.

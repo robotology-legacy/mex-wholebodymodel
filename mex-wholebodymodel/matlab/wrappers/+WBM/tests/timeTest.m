@@ -47,14 +47,14 @@ for i = 1:noi
     h_c    = wbm_icub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
     h_c    = wbm_icub.generalizedBiasForces(R, p, q_j, dq_j, v_b);
 
-    tau_c  = wbm_icub.coriolisCentrifugalForces(R, p, q_j, dq_j, v_b);
-    tau_c  = wbm_icub.coriolisCentrifugalForces(R, p, q_j, dq_j, v_b);
+    c_qv   = wbm_icub.coriolisBiasForces(R, p, q_j, dq_j, v_b);
+    c_qv   = wbm_icub.coriolisBiasForces(R, p, q_j, dq_j, v_b);
 
-    tau_g  = wbm_icub.gravityForces(R, p, q_j);
-    tau_g  = wbm_icub.gravityForces(R, p, q_j);
+    g_v    = wbm_icub.gravityBiasForces(R, p, q_j);
+    g_v    = wbm_icub.gravityBiasForces(R, p, q_j);
 
-    dJdq_1 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstr_link_names{1});
-    dJdq_2 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstr_link_names{2});
+    djdq_1 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstr_link_names{1});
+    djdq_2 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstr_link_names{2});
 
     J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstr_link_names{1});
     J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstr_link_names{2});
@@ -75,10 +75,10 @@ fprintf('\n\nStarting optimized mode trial\n-----------------------------\n');
 
 % base model:
 icub_model = wbmBaseRobotModel;
-icub_model.ndof         = 25;
-icub_model.urdf_robot_name   = 'icubGazeboSim';
-icub_model.wf_R_b = eye(3,3);
-icub_model.g_wf         = [0; 0; 9.81];
+icub_model.ndof            = 25;
+icub_model.urdf_robot_name = 'icubGazeboSim';
+icub_model.wf_R_b          = eye(3,3);
+icub_model.g_wf            = [0; 0; 9.81];
 % base robot config:
 icub_config = wbmHumanoidConfig;
 icub_config.nCstrs          = 2;
@@ -114,14 +114,14 @@ for i = 1:noi
     h_c    = wbm_icub.generalizedBiasForces();
     h_c    = wbm_icub.generalizedBiasForces();
 
-    tau_c  = wbm_icub.coriolisCentrifugalForces();
-    tau_c  = wbm_icub.coriolisCentrifugalForces();
+    c_qv   = wbm_icub.coriolisBiasForces();
+    c_qv   = wbm_icub.coriolisBiasForces();
 
-    tau_g  = wbm_icub.gravityForces();
-    tau_g  = wbm_icub.gravityForces();
+    g_v    = wbm_icub.gravityBiasForces();
+    g_v    = wbm_icub.gravityBiasForces();
 
-    dJdq_1 = wbm_icub.dJdq(icub_config.cstr_link_names{1});
-    dJdq_2 = wbm_icub.dJdq(icub_config.cstr_link_names{2});
+    djdq_1 = wbm_icub.dJdq(icub_config.cstr_link_names{1});
+    djdq_2 = wbm_icub.dJdq(icub_config.cstr_link_names{2});
 
     J      = wbm_icub.jacobian(icub_config.cstr_link_names{1});
     J      = wbm_icub.jacobian(icub_config.cstr_link_names{2});

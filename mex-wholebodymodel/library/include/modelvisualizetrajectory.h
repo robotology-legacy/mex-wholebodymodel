@@ -40,21 +40,21 @@ namespace mexWBIComponent
 
       /**
        * Delete the (static) instance of this component,
-       * and set the instance pointer to NULL.
+       * and set the instance pointer to 0.
        */
       static void deleteInstance();
 
-      virtual bool allocateReturnSpace(int, mxArray*[]);
-      virtual bool compute(int, const mxArray *[]);
-      virtual bool computeFast(int, const mxArray *[]);
-      //virtual bool display(int, const mxArray *[]);
+      virtual bool allocateReturnSpace(int nlhs, mxArray **plhs);
+      virtual bool compute(int nrhs, const mxArray **prhs);
+      virtual bool computeFast(int nrhs, const mxArray **prhs);
+      //virtual bool display(int nrhs, const mxArray **prhs);
 
       virtual ~ModelVisualizeTrajectory();
 
     private:
       ModelVisualizeTrajectory();
-      bool visualizeTrajectory(int, const mxArray *[]);
-      bool openPortsToICubGui(void);
+      bool visualizeTrajectory(int nrhs, const mxArray **prhs);
+      bool openPortsToICubGui();
 
       static ModelVisualizeTrajectory *modelVisualizeTrajectory;
 

@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
- * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -31,152 +31,160 @@
 
 using namespace mexWBIComponent;
 
-// ModelState *ModelState::modelState = NULL;
-boost::scoped_ptr<ModelState> ModelState::modelState(NULL);
-wbi::iWholeBodyModel *ModelState::robotWBIModel = NULL;
+ModelState *ModelState::modelState = 0;
+wbi::iWholeBodyModel *ModelState::robotWBIModel = 0;
+
+size_t ModelState::numDof = 0;
+std::string ModelState::currRobotName = "";
+
+double ModelState::svb[6]   = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+double ModelState::sg[3]    = {0.0f, 0.0f, 0.0f};
+double *ModelState::sqj     = 0;
+double *ModelState::sqj_dot = 0;
+
+wbi::Frame ModelState::wf_H_b = wbi::Frame();
 
 bool isRobotNameAFile(const std::string &robotName)
 {
-  // Ugly hack: check the last four char of robotName :
+  // Ugly hack: check the last four char of robotName:
   // if it ends in .xxx or .xxxx (where xxx or xxxx is is an classical extention)
   // call the robotModelFromURDF, otherwise the usual robotModel
-  if(robotName.size() < 5)
+  if (robotName.size() < 5) {
     return false;
+  }
 
-  if( (robotName[robotName.size()-4] == '.') ||
-      (robotName[robotName.size()-5] == '.') )
+  if ( (robotName[robotName.size()-4] == '.') ||
+       (robotName[robotName.size()-5] == '.') )
+  {
     return true;
-
+  }
   // else ...
   return false;
 }
 
 ModelState::ModelState(std::string robotName)
 {
-  if(isRobotNameAFile(robotName))
+  if (isRobotNameAFile(robotName)) {
     robotModelFromURDF(robotName);
-  else
+  }
+  else {
     robotModel(robotName);
-
+  }
   numDof = robotWBIModel->getDoFs();
-  qjS    = new double[numDof];
-  qjDotS = new double[numDof];
 
-  gS[0] = 0.0f; gS[1] = 0.0f; gS[2] = -9.81f;
+  if ( (sqj == 0) && (sqj_dot == 0) ) {
+    sqj     = new double[numDof];
+    sqj_dot = new double[numDof];
+  }
+#ifdef DEBUG
+  mexPrintf("Allocated sqj & sqj_dot.\n");
+#endif
+
+  sg[0] = 0.0f; sg[1] = 0.0f; sg[2] = -9.81f;
 }
 
 ModelState::~ModelState()
 {
 #ifdef DEBUG
-  mexPrintf("ModelState destructor called\n");
+  mexPrintf("ModelState destructor called.\n");
 #endif
 
-  if(robotWBIModel != NULL)
-  {
+  if (robotWBIModel != 0) {
     delete robotWBIModel;
-    robotWBIModel = NULL;
-    // mexPrintf("deleted_1\n");
+    robotWBIModel = 0;
   }
 
-  if(qjDotS != NULL) // TO DEBUG: the dynamic allocated arrays qjDotS and qjS cannot be deleted --> access violations!
-  {
-    // mexPrintf("deleting_2\n");
-    delete[] qjDotS;
-    qjDotS = NULL;
-    // mexPrintf("deleted_2\n");
+  if (sqj_dot != 0) {
+    delete[] sqj_dot;
+    sqj_dot = 0;
   }
 
 #ifdef DEBUG
-  mexPrintf("free(qjDotS) called\n");
+  mexPrintf("sqj_dot deleted.\n");
 #endif
 
-  if(qjS != NULL)
-  {
-    // mexPrintf("deleting_3\n");
-    delete[] qjS;
-    qjS = NULL;
-    // mexPrintf("deleted_3\n");
+  if (sqj != 0) {
+    delete[] sqj;
+    sqj = 0;
   }
 
 #ifdef DEBUG
-  mexPrintf("free(qjS) called\n");
-  mexPrintf("ModelState destructor returning\n");
+  mexPrintf("sqj deleted.\n");
+  mexPrintf("ModelState destructor returning.\n");
 #endif
 }
 
 ModelState *ModelState::getInstance(std::string robotName)
 {
-  // if(modelState == NULL)
-  //   modelState = new ModelState(robotName);
-
-  if(modelState == NULL)
-    modelState.reset( new ModelState(robotName) );
-
-  // return modelState;
-  return modelState.get();
+  if (modelState == 0) {
+    modelState = new ModelState(robotName);
+  }
+  return modelState;
 }
 
-/*void ModelState::deleteInstance()
+void ModelState::deleteInstance()
 {
-  // mexPrintf("ModState::delInst\n");
-  // deleteObject(&modelState); // error
-} */
+  deleteObject(&modelState);
+  #ifdef DEBUG
+    mexPrintf("ModelState deleted.\n");
+  #endif
+}
 
-bool ModelState::setState(double *qj_t, double *qjDot_t, double *vb_t)
+bool ModelState::setState(double *qj_t, double *qj_dot_t, double *vb_t)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to update state\n");
+  mexPrintf("Trying to update state.\n");
 #endif
-  memcpy(qjS, qj_t, sizeof(double)*numDof);
-  memcpy(qjDotS, qjDot_t, sizeof(double)*numDof);
-  memcpy(vbS, vb_t, sizeof(double)*6);
+  memcpy(sqj, qj_t, sizeof(double)*numDof);
+  memcpy(sqj_dot, qj_dot_t, sizeof(double)*numDof);
+  memcpy(svb, vb_t, sizeof(double)*6);
 
   return true;
 }
 
-void ModelState::setGravity(double *g_temp)
+void ModelState::setGravity(double *pg)
 {
-  memcpy(gS, g_temp, sizeof(double)*3);
+  memcpy(sg, pg, sizeof(double)*3);
 }
 
 double *ModelState::qj()
 {
-  return &qjS[0];
+  return &sqj[0];
 }
 
 void ModelState::qj(double *qj_t)
 {
-  memcpy(qj_t, qjS, sizeof(double)*numDof);
+  memcpy(qj_t, sqj, sizeof(double)*numDof);
 }
 
-double *ModelState::qjDot()
+double *ModelState::qj_dot()
 {
-  return &qjDotS[0];
+  return &sqj_dot[0];
 }
 
-void ModelState::qjDot(double *qjDot_t)
+void ModelState::qj_dot(double *qj_dot_t)
 {
-  memcpy(qjDot_t, qjDotS, sizeof(double)*numDof);
+  memcpy(qj_dot_t, sqj_dot, sizeof(double)*numDof);
 }
 
 double *ModelState::vb()
 {
-  return &vbS[0];
+  return &svb[0];
 }
 
 void ModelState::vb(double *vb_t)
 {
-  memcpy(vb_t, vbS, sizeof(double)*6);
+  memcpy(vb_t, svb, sizeof(double)*6);
 }
 
-double* ModelState::g(void)
+double* ModelState::g()
 {
-  return &gS[0];
+  return &sg[0];
 }
 
-void ModelState::g(double *gT)
+void ModelState::g(double *g_t)
 {
-  memcpy(gT, gS, sizeof(double)*3);
+  memcpy(g_t, sg, sizeof(double)*3);
 }
 
 size_t ModelState::dof()
@@ -184,30 +192,29 @@ size_t ModelState::dof()
   return numDof;
 }
 
-wbi::iWholeBodyModel *ModelState::robotModel(void)
+wbi::iWholeBodyModel *ModelState::robotModel()
 {
   return robotWBIModel;
 }
 
-void  ModelState::robotModel(std::string robotName)
+void ModelState::robotModel(std::string robotName)
 {
-  if(robotWBIModel != NULL)
-  {
-    mexPrintf("Deleting older version of robot");
+  if (robotWBIModel != 0) {
+    mexPrintf("Deleting older version of the robot model.\n");
     delete robotWBIModel;
   }
-  // set YARP_ROBOT_NAME enviromental variable
-  // to load the robot-specific configuration files
-  // not a clean solution , see discussion in
+  // set YARP_ROBOT_NAME enviromental variable to
+  // load the robot-specific configuration files
+  // not a clean solution, see discussion in,
   // https://github.com/robotology/yarp/issues/593
   // and https://github.com/robotology/mex-wholebodymodel/issues/32
   yarp::os::Network::setEnvironment("YARP_ROBOT_NAME", robotName);
 
-  currentRobotName = robotName;
+  currRobotName = robotName;
   std::string localName = "mexWBModel";
   yarp::os::ResourceFinder rf;
   yarp::os::Property yarpWbiOptions;
-  //Get wbi options from the canonical file
+  // get wbi options from the canonical file
   rf.setVerbose(true);
   rf.setDefaultConfigFile("yarpWholeBodyInterface.ini");
   rf.configure(0, 0);
@@ -215,42 +222,43 @@ void  ModelState::robotModel(std::string robotName)
   std::string wbiConfFile = rf.findFile("yarpWholeBodyInterface.ini");
   yarpWbiOptions.fromConfigFile(wbiConfFile);
 
-  // Never get the limits from getLimitsFromControlBoard
-  // When using mex-wholebodymodel
+  // never get the limits from getLimitsFromControlBoard
+  // when using mex-wholebodymodel
   yarpWbiOptions.unput("getLimitsFromControlBoard");
 
   robotWBIModel = new yarpWbi::yarpWholeBodyModel(localName.c_str(), yarpWbiOptions);
 
-  wbi::IDList RobotMainJoints;
-  std::string RobotMainJointsListName = "ROBOT_MEX_WBI_TOOLBOX";
-  if( !yarpWbi::loadIdListFromConfig(RobotMainJointsListName, yarpWbiOptions, RobotMainJoints) )
-    fprintf(stderr, "[ERR] mex-wholebodymodel: impossible to load wbiId joint list with name %s\n", RobotMainJointsListName.c_str());
+  wbi::IDList robMainJointIDList;
+  std::string robMainJointIDListName = "ROBOT_MEX_WBI_TOOLBOX";
+  if ( !yarpWbi::loadIdListFromConfig(robMainJointIDListName, yarpWbiOptions, robMainJointIDList) ) {
+    fprintf(stderr, "[ERR] mex-wholebodymodel: failed to load (WBI) ID joint list with name: %s\n", robMainJointIDListName.c_str());
+  }
 
-  robotWBIModel->addJoints(RobotMainJoints);
+  robotWBIModel->addJoints(robMainJointIDList);
 
-  if( !robotWBIModel->init() )
-    mexPrintf("WBI unable to initialise (usually means unable to connect to chosen robot)\n");
+  if ( !robotWBIModel->init() ) {
+    mexPrintf("WBI unable to initialise (usually means unable to connect to chosen robot).\n");
+  }
 
   // update the number of dofs
   numDof = robotWBIModel->getDoFs();
 
-  mexPrintf("mexWholeBodyModel started with robot : %s, Num of Joints : %d \n", robotName.c_str(), robotWBIModel->getDoFs());
+  mexPrintf("mexWholeBodyModel started with robot: %s, Num of Joints: %d\n", robotName.c_str(), robotWBIModel->getDoFs());
 }
 
-void  ModelState::robotModelFromURDF(std::string urdfFileName)
+void ModelState::robotModelFromURDF(std::string urdfFileName)
 {
-  if(robotWBIModel != NULL)
-  {
-    mexPrintf("Deleting older version of robot");
+  if (robotWBIModel != 0) {
+    mexPrintf("Deleting older version of the robot model.\n");
     delete robotWBIModel;
   }
 
   std::string localName = "mexWBModel";
   yarp::os::Property yarpWbiOptions;
 
-  //Overwrite the robot parameter that could be present in wbi_conf_file
-  currentRobotName = "robotLoadedDirectlyFromURDFfile";
-  yarpWbiOptions.put("robot", currentRobotName);
+  // overwrite the robot parameter that could be present in wbi_conf_file
+  currRobotName = "robotLoadedDirectlyFromURDFfile";
+  yarpWbiOptions.put("robot", currRobotName);
   yarpWbiOptions.put("urdf", urdfFileName.c_str());
   robotWBIModel = new yarpWbi::yarpWholeBodyModel(localName.c_str(), yarpWbiOptions);
 
@@ -260,31 +268,33 @@ void  ModelState::robotModelFromURDF(std::string urdfFileName)
 
   iDynTree::dofsListFromURDF(urdfFileName, dofsFromURDF);
 
-  for(size_t dof=0; dof < dofsFromURDF.size(); dof++)
+  for (size_t dof=0; dof < dofsFromURDF.size(); dof++) {
     RobotURDFJoints.addID(dofsFromURDF[dof]);
+  }
 
   robotWBIModel->addJoints(RobotURDFJoints);
 
-  if( !robotWBIModel->init() )
-    mexPrintf("WBI unable to initialise (usually means unable to connect to chosen robot)\n");
+  if ( !robotWBIModel->init() ) {
+    mexPrintf("WBI unable to initialise (usually means unable to connect to chosen robot).\n");
+  }
 
   // update the number of dofs
   numDof = robotWBIModel->getDoFs();
 
-  mexPrintf("mexWholeBodyModel started with robot loaded from urdf file : %s, Num of Joints : %d \n", urdfFileName.c_str(), robotWBIModel->getDoFs());
+  mexPrintf("mexWholeBodyModel started with robot loaded from URDF file: %s, Num of Joints: %d\n", urdfFileName.c_str(), robotWBIModel->getDoFs());
 }
 
-std::string ModelState::robotName(void)
+std::string ModelState::robotName()
 {
-  return currentRobotName;
+  return currRobotName;
 }
 
-wbi::Frame ModelState::getRootWorldRotoTranslation(void)
+wbi::Frame ModelState::getBase2WorldTransformation()
 {
-  return world_H_rootLink;
+  return wf_H_b;
 }
 
-void ModelState::setRootWorldRotoTranslation(wbi::Frame rootWorldFrame)
+void ModelState::setBase2WorldTransformation(wbi::Frame frm3d_H)
 {
-  world_H_rootLink = rootWorldFrame;
+  wf_H_b = frm3d_H;
 }

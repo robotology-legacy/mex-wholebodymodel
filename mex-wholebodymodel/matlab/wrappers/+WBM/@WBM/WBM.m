@@ -109,14 +109,14 @@ classdef WBM < WBM.WBMBase
             obj.mwbm_config.init_state_params.qt_b = vqT_init(4:7,1); % orientation (quaternion)
         end
 
-        function wf_vqT_lnk = fkinVQTransformation(obj, urdf_link_name, q_j, vqT, g_wf)
+        function vqT_lnk = fkinVQTransformation(obj, urdf_link_name, q_j, vqT_b, g_wf)
             % computes the forward kinematic vector-quaternion transf. of a specified link frame:
             if (nargin < 4)
                 error('WBM::fkinVQTransformation: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
 
             % get the VQ-Transformation form the base state ...
-            [p_b, R_b] = WBM.utilities.frame2posRotm(vqT);
+            [p_b, R_b] = WBM.utilities.frame2posRotm(vqT_b);
             % set the world frame to the base ...
             if ~exist('g_wf', 'var')
                 obj.setWorldFrame(R_b, p_b); % use the default gravity vector ...
@@ -124,16 +124,22 @@ classdef WBM < WBM.WBMBase
                 obj.setWorldFrame(R_b, p_b, g_wf);
             end
             % compute the forward kinematics of the link frame ...
-            wf_vqT_lnk = obj.forwardKinematics(R_b, p_b, q_j, urdf_link_name);
+            vqT_lnk = obj.forwardKinematics(R_b, p_b, q_j, urdf_link_name);
         end
 
-        function [Jc, dJcdq] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b)
-            nCstrs = obj.mwbm_config.nCstrs; % must be >= 1!
-
-            m = 6*nCstrs;
+        function [Jc, djcdq] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b)
+            nCstrs = obj.mwbm_config.nCstrs;
             n = 6 + obj.mwbm_model.ndof;
+
+            if (nCstrs == 0)
+                Jc = zeros(6,n);
+                djcdq = zeros(6,1);
+                return
+            end
+            % else ...
+            m = 6*nCstrs;
             Jc = zeros(m,n);
-            dJcdq = zeros(m,1);
+            djcdq = zeros(m,1);
 
             % compute for each contact constraint the Jacobian and the derivative Jacobian:
             switch nargin
@@ -141,13 +147,13 @@ classdef WBM < WBM.WBMBase
                     for i = 1:nCstrs
                         cstr_link = obj.mwbm_config.cstr_link_names{1,i};
                         Jc(6*i-5:6*i,1:n)  = mexWholeBodyModel('jacobian', wf_R_b_arr, wf_p_b, q_j, cstr_link); % 6*(i-1)+1 = 6*i-5
-                        dJcdq(6*i-5:6*i,1) = mexWholeBodyModel('djdq', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, cstr_link);
+                        djcdq(6*i-5:6*i,1) = mexWholeBodyModel('dJdq', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, cstr_link);
                     end
                 case 1
                     for i = 1:nCstrs
                         cstr_link = obj.mwbm_config.cstr_link_names{1,i};
                         Jc(6*i-5:6*i,1:n)  = mexWholeBodyModel('jacobian', cstr_link);
-                        dJcdq(6*i-5:6*i,1) = mexWholeBodyModel('djdq', cstr_link);
+                        djcdq(6*i-5:6*i,1) = mexWholeBodyModel('dJdq', cstr_link);
                     end
                 otherwise
                     error('WBM::contactJacobians: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -159,25 +165,25 @@ classdef WBM < WBM.WBMBase
                 case 7 % normal mode:
                     % wf_R_b = varargin{1}
                     wf_p_b = varargin{1,2};
-                    q_j          = varargin{1,3};
-                    dq_j         = varargin{1,4};
-                    v_b          = varargin{1,5};
-                    tau          = varargin{1,6};
+                    q_j    = varargin{1,3};
+                    dq_j   = varargin{1,4};
+                    v_b    = varargin{1,5};
+                    tau    = varargin{1,6};
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
                     M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, wf_p_b, q_j);
-                    C_qv = mexWholeBodyModel('generalised-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                    c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
 
                     % compute for each contact constraint the Jacobian and the derivative Jacobian:
-                    [Jc, dJcdq] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                    [Jc, djcdq] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
                 case 3 % optimized mode:
                     dq_j = varargin{1,1};
                     tau  = varargin{1,2};
 
                     M    = mexWholeBodyModel('mass-matrix');
-                    C_qv = mexWholeBodyModel('generalised-forces');
+                    c_qv = mexWholeBodyModel('generalized-forces');
 
-                    [Jc, dJcdq] = contactJacobians(obj);
+                    [Jc, djcdq] = contactJacobians(obj);
                 otherwise
                     error('WBM::jointAccelerations: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -189,17 +195,17 @@ classdef WBM < WBM.WBMBase
             %   [2] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, pp. 269-270, eq. (6.5) & (6.6).
             Jc_t      = Jc.';
             JcMinv    = Jc / M; % x*M = Jc --> x = Jc*M^(-1)
-            JcMinvJct = JcMinv * Jc_t; % inverse mass matrix in contact space
+            Upsilon_c = JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix")
             tau_fr    = frictionForces(obj, dq_j); % friction torques (negative torque values)
             tau_gen   = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = tau + (-tau_fr)
             % contact (constraint) forces f_c:
-            f_c = -(JcMinvJct \ (JcMinv*(C_qv - tau_gen) - dJcdq)); % JcMinvJct*f_c = (...) --> f_c = JcMinvJct^(-1)*(...)
+            f_c = -(Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq)); % Upsilon_c*f_c = (...) --> f_c = Upsilon_c^(-1)*(...)
 
             % Joint Acceleration q_ddot (derived from the state-space equation):
             % For further details see:
             %   [1] Efficient Dynamic Simulation of Robotic Mechanisms, K. Lilly, Springer, 1992, p. 82, eq. (5.2).
-            ddq_j = M \ (tau_gen - C_qv - Jc_t*f_c); % ddq_j = M^(-1) * (tau - C_qv - Jc.'*(-f_c))
-            %ddq_j = M \ (Jc.'*f_c + tau_gen - C_qv); % cause Jc.'*f_c round-off errors?
+            ddq_j = M \ (tau_gen - c_qv - Jc_t*f_c); % ddq_j = M^(-1) * (tau - c_qv - Jc.'*(-f_c))
+            %ddq_j = M \ (Jc.'*f_c + tau_gen - c_qv); % cause Jc.'*f_c round-off errors?
 
             acc_data = struct('f_c', f_c, 'tau', tau, 'tau_gen', tau_gen);
         end
@@ -356,6 +362,9 @@ classdef WBM < WBM.WBMBase
             % mark the start point ...
             plot3(x_b(1,1), x_b(1,2), x_b(1,3), 'Marker', prop.marker, 'MarkerEdgeColor', prop.mkr_color);
 
+            axis square;
+            grid on;
+
             % add title and axis-lables ...
             if ~isempty(prop.title)
                 title(prop.title, 'Interpreter', 'latex', 'FontSize', prop.title_fnt_sz);
@@ -363,12 +372,12 @@ classdef WBM < WBM.WBMBase
             xlabel('$x_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
             ylabel('$y_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
             zlabel('$z_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
-
-            grid on;
-            axis square;
         end
 
-        % Experimental: method does not work at the moment (Matlab hangs when it calls the mex-function)
+        % EXPERIMENTAL: This method does not work at the moment.
+        % (Matlab hangs when it calls this function. Probably it depends on
+        %  further applications outside of Matlab which are not installed.)
+        %
         % function visualizeTrajectoryICubGUI(obj, t, stmChi)
         %     if (nargin < 2)
         %         error('WBM::visualizeTrajectoryICubGUI: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -379,10 +388,10 @@ classdef WBM < WBM.WBMBase
         %         error('WBM::visualizeTrajectoryICubGUI: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
         %     end
         %     cutp = obj.mwbm_model.ndof + 7;
-        %     vqT_b = stmChi(1:m,1:7);    % m -by- vqT_b
-        %     q_j   = stmChi(1:m,8:cutp); % m -by- q_j
+        %     vqT = stmChi(1:m,1:7);    % m -by- vqT_b matrix
+        %     Q_j = stmChi(1:m,8:cutp); % m -by- q_j matrix
 
-        %     mexWholeBodyModel('visualize-trajectory', t, q_j, vqT_b);
+        %     mexWholeBodyModel('visualize-trajectory', t, Q_j, vqT);
         % end
 
         function setLinkPayloads(obj, link_names, pl_data)
@@ -448,23 +457,23 @@ classdef WBM < WBM.WBMBase
                     lnk_p_pl     = obj.mwbm_config.payload_links(pl_idx,1).lnk_p_pl;
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-                    wf_H_lnk = mexWholeBodyModel('rototranslation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, pl_link_name);
+                    wf_H_lnk = mexWholeBodyModel('transformation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, pl_link_name);
                 case 4
                     % use the values of the default payload-link ...
                     lnk_p_pl = obj.mwbm_config.payload_links(1,1).lnk_p_pl;
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-                    wf_H_lnk = mexWholeBodyModel('rototranslation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, ...
+                    wf_H_lnk = mexWholeBodyModel('transformation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, ...
                                                  obj.mwbm_config.payload_links(1,1).urdf_link_name);
                 case 2 % optimized modes:
                     pl_idx       = varargin{1,1};
                     pl_link_name = getLinkName(obj, obj.mwbm_config.payload_links, pl_idx);
                     lnk_p_pl     = obj.mwbm_config.payload_links(pl_idx,1).lnk_p_pl;
 
-                    wf_H_lnk = mexWholeBodyModel('rototranslation-matrix', pl_link_name);
+                    wf_H_lnk = mexWholeBodyModel('transformation-matrix', pl_link_name);
                 case 1
                     lnk_p_pl = obj.mwbm_config.payload_links(1,1).lnk_p_pl;
-                    wf_H_lnk = mexWholeBodyModel('rototranslation-matrix', obj.mwbm_config.payload_links(1,1).urdf_link_name);
+                    wf_H_lnk = mexWholeBodyModel('transformation-matrix', obj.mwbm_config.payload_links(1,1).urdf_link_name);
                 otherwise
                     error('WBM::payloadFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -572,24 +581,24 @@ classdef WBM < WBM.WBMBase
                     ee_vqT_tt    = obj.mwbm_config.tool_links(t_idx,1).ee_vqT_tt;
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-                    wf_H_ee = mexWholeBodyModel('rototranslation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, ee_link_name);
+                    wf_H_ee = mexWholeBodyModel('transformation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, ee_link_name);
                 case 4
                     % use the values of the default tool link (1st element of the list) ...
                     ee_vqT_tt = obj.mwbm_config.tool_links(1,1).ee_vqT_tt;
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-                    wf_H_ee = mexWholeBodyModel('rototranslation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, ...
+                    wf_H_ee = mexWholeBodyModel('transformation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, ...
                                                 obj.mwbm_config.tool_links(1,1).urdf_link_name);
                 case 2 % optimized modes:
                     t_idx        = varargin{1,1};
                     ee_link_name = getLinkName(obj, obj.mwbm_config.tool_links, t_idx);
                     ee_vqT_tt    = obj.mwbm_config.tool_links(t_idx,1).ee_vqT_tt;
 
-                    wf_H_ee = mexWholeBodyModel('rototranslation-matrix', ee_link_name);
+                    wf_H_ee = mexWholeBodyModel('transformation-matrix', ee_link_name);
                 case 1
                     % use the default tool link ...
                     ee_vqT_tt = obj.mwbm_config.tool_links(1,1).ee_vqT_tt;
-                    wf_H_ee   = mexWholeBodyModel('rototranslation-matrix', obj.mwbm_config.tool_links(1,1).urdf_link_name);
+                    wf_H_ee   = mexWholeBodyModel('transformation-matrix', obj.mwbm_config.tool_links(1,1).urdf_link_name);
                 otherwise
                     error('WBM::toolFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -602,7 +611,7 @@ classdef WBM < WBM.WBMBase
             wf_H_tt = wf_H_ee * ee_H_tt; % tool transformation matrix
         end
 
-        function J_tt = jacobianTool(obj, varargin) % Jacobian matrix in tool-frame
+        function wf_J_tt = jacobianTool(obj, varargin) % Jacobian matrix in tool-frame
             if (obj.mwbm_config.nTools == 0)
                 error('WBM::jacobianTool: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
             end
@@ -618,8 +627,8 @@ classdef WBM < WBM.WBMBase
                     ee_vqT_tt    = obj.mwbm_config.tool_links(t_idx,1).ee_vqT_tt;
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-                    wf_H_ee = mexWholeBodyModel('rototranslation-matrix', wf_R_b_arr, wf_p_b, q_j, ee_link_name);
-                    J_ee    = mexWholeBodyModel('jacobian', wf_R_b_arr, wf_p_b, q_j, ee_link_name);
+                    wf_H_ee = mexWholeBodyModel('transformation-matrix', wf_R_b_arr, wf_p_b, q_j, ee_link_name);
+                    wf_J_ee = mexWholeBodyModel('jacobian', wf_R_b_arr, wf_p_b, q_j, ee_link_name);
                 case 4
                     % use the values of the default tool-link (1st element of the list) ...
                     wf_p_b = varargin{1,2};
@@ -629,23 +638,23 @@ classdef WBM < WBM.WBMBase
                     ee_vqT_tt    = obj.mwbm_config.tool_links(1,1).ee_vqT_tt;
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-                    wf_H_ee = mexWholeBodyModel('rototranslation-matrix', wf_R_b_arr, wf_p_b, q_j, ee_link_name);
-                    J_ee    = mexWholeBodyModel('jacobian', wf_R_b_arr, wf_p_b, q_j, ee_link_name);
+                    wf_H_ee = mexWholeBodyModel('transformation-matrix', wf_R_b_arr, wf_p_b, q_j, ee_link_name);
+                    wf_J_ee = mexWholeBodyModel('jacobian', wf_R_b_arr, wf_p_b, q_j, ee_link_name);
                 case 2 % optimized modes:
                     t_idx = varargin{1,1};
 
                     ee_link_name = obj.mwbm_config.tool_links(t_idx,1).urdf_link_name;
                     ee_vqT_tt    = obj.mwbm_config.tool_links(t_idx,1).ee_vqT_tt;
 
-                    wf_H_ee = mexWholeBodyModel('rototranslation-matrix', ee_link_name);
-                    J_ee    = mexWholeBodyModel('jacobian', ee_link_name);
+                    wf_H_ee = mexWholeBodyModel('transformation-matrix', ee_link_name);
+                    wf_J_ee = mexWholeBodyModel('jacobian', ee_link_name);
                 case 1
                     % use the default tool-link ...
                     ee_link_name = obj.mwbm_config.tool_links(1,1).urdf_link_name;
                     ee_vqT_tt    = obj.mwbm_config.tool_links(1,1).ee_vqT_tt;
 
-                    wf_H_ee = mexWholeBodyModel('rototranslation-matrix', ee_link_name);
-                    J_ee    = mexWholeBodyModel('jacobian', ee_link_name);
+                    wf_H_ee = mexWholeBodyModel('transformation-matrix', ee_link_name);
+                    wf_J_ee = mexWholeBodyModel('jacobian', ee_link_name);
                 otherwise
                     error('WBM::jacobianTool: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -658,8 +667,8 @@ classdef WBM < WBM.WBMBase
             %      tt[wf]_X_ee[wf] = |                              |,
             %                        | 0                 I          |
             %
-            %   s.t. J_tt = tt[wf]_X_ee[wf] * ee[wf]_J_ee. The notations tt[wf] and ee[wf]
-            %   are denoting frames with origin o_tt or o_ee with orientation [wf].
+            %   s.t. wf_J_tt = tt[wf]_X_ee[wf] * ee[wf]_J_ee. The notations tt[wf] and ee[wf]
+            %   are denoting frames with origin o_tt and o_ee with orientation [wf].
             %
             % For further details see:
             %   [1] Multibody Dynamics Notation, S. Traversaro & A. Saccon, Eindhoven University of Technology,
@@ -675,13 +684,13 @@ classdef WBM < WBM.WBMBase
             wf_p_tt = wf_R_ee * (ee_R_tt * p_tt); % = wf_R_ee * ee_p_tt
 
             % compute the skew-symmetric matrix S(p_tt) ...
-            Sp_tt  = WBM.utilities.skew(wf_p_tt);
+            Sp_tt = WBM.utilities.skew(wf_p_tt);
             % create the velocity transformation matrix:
-            tt_X_ee = eye(6,6);
-            tt_X_ee(1:3,4:6) = -Sp_tt;
+            tt_X_wf = eye(6,6);
+            tt_X_wf(1:3,4:6) = -Sp_tt;
 
-            % compute J_tt by performing velocity addition ...
-            J_tt = tt_X_ee * J_ee; % = tt[wf]_X_ee[wf] * ee[wf]_J_ee
+            % compute wf_J_tt by performing velocity addition ...
+            wf_J_tt = tt_X_wf * wf_J_ee; % = tt[wf]_X_ee[wf] * ee[wf]_J_ee
         end
 
         function [chn_q, chn_dq] = getStateChains(obj, chain_names, q_j, dq_j)
@@ -990,13 +999,13 @@ classdef WBM < WBM.WBMBase
                 msl1  = max(slen1);
                 msl2  = max(slen2);
                 % compute the number of spaces ...
-                nspc = msl1 - 9 + 4; % length('link_name') = 9
+                nspc = msl1 - 9 + 5; % length('link_name') = 9
 
                 % create the formatted table in string form ...
-                strPldTbl = sprintf('  idx   link_name%smass%spos\\n', blanks(nspc), blanks(msl2));
+                strPldTbl = sprintf('  idx   link_name%smass%spos\\n', blanks(nspc), blanks(msl2-1));
                 for i = 1:nPlds
-                    nspc_1 = msl1 - slen1(i,1) + 4;
-                    nspc_2 = msl2 - slen2(i,1) + 4;
+                    nspc_1 = msl1 - slen1(i,1) + 5;
+                    nspc_2 = msl2 - slen2(i,1) + 3;
                     str = sprintf('   %d    %s%s%s%s%s\\n', ...
                                   i, clnk_names{i,1}, blanks(nspc_1), cmass{i,1}, ...
                                   blanks(nspc_2), cpos{i,1});
@@ -1013,7 +1022,7 @@ classdef WBM < WBM.WBMBase
                                  ' link payloads:\n%s'], ...
                                 obj.mwbm_config.nCstrs, strLnkNamesLst, ...
                                 strInitState, nPlds, strPldTbl);
-            disp(strConfig);
+            fprintf('%s\n', strConfig);
         end
 
     end

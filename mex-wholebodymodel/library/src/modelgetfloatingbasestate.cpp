@@ -18,6 +18,7 @@
  */
 
 // global includes
+#include <cstring>
 
 // library includes
 
@@ -26,12 +27,16 @@
 
 using namespace mexWBIComponent;
 
-ModelGetFloatingBaseState *ModelGetFloatingBaseState::modelGetFloatingBaseState;
+ModelGetFloatingBaseState *ModelGetFloatingBaseState::modelGetFloatingBaseState = 0;
+
+double *ModelGetFloatingBaseState::wf_R_b = 0;
+double *ModelGetFloatingBaseState::wf_p_b = 0;
+double *ModelGetFloatingBaseState::vb     = 0;
 
 ModelGetFloatingBaseState::ModelGetFloatingBaseState() : ModelComponent(0, 1, 3)
 {
 #ifdef DEBUG
-  mexPrintf("ModelGetFloatingBaseState constructuted\n");
+  mexPrintf("ModelGetFloatingBaseState constructuted.\n");
 #endif
 }
 
@@ -41,9 +46,9 @@ ModelGetFloatingBaseState::~ModelGetFloatingBaseState()
 
 ModelGetFloatingBaseState *ModelGetFloatingBaseState::getInstance()
 {
-  if(modelGetFloatingBaseState == NULL)
+  if (modelGetFloatingBaseState == 0) {
     modelGetFloatingBaseState = new ModelGetFloatingBaseState;
-
+  }
   return modelGetFloatingBaseState;
 }
 
@@ -55,18 +60,18 @@ void ModelGetFloatingBaseState::deleteInstance()
 bool ModelGetFloatingBaseState::allocateReturnSpace(int nlhs, mxArray **plhs)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to allocateReturnSpace in ModelGetFloatingBaseState\n");
+  mexPrintf("Trying to allocateReturnSpace in ModelGetFloatingBaseState.\n");
 #endif
-  if(nlhs != 3)
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumOutputs", "3 output arguments required for ModelGetFloatingBaseState");
-
+  if (nlhs != 3) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumOutputs", "3 output arguments required for ModelGetFloatingBaseState.");
+  }
   plhs[0] = mxCreateDoubleMatrix(3,3, mxREAL);
   plhs[1] = mxCreateDoubleMatrix(3,1, mxREAL);
   plhs[2] = mxCreateDoubleMatrix(6,1, mxREAL);
 
-  w_R_b = mxGetPr(plhs[0]);
-  w_p_b = mxGetPr(plhs[1]);
-  vb    = mxGetPr(plhs[2]);
+  wf_R_b = mxGetPr(plhs[0]);
+  wf_p_b = mxGetPr(plhs[1]);
+  vb     = mxGetPr(plhs[2]);
 
   return true;
 }
@@ -74,24 +79,22 @@ bool ModelGetFloatingBaseState::allocateReturnSpace(int nlhs, mxArray **plhs)
 bool ModelGetFloatingBaseState::compute(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  mexPrintf("ModelGetFloatingBaseState performing Compute");
+  mexPrintf("ModelGetFloatingBaseState performing compute.\n");
 #endif
-  world_H_rootLink = modelState->getRootWorldRotoTranslation();
+  wf_H_b = modelState->getBase2WorldTransformation();
 
 #ifdef DEBUG
-  mexPrintf("Inside getState\nRootWorldRotoTrans\n");
-  mexPrintf("world_H_root\n");
-
-  mexPrintf( (world_H_rootLink.R.toString()).c_str() );
+  mexPrintf("Inside getState - RootWorldRotoTrans:\n");
+  mexPrintf("wf_H_b\n");
+  mexPrintf( (wf_H_b.R.toString()).c_str() );
   mexPrintf(" = \n");
-
-  mexPrintf("world_H_ReferenceLink\n");
+  mexPrintf("wf_H_lnk\n");
   mexPrintf( ((modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str() );
   mexPrintf("\n\n");
 #endif
 
-  double rotm[9]; // 3x3 rotation matrix array ...
-  world_H_rootLink.R.getDcm(rotm);
+  double rotm[9]; // 3x3 rotation matrix array
+  wf_H_b.R.getDcm(rotm);
 
 #ifdef DEBUG
   std::stringstream ssR;
@@ -99,16 +102,19 @@ bool ModelGetFloatingBaseState::compute(int nrhs, const mxArray **prhs)
   ssR.precision(4);
   double dVal = 0.0f;
 
-  ssR << "DCM :\n";
-  for(int i=0; i < 9; i++)
-  {
+  ssR << "DCM:\n";
+  for (int i=0; i < 9; i++) {
     dVal = *(rotm + i);
-    if (dVal < 0)
+    if (dVal < 0) {
       ssR << "  " << dVal;
-    else
+    }
+    else {
       ssR << "   " << dVal;
+    }
 
-    if(((i+1) % 3) == 0) ssR << "\n";
+    if(((i+1) % 3) == 0) {
+      ssR << "\n";
+    }
   }
 
   std::string sR = ssR.str();
@@ -118,9 +124,9 @@ bool ModelGetFloatingBaseState::compute(int nrhs, const mxArray **prhs)
   // since the values in the array are stored in row-major order and Matlab
   // uses the column-major order for multi-dimensional arrays, we have to
   // make an array-transposition ...
-  reorderMatrixInColMajor(rotm, w_R_b);
+  reorderMatrixInColMajor(rotm, wf_R_b);
 
-  memcpy(w_p_b, world_H_rootLink.p, 3*sizeof(double));
+  memcpy(wf_p_b, wf_H_b.p, 3*sizeof(double));
   modelState->vb(vb);
 
   return true;
@@ -129,25 +135,25 @@ bool ModelGetFloatingBaseState::compute(int nrhs, const mxArray **prhs)
 bool ModelGetFloatingBaseState::computeFast(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  mexPrintf("ModelGetFloatingBaseState performing Compute Fast");
+  mexPrintf("ModelGetFloatingBaseState performing computeFast.\n");
 #endif
 #ifdef DEBUG
-  world_H_rootLink = modelState->getRootWorldRotoTranslation();
+  wf_H_b = modelState->getBase2WorldTransformation();
 
-  mexPrintf("Inside getState\nRootWorldRotoTrans\n");
-  mexPrintf("world_H_root\n");
-  mexPrintf( (world_H_rootLink.R.toString()).c_str() );
+  mexPrintf("Inside getState - RootWorldRotoTrans:\n");
+  mexPrintf("wf_H_b\n");
+  mexPrintf( (wf_H_b.R.toString()).c_str() );
   mexPrintf(" = \n");
-  mexPrintf("world_H_ReferenceLink\n");
+  mexPrintf("wf_H_lnk\n");
   mexPrintf( ((modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str() );
   mexPrintf("\n\n");
 #endif
   double rotm[9];
 
-  (modelState->getRootWorldRotoTranslation()).R.getDcm(rotm);
-  reorderMatrixInColMajor(rotm, w_R_b);
+  (modelState->getBase2WorldTransformation()).R.getDcm(rotm);
+  reorderMatrixInColMajor(rotm, wf_R_b); // matrix in "column major order"
 
-  memcpy(w_p_b, (modelState->getRootWorldRotoTranslation()).p, 3*sizeof(double));
+  memcpy(wf_p_b, (modelState->getBase2WorldTransformation()).p, 3*sizeof(double));
   modelState->vb(vb);
 
   return true;

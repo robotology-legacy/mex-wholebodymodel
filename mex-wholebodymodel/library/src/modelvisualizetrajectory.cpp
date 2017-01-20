@@ -28,7 +28,7 @@
 
 using namespace mexWBIComponent;
 
-ModelVisualizeTrajectory *ModelVisualizeTrajectory::modelVisualizeTrajectory;
+ModelVisualizeTrajectory *ModelVisualizeTrajectory::modelVisualizeTrajectory = 0;
 
 //bool setState(int, const mxArray *[]);
 
@@ -46,7 +46,7 @@ ModelVisualizeTrajectory::~ModelVisualizeTrajectory()
 
 ModelVisualizeTrajectory *ModelVisualizeTrajectory::getInstance()
 {
-  if (modelVisualizeTrajectory == NULL)
+  if (modelVisualizeTrajectory == 0)
   {
     modelVisualizeTrajectory = new ModelVisualizeTrajectory;
   }
@@ -58,32 +58,32 @@ void ModelVisualizeTrajectory::deleteInstance()
   deleteObject(&modelVisualizeTrajectory);
 }
 
-bool ModelVisualizeTrajectory::allocateReturnSpace(int nlhs, mxArray *plhs[])
+bool ModelVisualizeTrajectory::allocateReturnSpace(int nlhs, mxArray **plhs)
 {
   // nothing to do really
   return true;
 }
 
-bool ModelVisualizeTrajectory::compute(int nrhs, const mxArray *prhs[])
+bool ModelVisualizeTrajectory::compute(int nrhs, const mxArray **prhs)
 {
   visualizeTrajectory(nrhs, prhs);
   return true;
 }
 
-bool ModelVisualizeTrajectory::computeFast(int nrhs, const mxArray *prhs[])
+bool ModelVisualizeTrajectory::computeFast(int nrhs, const mxArray **prhs)
 {
   visualizeTrajectory(nrhs, prhs);
   return true;
 }
-bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs[])
+bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray **prhs)
 {
-  // if(!portStatus)
+  // if (!portStatus)
   // {
   openPortsToICubGui();
   // }
 
-  if( mxGetN(prhs[1]) != 1 || mxGetM(prhs[1]) != mxGetM(prhs[2]) || mxGetN(prhs[2]) != modelState->dof() ||
-      mxGetM(prhs[1]) != mxGetM(prhs[3]) || mxGetN(prhs[3]) != 7 )
+  if ( mxGetN(prhs[1]) != 1 || mxGetM(prhs[1]) != mxGetM(prhs[2]) || mxGetN(prhs[2]) != modelState->dof() ||
+       mxGetM(prhs[1]) != mxGetM(prhs[3]) || mxGetN(prhs[3]) != 7 )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components");
   }
@@ -103,13 +103,13 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs
 
   mexPrintf("Starting to send data to iCubGui\n");
   double totDelayTime = 0.0;
-  while(ti < numTSteps)
+  while (ti < numTSteps)
   {
     iniTime = yarp::os::Time::now();
 
     // floatingBase
     floatingBaseData.clear();
-    for(i=3; i < 8; i++)
+    for (i=3; i < 8; i++)
     {
       quatVal[i - 3] = tXb[ti + i*numTSteps];
     }
@@ -128,7 +128,7 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs
 
     // torso
     torsoData.clear();
-    for(i=0; i < 3; i++)
+    for (i=0; i < 3; i++)
     {
       //torsoData.addDouble(qj[ti*modelState->dof()+i]);
       torsoData.addDouble(qj[ti + i*numTSteps] ); //[ti*modelState->dof()+i]);
@@ -139,7 +139,7 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs
 
     // left_arm
     leftArmData.clear();
-    for(i=3; i < 7; i++)
+    for (i=3; i < 7; i++)
     {
       //leftArmData.addDouble(qj[ti*modelState->dof()+i]);
       leftArmData.addDouble(qj[ti + i*numTSteps] );
@@ -147,14 +147,14 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs
 
     // right_arm
     rightArmData.clear();
-    for(i=8; i < 12; i++)
+    for (i=8; i < 12; i++)
     {
       //rightArmData.addDouble(qj[ti*modelState->dof()+i]);
       rightArmData.addDouble(qj[ti + i*numTSteps] );
     }
 
     // padding to make the rest of arms render (minor issue with icubGui non controlled DoF in a port)
-    for(size_t j = 0; j < 11; j++)
+    for (size_t j = 0; j < 11; j++)
     {
       //leftArmData.addDouble(qj[ti*modelState->dof()+i]);
       leftArmData.addDouble(0.0);
@@ -163,7 +163,7 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs
 
     // left_leg
     leftLegData.clear();
-    for(i=13; i < 18; i++)
+    for (i=13; i < 18; i++)
     {
       //leftLegData.addDouble(qj[ti*modelState->dof()+i]);
       leftLegData.addDouble(qj[ti + i*numTSteps] );
@@ -171,14 +171,14 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs
 
     // right_leg
     rightLegData.clear();
-    for(i=19; i < 24; i++)
+    for (i=19; i < 24; i++)
     {
       //rightLegData.addDouble(qj[ti*modelState->dof()+i]);
       rightLegData.addDouble(qj[ti + i * numTSteps] );
     }
 
-    // if( !torso.write(torsoData) || !leftArm.write(leftArmData) || !rightArm.write(rightArmData) ||
-    //     !leftLeg.write(leftLegData) || rightLeg.write(rightLegData) )
+    // if ( !torso.write(torsoData) || !leftArm.write(leftArmData) || !rightArm.write(rightArmData) ||
+    //      !leftLeg.write(leftLegData) || rightLeg.write(rightLegData) )
     // {
     //   mexErrMsgIdAndTxt( "MATLAB:mexatexit:networkerror","Unable to write to icubGuiports");
     // }
@@ -197,7 +197,7 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:networkerror", "Unable to write to icubGuiports leftArm");
     }
 
-    if ( !rightArm.write(rightArmData))
+    if (!rightArm.write(rightArmData))
     {
       mexErrMsgIdAndTxt( "MATLAB:mexatexit:networkerror", "Unable to write to icubGuiports rightArm");
     }
@@ -213,7 +213,7 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs
     }
     finTime = yarp::os::Time::now();
     delayTime = t[ti + 1] - t[ti] - finTime + iniTime;
-    if(delayTime > 0)
+    if (delayTime > 0)
     {
       yarp::os::Time::delay(delayTime);
       totDelayTime = totDelayTime + delayTime;
@@ -236,9 +236,9 @@ bool ModelVisualizeTrajectory::visualizeTrajectory(int nrhs, const mxArray *prhs
 // {
 // }
 
-bool ModelVisualizeTrajectory::openPortsToICubGui(void)
+bool ModelVisualizeTrajectory::openPortsToICubGui()
 {
-  // if(!portStatus)
+  // if (!portStatus)
   // {
 
   // torso
@@ -250,9 +250,9 @@ bool ModelVisualizeTrajectory::openPortsToICubGui(void)
   rightArm.open("/mexWBIDataSource/right_arm");
   floatingBase.open("/mexWBIDataSource/base");
 
-  // if( !yarp::os::Network::connect("/mexWBIDataSource/left_leg","/iCubGui/left_leg:i") || !yarp::os::Network::connect("/mexWBIDataSource/left_arm","/iCubGui/left_arm:i") ||
-  //     !yarp::os::Network::connect("/mexWBIDataSource/right_leg","/iCubGui/right_leg:i") || !yarp::os::Network::connect("/mexWBIDataSource/right_arm","/iCubGui/right_arm:i") ||
-  //     !yarp::os::Network::connect("/mexWBIDataSource/torso","/iCubGui/torso:i") )
+  // if ( !yarp::os::Network::connect("/mexWBIDataSource/left_leg","/iCubGui/left_leg:i") || !yarp::os::Network::connect("/mexWBIDataSource/left_arm","/iCubGui/left_arm:i") ||
+  //      !yarp::os::Network::connect("/mexWBIDataSource/right_leg","/iCubGui/right_leg:i") || !yarp::os::Network::connect("/mexWBIDataSource/right_arm","/iCubGui/right_arm:i") ||
+  //      !yarp::os::Network::connect("/mexWBIDataSource/torso","/iCubGui/torso:i") )
   // {
   //   portStatus = false;
   //   mexErrMsgIdAndTxt( "MATLAB:mexatexit:networkerror","Unable to link to icubGuiports");

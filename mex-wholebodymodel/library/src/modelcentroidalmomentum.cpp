@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
- * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -27,12 +27,17 @@
 
 using namespace mexWBIComponent;
 
-ModelCentroidalMomentum *ModelCentroidalMomentum::modelCentroidalMomentum;
+ModelCentroidalMomentum *ModelCentroidalMomentum::modelCentroidalMomentum = 0;
+
+double *ModelCentroidalMomentum::qj     = 0;
+double *ModelCentroidalMomentum::qj_dot = 0;
+double *ModelCentroidalMomentum::vb     = 0;
+double *ModelCentroidalMomentum::h_c    = 0;
 
 ModelCentroidalMomentum::ModelCentroidalMomentum() : ModelComponent(5, 0, 1)
 {
 #ifdef DEBUG
-  mexPrintf("ModelCentroidalMomentum constructed\n");
+  mexPrintf("ModelCentroidalMomentum constructed.\n");
 #endif
 }
 
@@ -42,9 +47,9 @@ ModelCentroidalMomentum::~ModelCentroidalMomentum()
 
 ModelCentroidalMomentum *ModelCentroidalMomentum::getInstance()
 {
-  if(modelCentroidalMomentum == NULL)
+  if (modelCentroidalMomentum == 0) {
     modelCentroidalMomentum = new ModelCentroidalMomentum;
-
+  }
   return modelCentroidalMomentum;
 }
 
@@ -53,85 +58,87 @@ void ModelCentroidalMomentum::deleteInstance()
   deleteObject(&modelCentroidalMomentum);
 }
 
-bool ModelCentroidalMomentum::allocateReturnSpace(int nlhs, mxArray *plhs[])
+bool ModelCentroidalMomentum::allocateReturnSpace(int nlhs, mxArray **plhs)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to allocateReturnSpace in ModelCentroidalMomentum\n");
+  mexPrintf("Trying to allocateReturnSpace in ModelCentroidalMomentum.\n");
 #endif
   plhs[0] = mxCreateNumericMatrix(6, 1, mxDOUBLE_CLASS, mxREAL);
-  h = mxGetPr(plhs[0]);
+  h_c = mxGetPr(plhs[0]);
 
   return true;
 }
 
-bool ModelCentroidalMomentum::compute(int nrhs, const mxArray *prhs[])
+bool ModelCentroidalMomentum::compute(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to compute generalised bias forces\n");
+  mexPrintf("ModelCentroidalMomentum performing compute.\n");
 #endif
   return processArguments(nrhs, prhs);
 }
 
-bool ModelCentroidalMomentum::computeFast(int nrhs, const mxArray *prhs[])
+bool ModelCentroidalMomentum::computeFast(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to fast compute generalised bias forces\n");
+  mexPrintf("ModelCentroidalMomentum performing computeFast.\n");
 #endif
 #ifdef DEBUG
-  if(h == NULL) return false;
+  if (h_c == 0) {
+    return false;
+  }
 #endif
   robotModel = modelState->robotModel();
 
-  qj    = modelState->qj();
-  qjDot = modelState->qjDot();
-  vb    = modelState->vb();
+  wf_H_b = modelState->getBase2WorldTransformation();
+  qj     = modelState->qj();
+  qj_dot = modelState->qj_dot();
+  vb     = modelState->vb();
 
-  world_H_rootLink = modelState->getRootWorldRotoTranslation();
-
-  if( !robotModel->computeCentroidalMomentum(qj, world_H_rootLink, qjDot, vb, h) )
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeCentroidalMomentum call");
-
+  if ( !robotModel->computeCentroidalMomentum(qj, wf_H_b, qj_dot, vb, h_c) ) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeCentroidalMomentum call.");
+  }
   return true;
 }
 
-bool ModelCentroidalMomentum::processArguments(int nrhs, const mxArray *prhs[])
+bool ModelCentroidalMomentum::processArguments(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  if(h == NULL) return false;
+  if (h_c == 0) {
+    return false;
+  }
 #endif
   size_t numDof = modelState->dof();
 
   if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != numDof ||
        mxGetN(prhs[3]) != 1 || mxGetM(prhs[4]) != numDof || mxGetN(prhs[4]) != 1 || mxGetM(prhs[5]) != 6 || mxGetN(prhs[5]) != 1 )
   {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state argument dimensions in ModelCentroidalMomentum call");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state argument dimensions in ModelCentroidalMomentum call.");
   }
   robotModel = modelState->robotModel();
 
-  double *R_temp, *p_temp;
-  R_temp = mxGetPr(prhs[1]);
-  p_temp = mxGetPr(prhs[2]);
-
-  qj    = mxGetPr(prhs[3]);
-  qjDot = mxGetPr(prhs[4]);
-  vb    = mxGetPr(prhs[5]);
+  double *pR, *ppos;
+  pR     = mxGetPr(prhs[1]);
+  ppos   = mxGetPr(prhs[2]);
+  qj     = mxGetPr(prhs[3]);
+  qj_dot = mxGetPr(prhs[4]);
+  vb     = mxGetPr(prhs[5]);
 
 #ifdef DEBUG
-  mexPrintf("qj received\n");
+  mexPrintf("qj received.\n");
 
-  for(size_t i=0; i < numDof; i++)
+  for (size_t i=0; i < numDof; i++) {
     mexPrintf(" %f", qj[i]);
+  }
 #endif
 
-  double tempR[9];
-  reorderMatrixInRowMajor(R_temp, tempR);
-  wbi::Rotation tempRot(tempR);
+  double R_rmo[9];
+  reorderMatrixInRowMajor(pR, R_rmo); // matrix in "row major order"
+  wbi::Rotation rot3d(R_rmo);
 
-  world_H_rootLink = wbi::Frame(tempRot, p_temp);
+  wf_H_b = wbi::Frame(rot3d, ppos);
 
-  if( !robotModel->computeCentroidalMomentum(qj, world_H_rootLink, qjDot, vb, h) )
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeCentroidalMomentum call");
-
+  if ( !robotModel->computeCentroidalMomentum(qj, wf_H_b, qj_dot, vb, h_c) ) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeCentroidalMomentum call.");
+  }
   return true;
 }
-

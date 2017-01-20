@@ -58,18 +58,18 @@ classdef WBMBase < handle
 
         function initModel(obj, urdf_model_name)
             if ~exist('urdf_model_name', 'var')
-                % Optimized mode: use the default (URDF) robot model which
-                % is defined in the environment variable YARP_ROBOT_NAME
-                % of the WB-Toolbox ...
+                % Optimized mode: use the default (URDF) robot model of the
+                % yarpWholeBodyInterface which is defined in the environment
+                % variable YARP_ROBOT_NAME.
                 obj.mwbm_model.urdf_robot_name = getenv('YARP_ROBOT_NAME');
-                mexWholeBodyModel('model-initialise');
+                mexWholeBodyModel('model-initialize');
                 return
             end
-            % else, use the model name of the robot that is supported by the
-            % WB-Toolbox (the URDF-file(s) must exist in the directory of
-            % the WB-Toolbox) ...
+            % else, use the model name of the robot that is supported by
+            % the yarpWholeBodyInterface (the URDF-file must exist in the
+            % directory of the yarpWholeBodyInterface library) ...
             obj.mwbm_model.urdf_robot_name = urdf_model_name;
-            mexWholeBodyModel('model-initialise', obj.mwbm_model.urdf_robot_name);
+            mexWholeBodyModel('model-initialize', obj.mwbm_model.urdf_robot_name);
         end
 
         function initModelURDF(obj, urdf_file_name)
@@ -81,7 +81,7 @@ classdef WBMBase < handle
             end
 
             obj.mwbm_model.urdf_robot_name = urdf_file_name;
-            mexWholeBodyModel('model-initialise-urdf', obj.mwbm_model.urdf_robot_name);
+            mexWholeBodyModel('model-initialize-urdf', obj.mwbm_model.urdf_robot_name);
         end
 
         function setWorldFrame(obj, wf_R_b, wf_p_b, g_wf)
@@ -158,7 +158,7 @@ classdef WBMBase < handle
 
         function stFltb = getFloatingBaseState(~)
             stFltb = WBM.wbmFltgBaseState;
-            [R_b, p_b, v_b] = mexWholeBodyModel('get-floating-base-state');
+            [R_b, p_b, v_b] = mexWholeBodyModel('get-fbase-state');
 
             stFltb.wf_R_b = R_b; % orientation of the base (in axis-angle representation)
             stFltb.wf_p_b = p_b; % cartesian position of the base
@@ -177,16 +177,16 @@ classdef WBMBase < handle
                     urdf_link_name = obj.mwbm_model.urdf_fixed_link;
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
-                    wf_H_lnk = mexWholeBodyModel('rototranslation-matrix', varargin{1,1});
+                    wf_H_lnk = mexWholeBodyModel('transformation-matrix', varargin{1,1});
                     return
                 case 1
-                    wf_H_lnk = mexWholeBodyModel('rototranslation-matrix', obj.mwbm_model.urdf_fixed_link);
+                    wf_H_lnk = mexWholeBodyModel('transformation-matrix', obj.mwbm_model.urdf_fixed_link);
                     return
                 otherwise
                     error('WBMBase::transformationMatrix: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-            wf_H_lnk = mexWholeBodyModel('rototranslation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, urdf_link_name);
+            wf_H_lnk = mexWholeBodyModel('transformation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, urdf_link_name);
         end
 
         function M = massMatrix(~, wf_R_b, wf_p_b, q_j)
@@ -203,17 +203,17 @@ classdef WBMBase < handle
             end
         end
 
-        function [jl_lower, jl_upper] = getJointLimits(~)
-            [jl_lower, jl_upper] = mexWholeBodyModel('joint-limits');
+        function [jlim_lower, jlim_upper] = getJointLimits(~)
+            [jlim_lower, jlim_upper] = mexWholeBodyModel('joint-limits');
         end
 
         function resv = isJointLimit(obj, q_j)
             resv = ~((q_j > obj.mwbm_model.jlim.lwr) & (q_j < obj.mwbm_model.jlim.upr));
         end
 
-        tau_j = inverseDynamics(obj, varargin) % not completely implemented in C++!
+        tau_j = inverseDynamics(obj, varargin)
 
-        function J = jacobian(obj, varargin)
+        function wf_J_lnk = jacobian(obj, varargin)
             % wf_R_b = varargin{1}
             % wf_p_b = varargin{2}
             % q_j    = varargin{3}
@@ -225,19 +225,19 @@ classdef WBMBase < handle
                     urdf_link_name = obj.mwbm_model.urdf_fixed_link;
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
-                    J = mexWholeBodyModel('jacobian', varargin{1,1});
+                    wf_J_lnk = mexWholeBodyModel('jacobian', varargin{1,1});
                     return
                 case 1
-                    J = mexWholeBodyModel('jacobian', obj.mwbm_model.urdf_fixed_link);
+                    wf_J_lnk = mexWholeBodyModel('jacobian', obj.mwbm_model.urdf_fixed_link);
                     return
                 otherwise
                     error('WBMBase::jacobian: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-            J = mexWholeBodyModel('jacobian', wf_R_b_arr, varargin{1,2}, varargin{1,3}, urdf_link_name);
+            wf_J_lnk = mexWholeBodyModel('jacobian', wf_R_b_arr, varargin{1,2}, varargin{1,3}, urdf_link_name);
         end
 
-        function dJ = dJdq(obj, varargin)
+        function djdq_lnk = dJdq(obj, varargin)
             % wf_R_b = varargin{1}
             % wf_p_b = varargin{2}
             % q_j    = varargin{3}
@@ -250,16 +250,16 @@ classdef WBMBase < handle
                     urdf_link_name = obj.mwbm_model.urdf_fixed_link; % default link name ...
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
-                    dJ = mexWholeBodyModel('djdq', varargin{1,1});
+                    djdq_lnk = mexWholeBodyModel('dJdq', varargin{1,1});
                     return
                 case 1
-                    dJ = mexWholeBodyModel('djdq', obj.mwbm_model.urdf_fixed_link);
+                    djdq_lnk = mexWholeBodyModel('dJdq', obj.mwbm_model.urdf_fixed_link);
                     return
                 otherwise
                     error('WBMBase::dJdq: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-            dJ = mexWholeBodyModel('djdq', wf_R_b_arr, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5}, urdf_link_name);
+            djdq_lnk = mexWholeBodyModel('dJdq', wf_R_b_arr, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5}, urdf_link_name);
         end
 
         function h_c = centroidalMomentum(~, wf_R_b, wf_p_b, q_j, dq_j, v_b)
@@ -276,7 +276,7 @@ classdef WBMBase < handle
             end
         end
 
-        function wf_vqT_lnk = forwardKinematics(obj, varargin)
+        function vqT_lnk = forwardKinematics(obj, varargin)
             % wf_R_b = varargin{1}
             % wf_p_b = varargin{2}
             % q_j    = varargin{3}
@@ -287,27 +287,27 @@ classdef WBMBase < handle
                     urdf_link_name = obj.mwbm_model.urdf_fixed_link; % default link name ...
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
-                    wf_vqT_lnk = mexWholeBodyModel('forward-kinematics', varargin{1,1});
+                    vqT_lnk = mexWholeBodyModel('forward-kinematics', varargin{1,1});
                     return
                 case 1
-                    wf_vqT_lnk = mexWholeBodyModel('forward-kinematics', obj.mwbm_model.urdf_fixed_link);
+                    vqT_lnk = mexWholeBodyModel('forward-kinematics', obj.mwbm_model.urdf_fixed_link);
                     return
                 otherwise
                     error('WBMBase::forwardKinematics: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-            wf_vqT_lnk = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, varargin{1,2}, varargin{1,3}, urdf_link_name);
+            vqT_lnk = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, varargin{1,2}, varargin{1,3}, urdf_link_name);
         end
 
-        function C_qv = generalizedBiasForces(~, wf_R_b, wf_p_b, q_j, dq_j, v_b)
+        function c_qv = generalizedBiasForces(~, wf_R_b, wf_p_b, q_j, dq_j, v_b)
             switch nargin
                 case 6
                     % normal mode:
                     wf_R_b_arr = reshape(wf_R_b, 9, 1);
-                    C_qv = mexWholeBodyModel('generalised-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                    c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
                 case 1
                     % optimized mode:
-                    C_qv = mexWholeBodyModel('generalised-forces');
+                    c_qv = mexWholeBodyModel('generalized-forces');
                 otherwise
                     error('WBMBase::generalizedBiasForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -325,41 +325,41 @@ classdef WBMBase < handle
                     Jc_t = varargin{1,7};
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-                    C_qv = mexWholeBodyModel('generalised-forces', wf_R_b_arr, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
+                    c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
                 case 3 % optimized mode:
                     f_c  = varargin{1,1};
                     Jc_t = varargin{1,2};
 
-                    C_qv = mexWholeBodyModel('generalised-forces');
+                    c_qv = mexWholeBodyModel('generalized-forces');
                 otherwise
                     error('WBMBase::generalizedForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            tau_gen = C_qv - Jc_t*f_c;
+            tau_gen = c_qv - Jc_t*f_c;
         end
 
-        function tau_c = coriolisCentrifugalForces(~, wf_R_b, wf_p_b, q_j, dq_j, v_b)
+        function c_qv = coriolisBiasForces(~, wf_R_b, wf_p_b, q_j, dq_j, v_b)
             switch nargin
                 case 6
                     % normal mode:
                     wf_R_b_arr = reshape(wf_R_b, 9, 1);
-                    tau_c = mexWholeBodyModel('coriolis-centrifugal-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                    c_qv = mexWholeBodyModel('coriolis-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
                 case 1
                     % optimized mode:
-                    tau_c = mexWholeBodyModel('coriolis-centrifugal-forces');
+                    c_qv = mexWholeBodyModel('coriolis-forces');
                 otherwise
-                    error('WBMBase::coriolisCentrifugalForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                    error('WBMBase::coriolisBiasForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
         end
 
-        function tau_g = gravityForces(~, wf_R_b, wf_p_b, q_j)
+        function g_v = gravityBiasForces(~, wf_R_b, wf_p_b, q_j)
             switch nargin
                 case 4
                     % normal mode:
                     wf_R_b_arr = reshape(wf_R_b, 9, 1);
-                    tau_g = mexWholeBodyModel('gravity-forces', wf_R_b_arr, wf_p_b, q_j);
+                    g_v = mexWholeBodyModel('gravity-forces', wf_R_b_arr, wf_p_b, q_j);
                 case 1
                     % optimized mode:
-                    tau_g = mexWholeBodyModel('gravity-forces');
+                    g_v = mexWholeBodyModel('gravity-forces');
                 otherwise
                     error('WBMBase::gravityForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -388,19 +388,19 @@ classdef WBMBase < handle
             tau_fr =  tau_vf + tau_cf;                            % friction torques
         end
 
-        function [M, C_qv, h_c] = wholeBodyDynamics(~, wf_R_b, wf_p_b, q_j, dq_j, v_b)
+        function [M, c_qv, h_c] = wholeBodyDynamics(~, wf_R_b, wf_p_b, q_j, dq_j, v_b)
             switch nargin
                 case 6
                     % normal mode:
                     wf_R_b_arr = reshape(wf_R_b, 9, 1);
 
                     M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, wf_p_b, q_j);
-                    C_qv = mexWholeBodyModel('generalised-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                    c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
                     h_c  = mexWholeBodyModel('centroidal-momentum', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b); % = omega
                 case 1
                     % optimized mode:
                     M    = mexWholeBodyModel('mass-matrix');
-                    C_qv = mexWholeBodyModel('generalised-forces');
+                    c_qv = mexWholeBodyModel('generalized-forces');
                     h_c  = mexWholeBodyModel('centroidal-momentum'); % = omega
                 otherwise
                     error('WBMBase::wholeBodyDynamics: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -487,8 +487,8 @@ classdef WBMBase < handle
             frict_coeff = obj.mwbm_model.frict_coeff;
         end
 
-        function jl = get.joint_limits(obj)
-            jl = obj.mwbm_model.jlim;
+        function jlim = get.joint_limits(obj)
+            jlim = obj.mwbm_model.jlim;
         end
 
         function robot_model = get.robot_model(obj)
@@ -531,7 +531,7 @@ classdef WBMBase < handle
                                 mat2str(obj.mwbm_model.wf_R_b, prec), ...
                                 mat2str(obj.mwbm_model.wf_p_b, prec), ...
                                 mat2str(obj.mwbm_model.g_wf, prec), strFrictions);
-            disp(strParams);
+            fprintf('%s\n', strParams);
         end
 
     end

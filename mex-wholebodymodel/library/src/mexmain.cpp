@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -19,9 +20,14 @@
 
 // global includes
 
+// library includes
+
 // local includes
 #include "modelcomponent.h"
 #include "componentmanager.h"
+
+// preprocessor directives
+//#define DEBUG
 
 // namespaces
 using namespace mexWBIComponent;
@@ -29,62 +35,63 @@ using namespace mexWBIComponent;
 // global variables
 
 /**
- * just a local copy of the pointer that you get
+ * Just a local copy of the pointer that you get
  * by ComponentManager::getInstance()
  *
  * To properly destroy, call ComponentManager::deleteInstance()
  * and then set this pointer to 0.
  */
-static ComponentManager *componentManagerLocalPointerCopy = NULL;
+static ComponentManager *componentManagerLocalPointerCopy = 0;
 
 // Cleanup function to call when matlab exits or mex clears
 void MEXWBM_Matlab_ExitFcn(void)
 {
   ComponentManager::deleteInstance();
-  componentManagerLocalPointerCopy = NULL;
-  // mexPrintf("DONE_5\n");
+  componentManagerLocalPointerCopy = 0;
 }
 
 //=========================================================================================================================
 // Entry point function to library
-void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+void mexFunction(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs)
 {
-  if(componentManagerLocalPointerCopy == NULL)
-  {
-    // Initialisation of the component, i.e first call after a 'close all' or matlab start
-    if(nrhs < 1)
+  if (componentManagerLocalPointerCopy == 0) {
+    // initialisation of the component, i.e first call after a 'close all' or matlab start
+    if (nrhs < 1) {
       mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Initialisation has not been performed correctly.");
+    }
+    // check to be sure input is of type char
+    if ( !(mxIsChar(prhs[0])) ) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Initialisation must include component.");
+    }
 
-    // Check to be sure input is of type char
-    if( !(mxIsChar(prhs[0])) )
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Initialisation must include component.\n.");
-
-    if(nrhs == 2)
-    {
-      if( !(mxIsChar(prhs[1])) )
-        mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Initialisation must include component and a robot name.\n.");
-
+    if (nrhs == 2) {
+      if ( !(mxIsChar(prhs[1])) ) {
+        mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Initialisation must include component and a robot name.");
+      }
       componentManagerLocalPointerCopy = ComponentManager::getInstance(mxArrayToString(prhs[1]));
     }
-    else
+    else {
       componentManagerLocalPointerCopy = ComponentManager::getInstance();
+    }
 
-    // Register function to call on Matlab close / mex clear
+    // register function to call on Matlab close / mex clear
     // to proper deallocate all the memory
     mexAtExit(MEXWBM_Matlab_ExitFcn);
   }
-  else
+  else {
     componentManagerLocalPointerCopy = ComponentManager::getInstance();
+  }
 
 #ifdef DEBUG
-  mexPrintf("starting to process function\n");
+  mexPrintf("Starting to process function...\n");
 #endif
 
-  if(nrhs < 1)
+  if (nrhs < 1) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Required Component must be named.");
-  // Check to be sure input is of type char
-  if( !(mxIsChar(prhs[0])) )
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Input must be of type string.\n.");
-
+  }
+  // check to be sure input is of type char
+  if ( !(mxIsChar(prhs[0])) ) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Input must be of type string.");
+  }
   componentManagerLocalPointerCopy->processFunctionCall(nlhs, plhs, nrhs, prhs);
 }

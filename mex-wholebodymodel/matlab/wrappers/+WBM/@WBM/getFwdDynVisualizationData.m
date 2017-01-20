@@ -74,14 +74,14 @@ function fdyn_data = getFDynDataExt(obj, t, stvChi, fhTrqControl, foot_conf)
     setState(obj, stp.q_j, stp.dq_j, v_b);
 
     M    = mexWholeBodyModel('mass-matrix');
-    C_qv = mexWholeBodyModel('generalised-forces');
+    c_qv = mexWholeBodyModel('generalized-forces');
     % compute the constraint (contact) Jacobians:
-    [Jc, dJcdq] = contactJacobians(obj);
+    [Jc, djcdq] = contactJacobians(obj);
 
     % get the torque forces and the visualization data from the controller:
-    [tau, ctrl_data] = fhTrqControl(t, M, C_qv, stp, nu, Jc, dJcdq, foot_conf);
+    [tau, ctrl_data] = fhTrqControl(t, M, c_qv, stp, nu, Jc, djcdq, foot_conf);
     % get the visualization data from the acceleration calculation:
-    [~,fdyn_data] = jointAccelerationsExt(obj, M, C_qv, stp.dq_j, nu, tau, Jc, dJcdq, foot_conf); % optimized mode
+    [~,fdyn_data] = jointAccelerationsExt(obj, M, c_qv, stp.dq_j, nu, tau, Jc, djcdq, foot_conf); % optimized mode
     % add the controller data to the visualization data:
     fdyn_data.ctrl_data = ctrl_data;
 end

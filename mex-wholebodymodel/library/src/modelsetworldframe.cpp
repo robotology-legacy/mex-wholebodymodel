@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
- * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -32,7 +32,7 @@ ModelSetWorldFrame *ModelSetWorldFrame::modelSetWorldFrame = 0;
 ModelSetWorldFrame::ModelSetWorldFrame() : ModelComponent(3, 2, 0)
 {
 #ifdef DEBUG
-  mexPrintf("ModelSetWorldFrame constructed\n");
+  mexPrintf("ModelSetWorldFrame constructed.\n");
 #endif
 }
 
@@ -42,9 +42,9 @@ ModelSetWorldFrame::~ModelSetWorldFrame()
 
 ModelSetWorldFrame* ModelSetWorldFrame::getInstance()
 {
-  if(modelSetWorldFrame == NULL)
+  if (modelSetWorldFrame == 0) {
     modelSetWorldFrame = new ModelSetWorldFrame;
-
+  }
   return modelSetWorldFrame;
 }
 
@@ -53,47 +53,51 @@ void ModelSetWorldFrame::deleteInstance()
   deleteObject(&modelSetWorldFrame);
 }
 
-bool ModelSetWorldFrame::allocateReturnSpace(int a, mxArray *[])
+bool ModelSetWorldFrame::allocateReturnSpace(int nlhs, mxArray **plhs)
 {
   // Nothing to do really
   return true;
 }
 
-bool ModelSetWorldFrame::compute(int nrhs, const mxArray *prhs[])
+bool ModelSetWorldFrame::compute(int nrhs, const mxArray **prhs)
 {
   if( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 ||
       mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != 3 || mxGetN(prhs[3]) != 1 )
   {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
   }
-  double *R_temp, *p_temp, *g_temp;
-  R_temp = mxGetPr(prhs[1]);
-  p_temp = mxGetPr(prhs[2]);
-  g_temp = mxGetPr(prhs[3]);
+  double *pR, *ppos, *pg;
+  pR   = mxGetPr(prhs[1]);
+  ppos = mxGetPr(prhs[2]);
+  pg   = mxGetPr(prhs[3]);
 
-  double tempR[9];
-  reorderMatrixInRowMajor(R_temp, tempR);
-  wbi::Rotation tempRot(tempR);
-  wbi::Frame tempFrame(tempRot, p_temp);
+  double R_rmo[9];
+  reorderMatrixInRowMajor(pR, R_rmo); // matrix in "row major order"
 
-  modelState->setRootWorldRotoTranslation(tempFrame);
-  modelState->setGravity(g_temp);
+  wbi::Rotation rot3d(R_rmo);
+  wbi::Frame wf_H_b(rot3d, ppos);
+
+  modelState->setBase2WorldTransformation(wf_H_b);
+  modelState->setGravity(pg);
 
   return true;
 }
 
-bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray* prhs[])
+bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray **prhs)
 {
-  if( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 )
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components");
+  if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
+  }
+  double *pR, *ppos;
+  pR   = mxGetPr(prhs[1]);
+  ppos = mxGetPr(prhs[2]);
 
-  double *R_temp, *p_temp;
-  R_temp = mxGetPr(prhs[1]);
-  p_temp = mxGetPr(prhs[2]);
+  double R_rmo[9];
+  reorderMatrixInRowMajor(pR, R_rmo); // matrix in "row major order"
 
-  wbi::Rotation tempRot(R_temp);
-  wbi::Frame tempFrame(tempRot, p_temp);
+  wbi::Rotation rot3d(R_rmo);
+  wbi::Frame wf_H_b(rot3d, ppos);
 
-  modelState->setRootWorldRotoTranslation(tempFrame);
+  modelState->setBase2WorldTransformation(wf_H_b);
   return true;
 }

@@ -36,27 +36,32 @@ namespace mexWBIComponent
 
       /**
        * Delete the (static) instance of this component,
-       * and set the instance pointer to NULL.
+       * and set the instance pointer to 0.
        */
       static void deleteInstance();
 
-      virtual bool allocateReturnSpace(int, mxArray**);
-      virtual bool compute(int, const mxArray**);
-      virtual bool computeFast(int, const mxArray**);
+      virtual bool allocateReturnSpace(int nlhs, mxArray **plhs);
+      virtual bool compute(int nrhs, const mxArray **prhs);
+      virtual bool computeFast(int nrhs, const mxArray **prhs);
 
       virtual ~ModelInverseDynamics();
 
     private:
       ModelInverseDynamics();
-      bool processArguments(int, const mxArray**);
+      bool processArguments(int nrhs, const mxArray **prhs);
+      bool processFastArguments(int nrhs, const mxArray **prhs);
 
       static ModelInverseDynamics *modelInverseDynamics;
 
-      double *qj;
-      double *qjDot;
-      double *vb;
-      double *g;
-      double *tau;
+      // inputs:
+      static double *qj;
+      static double *qj_dot;
+      static double *qj_ddot;
+      static double *vb;
+      static double *vb_dot;
+      static double *g;
+      // output:
+      static double *tau; // joint torques
     };
 
 }

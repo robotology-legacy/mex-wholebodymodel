@@ -31,6 +31,8 @@ slprj/
 ## Sublime Text: ------------------------------------
 ##
 ## Ignore projects and workspaces.
+## url: https://www.sublimetext.com
 ##---------------------------------------------------
 *.sublime-project
 *.sublime-workspace
+

@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
- * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -27,49 +27,46 @@
 // library includes
 #include <wbi/wbiUtil.h>
 #include <wbi/iWholeBodyModel.h>
-#include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <Eigen/Dense>
 
 // local includes
 
 namespace mexWBIComponent
 {
-  class ModelState : private boost::noncopyable
+  class ModelState
   {
     public:
-      static ModelState *getInstance(std::string = "icubGazeboSim");
+      static ModelState *getInstance(std::string robotName = "icubGazeboSim");
       static void initModelState();
 
       /**
       * Delete the (static) instance of this component,
-      * and set the instance pointer to NULL.
+      * and set the instance pointer to 0.
       */
-      // static void deleteInstance();
+      static void deleteInstance();
 
-      bool setState(double*, double*, double*);
+      bool setState(double *qj_t, double *qj_dot_t, double *vb_t);
 
-      void setRootWorldRotoTranslation(wbi::Frame);
-      void setGravity(double *g_temp);
+      void setBase2WorldTransformation(wbi::Frame frm3d_H);
+      void setGravity(double *pg);
 
-      wbi::Frame getRootWorldRotoTranslation(void);
+      wbi::Frame getBase2WorldTransformation();
 
       double *qj();
-      double *qjDot();
+      double *qj_dot();
       double *vb();
       double *g();
 
-      void qj(double*);
-      void qjDot(double*);
-      void vb(double*);
-      void g(double*);
+      void qj(double *qj_t);
+      void qj_dot(double *qj_dot_t);
+      void vb(double *vb_t);
+      void g(double *g_t);
       size_t dof();
 
       /**
       * Load a robot model from a yarpWholeBodyInterface
       * configuration, specifyng the YARP_ROBOT_NAME
       */
-      void robotModel(std::string);
+      void robotModel(std::string robotName);
 
       /**
       * Load a robot model from a URDF file path.
@@ -78,34 +75,26 @@ namespace mexWBIComponent
       */
       void robotModelFromURDF(std::string urdfFileName);
 
-      wbi::iWholeBodyModel *robotModel(void);
-      std::string robotName(void);
+      wbi::iWholeBodyModel *robotModel();
+      std::string robotName();
 
-      // virtual ~ModelState();
       ~ModelState();
 
     private:
-      ModelState(std::string);
+      ModelState(std::string robotName);
 
-      // Note: The difference here is that the 'pointer' for the variable
-      // modelState is static and not the object! The deletion process is
-      // here different. With the delete-operator we delete only the pointer
-      // to the object and not the object self --> segmentation fault!
-      // Furthermore, this class describes a singelton pattern. When the
-      // instance will be created, we have to add it to a 'deletion-manager'
-      // that the object is guaranteed to be deleted.
-
-      // static ModelState *modelState;
-      static boost::scoped_ptr<ModelState> modelState;
+      static ModelState *modelState;
       static wbi::iWholeBodyModel *robotWBIModel;
+      //wbi::iWholeBodyModel *robotWBIModel;
 
-      size_t numDof;
-      std::string currentRobotName;
+      static size_t numDof;
+      static std::string currRobotName;
 
-      double vbS[6], *qjS, *qjDotS, gS[3];
+      // state variables:
+      static double *sqj, *sqj_dot, svb[6], sg[3];
 
-      Eigen::Matrix4d H_w2b;
-      wbi::Frame world_H_rootLink;
+      // frame transformation (from base to world frame):
+      static wbi::Frame wf_H_b;
   };
 
   /**
@@ -115,11 +104,13 @@ namespace mexWBIComponent
    */
   template <class T> void deleteObject(T **pp)
   {
-    if(*pp != NULL)
-    {
+    if (*pp != 0) {
       delete *pp;
-      *pp = NULL;
-      // mexPrintf("delete object executed.\n");
+      *pp = 0;
+
+    #ifdef DEBUG
+      mexPrintf("Object deleted.\n");
+    #endif
     }
   };
 

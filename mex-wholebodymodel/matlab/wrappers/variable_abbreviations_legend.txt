@@ -97,13 +97,14 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ul        ...  upper limit(s)
     upr       ...  upper
     v         ...  vector
-    veT       ...  vector-Euler-angles transformation [translation with Euler angles] (vector)
+    veT       ...  vector Euler-angle transformation [translation with Euler angles] (vector)
     vel       ...  velocit(y/ies)
     vfrict    ...  viscous friction
     vpos      ...  vector position [translation] (vector)
     vqT       ...  vector-quaternion transformation [VQS-Transformation] (vector) (*)
     vtr       ...  vector translation (vector)
     vtx       ...  vert(ex/ices)
+    vxT       ...  vector axis-angle transformation [translation with axis angles] (vector)
     w         ...  world
     wbm       ...  whole body model
     wf, WF    ...  world frame

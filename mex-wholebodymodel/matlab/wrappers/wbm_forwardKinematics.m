@@ -1,26 +1,33 @@
-function [p] = wbm_forwardKinematics(varargin)
-%WBM_FORWARDKINEMATICS computes the forward kinematics rototranslation to a specified link in the current joint
-%   configuration.
-%   Arguments :
-%       Optimised Mode : link_name - string matching URDF name of the link (frame)
-%       Normal Mode : R - rotation from rootLink to world frame (3 x 3)
-%                     p - translation from rootLink to world frame (3 x 1)
-%                     qj - joint positions (NumDoF x 1)
-%                     link_name - string matching URDF name of the link (frame)
-%   Returns :   p - 7 dimensional vector of the rototranslation of link
-%   frame. First 3 elements are the position, next 4 are the orientation in
-%   quaternions
-%
-% Author : Naveen Kuppuswamy (naveen.kuppuswamy@iit.it)
-% Genova, Dec 2014
+function vqT_lnk = wbm_forwardKinematics(varargin)
+    % wbm_forwardKinematics computes the forward kinematic transformation vector to a specified
+    % link (frame) w.r.t. the current joint configuration q_j.
+    %
+    %   INPUT ARGUMENTS:
+    %       Optimized mode:
+    %           urdf_link_name -- string matching URDF name of the link (frame)
+    %
+    %       Normal mode:
+    %                   wf_R_b -- (3 x 3) rotation matrix from base to world frame
+    %                   wf_p_b -- (3 x 1) position vector from base to world frame
+    %                      q_j -- (nDoF x 1) joint angle vector in radian
+    %           urdf_link_name -- string matching URDF name of the link (frame)
+    %
+    %   OUTPUT ARGUMENTS:
+    %       vqT_lnk -- (7 x 1) vector-quaternion transformation from the specified link (frame) to
+    %                  the world frame. (*)
+    %
+    %   (*) The first 3 elements of the vector representing the position and the
+    %       remaining 4 elements are the orientation in quaternions.
+    %
+    % Author: Naveen Kuppuswamy (naveen.kuppuswamy@iit.it); Genova, Dec 2014
+    % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
 
-switch(nargin)
-    case 1
-        p = mexWholeBodyModel('forward-kinematics',varargin{1});
-    case 4
-        p = mexWholeBodyModel('forward-kinematics',reshape(varargin{1},[],1), varargin{2},varargin{3},varargin{4});
-    otherwise
-        disp('forwardKinematics : Incorrect number of arguments, check docs');
-end
-
+    switch nargin
+        case 1
+            vqT_lnk = mexWholeBodyModel('forward-kinematics', varargin{1});
+        case 4
+            vqT_lnk = mexWholeBodyModel('forward-kinematics', reshape(varargin{1}, [], 1), varargin{2}, varargin{3}, varargin{4});
+        otherwise
+            error('wbm_forwardKinematics: %s\n', wbm_errorMsg());
+    end
 end

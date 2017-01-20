@@ -21,11 +21,11 @@ classdef (Abstract) IMultChainTree < handle
     methods(Abstract)
         ddq_j = accel(obj, q_j, dq_j, tau)
 
-        tau_c = corolis(obj, q_j, dq_j)
+        c_qv = corolis(obj, q_j, dq_j)
 
         tau_fr = friction(obj, dq_j)
 
-        tau_g = gravload(obj, q_j)
+        g_v = gravload(obj, q_j)
 
         tau_j = invdyn(obj, q_j, dq_j, ddq_j)
 
@@ -37,11 +37,11 @@ classdef (Abstract) IMultChainTree < handle
 
         wf_H_ee = T0_n(obj, q_j) % computes the forward kinematics of the current end-effector.
 
-        dJ = jacob_dot(obj, q_j, dq_j)
+        djdq_lnk = jacob_dot(obj, q_j, dq_j)
 
-        J_0 = jacob0(obj, q_j, varargin)
+        wf_J_lnk = jacob0(obj, q_j, varargin)
 
-        J_ee = jacobn(obj, q_j) % Jacobian of the current ee-frame.
+        wf_J_ee = jacobn(obj, q_j) % Jacobian of the current ee-frame.
 
         M = inertia(obj, q_j)
 

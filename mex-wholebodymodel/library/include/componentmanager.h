@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
- * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -21,31 +21,37 @@
 #ifndef COMPONENTNMAINTAINER_H
 #define COMPONENTNMAINTAINER_H
 
-// standard includes
-
-// external headers
+// global includes
 #include <mex.h>
+
+// library includes
+
+// local includes
 
 // forward declarations
 namespace mexWBIComponent
 {
-  class ModelCentroidalMomentum;
+  class ModelState;
   class ModelComponent;
-  class ModelCoriolisCentrifugalForces;
-  class ModelDjDq;
+  // ------------------------------------
+  // kinematic/dynamic function classes:
+  // ------------------------------------
+  class ModelCentroidalMomentum;
+  class ModelCoriolisBiasForces;
+  class ModelDJdq;
   class ModelForwardKinematics;
-  class ModelGeneralisedBiasForces;
+  class ModelGeneralizedBiasForces;
   class ModelGetFloatingBaseState;
   class ModelGetState;
-  class ModelGravityForces;
-  class ModelInitialise;
-  class ModelInitialiseURDF;
+  class ModelGravityBiasForces;
+  class ModelInitialize;
+  class ModelInitializeURDF;
+  class ModelInverseDynamics;
   class ModelJacobian;
   class ModelJointLimits;
   class ModelMassMatrix;
-  class ModelRotoTranslationMatrix;
   class ModelSetWorldFrame;
-  class ModelState;
+  class ModelTransformationMatrix;
   class ModelUpdateState;
   class ModelVisualizeTrajectory;
 }
@@ -57,48 +63,48 @@ namespace mexWBIComponent
     public:
       static ComponentManager *getInstance(std::string robotName = "icub");
 
-      bool processFunctionCall(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+      bool processFunctionCall(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs);
 
       /**
        * Delete the (static) instance of this component,
-       * and set the instance pointer to NULL.
+       * and set the instance pointer to 0.
        */
       static void deleteInstance();
 
       ~ComponentManager();
 
     private:
-      ComponentManager(std::string);
-      void initialise(std::string);
+      ComponentManager(std::string robotName);
+      void initialise(std::string robotName);
 
       static void cleanup();
 
       static ComponentManager *componentManager;
 
-      ModelState *modelState;
+      static ModelState     *modelState;
+      static ModelComponent *currentComponent;
 
-      ModelCentroidalMomentum *modelCentroidalMomentum;
-      ModelComponent *currentComponent;
-      ModelCoriolisCentrifugalForces *modelCoriolisCentrifugalForces;
-      ModelDjDq *modelDjDq;
-      ModelForwardKinematics *modelForwardKinematics;
-      ModelGeneralisedBiasForces *modelGeneralisedBiasForces;
-      ModelGetFloatingBaseState *modelGetFloatingBaseState;
-      ModelGetState *modelGetState;
-      ModelGravityForces *modelGravityForces;
-      ModelInitialise *modelInitialise;
-      ModelInitialiseURDF *modelInitialiseURDF;
-      ModelJacobian *modelJacobian;
-      ModelJointLimits *modelJointLimits;
-      ModelMassMatrix *modelMassMatrix;
-      ModelRotoTranslationMatrix *modelRotoTranslationMatrix;
-      ModelSetWorldFrame *modelSetWorldFrame;
-      ModelUpdateState *modelUpdateState;
-      ModelVisualizeTrajectory *modelVisualizeTrajectory;
+      static ModelCentroidalMomentum    *modelCentroidalMomentum;
+      static ModelCoriolisBiasForces    *modelCoriolisBiasForces;
+      static ModelDJdq                  *modelDJdq;
+      static ModelForwardKinematics     *modelForwardKinematics;
+      static ModelGeneralizedBiasForces *modelGeneralizedBiasForces;
+      static ModelGetFloatingBaseState  *modelGetFloatingBaseState;
+      static ModelGetState              *modelGetState;
+      static ModelGravityBiasForces     *modelGravityBiasForces;
+      static ModelInitialize            *modelInitialize;
+      static ModelInitializeURDF        *modelInitializeURDF;
+      static ModelInverseDynamics       *modelInverseDynamics;
+      static ModelJacobian              *modelJacobian;
+      static ModelJointLimits           *modelJointLimits;
+      static ModelMassMatrix            *modelMassMatrix;
+      static ModelSetWorldFrame         *modelSetWorldFrame;
+      static ModelTransformationMatrix  *modelTransformationMatrix;
+      static ModelUpdateState           *modelUpdateState;
+      static ModelVisualizeTrajectory   *modelVisualizeTrajectory;
 
-      int numDof;
-
-      std::map <std::string, ModelComponent*> componentList;
+      static int numDof;
+      static std::map<std::string, ModelComponent*> componentList;
   };
 
 }

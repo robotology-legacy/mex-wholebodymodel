@@ -54,16 +54,16 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             ddq_j = obj.mwbm.jointAccelerations(q_j, dq_j, tau);
         end
 
-        function tau_c = corolis(obj, q_j, dq_j)
-            tau_c = obj.mwbm.coriolisForces(q_j, dq_j);
+        function c_qv = corolis(obj, q_j, dq_j)
+            c_qv = obj.mwbm.coriolisForces(q_j, dq_j);
         end
 
         function tau_fr = friction(obj, dq_j)
             tau_fr = obj.mwbm.frictionForces(dq_j);
         end
 
-        function tau_g = gravload(obj, q_j)
-            tau_g = obj.mwbm.gravityForces(q_j);
+        function g_v = gravload(obj, q_j)
+            g_v = obj.mwbm.gravityForces(q_j);
         end
 
         function tau_j = invdyn(obj, q_j, dq_j, ddq_j)
@@ -87,19 +87,19 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             wf_H_ee = WBM.utilities.frame2tform(vqT_ee);
         end
 
-        function dJ = jacob_dot(obj, q_j, dq_j)
-            dJ = obj.mwbm.jacobianDot(obj.mlink_ctrl, q_j, dq_j);
+        function djdq_lnk = jacob_dot(obj, q_j, dq_j)
+            djdq_lnk = obj.mwbm.jacobianDot(obj.mlink_ctrl, q_j, dq_j);
         end
 
-        function J_0 = jacob0(obj, q_j, varargin)
+        function wf_J_lnk = jacob0(obj, q_j, varargin)
             % options:
             opt.rpy   = false;
             opt.eul   = false;
             opt.trans = false;
             opt.rot   = false;
-            opt = tb_optparse(opt, varargin);
+            opt = tb_optparse(opt, varargin); % (function from the Robotics Toolbox of Peter Corke.)
 
-            J_0 = obj.mwbm.jacobian(obj.mlink_ctrl, q_j);
+            wf_J_lnk = obj.mwbm.jacobian(obj.mlink_ctrl, q_j);
 
             if opt.rpy
                 % compute the analytical Jacobian with the Euler rotation rate in ZYX (RPY) order:
@@ -109,7 +109,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
                     error('MultChainTree::jacob0: %s', WBM.wbmErrorMsg.SINGULAR_MAT);
                 end
 
-                J_0 = blkdiag(eye(3,3), B_inv) * J_0;
+                wf_J_lnk = blkdiag(eye(3,3), B_inv) * wf_J_lnk;
             elseif opt.eul
                 % compute the analytical Jacobian with the Euler rotation rate in ZYZ order:
                 wf_H_lnk = obj.mwbm.forwardKin(obj.mlink_ctrl, q_j);
@@ -118,20 +118,20 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
                     error('MultChainTree::jacob0: %s', WBM.wbmErrorMsg.SINGULAR_MAT);
                 end
 
-                J_0 = blkdiag(eye(3,3), B_inv) * J_0;
+                wf_J_lnk = blkdiag(eye(3,3), B_inv) * wf_J_lnk;
             end
 
             if opt.trans
                 % return the translational sub-matrix of the Jacobian:
-                J_0 = J_0(1:3,1:6);
+                wf_J_lnk = wf_J_lnk(1:3,1:6);
             elseif opt.rot
                 % return the rotational sub-matrix of the Jacobian:
-                J_0 = J_0(4:6,1:6);
+                wf_J_lnk = wf_J_lnk(4:6,1:6);
             end
         end
 
-        function J_ee = jacobn(obj, q_j) % Jacobian of the current ee-frame.
-            J_ee = obj.mwbm.jacobian(obj.mlink_ee, q_j);
+        function wf_J_ee = jacobn(obj, q_j) % Jacobian of the current ee-frame.
+            wf_J_ee = obj.mwbm.jacobian(obj.mlink_ee, q_j);
         end
 
         function M = inertia(obj, q_j)
@@ -233,8 +233,8 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function jlmts = get.qlim(obj)
-            jl    = obj.mwbm.jlimits;
-            jlmts = horzcat(jl.lwr, jl.upr);
+            jlim  = obj.mwbm.jlimits;
+            jlmts = horzcat(jlim.lwr, jlim.upr);
         end
 
         function ndof = get.n(obj)

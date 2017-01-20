@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
- * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -27,12 +27,18 @@
 
 using namespace mexWBIComponent;
 
-ModelGetState *ModelGetState::modelGetState;
+ModelGetState *ModelGetState::modelGetState = 0;
+
+double ModelGetState::quat_b[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+double *ModelGetState::vqT_b    = 0;
+double *ModelGetState::qj       = 0;
+double *ModelGetState::qj_dot   = 0;
+double *ModelGetState::vb       = 0;
 
 ModelGetState::ModelGetState() : ModelComponent(0, 1, 4)
 {
 #ifdef DEBUG
-  mexPrintf("ModelGetState Constructuted\n");
+  mexPrintf("ModelGetState constructuted.\n");
 #endif
 }
 
@@ -42,9 +48,9 @@ ModelGetState::~ModelGetState()
 
 ModelGetState *ModelGetState::getInstance()
 {
-  if(modelGetState == NULL)
+  if (modelGetState == 0) {
     modelGetState = new ModelGetState;
-
+  }
   return modelGetState;
 }
 
@@ -53,106 +59,109 @@ void ModelGetState::deleteInstance()
   deleteObject(&modelGetState);
 }
 
-bool ModelGetState::allocateReturnSpace(int nlhs, mxArray *plhs[])
+bool ModelGetState::allocateReturnSpace(int nlhs, mxArray **plhs)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to allocateReturnSpace in ModelGetState\n");
+  mexPrintf("Trying to allocateReturnSpace in ModelGetState.\n");
 #endif
-  if(nlhs != 4)
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumOutputs", "4 output arguments required for ModelGetState");
-
+  if (nlhs != 4) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumOutputs", "4 output arguments required for ModelGetState.");
+  }
   int numDof = modelState->dof();
 
   plhs[0] = mxCreateDoubleMatrix(numDof, 1, mxREAL); // qj
-  plhs[1] = mxCreateDoubleMatrix(7, 1, mxREAL);      // wTb
-  plhs[2] = mxCreateDoubleMatrix(numDof, 1, mxREAL); // qjDot
+  plhs[1] = mxCreateDoubleMatrix(7, 1, mxREAL);      // vqT_b
+  plhs[2] = mxCreateDoubleMatrix(numDof, 1, mxREAL); // qj_dot
   plhs[3] = mxCreateDoubleMatrix(6, 1, mxREAL);      // vb
 
-  qj    = mxGetPr(plhs[0]);
-  wTb   = mxGetPr(plhs[1]);
-  qjDot = mxGetPr(plhs[2]);
-  vb    = mxGetPr(plhs[3]);
+  qj     = mxGetPr(plhs[0]);
+  vqT_b  = mxGetPr(plhs[1]);
+  qj_dot = mxGetPr(plhs[2]);
+  vb     = mxGetPr(plhs[3]);
 
   return true;
 }
 
-bool ModelGetState::compute(int nrhs, const mxArray *prhs[])
+bool ModelGetState::compute(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  mexPrintf("ModelGetState performing Compute");
+  mexPrintf("ModelGetState performing compute.\n");
 #endif
   modelState->qj(qj);
-  world_H_rootLink = modelState->getRootWorldRotoTranslation();
+  wf_H_b = modelState->getBase2WorldTransformation();
 
 #ifdef DEBUG
-  mexPrintf("Inside getState\nRootWorldRotoTrans\n");
-  mexPrintf("world_H_root\n");
-  mexPrintf((world_H_rootLink.R.toString()).c_str());
+  mexPrintf("Inside getState - RootWorldRotoTrans:\n");
+  mexPrintf("wf_H_b\n");
+  mexPrintf((wf_H_b.R.toString()).c_str());
   mexPrintf(" = \n");
-  mexPrintf("world_H_ReferenceLink\n");
+  mexPrintf("wf_H_lnk\n");
   mexPrintf(( (modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str());
   mexPrintf("\n\n");
 #endif
 
-  world_H_rootLink.R.getQuaternion(rootQuaternion[1], rootQuaternion[2], rootQuaternion[3], rootQuaternion[0]);
+  wf_H_b.R.getQuaternion(quat_b[1], quat_b[2], quat_b[3], quat_b[0]);
 
 #ifdef DEBUG
   std::stringstream ssR;
-  ssR << "Quat : [" << rootQuaternion[0] << "," << rootQuaternion[1] << "," << rootQuaternion[2] << "," << rootQuaternion[3] << "]\n";
+  ssR << "quaternion: [" << quat_b[0] << "," << quat_b[1] << "," << quat_b[2] << "," << quat_b[3] << "]\n";
   std::string sR = ssR.str();
   mexPrintf(sR.c_str());
 #endif
 
   int i;
-  for(i=0; i < 3; i++)
-    *(wTb + i) = *(world_H_rootLink.p + i);
+  for (i=0; i < 3; i++) {
+    *(vqT_b + i) = *(wf_H_b.p + i);
+  }
 
-  for(i=0; i < 4; i++)
-    *(wTb + 3+i) = *(rootQuaternion + i);
+  for (i=0; i < 4; i++) {
+    *(vqT_b + (3+i)) = *(quat_b + i);
+  }
 
-  modelState->qjDot(qjDot);
+  modelState->qj_dot(qj_dot);
   modelState->vb(vb);
 
   return true;
 }
 
-bool ModelGetState::computeFast(int nrhs, const mxArray *prhs[])
+bool ModelGetState::computeFast(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  mexPrintf("ModelGetState performing Compute Fast");
+  mexPrintf("ModelGetState performing computeFast.\n");
 #endif
   modelState->qj(qj);
-  world_H_rootLink = modelState->getRootWorldRotoTranslation();
+  wf_H_b = modelState->getBase2WorldTransformation();
 
 #ifdef DEBUG
-  mexPrintf("Inside getState\nRootWorldRotoTrans\n");
-  mexPrintf("world_H_root\n");
-  mexPrintf((world_H_rootLink.R.toString()).c_str());
+  mexPrintf("Inside of getState - RootWorldRotoTrans:\n");
+  mexPrintf("wf_H_b\n");
+  mexPrintf((wf_H_b.R.toString()).c_str());
   mexPrintf(" = \n");
-  mexPrintf("world_H_ReferenceLink\n");
+  mexPrintf("wf_H_lnk\n");
   mexPrintf(( (modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str());
   mexPrintf("\n\n");
 #endif
 
-  (modelState->getRootWorldRotoTranslation()).R.getQuaternion(rootQuaternion[1], rootQuaternion[2], rootQuaternion[3], rootQuaternion[0]);
+  (modelState->getBase2WorldTransformation()).R.getQuaternion(quat_b[1], quat_b[2], quat_b[3], quat_b[0]);
 
 #ifdef DEBUG
   std::stringstream ssR;
-  ssR << "Quat : [" << rootQuaternion[0] << "," << rootQuaternion[1] << "," << rootQuaternion[2] << "," << rootQuaternion[3] << "]\n";
+  ssR << "quaternion: [" << quat_b[0] << "," << quat_b[1] << "," << quat_b[2] << "," << quat_b[3] << "]\n";
   std::string sR = ssR.str();
   mexPrintf(sR.c_str());
 #endif
 
   int i;
-  for(i=0; i < 3; i++)
-    *(wTb + i) = *(world_H_rootLink.p + i);
+  for (i=0; i < 3; i++) {
+    *(vqT_b + i) = *(wf_H_b.p + i);
+  }
 
-  for(i=0; i < 4; i++)
-    *(wTb + 3+i) = *(rootQuaternion + i);
+  for (i=0; i < 4; i++) {
+    *(vqT_b + (3+i)) = *(quat_b + i);
+  }
 
-  modelState->qjDot(qjDot);
+  modelState->qj_dot(qj_dot);
   modelState->vb(vb);
 
   return true;
 }
-

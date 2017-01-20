@@ -17,8 +17,8 @@
  * Public License for more details
  */
 
-#ifndef MODELGRAVITYFORCES_H
-#define MODELGRAVITYFORCES_H
+#ifndef MODELCORIOLISBIASFORCES_H
+#define MODELCORIOLISBIASFORCES_H
 
 // global includes
 
@@ -29,35 +29,40 @@
 
 namespace mexWBIComponent
 {
-  class ModelGravityForces : public ModelComponent
+  class
+ModelCoriolisBiasForces : public ModelComponent
   {
     public:
-      static ModelGravityForces *getInstance();
+      static ModelCoriolisBiasForces *getInstance();
 
       /**
        * Delete the (static) instance of this component,
-       * and set the instance pointer to NULL.
+       * and set the instance pointer to 0.
        */
       static void deleteInstance();
 
-      virtual bool allocateReturnSpace(int, mxArray**);
-      virtual bool compute(int, const mxArray**);
-      virtual bool computeFast(int, const mxArray**);
+      virtual bool allocateReturnSpace(int nlhs, mxArray **plhs);
+      virtual bool compute(int nrhs, const mxArray **prhs);
+      virtual bool computeFast(int nrhs, const mxArray **prhs);
 
-      virtual ~ModelGravityForces();
+      virtual ~ModelCoriolisBiasForces();
 
     private:
-      ModelGravityForces();
-      bool processArguments(int, const mxArray**);
+      ModelCoriolisBiasForces();
+      bool processArguments(int nrhs, const mxArray **prhs);
 
-      static ModelGravityForces *modelGravityForces;
+      static ModelCoriolisBiasForces *modelCoriolisBiasForces;
 
-      static double vb_0[6];
-      double *qj;
-      double *g;
-      double *h;
+      static double g_0[3]; // 0-gravity vector
+
+      // inputs:
+      static double *qj;
+      static double *qj_dot;
+      static double *vb;
+      // output:
+      static double *c_qv; // Coriolis and centrifugal forces C(q,dq)
   };
 
 }
 
-#endif // MODELGRAVITYFORCES_H
+#endif // MODELCORIOLISBIASFORCES_H

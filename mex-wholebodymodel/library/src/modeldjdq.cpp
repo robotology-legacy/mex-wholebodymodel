@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
- * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -28,134 +28,144 @@
 
 using namespace mexWBIComponent;
 
-ModelDjDq *ModelDjDq::modelDjDq;
+ModelDJdq *ModelDJdq::modelDJdq = 0;
 
-ModelDjDq::ModelDjDq(void) : ModelComponent(6, 1, 1)
+double *ModelDJdq::qj     = 0;
+double *ModelDJdq::qj_dot = 0;
+double *ModelDJdq::vb     = 0;
+char   *ModelDJdq::refLnk = 0;
+double *ModelDJdq::dJdq   = 0;
+
+ModelDJdq::ModelDJdq() : ModelComponent(6, 1, 1)
 {
 #ifdef DEBUG
-  mexPrintf("ModelGeneralisedBiasForces constructed\n");
+  mexPrintf("ModelGeneralizedBiasForces constructed.\n");
 #endif
 }
 
-ModelDjDq::~ModelDjDq()
+ModelDJdq::~ModelDJdq()
 {
 }
 
-ModelDjDq *ModelDjDq::getInstance(void)
+ModelDJdq *ModelDJdq::getInstance()
 {
-  if(modelDjDq == NULL)
-    modelDjDq = new ModelDjDq;
-
-  return modelDjDq;
+  if (modelDJdq == 0) {
+    modelDJdq = new ModelDJdq;
+  }
+  return modelDJdq;
 }
 
-void ModelDjDq::deleteInstance()
+void ModelDJdq::deleteInstance()
 {
-  deleteObject(&modelDjDq);
+  deleteObject(&modelDJdq);
 }
 
-bool ModelDjDq::allocateReturnSpace(int nlhs, mxArray *plhs[])
+bool ModelDJdq::allocateReturnSpace(int nlhs, mxArray **plhs)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to allocateReturnSpace in ModelDjDq\n");
+  mexPrintf("Trying to allocateReturnSpace in ModelDJdq.\n");
 #endif
-  if(nlhs != 1)
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "one output argument required for computing ModelDjDq.");
-
+  if (nlhs != 1) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "one output argument required for computing ModelDJdq.");
+  }
   plhs[0] = mxCreateNumericMatrix(6, 1, mxDOUBLE_CLASS, mxREAL);
-  Djdq = mxGetPr(plhs[0]);
+  dJdq = mxGetPr(plhs[0]);
 
   return true;
 }
 
-bool ModelDjDq::compute(int nrhs, const mxArray *prhs[])
+bool ModelDJdq::compute(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to compute ModelDjDq\n");
+  mexPrintf("ModelDJdq performing compute.\n");
 #endif
   return processArguments(nrhs, prhs);
 }
 
-bool ModelDjDq::computeFast(int nrhs, const mxArray *prhs[])
+bool ModelDJdq::computeFast(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to compute ModelDjDq\n");
+  mexPrintf("ModelDJdq performing computeFast.\n");
 #endif
 #ifdef DEBUG
-  if(Djdq == NULL) return false;
+  if (dJdq == 0) {
+    return false;
+  }
 #endif
-  if( !mxIsChar(prhs[1]) )
-    mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components");
+  if( !mxIsChar(prhs[1]) ) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
+  }
 
   robotModel = modelState->robotModel();
 
-  qj    = modelState->qj();
-  qjDot = modelState->qjDot();
-  vb    = modelState->vb();
+  wf_H_b = modelState->getBase2WorldTransformation();
+  qj     = modelState->qj();
+  qj_dot = modelState->qj_dot();
+  vb     = modelState->vb();
+  refLnk = mxArrayToString(prhs[1]);
 
-  world_H_rootLink = modelState->getRootWorldRotoTranslation();
-
-  refLink = mxArrayToString(prhs[1]);
   std::string com("com");
-  int refLinkID = -1; // if refLink = "com"
+  int refLnkID = -1; // if refLnk = "com"
 
-  if(com.compare(refLink) != 0)
-  {
+  if (com.compare(refLnk) != 0) {
     // get the index number ...
-    robotModel->getFrameList().idToIndex(refLink, refLinkID);
+    robotModel->getFrameList().idToIndex(refLnk, refLnkID);
   }
 
-  if( !robotModel->computeDJdq(qj, world_H_rootLink, qjDot, vb, refLinkID, Djdq) )
-    mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs", "Something failed in the WBI DJDq call");
-
+  if ( !robotModel->computeDJdq(qj, wf_H_b, qj_dot, vb, refLnkID, dJdq) ) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI DJDq call.");
+  }
   return true;
 }
 
-bool ModelDjDq::processArguments(int nrhs, const mxArray *prhs[])
+bool ModelDJdq::processArguments(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  if(Djdq == NULL) return false;
+  if (dJdq == 0) {
+    return false;
+  }
 #endif
   size_t numDof = modelState->dof();
 
-  if( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||
-      mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || mxGetM(prhs[4]) != numDof || mxGetN(prhs[4]) != 1 ||
-      mxGetM(prhs[5]) != 6 || mxGetN(prhs[5]) != 1 || !(mxIsChar(prhs[6])) )
+  if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != numDof ||
+       mxGetN(prhs[3]) != 1 || mxGetM(prhs[4]) != numDof || mxGetN(prhs[4]) != 1 || mxGetM(prhs[5]) != 6 ||
+       mxGetN(prhs[5]) != 1 || !(mxIsChar(prhs[6])) )
   {
-    mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions / inputs");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/inputs.");
   }
   robotModel = modelState->robotModel();
 
-  double *R_temp, *p_temp;
-  R_temp = mxGetPr(prhs[1]);
-  p_temp = mxGetPr(prhs[2]);
-
-  qj      = mxGetPr(prhs[3]);
-  qjDot   = mxGetPr(prhs[4]);
-  vb      = mxGetPr(prhs[5]);
-  refLink = mxArrayToString(prhs[6]);
+  double *pR, *ppos;
+  pR     = mxGetPr(prhs[1]);
+  ppos   = mxGetPr(prhs[2]);
+  qj     = mxGetPr(prhs[3]);
+  qj_dot = mxGetPr(prhs[4]);
+  vb     = mxGetPr(prhs[5]);
+  refLnk = mxArrayToString(prhs[6]);
 
 #ifdef DEBUG
-  mexPrintf("qj received \n");
+  mexPrintf("qj received.\n");
 
-  for(size_t i=0; i < numDof; i++)
+  for (size_t i=0; i < numDof; i++) {
     mexPrintf(" %f", *(qj + i));
+  }
 #endif
 
-  double tempR[9];
-  reorderMatrixInRowMajor(R_temp, tempR);
-  wbi::Rotation tempRot(tempR);
+  double R_rmo[9];
+  reorderMatrixInRowMajor(pR, R_rmo); // matrix in "row major order"
+  wbi::Rotation rot3d(R_rmo);
 
-  world_H_rootLink = wbi::Frame(tempRot, p_temp);
+  wf_H_b = wbi::Frame(rot3d, ppos);
 
   std::string com("com");
-  int refLinkID = -1; // if refLink = "com"
+  int refLnkID = -1; // if refLnk = "com"
 
-  if(com.compare(refLink) != 0)
-    robotModel->getFrameList().idToIndex(refLink, refLinkID);
+  if (com.compare(refLnk) != 0) {
+    robotModel->getFrameList().idToIndex(refLnk, refLnkID);
+  }
 
-  if( !robotModel->computeDJdq(qj, world_H_rootLink, qjDot, vb, refLinkID, Djdq) )
-    mexErrMsgIdAndTxt( "MATLAB:mexatexit:invalidInputs", "Something failed in the WBI DJDq call");
-
+  if ( !robotModel->computeDJdq(qj, wf_H_b, qj_dot, vb, refLnkID, dJdq) ) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI DJDq call.");
+  }
   return true;
 }

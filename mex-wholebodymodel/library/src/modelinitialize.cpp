@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -17,54 +18,55 @@
  * Public License for more details
  */
 
-#include "modelinitialise.h"
+#include "modelinitialize.h"
 
 using namespace mexWBIComponent;
 
-ModelInitialise *ModelInitialise::modelInitialise;
+ModelInitialize *ModelInitialize::modelInitialize = 0;
 
-ModelInitialise::ModelInitialise() : ModelComponent(1, 0, 0)
+ModelInitialize::ModelInitialize() : ModelComponent(1, 0, 0)
 {
 }
 
-ModelInitialise::~ModelInitialise()
+ModelInitialize::~ModelInitialize()
 {
 }
 
-bool ModelInitialise::allocateReturnSpace(int, mxArray *[])
+bool ModelInitialize::allocateReturnSpace(int nlhs, mxArray **plhs)
 {
   // nothing to do really
   return true;
 }
 
-ModelInitialise *ModelInitialise::getInstance()
+ModelInitialize *ModelInitialize::getInstance()
 {
-  if(modelInitialise == NULL)
-    modelInitialise = new ModelInitialise();
-
-  return modelInitialise;
+  if (modelInitialize == 0) {
+    modelInitialize = new ModelInitialize();
+  }
+  return modelInitialize;
 }
 
-void ModelInitialise::deleteInstance()
+void ModelInitialize::deleteInstance()
 {
-  deleteObject(&modelInitialise);
+  deleteObject(&modelInitialize);
 }
 
-bool ModelInitialise::compute(int nrhs, const mxArray *prhs[])
+bool ModelInitialize::compute(int nrhs, const mxArray **prhs)
 {
-  if( !mxIsChar(prhs[1]) )
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components");
+  if ( !mxIsChar(prhs[1]) ) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
+  }
+  std::string robotName = mxArrayToString(prhs[1]);
 
-  std::string robName = mxArrayToString(prhs[1]);
-
-  if(robName.compare(modelState->robotName()) != 0)
-    modelState->robotModel(robName);
+  if (robotName.compare(modelState->robotName()) != 0) {
+    modelState->robotModel(robotName);
+  }
 
   mexPrintf("Robot name set as: %s\n", (modelState->robotName()).c_str());
   return true;
 }
 
-bool ModelInitialise::computeFast(int nrhs, const mxArray *prhs[])
+bool ModelInitialize::computeFast(int nrhs, const mxArray **prhs)
 {
   // nothing to do really
   return true;

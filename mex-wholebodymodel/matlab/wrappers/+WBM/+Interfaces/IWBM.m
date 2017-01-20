@@ -29,15 +29,15 @@ classdef (Abstract) IWBM < handle
 
         ddq_j = jointAccelerationsExt(obj, q_j, dq_j, tau, stFltb)
 
-        tau_c = coriolisForces(obj, q_j, dq_j, stFltb)
+        c_qv = coriolisForces(obj, q_j, dq_j, stFltb)
 
         tau_fr = frictionForces(obj, dq_j)
 
-        C_qv = generalizedBiasForces(obj, q_j, dq_j, stFltb)
+        c_qv = generalizedBiasForces(obj, q_j, dq_j, stFltb)
 
         tau_gen = generalizedForces(obj, q_j, dq_j, f_c, Jc_t, stFltb)
 
-        tau_g = gravityForces(obj, q_j, stFltb)
+        g_v = gravityForces(obj, q_j, stFltb)
 
         tau_j = inverseDyn(obj, q_j, dq_j, ddq_j, dv_b, stFltb)
 
@@ -57,13 +57,13 @@ classdef (Abstract) IWBM < handle
 
         h_c = centroidalMomentum(obj, q_j, dq_j, stFltb)
 
-        [M, C_qv, h_c] = wholeBodyDyn(obj, q_j, dq_j, stFltb)
+        [M, c_qv, h_c] = wholeBodyDyn(obj, q_j, dq_j, stFltb)
 
-        J = jacobian(obj, lnk_name, q_j, stFltb)
+        wf_J_lnk = jacobian(obj, lnk_name, q_j, stFltb)
 
-        dJ = jacobianDot(obj, lnk_name, q_j, dq_j, stFltb)
+        djdq_lnk = jacobianDot(obj, lnk_name, q_j, dq_j, stFltb)
 
-        J_tt = jacobianTool(obj, t_idx, q_j, stFltb) % Jacobian matrix in tool-frame
+        wf_J_tt = jacobianTool(obj, t_idx, q_j, stFltb) % Jacobian matrix in tool-frame
 
         payload(obj, pt_mass, pos, link_names)
 

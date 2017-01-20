@@ -1,25 +1,27 @@
-function [qj,xTb,qjDot,vb]  = wbm_getState( varargin )
-%WBM_GETSTATE Obtains the currently stored state (joint angles, floating base joint
-%velocities, floating base velocity)
-%   Arguments :
-%       Optimised Mode : No arguments
-%       Normal Mode :  No arguments
-%   Returns :   qj - joint angles (NumDoF x 1)
-%               xTb - base rototranslation (7 x 1) with 3 for position of frame and 4 for orientation quaternion
-%                      (return is already flipped so that quaternion organised as real
-%                      followed by imaginary)
-%               dqj - joint velocities (NumDoF x 1)
-%               vxb - floating base velocity (6 x 1)
-%
-% Author : Naveen Kuppuswamy (naveen.kuppuswamy@iit.it)
-% Genova, Dec 2014
+function [q_j, vqT_b, dq_j, v_b] = wbm_getState(varargin)
+    % wbm_getState obtains the currently stored state of the system (joint angles and velocities,
+    % floating base velocity and base VQ-Transformation).
+    %
+    %   INPUT ARGUMENTS:
+    %       Optimized mode:  no arguments
+    %       Normal mode:     no arguments
+    %
+    %   OUTPUT ARGUMENTS:
+    %       q_j   -- (nDoF x 1) joint angle vector in radian
+    %       vqT_b -- (7 x 1) vector-quaternion transformation from base to world frame (*)
+    %       dq_j  -- (nDoF x 1) joint angle velocities
+    %       v_b   -- (6 x 1) floating base velocity
+    %
+    %   (*) The first 3 elements of the vector representing the position and the
+    %       remaining 4 elements are the orientation in quaternions.
+    %
+    % Author: Naveen Kuppuswamy (naveen.kuppuswamy@iit.it); Genova, Dec 2014
+    % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
 
-switch(nargin)
-    case 0
-        [qj,xTbT,qjDot,vb]  = mexWholeBodyModel('get-state');
-        xTb = xTbT;
-    otherwise
-        disp('getState : Incorrect number of arguments, check docs');
+    switch nargin
+        case 0
+            [q_j, vqT_b, dq_j, v_b] = mexWholeBodyModel('get-state');
+        otherwise
+            error('wbm_getState: %s\n', wbm_errorMsg());
+    end
 end
-end
-

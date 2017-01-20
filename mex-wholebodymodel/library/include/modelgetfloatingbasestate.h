@@ -36,13 +36,13 @@ namespace mexWBIComponent
 
       /**
        * Delete the (static) instance of this component,
-       * and set the instance pointer to NULL.
+       * and set the instance pointer to 0.
        */
       static void deleteInstance();
 
-      virtual bool allocateReturnSpace(int, mxArray**);
-      virtual bool compute(int, const mxArray**);
-      virtual bool computeFast(int, const mxArray**);
+      virtual bool allocateReturnSpace(int nlhs, mxArray **plhs);
+      virtual bool compute(int nrhs, const mxArray **prhs);
+      virtual bool computeFast(int nrhs, const mxArray **prhs);
 
       virtual ~ModelGetFloatingBaseState();
 
@@ -51,9 +51,10 @@ namespace mexWBIComponent
 
       static ModelGetFloatingBaseState *modelGetFloatingBaseState;
 
-      double *w_R_b; // orientation of the floating base in axis-angle representation (w_R_b)
-      double *w_p_b; // cartesian position (translation) of the floating base (x_b)
-      double *vb;    // cartesian velocity (dx_b) and the rotational velocity of the floating base orientation (omega_b)
+      // outputs:
+      static double *wf_R_b; // orientation of the floating base in matrix form
+      static double *wf_p_b; // cartesian position (translation) of the floating base (x_b)
+      static double *vb;     // cartesian velocity (dx_b) and the rotational velocity (omega_b) of the floating base orientation
   };
 
 }

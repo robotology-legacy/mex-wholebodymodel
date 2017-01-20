@@ -2,12 +2,12 @@ function [ddq_j, acc_data] = jointAccelerationsExt(obj, varargin)
     switch nargin
         case 9 % optimized mode:
             M         = varargin{1,1};
-            C_qv      = varargin{1,2};
+            c_qv      = varargin{1,2};
             dq_j      = varargin{1,3};
             nu        = varargin{1,4};
             tau       = varargin{1,5};
             Jc        = varargin{1,6};
-            dJcdq     = varargin{1,7};
+            djcdq     = varargin{1,7};
             foot_conf = varargin{1,8};
 
             % get the initial transformation vectors (VE-Transformations*) of the feet:
@@ -35,10 +35,10 @@ function [ddq_j, acc_data] = jointAccelerationsExt(obj, varargin)
 
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
             M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, wf_p_b, q_j);
-            C_qv = mexWholeBodyModel('generalised-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+            c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
 
             % compute for each contact constraint the Jacobian and the derivative Jacobian:
-            [Jc, dJcdq] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+            [Jc, djcdq] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
 
             % get the new VQ-Transformations for the feet:
             fk_new_vqT.l_sole = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, wf_p_b, q_j, 'l_sole');
@@ -54,9 +54,9 @@ function [ddq_j, acc_data] = jointAccelerationsExt(obj, varargin)
             fk_init_veT.r_foot = foot_conf.veT_init.r_sole;
 
             M    = mexWholeBodyModel('mass-matrix');
-            C_qv = mexWholeBodyModel('generalised-forces');
+            c_qv = mexWholeBodyModel('generalized-forces');
 
-            [Jc, dJcdq] = contactJacobians(obj);
+            [Jc, djcdq] = contactJacobians(obj);
 
             fk_new_vqT.l_sole = mexWholeBodyModel('forward-kinematics', 'l_sole');
             fk_new_vqT.r_sole = mexWholeBodyModel('forward-kinematics', 'r_sole');
@@ -83,13 +83,15 @@ function [ddq_j, acc_data] = jointAccelerationsExt(obj, varargin)
                               (fk_new_veT.r_foot - fk_init_veT.r_foot) );
 
     elseif (~foot_conf.ground.left && foot_conf.ground.right)
-        delta_feet = (fk_new_veT.r_foot - fk_init_veT.r_foot);
+        delta_feet = fk_new_veT.r_foot - fk_init_veT.r_foot;
 
     elseif (foot_conf.ground.left && ~foot_conf.ground.right)
-        delta_feet = (fk_new_veT.l_foot - fk_init_veT.l_foot);
+        delta_feet = fk_new_veT.l_foot - fk_init_veT.l_foot;
+    else
+        % both feet are not onto the ground. Either the robot is
+        % lifted into the air, or is jumping (or is flying ;-) ) ...
+        delta_feet = 0;
     end
-    % else, both feet are not fixed onto the ground. Either the robot
-    % is lifted into the air or is jumping, or is flying ;-) ...
 
     % Calculation of the contact force vector for a closed-loop control system with additional
     % velocity and position correction for the feet (position-regulation system):
@@ -100,16 +102,16 @@ function [ddq_j, acc_data] = jointAccelerationsExt(obj, varargin)
     %   [2] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, pp. 269-270, eq. (6.5) & (6.6).
     Jc_t      = Jc.';
     JcMinv    = Jc / M; % x*M = Jc --> x = Jc*M^(-1)
-    JcMinvJct = JcMinv * Jc_t; % inverse mass matrix in contact space
+    Upsilon_c = JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix")
     tau_fr    = frictionForces(obj, dq_j); % friction torques (negative torque values)
     tau_gen   = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = tau + (-tau_fr)
     % contact (constraint) forces ...
-    f_c = -(JcMinvJct \ (JcMinv*(C_qv - tau_gen) - dJcdq - k_v.*(Jc*nu) - k_p.*delta_feet));
+    f_c = -(Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq - k_v.*(Jc*nu) - k_p.*delta_feet));
 
     % Joint Acceleration q_ddot (derived from the state-space equation):
     % For further details see:
     %   [1] Efficient Dynamic Simulation of Robotic Mechanisms, K. Lilly, Springer, 1992, p. 82, eq. (5.2).
-    ddq_j = M \ (tau_gen - C_qv - Jc_t*f_c); % ddq_j = M^(-1) * (...)
+    ddq_j = M \ (tau_gen - c_qv - Jc_t*f_c); % ddq_j = M^(-1) * (...)
 
     acc_data = struct('f_c', f_c, 'tau', tau, 'tau_gen', tau_gen);
 end
