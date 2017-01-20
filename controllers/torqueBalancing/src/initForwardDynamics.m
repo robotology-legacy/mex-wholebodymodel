@@ -1,18 +1,18 @@
 function [] = initForwardDynamics(CONFIG)
-%INITFORWARDDYNAMICS setup the forward dynamics integration of the robot 
-%                    iCub in MATLAB.
+%INITFORWARDDYNAMICS setups the forward dynamics integration of the robot 
+%                    iCub using MATLAB.
 %
-%   [] = INITFORWARDDYNAMICS(CONFIG) takes as input the structure CONFIG 
-%   containing all the configuration parameters. It has no output. The 
-%   forward dynamics integration will be performed following the options 
-%   the user specified in the initialization file.
+% [] = INITFORWARDDYNAMICS(CONFIG) takes as input the structure CONFIG 
+% containing all the configuration parameters. It has no output. The 
+% forward dynamics integration will be performed following the options 
+% the user specified in the initialization file.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
 
 % ------------Initialization----------------
-%% Setup the configuration parameters
+%% Setup the configuration and state parameters
 feet_on_ground               = CONFIG.feet_on_ground;
 ndof                         = CONFIG.ndof;
 qjInit                       = CONFIG.qjInit;
@@ -21,20 +21,20 @@ v_bInit                      = zeros(3,1);
 w_omega_bInit                = zeros(3,1);
 
 %% Contact constraints definition
-if       sum(feet_on_ground) == 2
+if sum(feet_on_ground) == 2
     
-    CONFIG.constraintLinkNames   = {'l_sole','r_sole'};
+    CONFIG.constraintLinkNames = {'l_sole','r_sole'};
     
-elseif   feet_on_ground(1) == 1 && feet_on_ground(2) == 0
+elseif feet_on_ground(1) == 1 && feet_on_ground(2) == 0
     
-    CONFIG.constraintLinkNames   = {'l_sole'};
+    CONFIG.constraintLinkNames = {'l_sole'};
     
-elseif   feet_on_ground(1) == 0 && feet_on_ground(2) == 1
+elseif feet_on_ground(1) == 0 && feet_on_ground(2) == 1
     
-    CONFIG.constraintLinkNames   = {'r_sole'};
+    CONFIG.constraintLinkNames = {'r_sole'};
 end
 
-CONFIG.numConstraints            = length(CONFIG.constraintLinkNames);
+CONFIG.numConstraints = length(CONFIG.constraintLinkNames);
 
 %% Update the initial conditions
 wbm_updateState(qjInit,dqjInit,[v_bInit;w_omega_bInit]);

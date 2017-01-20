@@ -5,9 +5,8 @@
 % The user can set the parameters below to generate different simulations.
 % The forward dynamics integration is available for both the robot balancing
 % on one foot and two feet, and for the robot standing or moving, following
-% a CoM trajectory. It is also possible to use a QP program to ensure the contact
-% forces at feet are inside the friction cones. A linearization setup for both
-% analysis and gain tuning purpose is available, too.
+% a CoM trajectory. It is also possible to use a QP program to ensure the
+% contact forces at feet are inside the friction cones.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -48,7 +47,7 @@ CONFIG.reg_HessianQP      = 1e-3;
 CONFIG.integrateWithFixedStep    = 0;                                      %either 0 or 1
 
 % The fixed step integration needs a desingularization of system mass matrix
-% to converge to a solution
+% in order to converge to a solution
 if CONFIG.integrateWithFixedStep == 1
     
     CONFIG.massCorr = 0.05;
@@ -71,30 +70,30 @@ plot_set
 
 % this is the figure counter. It is used to automatically adapt the figure
 % number in case new figures are added
-CONFIG.figureCont                = 1;
+CONFIG.figureCont = 1;
 
 %% Initialize the robot model
 wbm_modelInitialise('icubGazeboSim');
-CONFIG.ndof  = 25;
+CONFIG.ndof = 25;
 
 %% Initial joints position [deg]
 leftArmInit  = [ -20  30  0  45  0]';
 rightArmInit = [ -20  30  0  45  0]';
 torsoInit    = [ -10   0  0]';
 
-if       sum(CONFIG.feet_on_ground) == 2
+if sum(CONFIG.feet_on_ground) == 2
     
     % initial conditions for balancing on two feet
     leftLegInit  = [  25.5   0   0  -18.5  -5.5  0]';
     rightLegInit = [  25.5   0   0  -18.5  -5.5  0]';
     
-elseif   CONFIG.feet_on_ground(1) == 1 && CONFIG.feet_on_ground(2) == 0
+elseif CONFIG.feet_on_ground(1) == 1 && CONFIG.feet_on_ground(2) == 0
     
     % initial conditions for the robot standing on the left foot
     leftLegInit  = [  25.5   15   0  -18.5  -5.5  0]';
     rightLegInit = [  25.5    5   0  -40    -5.5  0]';
     
-elseif   CONFIG.feet_on_ground(1) == 0 && CONFIG.feet_on_ground(2) == 1
+elseif CONFIG.feet_on_ground(1) == 0 && CONFIG.feet_on_ground(2) == 1
     
     % initial conditions for the robot standing on the right foot
     leftLegInit  = [  25.5    5   0  -40    -5.5  0]';
@@ -105,7 +104,7 @@ end
 CONFIG.qjInit = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
 
 %% Paths definition and initialize the forward dynamics integration
-% Add the required paths. This procedure will make the paths consistent for
+% add the required paths. This procedure will make the paths consistent for
 % any starting folder.
 codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
 utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/utilityMatlabFunctions'];
@@ -119,5 +118,6 @@ addpath(robot_root);
 addpath(plots_root);
 addpath(src_root);
 
+%% INITIALIZATION
 % initialize the forward dynamics
 initForwardDynamics(CONFIG);
