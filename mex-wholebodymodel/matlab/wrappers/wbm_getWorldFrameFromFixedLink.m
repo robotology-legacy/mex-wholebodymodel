@@ -14,12 +14,11 @@ function [wf_R_b, wf_p_b] = wbm_getWorldFrameFromFixedLink(varargin)
     %                       q_j -- (nDoF x 1) joint angle vector in radian
     %
     %   OUTPUT ARGUMENTS:
-    %       wf_R_b -- (3 x 3) rotation matrix from base to world frame
-    %       wf_p_b -- (3 x 1) position vector from base to world frame
+    %       wf_R_b -- (3 x 3) rotation matrix (from base to world frame)
+    %       wf_p_b -- (3 x 1) position vector (from base to world frame)
     %
     % Author: Naveen Kuppuswamy (naveen.kuppuswamy@iit.it); Genova, Dec 2014
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
-
     switch nargin
         case 1
             [wf_R_b, wf_p_b] = computeNewWorld2Base(varargin{1});
@@ -32,7 +31,7 @@ end
 
 
 function [wf_R_b, wf_p_b] = computeNewWorld2Base(varargin)
-    [~,ow_vqT_b,~,~] = wbm_getState(); % vector-quaternion transformation (from base to old world)
+    [ow_vqT_b,~,~,~] = wbm_getState(); % vector-quaternion transformation (from base to old world)
     [ow_p_b, ow_R_b] = frame2posrot(ow_vqT_b);
 
     % homogeneous transformation matrix H (from base to old world):

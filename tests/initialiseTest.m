@@ -4,14 +4,14 @@ close all;
 fprintf('Running initialiseTest\n');
 
 %% Try to load a model using the YARP_ROBOT_NAME before
-wbm_modelInitialise('icubGazeboSim');
+wbm_modelInitialize('icubGazeboSim');
 
 %% check if the limits has size 25
 [min_iCub,max_iCub] = wbm_jointLimits();
 WBMAssertEqual(size(min_iCub,1),25,'Error in size of iCub limits');
 
 %% Now initialise mexWholeBodyModel given an urdf file
-wbm_modelInitialiseFromURDF('twoLinks.urdf');
+wbm_modelInitializeFromURDF('twoLinks.urdf');
 
 %% get limits
 [min,max] = wbm_jointLimits();

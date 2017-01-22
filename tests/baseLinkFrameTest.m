@@ -2,7 +2,7 @@ clear
 close all;
 
 %% initialise mexWholeBodyModel
-wbm_modelInitialise('icubGazeboSim');
+wbm_modelInitialize('icubGazeboSim');
 
 %% setup params
 params.ndof = 25;
@@ -36,7 +36,7 @@ params.dampingCoeff = 0.00;
 % fprintf('Converting to a set world frame... \n');
 wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
 
-[qj,T_b,dqj,vb] = wbm_getState();
+[T_b,~,~,~] = wbm_getState();
 
 fprintf('Prior rotation \n');
 disp(rot);
@@ -46,7 +46,7 @@ disp(rot'*rot);
 
 wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
 
-[qj,T_b_Got,dqj,vb] = wbm_getState();
+[T_b_Got,~,~,~] = wbm_getState();
 
 [posGot,rotGot] = frame2posrot(T_b_Got);
 fprintf('Post convertion rotation \n');

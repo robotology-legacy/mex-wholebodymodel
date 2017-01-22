@@ -13,16 +13,15 @@ function wf_J_lnk = wbm_jacobian(varargin)
     %           urdf_link_name -- string matching URDF name of the link (frame)
     %
     %   OUTPUT ARGUMENTS:
-    %       wf_J_lnk -- (6 x (nDoF+6)) Jacobian matrix from the specified link (frame) to the world frame.
+    %       wf_J_lnk -- (6 x (nDoF+6)) Jacobian matrix (from link (frame) to world frame).
     %
     % Author: Naveen Kuppuswamy (naveen.kuppuswamy@iit.it); Genova, Dec 2014
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
-
     switch nargin
         case 1
             wf_J_lnk = mexWholeBodyModel('jacobian', varargin{1});
         case 4
-            wf_J_lnk = mexWholeBodyModel('jacobian', reshape(varargin{1}, [], 1), varargin{2}, varargin{3}, varargin{4});
+            wf_J_lnk = mexWholeBodyModel('jacobian', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3}, varargin{4});
         otherwise
             error('wbm_jacobian: %s\n', wbm_errorMsg());
     end

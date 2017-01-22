@@ -19,7 +19,6 @@ set(SOURCES src/mexmain.cpp
             src/modelsetworldframe.cpp
             src/modeltransformationmatrix.cpp
             src/modelupdatestate.cpp
-            src/modelvisualizetrajectory.cpp
 )
             
 set(HEADERS include/componentmanager.h
@@ -43,7 +42,6 @@ set(HEADERS include/componentmanager.h
             include/modelsetworldframe.h
             include/modeltransformationmatrix.h
             include/modelupdatestate.h
-            include/modelvisualizetrajectory.h
 )
 
 source_group("Source Files" FILES ${SOURCES})

@@ -29,11 +29,9 @@ using namespace mexWBIComponent;
 
 ModelGravityBiasForces *ModelGravityBiasForces::modelGravityBiasForces = 0;
 
-//double ModelGravityBiasForces::vb_0[6]   = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-//double *ModelGravityBiasForces::qj_dot_0 = 0;
 double *ModelGravityBiasForces::qj  = 0;
 double *ModelGravityBiasForces::g   = 0;
-double *ModelGravityBiasForces::g_v = 0;
+double *ModelGravityBiasForces::g_q = 0;
 
 ModelGravityBiasForces::ModelGravityBiasForces() : ModelComponent(3, 0, 1)
 {
@@ -44,10 +42,6 @@ ModelGravityBiasForces::ModelGravityBiasForces() : ModelComponent(3, 0, 1)
 
 ModelGravityBiasForces::~ModelGravityBiasForces()
 {
-  // if (qj_dot_0 != 0) {
-  //   delete[] qj_dot_0;
-  //   qj_dot_0 = 0;
-  // }
 }
 
 ModelGravityBiasForces *ModelGravityBiasForces::getInstance()
@@ -71,12 +65,7 @@ bool ModelGravityBiasForces::allocateReturnSpace(int nlhs, mxArray **plhs)
   int numDof = modelState->dof();
 
   plhs[0] = mxCreateDoubleMatrix(numDof+6, 1, mxREAL);
-  g_v = mxGetPr(plhs[0]);
-
-  // if (qj_dot_0 == 0) {
-  //   qj_dot_0 = new double[numDof];
-  //   memset(qj_dot_0, 0, numDof*sizeof(double));
-  // }
+  g_q = mxGetPr(plhs[0]);
 
   return true;
 }
@@ -95,7 +84,7 @@ bool ModelGravityBiasForces::computeFast(int nrhs, const mxArray **prhs)
   mexPrintf("ModelGravityBiasForces performing computeFast.\n");
 #endif
 #ifdef DEBUG
-  if (g_v == 0) {
+  if (g_q == 0) {
     return false;
   }
 #endif
@@ -105,11 +94,7 @@ bool ModelGravityBiasForces::computeFast(int nrhs, const mxArray **prhs)
   qj     = modelState->qj();
   g      = modelState->g();
 
-  // if ( !robotModel->computeGeneralizedBiasForces(qj, wf_H_b, qj_dot_0, vb_0, g, g_v) )
-  // {
-  //   mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeGeneralizedBiasForces call.");
-  // }
-  if ( !robotModel->computeGravityBiasForces(qj, wf_H_b, g, g_v) )
+  if ( !robotModel->computeGravityBiasForces(qj, wf_H_b, g, g_q) )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeGravityBiasForces call.");
   }
@@ -119,7 +104,7 @@ bool ModelGravityBiasForces::computeFast(int nrhs, const mxArray **prhs)
 bool ModelGravityBiasForces::processArguments(int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  if (g_v == 0) {
+  if (g_q == 0) {
     return false;
   }
 #endif
@@ -152,10 +137,7 @@ bool ModelGravityBiasForces::processArguments(int nrhs, const mxArray **prhs)
 
   wf_H_b = wbi::Frame(rot3d, ppos);
 
-  // if ( !robotModel->computeGeneralizedBiasForces(qj, wf_H_b, qj_dot_0, vb_0, g, g_v) ) {
-  //   mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeGeneralizedBiasForces call.");
-  // }
-  if ( !robotModel->computeGravityBiasForces(qj, wf_H_b, g, g_v) )
+  if ( !robotModel->computeGravityBiasForces(qj, wf_H_b, g, g_q) )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeGravityBiasForces call.");
   }

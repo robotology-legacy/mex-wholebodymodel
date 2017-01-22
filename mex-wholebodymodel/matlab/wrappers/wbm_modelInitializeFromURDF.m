@@ -2,7 +2,7 @@ function wbm_modelInitializeFromURDF(varargin)
     % wbm_modelInitialize initializes the whole body model with a given URDF-file of a YARP-based robot.
     %
     %   INPUT ARGUMENTS:
-    %       Optimized mode:  no arguments
+    %       Optimized mode:  none (does not exist)
     %
     %       Normal mode:
     %           urdf_file_name -- string with the path to the URDF-file to read.
@@ -11,7 +11,6 @@ function wbm_modelInitializeFromURDF(varargin)
     %
     % Author: Silvio Traversaro (silvio.traversaro@iit.it); Genova, Nov 2015
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
-
     switch nargin
         case 1
             mexWholeBodyModel('model-initialize-urdf', varargin{1});

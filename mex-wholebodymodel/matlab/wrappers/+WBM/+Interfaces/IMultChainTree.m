@@ -25,7 +25,7 @@ classdef (Abstract) IMultChainTree < handle
 
         tau_fr = friction(obj, dq_j)
 
-        g_v = gravload(obj, q_j)
+        g_q = gravload(obj, q_j)
 
         tau_j = invdyn(obj, q_j, dq_j, ddq_j)
 

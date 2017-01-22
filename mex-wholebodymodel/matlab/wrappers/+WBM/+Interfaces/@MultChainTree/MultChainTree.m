@@ -62,8 +62,8 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             tau_fr = obj.mwbm.frictionForces(dq_j);
         end
 
-        function g_v = gravload(obj, q_j)
-            g_v = obj.mwbm.gravityForces(q_j);
+        function g_q = gravload(obj, q_j)
+            g_q = obj.mwbm.gravityForces(q_j);
         end
 
         function tau_j = invdyn(obj, q_j, dq_j, ddq_j)

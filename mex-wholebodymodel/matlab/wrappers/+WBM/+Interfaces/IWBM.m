@@ -37,7 +37,7 @@ classdef (Abstract) IWBM < handle
 
         tau_gen = generalizedForces(obj, q_j, dq_j, f_c, Jc_t, stFltb)
 
-        g_v = gravityForces(obj, q_j, stFltb)
+        g_q = gravityForces(obj, q_j, stFltb)
 
         tau_j = inverseDyn(obj, q_j, dq_j, ddq_j, dv_b, stFltb)
 

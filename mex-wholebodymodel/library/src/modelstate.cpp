@@ -252,7 +252,6 @@ void ModelState::robotModelFromURDF(std::string urdfFileName)
     mexPrintf("Deleting older version of the robot model.\n");
     delete robotWBIModel;
   }
-
   std::string localName = "mexWBModel";
   yarp::os::Property yarpWbiOptions;
 
@@ -263,7 +262,6 @@ void ModelState::robotModelFromURDF(std::string urdfFileName)
   robotWBIModel = new yarpWbi::yarpWholeBodyModel(localName.c_str(), yarpWbiOptions);
 
   wbi::IDList RobotURDFJoints;
-
   std::vector<std::string> dofsFromURDF;
 
   iDynTree::dofsListFromURDF(urdfFileName, dofsFromURDF);

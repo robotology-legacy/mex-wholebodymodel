@@ -32,8 +32,8 @@ ModelGetState *ModelGetState::modelGetState = 0;
 double ModelGetState::quat_b[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 double *ModelGetState::vqT_b    = 0;
 double *ModelGetState::qj       = 0;
-double *ModelGetState::qj_dot   = 0;
 double *ModelGetState::vb       = 0;
+double *ModelGetState::qj_dot   = 0;
 
 ModelGetState::ModelGetState() : ModelComponent(0, 1, 4)
 {
@@ -69,15 +69,15 @@ bool ModelGetState::allocateReturnSpace(int nlhs, mxArray **plhs)
   }
   int numDof = modelState->dof();
 
-  plhs[0] = mxCreateDoubleMatrix(numDof, 1, mxREAL); // qj
-  plhs[1] = mxCreateDoubleMatrix(7, 1, mxREAL);      // vqT_b
-  plhs[2] = mxCreateDoubleMatrix(numDof, 1, mxREAL); // qj_dot
-  plhs[3] = mxCreateDoubleMatrix(6, 1, mxREAL);      // vb
+  plhs[0] = mxCreateDoubleMatrix(7, 1, mxREAL);      // vqT_b
+  plhs[1] = mxCreateDoubleMatrix(numDof, 1, mxREAL); // qj
+  plhs[2] = mxCreateDoubleMatrix(6, 1, mxREAL);      // vb
+  plhs[3] = mxCreateDoubleMatrix(numDof, 1, mxREAL); // qj_dot
 
-  qj     = mxGetPr(plhs[0]);
-  vqT_b  = mxGetPr(plhs[1]);
-  qj_dot = mxGetPr(plhs[2]);
-  vb     = mxGetPr(plhs[3]);
+  vqT_b  = mxGetPr(plhs[0]);
+  qj     = mxGetPr(plhs[1]);
+  vb     = mxGetPr(plhs[2]);
+  qj_dot = mxGetPr(plhs[3]);
 
   return true;
 }
@@ -87,7 +87,6 @@ bool ModelGetState::compute(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("ModelGetState performing compute.\n");
 #endif
-  modelState->qj(qj);
   wf_H_b = modelState->getBase2WorldTransformation();
 
 #ifdef DEBUG
@@ -118,8 +117,9 @@ bool ModelGetState::compute(int nrhs, const mxArray **prhs)
     *(vqT_b + (3+i)) = *(quat_b + i);
   }
 
-  modelState->qj_dot(qj_dot);
+  modelState->qj(qj);
   modelState->vb(vb);
+  modelState->qj_dot(qj_dot);
 
   return true;
 }
@@ -129,7 +129,6 @@ bool ModelGetState::computeFast(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("ModelGetState performing computeFast.\n");
 #endif
-  modelState->qj(qj);
   wf_H_b = modelState->getBase2WorldTransformation();
 
 #ifdef DEBUG
@@ -160,8 +159,9 @@ bool ModelGetState::computeFast(int nrhs, const mxArray **prhs)
     *(vqT_b + (3+i)) = *(quat_b + i);
   }
 
-  modelState->qj_dot(qj_dot);
+  modelState->qj(qj);
   modelState->vb(vb);
+  modelState->qj_dot(qj_dot);
 
   return true;
 }

@@ -46,7 +46,6 @@
 #include "modeltransformationmatrix.h"
 #include "modelsetworldframe.h"
 #include "modelupdatestate.h"
-#include "modelvisualizetrajectory.h"
 
 using namespace mexWBIComponent;
 
@@ -72,7 +71,6 @@ ModelMassMatrix            *ComponentManager::modelMassMatrix = 0;
 ModelSetWorldFrame         *ComponentManager::modelSetWorldFrame = 0;
 ModelTransformationMatrix  *ComponentManager::modelTransformationMatrix = 0;
 ModelUpdateState           *ComponentManager::modelUpdateState = 0;
-ModelVisualizeTrajectory   *ComponentManager::modelVisualizeTrajectory = 0;
 
 int ComponentManager::numDof = 0;
 std::map<std::string, ModelComponent*> ComponentManager::componentList;
@@ -106,7 +104,7 @@ ComponentManager::ComponentManager(std::string robotName)
   componentList["dJdq"]                  = modelDJdq;
   componentList["forward-kinematics"]    = modelForwardKinematics;
   componentList["generalized-forces"]    = modelGeneralizedBiasForces;
-  componentList["get-fbase-state"]       = modelGetFloatingBaseState;
+  componentList["get-base-state"]        = modelGetFloatingBaseState;
   componentList["get-state"]             = modelGetState;
   componentList["gravity-forces"]        = modelGravityBiasForces;
   componentList["inverse-dynamics"]      = modelInverseDynamics;
@@ -118,7 +116,6 @@ ComponentManager::ComponentManager(std::string robotName)
   componentList["set-world-frame"]       = modelSetWorldFrame;
   componentList["transformation-matrix"] = modelTransformationMatrix;
   componentList["update-state"]          = modelUpdateState;
-  componentList["visualize-trajectory"]  = modelVisualizeTrajectory;
 }
 
 void ComponentManager::cleanup()
@@ -140,7 +137,6 @@ void ComponentManager::cleanup()
   ModelSetWorldFrame::deleteInstance();
   ModelTransformationMatrix::deleteInstance();
   ModelUpdateState::deleteInstance();
-  ModelVisualizeTrajectory::deleteInstance();
 
   ModelState::deleteInstance();
 #ifdef DEBUG
@@ -174,7 +170,6 @@ void ComponentManager::initialise(std::string robotName)
   modelSetWorldFrame         = ModelSetWorldFrame::getInstance();
   modelTransformationMatrix  = ModelTransformationMatrix::getInstance();
   modelUpdateState           = ModelUpdateState::getInstance();
-  modelVisualizeTrajectory   = ModelVisualizeTrajectory::getInstance();
 }
 
 bool ComponentManager::processFunctionCall(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs)

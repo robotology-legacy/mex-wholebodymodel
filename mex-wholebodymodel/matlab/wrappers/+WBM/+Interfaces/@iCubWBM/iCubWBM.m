@@ -121,11 +121,11 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             tau_gen = obj.mwbm_icub.generalizedForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, f_c, Jc_t);
         end
 
-        function g_v = gravityForces(obj, q_j, stFltb)
+        function g_q = gravityForces(obj, q_j, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            g_v = obj.mwbm_icub.gravityForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j);
+            g_q = obj.mwbm_icub.gravityForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j);
         end
 
         function tau_j = inverseDyn(obj, q_j, dq_j, ddq_j, dv_b, stFltb)

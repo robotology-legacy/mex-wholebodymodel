@@ -16,11 +16,11 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
 
     % reconstruct the rotation of the 'root link' to the 'world'
     % from the quaternion part of the transformation vector vqT_b:
-    [~,vqT_b,~,~] = wbm_getState();
+    [vqT_b,~,~,~] = wbm_getState();
     [~,R_b] = WBM.utilities.frame2posRotm(vqT_b);
 
     M    = wbm_massMatrix();
-    c_qv = wbm_generalisedBiasForces();
+    c_qv = wbm_generalizedBiasForces();
 
     % compute for each contact constraint the Jacobian and the derivative Jacobian:
     m = 6*nCstrs;

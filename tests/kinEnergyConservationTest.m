@@ -4,10 +4,10 @@ clear wholeBodyModel;
 
 %% initialise mexWholeBodyModel
 if( params.isURDF )
-    wbm_modelInitialiseFromURDF(params.urdfFilePath);
+    wbm_modelInitializeFromURDF(params.urdfFilePath);
     robotDisplayName = params.urdfFilePath;
 else
-    wbm_modelInitialise(params.yarpRobotName);
+    wbm_modelInitialize(params.yarpRobotName);
     robotDisplayName = params.yarpRobotName;
 end
 
@@ -39,7 +39,7 @@ disp(params.dqjInit');
 wbm_setWorldFrame(eye(3),[0 0 0]',[0 0 0]');
 wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit]);
 
-[qj,T_bInit,dqj,vb] = wbm_getState();
+[T_bInit,qj,vb,dqj] = wbm_getState();
 [Ptemp,Rtemp]       = frame2posrot(T_bInit);
 params.chiInit      = [T_bInit;params.qjInit;...
                        params.dx_bInit;params.omega_bInit;params.dqjInit];

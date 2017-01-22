@@ -13,6 +13,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     cfrict    ...  Coulomb friction
     chn       ...  chain
     chnt      ...  chain tree
+    cmo       ...  column major order
     cols      ...  columns
     config    ...  configuration
     cstr      ...  constraint
@@ -77,6 +78,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     rev       ...  revolute
     ridx      ...  row index(es)
     rlnk      ...  root link OR reference link
+    rmo       ...  row major order
     rpts      ...  repeats
     sc        ...  scalar OR scaled
     scn       ...  scene

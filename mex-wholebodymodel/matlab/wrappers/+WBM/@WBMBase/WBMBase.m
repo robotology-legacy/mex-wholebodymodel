@@ -153,12 +153,12 @@ classdef WBMBase < handle
         end
 
         function [vqT_b, q_j, v_b, dq_j] = getState(~)
-            [q_j, vqT_b, dq_j, v_b] = mexWholeBodyModel('get-state');
+            [vqT_b, q_j, v_b, dq_j] = mexWholeBodyModel('get-state');
         end
 
         function stFltb = getFloatingBaseState(~)
             stFltb = WBM.wbmFltgBaseState;
-            [R_b, p_b, v_b] = mexWholeBodyModel('get-fbase-state');
+            [R_b, p_b, v_b] = mexWholeBodyModel('get-base-state');
 
             stFltb.wf_R_b = R_b; % orientation of the base (in axis-angle representation)
             stFltb.wf_p_b = p_b; % cartesian position of the base
@@ -209,6 +209,16 @@ classdef WBMBase < handle
 
         function resv = isJointLimit(obj, q_j)
             resv = ~((q_j > obj.mwbm_model.jlim.lwr) & (q_j < obj.mwbm_model.jlim.upr));
+        end
+
+        function dv_b = generalizedBaseAcc(obj, M, c_qv, ddq_j)
+            n = obj.mwbm_model.ndof + 6;
+
+            h_0  = c_qv(1:6,1);
+            M_00 = M(1:6,1:6);
+            M_01 = M(1:6,7:n);
+
+            dv_b = -M_00 \ (M_01*ddq_j + h_0);
         end
 
         tau_j = inverseDynamics(obj, varargin)
@@ -351,15 +361,15 @@ classdef WBMBase < handle
             end
         end
 
-        function g_v = gravityBiasForces(~, wf_R_b, wf_p_b, q_j)
+        function g_q = gravityBiasForces(~, wf_R_b, wf_p_b, q_j)
             switch nargin
                 case 4
                     % normal mode:
                     wf_R_b_arr = reshape(wf_R_b, 9, 1);
-                    g_v = mexWholeBodyModel('gravity-forces', wf_R_b_arr, wf_p_b, q_j);
+                    g_q = mexWholeBodyModel('gravity-forces', wf_R_b_arr, wf_p_b, q_j);
                 case 1
                     % optimized mode:
-                    g_v = mexWholeBodyModel('gravity-forces');
+                    g_q = mexWholeBodyModel('gravity-forces');
                 otherwise
                     error('WBMBase::gravityForces: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end

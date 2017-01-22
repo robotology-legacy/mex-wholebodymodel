@@ -57,8 +57,8 @@ namespace mexWBIComponent
       // outputs:
       static double *vqT_b; // vector-quaternion transformation (from base to world frame)
       static double *qj;
-      static double *qj_dot;
       static double *vb;
+      static double *qj_dot;
   };
 
 }

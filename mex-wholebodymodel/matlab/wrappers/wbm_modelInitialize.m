@@ -14,7 +14,6 @@ function wbm_modelInitialize(varargin)
     %
     % Author: Naveen Kuppuswamy (naveen.kuppuswamy@iit.it); Genova, Dec 2014
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
-
     switch nargin
         case 0
             mexWholeBodyModel('model-initialize');

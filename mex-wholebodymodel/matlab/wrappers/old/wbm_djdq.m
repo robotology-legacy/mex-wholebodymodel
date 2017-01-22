@@ -12,7 +12,7 @@ function [ dJdq ] = wbm_djdq(varargin)
     %   Returns : dJdq, a vector of dimension 6X1
     %
     % Author : Naveen Kuppuswamy (naveen.kuppuswamy@iit.it)
-    % Genovas, Dec 2014
+    % Genova, Dec 2014
 
     switch(nargin)
         case 1

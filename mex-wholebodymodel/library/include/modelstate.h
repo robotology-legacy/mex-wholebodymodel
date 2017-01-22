@@ -85,7 +85,6 @@ namespace mexWBIComponent
 
       static ModelState *modelState;
       static wbi::iWholeBodyModel *robotWBIModel;
-      //wbi::iWholeBodyModel *robotWBIModel;
 
       static size_t numDof;
       static std::string currRobotName;

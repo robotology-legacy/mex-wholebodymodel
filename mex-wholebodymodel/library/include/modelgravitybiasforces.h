@@ -52,14 +52,11 @@ namespace mexWBIComponent
 
       static ModelGravityBiasForces *modelGravityBiasForces;
 
-      //static double vb_0[6];   // 0-velocity vector
-      //static double *qj_dot_0; // zero joint velocities
-
       // inputs:
       static double *qj;
       static double *g;
       // output:
-      static double *g_v;
+      static double *g_q;
   };
 
 }

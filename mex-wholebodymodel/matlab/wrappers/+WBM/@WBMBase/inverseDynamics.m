@@ -55,7 +55,7 @@ function tau_j = inverseDynamics(obj, varargin)
     tau_fr = frictionForces(obj, dq_j);
     tau_fr = vertcat(zeros(6,1), tau_fr);
 
-    %% Generalized floating-base acceleration for a hybrid-dynamics system:
+    %% Generalized floating base acceleration for a hybrid-dynamic system:
     %
     %  In general the equation of motion is given as follows:
     %
@@ -63,7 +63,7 @@ function tau_j = inverseDynamics(obj, varargin)
     %
     %  where C(q_j, dq_j) denotes the generalized bias force.
     %  In contrast to the fixed-based system, the equation of motion for a
-    %  floating-base system is given as follows:
+    %  floating base system is given as follows:
     %
     %       |   0   |   | M_00      M_01 |   | dv_b  |   | h_0 |   |   0    |
     %       |       | = |                | * |       | + |     | + |        |
@@ -74,27 +74,15 @@ function tau_j = inverseDynamics(obj, varargin)
     %  and dv_b = -(M_00)^(-1) * (M_01 * ddq_j + h_0) denotes the base acceleration.
     %
     % Further details about the formulas are available at:
-    %   [1] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008, chapter 9.3-9.5,
-    %       pp. 180-184, eq. (9.13) & (9.24).
+    %   [1] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008,
+    %       chapter 9.3-9.5, pp. 180-184, eq. (9.13) & (9.24).
     %   [2] Informatics in Control, Automation and Robotics, J. A. Cetto & J. Ferrier & J. Filipe,
-    %       Lecture Notes in Electrical Engineering, volume 89, Springer, 2011, p. 14, eq. (36) & (37).
+    %       Lecture Notes in Electrical Engineering, Volume 89, Springer, 2011, p. 14, eq. (36) & (37).
     %   [3] Dynamics of Tree-Type Robotic Systems, S. V. Shah & S. K. Saha & J. K. Dutt,
-    %       Intelligent Systems, Control and Automation: Science and Engineering, volume 62, Springer, 2012,
+    %       Intelligent Systems, Control and Automation: Science and Engineering, Volume 62, Springer, 2012,
     %       p. 119, eq. (7.1) & (7.2).
-    dv_b  = generalizedBaseAcceleration(M, c_qv, ddq_j, obj.mwbm_model.ndof);
+    dv_b  = generalizedBaseAcc(obj, M, c_qv, ddq_j);
     ddq_j = vertcat(dv_b, ddq_j); % mixed generalized acceleration
 
     tau_j = M*ddq_j + c_qv + tau_fr;
-end
-%% END of inverseDynamics.
-
-
-function dv_b = generalizedBaseAcceleration(M, c_qv, ddq_j, ndof)
-    n = ndof + 6;
-
-    h_0  = c_qv(1:6,1);
-    M_00 = M(1:6,1:6);
-    M_01 = M(1:6,7:n);
-
-    dv_b = -M_00 \ (M_01*ddq_j + h_0);
 end

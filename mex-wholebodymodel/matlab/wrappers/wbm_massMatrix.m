@@ -1,5 +1,5 @@
 function M = wbm_massMatrix(varargin)
-    % wbm_massMatrix computes the mass matrix of the floating-base robot w.r.t. the given joint
+    % wbm_massMatrix computes the mass matrix of the floating base robot w.r.t. the given joint
     % configuration q_j.
     %
     %   INPUT ARGUMENTS:
@@ -15,12 +15,11 @@ function M = wbm_massMatrix(varargin)
     %
     % Author: Naveen Kuppuswamy (naveen.kuppuswamy@iit.it); Genova, Dec 2014
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
-
     switch nargin
         case 0
             M = mexWholeBodyModel('mass-matrix');
         case 3
-            M = mexWholeBodyModel('mass-matrix', reshape(varargin{1}, [], 1), varargin{2}, varargin{3});
+            M = mexWholeBodyModel('mass-matrix', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3});
         otherwise
             error('wbm_massMatrix: %s\n', wbm_errorMsg());
     end

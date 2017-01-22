@@ -50,10 +50,10 @@ wbm_setWorldFrame(w_R_b,x_b,[0 0 0]');
 wbm_updateState(qj,dqj,[dx_b;omega_W]);
 
 M = wbm_massMatrix();
-h = wbm_generalisedBiasForces();
+h = wbm_generalizedBiasForces();
 
 %M = wbm_massMatrix(qj);
-%h = wbm_generalisedBiasForces(qj,dqj,[dx_b;omega_W]);
+%h = wbm_generalizedBiasForces(qj,dqj,[dx_b;omega_W]);
 
 g = zeros(size(h));
 
@@ -66,7 +66,7 @@ Jc = zeros(6*numConstraints,6+ndof);
 dJcDq = zeros(6*numConstraints,1);
 for i=1:numConstraints
     Jc(6*(i-1)+1:6*i,:) = wbm_jacobian(param.constraintLinkNames{i});
-    dJcDq(6*(i-1)+1:6*i,:) = wbm_djdq(param.constraintLinkNames{i});
+    dJcDq(6*(i-1)+1:6*i,:) = wbm_dJdq(param.constraintLinkNames{i});
 end
 
 %% control torque

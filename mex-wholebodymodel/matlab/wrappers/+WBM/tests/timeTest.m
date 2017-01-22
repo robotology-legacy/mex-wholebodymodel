@@ -50,8 +50,8 @@ for i = 1:noi
     c_qv   = wbm_icub.coriolisBiasForces(R, p, q_j, dq_j, v_b);
     c_qv   = wbm_icub.coriolisBiasForces(R, p, q_j, dq_j, v_b);
 
-    g_v    = wbm_icub.gravityBiasForces(R, p, q_j);
-    g_v    = wbm_icub.gravityBiasForces(R, p, q_j);
+    g_q    = wbm_icub.gravityBiasForces(R, p, q_j);
+    g_q    = wbm_icub.gravityBiasForces(R, p, q_j);
 
     djdq_1 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstr_link_names{1});
     djdq_2 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstr_link_names{2});
@@ -117,8 +117,8 @@ for i = 1:noi
     c_qv   = wbm_icub.coriolisBiasForces();
     c_qv   = wbm_icub.coriolisBiasForces();
 
-    g_v    = wbm_icub.gravityBiasForces();
-    g_v    = wbm_icub.gravityBiasForces();
+    g_q    = wbm_icub.gravityBiasForces();
+    g_q    = wbm_icub.gravityBiasForces();
 
     djdq_1 = wbm_icub.dJdq(icub_config.cstr_link_names{1});
     djdq_2 = wbm_icub.dJdq(icub_config.cstr_link_names{2});

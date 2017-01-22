@@ -53,7 +53,6 @@ namespace mexWBIComponent
   class ModelSetWorldFrame;
   class ModelTransformationMatrix;
   class ModelUpdateState;
-  class ModelVisualizeTrajectory;
 }
 
 namespace mexWBIComponent
@@ -101,7 +100,6 @@ namespace mexWBIComponent
       static ModelSetWorldFrame         *modelSetWorldFrame;
       static ModelTransformationMatrix  *modelTransformationMatrix;
       static ModelUpdateState           *modelUpdateState;
-      static ModelVisualizeTrajectory   *modelVisualizeTrajectory;
 
       static int numDof;
       static std::map<std::string, ModelComponent*> componentList;
