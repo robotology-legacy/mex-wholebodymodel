@@ -1,4 +1,4 @@
-function [] = kinEnergyConservationTest( params )
+function kinEnergyConservationTest(params)
 rng(0)
 clear wholeBodyModel;
 
