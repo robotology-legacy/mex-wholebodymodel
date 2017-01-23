@@ -1,5 +1,5 @@
 function wf_J_lnk = wbm_jacobian(varargin)
-    % wbm_jacobian computes the Jacobian of a specified link (frame) of the robot w.r.t. the current
+    % WBM_JACOBIAN computes the Jacobian of a specified link (frame) of the robot w.r.t. the current
     % joint configuration q_j.
     %
     %   INPUT ARGUMENTS:

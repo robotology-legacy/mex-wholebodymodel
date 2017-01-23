@@ -1,5 +1,5 @@
 function dv_b = generalizedBaseAcc(M, c_qv, ddq_j)
-    % generalizedBaseAcc computes the generalized floating base acceleration for
+    % GENERALIZEDBASEACC computes the generalized floating base acceleration for
     % a hybrid-dynamic system.
     %
     % Useful e.g. in inverse dynamics, when the base acceleration is unknown.

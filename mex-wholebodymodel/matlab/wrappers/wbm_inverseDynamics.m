@@ -1,5 +1,5 @@
 function tau_j = wbm_inverseDynamics(varargin)
-    % wbm_centroidalMomentum computes the inverse dynamics of a rigid-body system.
+    % WBM_CENTROIDALMOMENTUM computes the inverse dynamics of a rigid-body system.
     %
     % It depends on the state variables q_j, dq_j and v_b, and also on the joint angle accelerations
     % dqq_j and the floating base accelerations dv_b.

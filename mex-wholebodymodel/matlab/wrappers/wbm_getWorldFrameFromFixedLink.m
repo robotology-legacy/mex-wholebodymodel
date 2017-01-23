@@ -1,5 +1,5 @@
 function [wf_R_b, wf_p_b] = wbm_getWorldFrameFromFixedLink(varargin)
-    % wbm_getWorldFrameFromFixedLink returns the position and the orientation of the floating base
+    % WBM_GETWORLDFRAMEFROMFIXEDLINK returns the position and the orientation of the floating base
     % w.r.t. a world frame (WF) that is intentionally set and fixed at a specified (contact) link frame.
     %
     % The returned floating base position and orientation is obtained from the forward kinematics

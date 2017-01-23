@@ -75,10 +75,11 @@ ModelState::ModelState(std::string robotName)
   if ( (sqj == 0) && (sqj_dot == 0) ) {
     sqj     = new double[numDof];
     sqj_dot = new double[numDof];
+
+  #ifdef DEBUG
+    mexPrintf("Allocated sqj & sqj_dot.\n");
+  #endif
   }
-#ifdef DEBUG
-  mexPrintf("Allocated sqj & sqj_dot.\n");
-#endif
 
   sg[0] = 0.0f; sg[1] = 0.0f; sg[2] = -9.81f;
 }
@@ -93,12 +94,14 @@ ModelState::~ModelState()
     delete robotWBIModel;
     robotWBIModel = 0;
   }
+#ifdef DEBUG
+  mexPrintf("robotWBIModel deleted.\n");
+#endif
 
   if (sqj_dot != 0) {
     delete[] sqj_dot;
     sqj_dot = 0;
   }
-
 #ifdef DEBUG
   mexPrintf("sqj_dot deleted.\n");
 #endif
@@ -107,7 +110,6 @@ ModelState::~ModelState()
     delete[] sqj;
     sqj = 0;
   }
-
 #ifdef DEBUG
   mexPrintf("sqj deleted.\n");
   mexPrintf("ModelState destructor returning.\n");

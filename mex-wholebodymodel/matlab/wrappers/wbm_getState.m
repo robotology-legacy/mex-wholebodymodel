@@ -1,5 +1,5 @@
 function [vqT_b, q_j, v_b, dq_j] = wbm_getState()
-    % wbm_getState obtains the currently stored state of the system (joint angles and velocities,
+    % WBM_GETSTATE obtains the currently stored state of the system (joint angles and velocities,
     % floating base velocity and base VQ-Transformation).
     %
     %   INPUT ARGUMENTS:  none

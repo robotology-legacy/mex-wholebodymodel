@@ -146,6 +146,9 @@ void ComponentManager::cleanup()
 
 ComponentManager::~ComponentManager()
 {
+#ifdef DEBUG
+  mexPrintf("Start cleanup...\n");
+#endif
   cleanup();
 }
 
@@ -175,7 +178,7 @@ void ComponentManager::initialise(std::string robotName)
 bool ComponentManager::processFunctionCall(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to parseMexArguments...\n");
+  mexPrintf("Trying to parse mex-arguments...\n");
 #endif
   ModelComponent *activeComponent;
   char *str = mxArrayToString(prhs[0]);

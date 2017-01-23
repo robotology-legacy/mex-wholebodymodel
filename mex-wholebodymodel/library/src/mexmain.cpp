@@ -26,9 +26,6 @@
 #include "modelcomponent.h"
 #include "componentmanager.h"
 
-// preprocessor directives
-//#define DEBUG
-
 // namespaces
 using namespace mexWBIComponent;
 
@@ -46,6 +43,9 @@ static ComponentManager *componentManagerLocalPointerCopy = 0;
 // Cleanup function to call when matlab exits or mex clears
 void MEXWBM_Matlab_ExitFcn(void)
 {
+#ifdef DEBUG
+  mexPrintf("Try to delete ComponentManager...\n");
+#endif
   ComponentManager::deleteInstance();
   componentManagerLocalPointerCopy = 0;
 }

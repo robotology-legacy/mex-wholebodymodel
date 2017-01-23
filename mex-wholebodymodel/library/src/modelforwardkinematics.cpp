@@ -45,6 +45,14 @@ ModelForwardKinematics::~ModelForwardKinematics()
 #endif
 }
 
+ModelForwardKinematics *ModelForwardKinematics::getInstance()
+{
+  if (modelForwardKinematics == 0) {
+    modelForwardKinematics = new ModelForwardKinematics();
+  }
+  return modelForwardKinematics;
+}
+
 void ModelForwardKinematics::deleteInstance()
 {
   deleteObject(&modelForwardKinematics);
@@ -76,7 +84,7 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray **prhs)
   }
 #endif
   size_t numDof = modelState->dof();
-  
+
   if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||
        mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || !mxIsChar(prhs[4]) )
   {
@@ -203,12 +211,4 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray **prhs)
   mexPrintf("ModelForwardKinematics fast computed.\n");
 #endif
   return true;
-}
-
-ModelForwardKinematics *ModelForwardKinematics::getInstance()
-{
-  if (modelForwardKinematics == 0) {
-    modelForwardKinematics = new ModelForwardKinematics();
-  }
-  return modelForwardKinematics;
 }

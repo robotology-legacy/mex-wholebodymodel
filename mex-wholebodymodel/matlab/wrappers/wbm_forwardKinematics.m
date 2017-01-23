@@ -1,5 +1,5 @@
 function vqT_lnk = wbm_forwardKinematics(varargin)
-    % wbm_forwardKinematics computes the forward kinematic transformation vector to a specified
+    % WBM_FORWARDKINEMATICS computes the forward kinematic transformation vector to a specified
     % link (frame) w.r.t. the current joint configuration q_j.
     %
     %   INPUT ARGUMENTS:

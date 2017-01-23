@@ -1,5 +1,5 @@
 function errmsg = wbm_errorMsg()
-    % wbm_errorMsg returns the default error message for the wbm-functions.
+    % WBM_ERRORMSG returns the default error message for the wbm-functions.
     %
     %   INPUT ARGUMENTS:  none
     %

@@ -1,5 +1,5 @@
 function djdq_lnk = wbm_dJdq(varargin)
-    % wbm_dJdq computes the product of the time derivative of the Jacobian and the joint velocities,
+    % WBM_DJDQ computes the product of the time derivative of the Jacobian and the joint velocities,
     % w.r.t. to the current state and the specified link (frame) of the robot.
     %
     % Useful for Operational Space Control and for calculating the external contact constraints.

@@ -1,6 +1,6 @@
-function S = skew(v)
+function S = skewm(v)
     if (size(v,1) ~= 3)
-        error('skew: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+        error('skewm: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
     S = zeros(3,3);
 

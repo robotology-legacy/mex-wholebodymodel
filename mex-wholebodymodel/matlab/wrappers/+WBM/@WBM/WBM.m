@@ -374,26 +374,6 @@ classdef WBM < WBM.WBMBase
             zlabel('$z_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
         end
 
-        % EXPERIMENTAL: This method does not work at the moment.
-        % (Matlab hangs when it calls this function. Probably it depends on
-        %  further applications outside of Matlab which are not installed.)
-        %
-        % function visualizeTrajectoryICubGUI(obj, t, stmChi)
-        %     if (nargin < 2)
-        %         error('WBM::visualizeTrajectoryICubGUI: %s', WBM.wbmErrorMsg.WRONG_ARG);
-        %     end
-
-        %     [m, n] = size(stmChi);
-        %     if (n ~= obj.mwbm_config.stvLen)
-        %         error('WBM::visualizeTrajectoryICubGUI: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-        %     end
-        %     cutp = obj.mwbm_model.ndof + 7;
-        %     vqT = stmChi(1:m,1:7);    % m -by- vqT_b matrix
-        %     Q_j = stmChi(1:m,8:cutp); % m -by- q_j matrix
-
-        %     mexWholeBodyModel('visualize-trajectory', t, Q_j, vqT);
-        % end
-
         function setLinkPayloads(obj, link_names, pl_data)
             % verify the input types ...
             if ( ~iscell(link_names) || ~ismatrix(pl_data) )
@@ -684,7 +664,7 @@ classdef WBM < WBM.WBMBase
             wf_p_tt = wf_R_ee * (ee_R_tt * p_tt); % = wf_R_ee * ee_p_tt
 
             % compute the skew-symmetric matrix S(p_tt) ...
-            Sp_tt = WBM.utilities.skew(wf_p_tt);
+            Sp_tt = WBM.utilities.skewm(wf_p_tt);
             % create the velocity transformation matrix:
             tt_X_wf = eye(6,6);
             tt_X_wf(1:3,4:6) = -Sp_tt;

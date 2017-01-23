@@ -30,7 +30,7 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
     for i = 1:nCstrs
         cstr_link = robot_config.cstr_link_names{1,i};
         Jc(6*i-5:6*i,1:n)  = wbm_jacobian(cstr_link);
-        djcdq(6*i-5:6*i,1) = wbm_djdq(cstr_link);
+        djcdq(6*i-5:6*i,1) = wbm_dJdq(cstr_link);
     end
 
     % get the current control torques ...

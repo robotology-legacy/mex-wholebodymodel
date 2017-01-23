@@ -1,5 +1,5 @@
 function wf_H_lnk = wbm_transformationMatrix(varargin)
-    % wbm_transformationMatrix computes the homogeneous transformation matrix H of a specified
+    % WBM_TRANSFORMATIONMATRIX computes the homogeneous transformation matrix H of a specified
     % link (frame) of the robot w.r.t. the current joint configuration q_j.
     %
     %   INPUT ARGUMENTS:

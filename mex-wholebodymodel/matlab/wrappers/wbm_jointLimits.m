@@ -1,5 +1,5 @@
 function [jlim_lower, jlim_upper]  = wbm_jointLimits()
-    % wbm_jointLimits returns the lower and upper limits of the joint positions of the robot model.
+    % WBM_JOINTLIMITS returns the lower and upper limits of the joint positions of the robot model.
     %
     %   INPUT ARGUMENTS:  none
     %

@@ -1,7 +1,6 @@
-function [ X ] = skew( x )
-%SKEW Function to generate a 3X3 Skew Symmetric matrix out of a 3X1 vector.
-X=[0   -x(3)  x(2) ;
-   x(3) 0    -x(1) ;
-  -x(2) x(1)  0 ];
+function S = skew(v)
+    % SKEW function to generate a (3 x 3) skew-symmetric matrix S out of a (3 x 1) vector v.
+    S = [ 0    -v(3)  v(2);
+          v(3)  0    -v(1);
+         -v(2)  v(1)  0  ];
 end
-

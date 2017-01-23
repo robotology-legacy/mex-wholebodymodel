@@ -1,5 +1,5 @@
 function [wf_R_b, wf_p_b, v_b] = wbm_getFloatingBaseState()
-    % wbm_getFloatingBaseState returns the current state of the robot's floating base (orientation,
+    % WBM_GETFLOATINGBASESTATE returns the current state of the robot's floating base (orientation,
     % position and velocity).
     %
     % The values of the floating base state are derived from the currently stored state of the robot

@@ -13,7 +13,7 @@ function dquat = dQuat(quat, omega)
     %       [3] Quaternion kinematics for the error-state KF, Joan Solà, Universitat Politècnica de Catalunya, 2016,
     %           <http://www.iri.upc.edu/people/jsola/JoanSola/objectes/notes/kinematics.pdf>, p. 19, formulas (97) & (98).
     Omega_op = zeros(4,4);
-    Omega_op(2:4,2:4) = -WBM.utilities.skew(omega); % (skew-symmetric) cross product matrix
+    Omega_op(2:4,2:4) = -WBM.utilities.skewm(omega); % (skew-symmetric) cross product matrix
     Omega_op(1,2:4)   = -omega.';
     Omega_op(2:4,1)   =  omega;
 

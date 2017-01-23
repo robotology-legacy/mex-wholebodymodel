@@ -1,6 +1,6 @@
-function v = skew2vec(S)
+function v = skewm2vec(S)
     if ( (size(S,1) ~= 3) || (size(S,2) ~= 3) )
-        error('skew2vec: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+        error('skewm2vec: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
     end
     v = zeros(3,1);
 

@@ -1,5 +1,5 @@
 function M = wbm_massMatrix(varargin)
-    % wbm_massMatrix computes the mass matrix of the floating base robot w.r.t. the given joint
+    % WBM_MASSMATRIX computes the mass matrix of the floating base robot w.r.t. the given joint
     % configuration q_j.
     %
     %   INPUT ARGUMENTS:

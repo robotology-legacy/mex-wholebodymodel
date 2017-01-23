@@ -1,5 +1,5 @@
 function [M, c_qv, h_c] = wbm_wholeBodyDynamics(varargin)
-    % wbm_wholeBodyDynamics computes the mass matrix, the generalized bias forces and the centroidal
+    % WBM_WHOLEBODYDYNAMICS computes the mass matrix, the generalized bias forces and the centroidal
     % momentum of the floating base robot w.r.t. the joint angles and velocities q_j, dq_j and the
     % floating base velocity v_b.
     %

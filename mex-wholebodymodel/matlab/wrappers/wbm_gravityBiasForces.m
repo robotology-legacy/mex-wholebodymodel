@@ -1,5 +1,5 @@
 function g_q = wbm_gravityBiasForces(varargin)
-    % wbm_gravityBiasForces computes the gravity bias forces G(q_j) in the dynamics of rigid-body
+    % WBM_GRAVITYBIASFORCES computes the gravity bias forces G(q_j) in the dynamics of rigid-body
     % systems.
     %
     % This function is derived from the generalized bias force function and depends only on the

@@ -1,5 +1,5 @@
 function c_qv = wbm_coriolisBiasForces(varargin)
-    % wbm_coriolisBiasForces computes the bias Coriolis and centrifugal forces C(q_j,dq_j) in the
+    % WBM_CORIOLISBIASFORCES computes the bias Coriolis and centrifugal forces C(q_j,dq_j) in the
     % dynamics of rigid-body systems.
     %
     % This function is derived from the generalized bias force function and has the same

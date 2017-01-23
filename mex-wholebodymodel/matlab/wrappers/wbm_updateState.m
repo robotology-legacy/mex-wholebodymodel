@@ -1,5 +1,5 @@
 function wbm_updateState(varargin)
-    % wbm_updateState updates the state of the robot model, i.e. the joint angles and velocities,
+    % WBM_UPDATESTATE updates the state of the robot model, i.e. the joint angles and velocities,
     % and the floating base velocity.
     %
     %   INPUT ARGUMENTS:

@@ -1,5 +1,5 @@
 function wbm_setWorldFrame(varargin)
-    % wbm_setWorldFrame sets the world frame (WF), which is fixed at a specified (contact) link frame,
+    % WBM_SETWORLDFRAME sets the world frame (WF), which is fixed at a specified (contact) link frame,
     % to a given transformation (position & orientation).
     %
     % With the help of the WF-transformation, the transformation vqT_b from the base to the WF can be

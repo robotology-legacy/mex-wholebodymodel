@@ -1,5 +1,5 @@
 function wbm_modelInitialize(varargin)
-    % wbm_modelInitialize initializes the whole body model of the robot.
+    % WBM_MODELINITIALIZE initializes the whole body model of the robot.
     %
     %   INPUT ARGUMENTS:
     %       Optimized mode:  no arguments

@@ -56,7 +56,7 @@ namespace mexWBIComponent
       static double *qj;
       static double *g;
       // output:
-      static double *g_q;
+      static double *g_q; // gravity bias forces G(q)
   };
 
 }

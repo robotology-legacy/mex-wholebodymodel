@@ -1,5 +1,6 @@
 function wbm_modelInitializeFromURDF(varargin)
-    % wbm_modelInitialize initializes the whole body model with a given URDF-file of a YARP-based robot.
+    % WBM_MODELINITIALIZEFROMURDF initializes the whole body model with a given URDF-file of a
+    % YARP-based robot.
     %
     %   INPUT ARGUMENTS:
     %       Optimized mode:  none (does not exist)
