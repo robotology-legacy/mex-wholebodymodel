@@ -56,9 +56,7 @@ xCoM                  = FORKINEMATICS.xCoM;
 % jointLimitsCheck(qj,t);
 
 %% CoM and joints trajectory generator
-trajectory.jointReferences.ddqjRef = zeros(ndof,1);
-trajectory.jointReferences.dqjRef  = zeros(ndof,1);
-trajectory.jointReferences.qjRef   = qjInit;
+trajectory.jointReferences         = interpInverseKinematics(t,CONFIG.IKIN);
 trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(CONFIG.xCoMRef,t,CONFIG);
 
 %% Torque balancing controller
@@ -82,7 +80,6 @@ visualization.poseFeet    = [poseLFoot_ang;poseRFoot_ang];
 visualization.H           = H;
 visualization.HRef        = [m*trajectory.desired_x_dx_ddx_CoM(:,2);zeros(3,1)];
 visualization.fc          = fc;
-visualization.f0          = controlParam.f0;
 visualization.tau         = tau;
 
 end

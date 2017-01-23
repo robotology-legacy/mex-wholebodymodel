@@ -56,10 +56,23 @@ xCoM                  = FORKINEMATICS.xCoM;
 % jointLimitsCheck(qj,t);
 
 %% CoM and joints trajectory generator
-trajectory.jointReferences.ddqjRef = zeros(ndof,1);
-trajectory.jointReferences.dqjRef  = zeros(ndof,1);
-trajectory.jointReferences.qjRef   = qjInit;
-trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(CONFIG.xCoMRef,t,CONFIG);
+trajectory.desired_x_dx_ddx_CoM        = trajectoryGenerator(CONFIG.xCoMRef,t,CONFIG);
+
+% interpolation for joint reference trajectory with ikin
+if CONFIG.jointRef_with_ikin == 1
+    trajectory.jointReferences         = interpInverseKinematics(t,CONFIG.IKIN);
+else
+    trajectory.jointReferences.ddqjRef = zeros(ndof,1);
+    trajectory.jointReferences.dqjRef  = zeros(ndof,1);
+    trajectory.jointReferences.qjRef   = qjInit;
+end
+
+%% %%%%%%%%%%%%% LINEARIZATION DEBUG AND STABILITY ANALYSIS %%%%%%%%%%%% %%
+if CONFIG.linearizationDebug  == 1
+    % linearized joint accelerations
+    visualization.ddqjLin = trajectory.jointReferences.ddqjRef-CONFIG.linearization.KS*(qj-trajectory.jointReferences.qjRef)...
+                           -CONFIG.linearization.KD*(dqj-trajectory.jointReferences.dqjRef);
+end
 
 %% Torque balancing controller
 controlParam    = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE);
@@ -75,6 +88,8 @@ dnu             = M\(Jc'*fc + [zeros(6,1); tau]-h);
 dchi            = [nu;dnu];
 
 %% Parameters for visualization
+visualization.ddqjNonLin  = dnu(7:end);
+visualization.dqj         = dqj;
 visualization.qj          = qj;
 visualization.jointRef    = trajectory.jointReferences;
 visualization.xCoM        = xCoM;

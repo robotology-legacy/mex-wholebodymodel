@@ -20,7 +20,6 @@ clc
 %% Configure the simulation
 CONFIG.demo_movements                        = 1;                          %either 0 or 1
 CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left foot,right foot]
-CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
 
 %% Visualization setup
 % robot simulator
@@ -33,6 +32,10 @@ CONFIG.visualize_joints_dynamics             = 1;                          %eith
 CONFIG.tStart                                = 0;
 CONFIG.tEnd                                  = 10;
 CONFIG.sim_step                              = 0.01;
+
+%% Visualize the inverse kinematics results
+CONFIG.visualize_ikin_results                = 0;                          %either 0 or 1
+CONFIG.ikin_integration_step                 = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 % ONLY FOR DEVELOPERS
@@ -110,9 +113,11 @@ codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
 utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/tools'];
 robot_root   = [utility_root, filesep, '/robotFunctions'];
 plots_root   = [utility_root, filesep, '/visualization'];
-src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing/src'];
-config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing/config'];
-init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing/init'];
+ikin_root    = [utility_root, filesep, '/inverseKinematics'];
+centr_root   = [utility_root, filesep, '/centroidalTransformation'];
+src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingJointControl/src'];
+config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingJointControl/config'];
+init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingJointControl/init'];
 
 % add the paths
 addpath(utility_root);
@@ -121,6 +126,8 @@ addpath(plots_root);
 addpath(src_root);
 addpath(config_root);
 addpath(init_root);
+addpath(centr_root);
+addpath(ikin_root);
 
 %% INITIALIZATION
 % initialize the forward dynamics

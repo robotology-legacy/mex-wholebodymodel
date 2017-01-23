@@ -128,11 +128,7 @@ Sigma              = -(pinvLambda*JcMinvJct + NullLambda*JBar);
 SigmaNA            =  Sigma*NullA;
 
 % Postural task correction
-pinvLambdaDamp     =  Lambda'/(Lambda*Lambda' + pinv_damp*eye(size(Lambda,1)));
-NullLambdaDamp     =  eye(ndof)-pinvLambdaDamp*Lambda;
-posturalCorr       =  NullLambdaDamp*Mbar;
-impedances         =  impedances*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
-dampings           =  dampings*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
+posturalCorr       =  CONFIG.linearization.BNull;
 
 tauModel           =  pinvLambda*(JcMinv*h - dJc_nu) + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
                       + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
