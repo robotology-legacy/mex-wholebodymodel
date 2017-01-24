@@ -24,7 +24,7 @@ CONFIG.use_QPsolver                          = 0;                          %eith
 
 %% Visualization setup
 % robot simulator
-CONFIG.visualize_robot_simulator             = 0;                          %either 0 or 1
+CONFIG.visualize_robot_simulator             = 1;                          %either 0 or 1
 % forward dynamics integration results
 CONFIG.visualize_integration_results         = 1;                          %either 0 or 1
 CONFIG.visualize_joints_dynamics             = 1;                          %either 0 or 1
@@ -105,6 +105,24 @@ CONFIG.footSize  = [-0.16 0.16;       % xMin, xMax
                     -0.075 0.075];    % yMin, yMax
 % joints configuration [rad]
 CONFIG.qjInit    = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
+
+% list of joints/links used for robot simulator
+CONFIG.linkList     = cell(15,1);
+CONFIG.linkList{1}  = 'Waist'  ;
+CONFIG.linkList{2}  = 'RHipMot';
+CONFIG.linkList{3}  = 'RThighLowLeg' ;
+CONFIG.linkList{4}  = 'r_sole'      ;
+CONFIG.linkList{5}  = 'LHipMot'     ;
+CONFIG.linkList{6}  = 'LThighLowLeg' ;
+CONFIG.linkList{7}  = 'l_sole'      ;
+CONFIG.linkList{8}  = 'neck_1'      ;
+CONFIG.linkList{9}  = 'r_shoulder_1';
+CONFIG.linkList{10} = 'r_elbow_1'   ;
+CONFIG.linkList{11} = 'r_gripper'   ;
+CONFIG.linkList{12} = 'l_shoulder_1';
+CONFIG.linkList{13} = 'l_elbow_1'   ;
+CONFIG.linkList{14} = 'l_gripper'   ;
+CONFIG.linkList{15} = 'com'         ;
 
 %% Paths definition and initialize the forward dynamics integration
 % add the required paths. This procedure will make the paths consistent for

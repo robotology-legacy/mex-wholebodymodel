@@ -113,6 +113,12 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray **prhs)
   int refLnkID = -1; // if refLnk = "com"
 
   if (com.compare(refLnk) != 0) {
+    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "jacobian call Link ID does not exist.");
+    }
+  }
+  
+  if (com.compare(refLnk) != 0) {
     robotModel->getFrameList().idToIndex(refLnk, refLnkID);
   }
 
@@ -166,6 +172,12 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray *prhs[])
 
   std::string com("com");
   int refLnkID = -1; // if refLnk = "com"
+  
+  if (com.compare(refLnk) != 0) {
+    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "jacobian call Link ID does not exist.");
+    }
+  }
 
   if (com.compare(refLnk) != 0) {
     robotModel->getFrameList().idToIndex(refLnk, refLnkID);

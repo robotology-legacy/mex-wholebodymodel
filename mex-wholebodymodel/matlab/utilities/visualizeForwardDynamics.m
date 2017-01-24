@@ -59,22 +59,7 @@ wbm_setWorldFrame(R,p,[ 0,0,-9.81]');
 wbm_updateState(qjInit,zeros(CONFIG.ndof,1),zeros(6,1));
 
 % the list of link/joint names that are used to construct the robot in the visualizer
-L     = cell(15,1);
-L{1}  = 'root_link'   ;
-L{2}  = 'r_hip_1'     ;
-L{3}  = 'r_lower_leg' ;
-L{4}  = 'r_sole'      ;
-L{5}  = 'l_hip_1'     ;
-L{6}  = 'l_lower_leg' ;
-L{7}  = 'l_sole'      ;
-L{8}  = 'neck_1'      ;
-L{9}  = 'r_shoulder_1';
-L{10} = 'r_elbow_1'   ;
-L{11} = 'r_gripper'   ;
-L{12} = 'l_shoulder_1';
-L{13} = 'l_elbow_1'   ;
-L{14} = 'l_gripper'   ;
-L{15} = 'com'         ;
+L      = CONFIG.linkList;
 
 % RELATED TO WORLD REFERENCE FRAME ISSUE
 % since for now the world reference frame is that of the codyco_balancing_world,
