@@ -41,7 +41,7 @@ function [dchi, h, g, fc, kinEnergy] = forwardDynamics_kinEnergyTest(t, chi, par
 
     %% MexWholeBodyModel calls
     %reconstructing rotation of root to world from the quaternion
-    %[~,T_b,~,~] = wholeBodyModel('get-state');
+    %[T_b,~,~,~] = wholeBodyModel('get-state');
 
     w_R_b = quaternion2dcm(qt_b);
 

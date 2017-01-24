@@ -79,18 +79,18 @@ function [ddq_j, acc_data] = jointAccelerationsExt(obj, varargin)
     if (foot_conf.ground.left && foot_conf.ground.right)
         % error    =           current transf.   -    desired transf.
         %                      (curr. motion)          (ref. motion)
-        delta_feet = vertcat( (fk_new_veT.l_foot - fk_init_veT.l_foot), ...
+        error_feet = vertcat( (fk_new_veT.l_foot - fk_init_veT.l_foot), ...
                               (fk_new_veT.r_foot - fk_init_veT.r_foot) );
 
     elseif (~foot_conf.ground.left && foot_conf.ground.right)
-        delta_feet = fk_new_veT.r_foot - fk_init_veT.r_foot;
+        error_feet = fk_new_veT.r_foot - fk_init_veT.r_foot;
 
     elseif (foot_conf.ground.left && ~foot_conf.ground.right)
-        delta_feet = fk_new_veT.l_foot - fk_init_veT.l_foot;
+        error_feet = fk_new_veT.l_foot - fk_init_veT.l_foot;
     else
         % both feet are not onto the ground. Either the robot is
         % lifted into the air, or is jumping (or is flying ;-) ) ...
-        delta_feet = 0;
+        error_feet = 0;
     end
 
     % Calculation of the contact force vector for a closed-loop control system with additional
@@ -102,11 +102,11 @@ function [ddq_j, acc_data] = jointAccelerationsExt(obj, varargin)
     %   [2] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, pp. 269-270, eq. (6.5) & (6.6).
     Jc_t      = Jc.';
     JcMinv    = Jc / M; % x*M = Jc --> x = Jc*M^(-1)
-    Upsilon_c = JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix")
+    Upsilon_c = JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix"?)
     tau_fr    = frictionForces(obj, dq_j); % friction torques (negative torque values)
     tau_gen   = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = tau + (-tau_fr)
     % contact (constraint) forces ...
-    f_c = -(Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq - k_v.*(Jc*nu) - k_p.*delta_feet));
+    f_c = -(Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq - k_v.*(Jc*nu) - k_p.*error_feet));
 
     % Joint Acceleration q_ddot (derived from the state-space equation):
     % For further details see:
