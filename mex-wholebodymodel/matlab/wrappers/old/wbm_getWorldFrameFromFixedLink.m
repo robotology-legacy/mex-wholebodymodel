@@ -44,3 +44,4 @@ function [ world_R_base, world_p_base ] = computeNewWorldToBase(varargin)
     world_p_base = newWorld_H_base(1:3,4);
     world_R_base = newWorld_H_base(1:3,1:3);
 end
+
