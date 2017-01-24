@@ -91,7 +91,7 @@ for tCnt = 1:length(t)
     [chiDot(tCnt,:),hOut(tCnt,:),gOut(tCnt,:),~,kinEnergy(tCnt) ] = forwardDynamics_kinEnergyTest(t(tCnt,:),chi(tCnt,:)',params);
 end
 
-% Matlab R2014b and newer do not longer support the figure function under the "-nojvm" startup option.
+% Matlab R2014b and newer does not support anymore the figure function under the "-nojvm" startup option.
 % For more information, see "Changes to -nojvm Startup Option" in the MATLAB Release Notes,
 % <http://www.mathworks.com/help/matlab/release-notes.html#btsurqv-6>.
 %

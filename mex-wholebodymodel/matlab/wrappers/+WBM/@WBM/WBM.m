@@ -195,7 +195,7 @@ classdef WBM < WBM.WBMBase
             %   [2] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, pp. 269-270, eq. (6.5) & (6.6).
             Jc_t      = Jc.';
             JcMinv    = Jc / M; % x*M = Jc --> x = Jc*M^(-1)
-            Upsilon_c = JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix")
+            Upsilon_c = JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix"?)
             tau_fr    = frictionForces(obj, dq_j); % friction torques (negative torque values)
             tau_gen   = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = tau + (-tau_fr)
             % contact (constraint) forces f_c:

@@ -1,4 +1,4 @@
-function [wf_R_b, wf_p_b] = wbm_getWorldFrameFromFixedLink(varargin)
+function [wf_p_b, wf_R_b] = wbm_getWorldFrameFromFixedLink(varargin)
     % WBM_GETWORLDFRAMEFROMFIXEDLINK returns the position and the orientation of the floating base
     % w.r.t. a world frame (WF) that is intentionally set and fixed at a specified (contact) link frame.
     %
@@ -14,23 +14,23 @@ function [wf_R_b, wf_p_b] = wbm_getWorldFrameFromFixedLink(varargin)
     %                       q_j -- (nDoF x 1) joint angle vector in radian
     %
     %   OUTPUT ARGUMENTS:
-    %       wf_R_b -- (3 x 3) rotation matrix (from base to world frame)
     %       wf_p_b -- (3 x 1) position vector (from base to world frame)
+    %       wf_R_b -- (3 x 3) rotation matrix (from base to world frame)
     %
     % Author: Naveen Kuppuswamy (naveen.kuppuswamy@iit.it); Genova, Dec 2014
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
     switch nargin
         case 1
-            [wf_R_b, wf_p_b] = computeNewWorld2Base(varargin{1});
+            [wf_p_b, wf_R_b] = computeNewWorld2Base(varargin{1});
         case 2
-            [wf_R_b, wf_p_b] = computeNewWorld2Base(varargin{1}, varargin{2});
+            [wf_p_b, wf_R_b] = computeNewWorld2Base(varargin{1}, varargin{2});
         otherwise
             error('wbm_getWorldFrameFromFixedLink: %s\n', wbm_errorMsg());
     end
 end
 
 
-function [wf_R_b, wf_p_b] = computeNewWorld2Base(varargin)
+function [wf_p_b, wf_R_b] = computeNewWorld2Base(varargin)
     [ow_vqT_b,~,~,~] = wbm_getState(); % vector-quaternion transformation (from base to old world)
     [ow_p_b, ow_R_b] = frame2posrot(ow_vqT_b);
 
