@@ -2,12 +2,11 @@ function  desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG)
 %TRAJECTORYGENERATOR generates a desired CoM trajectory. The default trajectory
 %                    is a sinusoid in the Y direction.
 %
-%   desired_x_dx_ddx_CoM = GENERTRAJ(xCoMInit,t,config) takes as an input
-%   the initial CoM position, XCOMINIT, the current time T and the structure
-%   CONFIG which contains all the user-defined parameters.
-%
-%   The output DESIRED_X_DX_DDX_COM is a matrix [3x3] which contains the
-%   reference acceleration, velocity and position.
+% desired_x_dx_ddx_CoM = GENERTRAJ(xCoMInit,t,CONFIG) takes as an input
+% the initial CoM position, xCoMInit, the current time t and the structure
+% CONFIG which contains all the user-defined parameters.
+% The output desired_x_dx_ddx_CoM is a matrix [3x3] which contains the CoM
+% reference acceleration, velocity and position.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -23,6 +22,7 @@ directionOfOscillation     = [0;0;0];
 referenceParams            = [0.0 0.0];   %referenceParams(1) = amplitude of ascillations in meters
                                           %referenceParams(2) = frequency of ascillations in Hertz
 
+% NB: IF THE INTEGRATION IS PERFORMED USING ODE15S THIS PARAMETER SHOULD REMAIN ZERO                                           
 noOscillationTime          = 0;           % If params.demo_movements = 1, the variable noOscillationTime is the time, in seconds,
                                           % that the robot waits before starting the left-and-right
 
@@ -47,29 +47,35 @@ if size(t,1)==1 && size(t,2)==1
     
     if t >= noOscillationTime
     
-        Amplitude  = referenceParams(1);
+        amplitude  = referenceParams(1);
     else
-        Amplitude  = 0;
+        amplitude  = 0;
     end
 
-    xCoMDes    =  xCoMInit + Amplitude*sin(2*pi*frequency*t)*directionOfOscillation;
-    dxCoMDes   =             Amplitude*2*pi*frequency*cos(2*pi*frequency*t)*directionOfOscillation;
-    ddxCoMDes  =           - Amplitude*(2*pi*frequency)^2*sin(2*pi*frequency*t)*directionOfOscillation;
+    xCoMDes    =  xCoMInit + amplitude*sin(2*pi*frequency*t)*directionOfOscillation;
+    dxCoMDes   =             amplitude*2*pi*frequency*cos(2*pi*frequency*t)*directionOfOscillation;
+    ddxCoMDes  =           - amplitude*(2*pi*frequency)^2*sin(2*pi*frequency*t)*directionOfOscillation;
 
     desired_x_dx_ddx_CoM = [xCoMDes dxCoMDes ddxCoMDes];
 else
-    for k = 1:length(t)
-         if t(k) >= noOscillationTime
     
-            Amplitude  = referenceParams(1);
+    % in case t is a vector
+    desired_x_dx_ddx_CoM = zeros(3,3,length(t));
+
+    for k = 1:length(t)
+        if t(k) >= noOscillationTime
+    
+            amplitude  = referenceParams(1);
          else
-            Amplitude  = 0;
-         end
+            amplitude  = 0;
+        end
 
-    xCoMDes    =  xCoMInit + Amplitude*sin(2*pi*frequency*t(k))*directionOfOscillation;
-    dxCoMDes   =             Amplitude*2*pi*frequency*cos(2*pi*frequency*t(k))*directionOfOscillation;
-    ddxCoMDes  =           - Amplitude*(2*pi*frequency)^2*sin(2*pi*frequency*t(k))*directionOfOscillation;
+        xCoMDes    =  xCoMInit + amplitude*sin(2*pi*frequency*t(k))*directionOfOscillation;
+        dxCoMDes   =             amplitude*2*pi*frequency*cos(2*pi*frequency*t(k))*directionOfOscillation;
+        ddxCoMDes  =           - amplitude*(2*pi*frequency)^2*sin(2*pi*frequency*t(k))*directionOfOscillation;
 
-    desired_x_dx_ddx_CoM(:,:,k) = [xCoMDes dxCoMDes ddxCoMDes]; 
+        desired_x_dx_ddx_CoM(:,:,k) = [xCoMDes dxCoMDes ddxCoMDes]; 
     end
 end
+
+

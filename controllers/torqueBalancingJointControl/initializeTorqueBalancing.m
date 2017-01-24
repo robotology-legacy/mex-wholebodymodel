@@ -30,19 +30,18 @@ CONFIG.visualize_joints_dynamics             = 1;                          %eith
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 10;
+CONFIG.tEnd                                  = 5;
 CONFIG.sim_step                              = 0.01;
 
 %% Visualize the inverse kinematics results
-CONFIG.visualize_ikin_results                = 0;                          %either 0 or 1
+CONFIG.visualize_ikin_results                = 1;                          %either 0 or 1
 CONFIG.ikin_integration_step                 = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 % ONLY FOR DEVELOPERS
-% tolerances for pseudoinverse and QP
+% tolerances for pseudoinverse
 CONFIG.pinv_tol           = 1e-8;
 CONFIG.pinv_damp          = 5e-6;
-CONFIG.reg_HessianQP      = 1e-3;
 
 %% Forward dynamics integration setup
 % CONFIG.integrateWithFixedStep will use a Euler forward integrator instead

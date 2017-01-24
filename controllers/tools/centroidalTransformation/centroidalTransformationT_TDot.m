@@ -1,7 +1,12 @@
 function [T, dT] = centroidalTransformationT_TDot(xCoM,x_b,dxCoM,dx_b,M)
-% centroidalTransformationT_TDot
-% converts the normal floating base frame of reference to
-% the centroidal frame of reference
+%CENTROIDALTRANSFORMATIONT_TDOT converts dynamic equation parameters to the
+%                       corresponding values in centroidal frame of reference.
+%
+% [T, dT] = CENTROIDALTRANSFORMATIONT_TDOT(xCoM,x_b,dxCoM,dx_b,M)
+% takes as an input the robot forward kinematics and the mass matrix M.
+% The output are the transformation matrix T and its derivative, dT.
+
+% ------------Initialization----------------
 %% T calculation
 r       = xCoM - x_b;
 
@@ -17,7 +22,7 @@ ndof    = size(Mbj,2);
 T       = [X,Js;
            zeros(ndof,6),eye(ndof)];
 
-%% time derivative of T
+%% Time derivative of T
 dr      = dxCoM - dx_b;
 mdr     = M(1,1)*dr;
 

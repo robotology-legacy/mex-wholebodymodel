@@ -14,7 +14,7 @@ function  jointReferences = interpInverseKinematics(t,IKIN)
 %
 
 % ------------Initialization----------------
-% initial parameters
+%% initial parameters
 time       = IKIN.t;
 
 % find in the vector "time" the step which is before the current time t

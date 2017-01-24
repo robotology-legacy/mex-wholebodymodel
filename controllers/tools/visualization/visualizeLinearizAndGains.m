@@ -2,14 +2,13 @@ function figureCont = visualizeLinearizAndGains(t,CONFIG,ddqjNonLin,ddqjLin)
 %VISUALIZELINEARIZANDGAINS visualizes the results on the linearized joint space
 %                          dynamics of robot iCub.
 %
-%   figureCont = VISUALIZELINEARIZANDGAINS(t,CONFIG,ddqjNonLin,ddqjLin)
-%   takes as input the integration time T, the structure CONFIG containing all
-%   the utility parameters, the joint linear and nonlinear accelerations.
-%   It generates all the plots related to the
-%   stability analysis, it verifies the soundness of the linearization
-%   procedure and visualizes the gains matrices after optimization. The
-%   output is a counter for the automatic correction of figures numbers in
-%   case a new figure is added.
+% figureCont = VISUALIZELINEARIZANDGAINS(t,CONFIG,ddqjNonLin,ddqjLin)
+% takes as input the integration time t, the structure CONFIG containing all
+% the utility parameters, the joint linear and nonlinear accelerations.
+% It generates all the plots related to the stability analysis, it verifies 
+% the soundness of the linearization procedure and visualizes the gains 
+% matrices after optimization. The output is a counter for the automatic 
+% correction of figures numbers in case a new figure is added.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -116,7 +115,7 @@ if CONFIG.gains_tuning == 1
     ANull                 = CONFIG.linearization.ANull;
     BNull                 = CONFIG.linearization.BNull;
     KSo                   = ACartesian*CONFIG.gain.intMomentumGains*BCartesian + ANull*CONFIG.gain.impedances*BNull;
-    KDo                   = ACartesian*CONFIG.gain.MomentumGains*BCartesian + ANull*CONFIG.gain.dampings*BNull;
+    KDo                   = ACartesian*CONFIG.gain.momentumGains*BCartesian + ANull*CONFIG.gain.dampings*BNull;
     KSdes                 = CONFIG.gainsInit.KSdes;
     KDdes                 = CONFIG.gainsInit.KDdes;
     KSn                   = CONFIG.linearization.KS;

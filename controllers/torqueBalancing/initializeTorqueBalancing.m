@@ -31,7 +31,7 @@ CONFIG.visualize_joints_dynamics             = 1;                          %eith
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 10;
+CONFIG.tEnd                                  = 5;
 CONFIG.sim_step                              = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%

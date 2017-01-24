@@ -18,51 +18,28 @@ close  all
 clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation
-CONFIG.demo_movements                        = 1;                          %either 0 or 1
+CONFIG.demo_movements                        = 0;                          %either 0 or 1
 CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left foot,right foot]
-
-%% QP solver and gains tuning procedure
-CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
-CONFIG.gains_tuning                          = 1;                          %either 0 or 1
+CONFIG.use_QPsolver                          = 0;                          %either 0 or 1
 
 %% Visualization setup
 % robot simulator
-CONFIG.visualize_robot_simulator             = 1;                          %either 0 or 1
+CONFIG.visualize_robot_simulator             = 0;                          %either 0 or 1
 % forward dynamics integration results
 CONFIG.visualize_integration_results         = 1;                          %either 0 or 1
 CONFIG.visualize_joints_dynamics             = 1;                          %either 0 or 1
-% linearization and gains tuning
-CONFIG.visualize_gains_tuning_results        = 1;                          %either 0 or 1; available only if gains_tuning = 1
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
 CONFIG.tEnd                                  = 10;
 CONFIG.sim_step                              = 0.01;
 
-%% Generate the joint references with the inverse kinematics solver
-CONFIG.jointRef_with_ikin                    = 1;                          %either 0 or 1
-CONFIG.visualize_ikin_results                = 1;                          %either 0 or 1
-CONFIG.ikin_integration_step                 = 0.01;
-
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 % ONLY FOR DEVELOPERS
 % tolerances for pseudoinverse and QP
-CONFIG.pinv_tol            = 1e-8;
-CONFIG.pinv_damp           = 5e-6;
-CONFIG.reg_HessianQP       = 1e-3;
-
-%% Verify the joint space linearization; stability analysis procedure
-% run the simulation with CONFIG.linearizationDebug = 1 to verify that the
-% joint space linearization is performed properly, and to check the
-% controlled system's stability
-CONFIG.linearizationDebug  = 1;                                            %either 0 or 1
-
-% enter in debug mode
-if CONFIG.linearizationDebug == 1
-    
-    CONFIG.demo_movements  = 0;
-    CONFIG.use_QPsolver    = 0;
-end
+CONFIG.pinv_tol           = 1e-8;
+CONFIG.pinv_damp          = 5e-6;
+CONFIG.reg_HessianQP      = 1e-3;
 
 %% Forward dynamics integration setup
 % CONFIG.integrateWithFixedStep will use a Euler forward integrator instead
@@ -96,7 +73,7 @@ plot_set
 CONFIG.figureCont = 1;
 
 %% Initialize the robot model
-wbm_modelInitialise('icubGazeboSim');
+wbm_modelInitialise('bigman');
 CONFIG.ndof = 25;
 
 %% Initial joints position [deg]
@@ -133,11 +110,9 @@ codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
 utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/tools'];
 robot_root   = [utility_root, filesep, '/robotFunctions'];
 plots_root   = [utility_root, filesep, '/visualization'];
-gains_root   = [utility_root, filesep, '/linearizationAndGainTuning'];
-ikin_root    = [utility_root, filesep, '/inverseKinematics'];
-src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingGainTuning/src'];
-config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingGainTuning/config'];
-init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingGainTuning/init'];
+src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing/src'];
+config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing/config'];
+init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing/init'];
 
 % add the paths
 addpath(utility_root);
@@ -146,8 +121,6 @@ addpath(plots_root);
 addpath(src_root);
 addpath(config_root);
 addpath(init_root);
-addpath(gains_root);
-addpath(ikin_root);
 
 %% INITIALIZATION
 % initialize the forward dynamics

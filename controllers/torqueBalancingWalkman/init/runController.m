@@ -47,9 +47,9 @@ controlParam           = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,F
 
 if  use_QPsolver == 1
     
-    CONFIG.footSize    = [-0.07 0.07;       % xMin, xMax
-                          -0.03 0.03];      % yMin, yMax
-                      
+    CONFIG.footSize    = [-0.16 0.16;       % xMin, xMax
+                          -0.075 0.075];    % yMin, yMax
+                
     % quadratic programming solver for the nullspace of contact forces
     controlParam.fcDes = QPSolver(controlParam,CONFIG,FORKINEMATICS);
 end

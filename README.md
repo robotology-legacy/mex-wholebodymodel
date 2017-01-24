@@ -17,18 +17,16 @@ a rigid body is available at [examples/rigidBodyDynamics.m](examples/rigidBodyDy
 
 ## Controllers
 In [controllers](controllers/) the user can find different
-simulations of whole-body controller implemented using the mex-wholebodymodel interface. The official controller version is
-in the folder [controllers/torqueBalancing](controllers/torqueBalancing/), while in the folder
-[controllers/experiments](controllers/experiments/) other balancing controllers are implemented. 
-All the utility functions for control are in [controllers/utilitiesForTorqueBalancing](controllers/utilitiesForTorqueBalancing/).
+simulations of whole-body controller implemented using the mex-wholebodymodel interface. The "official" version is
+in the folder [controllers/torqueBalancing](controllers/torqueBalancing/), but also other balancing controllers are available. 
+All the utility functions for control are in [controllers/tools](controllers/tools/).
 For more informations about the balancing controller check the relative [README](controllers/torqueBalancing/).
 
 ## Mex-wholebodymodel
 This folder contains all the matlab and C++ utilities used for tests and controllers.
 
 ## Tests
-To verify regression in the code when the user modifies it, some
-regression tests have been implemented in this repository.
+To verify regression in the code when the user modifies it, some regression tests have been implemented in this repository.
 
 ### Run tests
 Tests use `ctest` infrastructure.

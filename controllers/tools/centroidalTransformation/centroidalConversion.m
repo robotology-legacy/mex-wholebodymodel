@@ -3,22 +3,22 @@ function centroidalDyn = centroidalConversion(DYNAMICS,FORKINEMATICS,STATE)
 %                     system, i.e. the base dynamics now coincides with the
 %                     CoM dynamics.
 %
-%           centroidal = CENTROIDALCONVERSION(dynamics,forKinematics,state)
-%           takes as an input the structures containing the robot dynamics,
-%           forward kinematics and state.
-%           The output is the structure CENTROIDALDYN which contains the robot
-%           dynamics converted into the centroidal coordinates.
+% centroidalDyn = CENTROIDALCONVERSION(DYNAMICS,FORKINEMATICS,STATE)
+% takes as an input the structures containing the robot dynamics,
+% forward kinematics and state.
+% The output is the structure CENTROIDALDYN which contains the robot
+% dynamics converted into the centroidal coordinates.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 
 % ------------Initialization----------------
 %% Dynamics
-M       = DYNAMICS.M;
-h       = DYNAMICS.h;
-g       = DYNAMICS.g;
-Jc      = DYNAMICS.Jc;
-dJc_nu  = DYNAMICS.dJc_nu;
+M        = DYNAMICS.M;
+h        = DYNAMICS.h;
+g        = DYNAMICS.g;
+Jc       = DYNAMICS.Jc;
+dJc_nu   = DYNAMICS.dJc_nu;
 
 %% Forward kinematics
 xCoM     = FORKINEMATICS.xCoM;
