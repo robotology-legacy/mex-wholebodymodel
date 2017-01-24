@@ -1,7 +1,8 @@
 function [ Cqv ] = wbm_generalisedBiasForces(varargin)
     % WBM_GENERALISEDBIASFORCES computes the generalised bias forces in the
-    %   dynamics - which are functions of the joint angles qj, the joint velocities qDot
-    %   and the floating base velocity vxb
+    % dynamics - which are functions of the joint angles qj, the joint velocities qDot
+    % and the floating base velocity vxb
+    %
     %   Arguments :
     %       Optimised Mode : No arguments
     %       Normal Mode : R - rotation from rootLink to world frame (3 x 3)

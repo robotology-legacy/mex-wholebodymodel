@@ -1,6 +1,6 @@
-function [wf_p_b, wf_R_b] = wbm_getWorldFrameFromFixedLink(varargin)
-    % WBM_GETWORLDFRAMEFROMFIXEDLINK returns the position and the orientation of the floating base
-    % w.r.t. a world frame (WF) that is intentionally set and fixed at a specified (contact) link frame.
+function [wf_p_b, wf_R_b] = wbm_getWorldFrameFromFixLnk(varargin)
+    % WBM_GETWORLDFRAMEFROMFIXLNK returns the position and the orientation of the floating base w.r.t.
+    % a world frame (WF) that is intentionally set and fixed at a specified (contact) link frame.
     %
     % The returned floating base position and orientation is obtained from the forward kinematics
     % w.r.t. the specified fixed link frame.
@@ -25,7 +25,7 @@ function [wf_p_b, wf_R_b] = wbm_getWorldFrameFromFixedLink(varargin)
         case 2
             [wf_p_b, wf_R_b] = computeNewWorld2Base(varargin{1}, varargin{2});
         otherwise
-            error('wbm_getWorldFrameFromFixedLink: %s\n', wbm_errorMsg());
+            error('wbm_getWorldFrameFromFixLnk: %s\n', wbm_errorMsg());
     end
 end
 

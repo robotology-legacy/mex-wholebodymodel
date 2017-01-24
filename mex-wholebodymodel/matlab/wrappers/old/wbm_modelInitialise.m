@@ -1,5 +1,6 @@
 function [] = wbm_modelInitialise(varargin)
     % WMB_MODELINITIALISE initialises the whole body model
+    %
     %   Arguments :
     %       Optimised Mode : No arguments
     %       Normal Mode :  robot-name as a string (URDF must exist in the whole body

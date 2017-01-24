@@ -32,7 +32,7 @@ params.dx_bInit = zeros(3,1);
 params.omega_bInit = zeros(3,1);
 params.dampingCoeff = 0.00;
 
-[pos,rot] = wbm_getWorldFrameFromFixedLink('l_sole',params.qjInit);
+[pos,rot] = wbm_getWorldFrameFromFixLnk('l_sole',params.qjInit);
 % fprintf('Converting to a set world frame... \n');
 wbm_setWorldFrame(rot,pos,[ 0,0,-9.81]');
 
