@@ -98,6 +98,15 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray **prhs)
   qj     = mxGetPr(prhs[3]);
   refLnk = mxArrayToString(prhs[4]);
 
+  std::string strCom("com");
+  int refLnkID = -1; // if refLnk = "com"
+
+  if (strCom.compare(refLnk) != 0) {
+    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "forwardKinematics call: Link ID does not exist.");
+    }
+  }
+
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
@@ -111,15 +120,6 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray **prhs)
   wbi::Rotation rot3d(R_rmo);
 
   wf_H_b = wbi::Frame(rot3d, ppos);
-
-  std::string com("com");
-  int refLnkID = -1; // if refLnk = "com"
-
-  if (com.compare(refLnk) != 0) {
-    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "forwardKinematics call Link ID does not exist.");
-    }
-  }
 
   double vxT_lnk[7]; // vector axis-angle transformation (from ref. link to world frame)
   if ( !(robotModel->forwardKinematics(qj, wf_H_b, refLnkID, vxT_lnk)) ) {
@@ -170,12 +170,12 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray **prhs)
   qj     = modelState->qj();
   refLnk = mxArrayToString(prhs[1]);
 
-  std::string com("com");
+  std::string strCom("com");
   int refLnkID = -1; // if refLnk = "com"
 
-  if (com.compare(refLnk) != 0) {
+  if (strCom.compare(refLnk) != 0) {
     if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "forwardKinematics call Link ID does not exist.");
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "forwardKinematics call: Link ID does not exist.");
     }
   }
 
