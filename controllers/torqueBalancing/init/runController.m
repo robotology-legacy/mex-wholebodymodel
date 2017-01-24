@@ -45,11 +45,7 @@ deltaPoseLFoot        = TL*(poseLFoot_ang-initForKinematics.poseLFoot_ang);
 %% BALANCING CONTROLLER: the current version uses a stack of task approach
 controlParam           = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE);
 
-if  use_QPsolver == 1
-    
-    CONFIG.footSize    = [-0.07 0.07;       % xMin, xMax
-                          -0.03 0.03];      % yMin, yMax
-                      
+if  use_QPsolver == 1                 
     % quadratic programming solver for the nullspace of contact forces
     controlParam.fcDes = QPSolver(controlParam,CONFIG,FORKINEMATICS);
 end

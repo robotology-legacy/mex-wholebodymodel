@@ -42,15 +42,15 @@ wbm_updateState(qjInit,dqjInit,[dx_bInit;w_omega_bInit]);
 % fixing the world reference frame w.r.t. the foot on ground position
 if  feet_on_ground(1) == 1
     
-    [w_R_bInit,x_bInit] = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
+    [x_bInit,w_R_bInit] = wbm_getWorldFrameFromFixLnk('l_sole',qjInit);
 else
-    [w_R_bInit,x_bInit] = wbm_getWorldFrameFromFixedLink('r_sole',qjInit);
+    [x_bInit,w_R_bInit] = wbm_getWorldFrameFromFixLnk('r_sole',qjInit);
 end
 
 wbm_setWorldFrame(w_R_bInit,x_bInit,[0 0 -9.81]')
 
 % initial state (floating base + joints)
-[~,basePoseInit,~,~]          = wbm_getState();
+[basePoseInit,~,~,~]          = wbm_getState();
 chiInit                       = [basePoseInit; qjInit; dx_bInit; w_omega_bInit; dqjInit];
 
 %% Initial gains
@@ -86,15 +86,15 @@ if CONFIG.linearizationDebug == 1
     % fixing the world reference frame w.r.t. the foot on ground position
     if  feet_on_ground(1) == 1
     
-        [w_R_bInit,x_bInit] = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
+        [x_bInit,w_R_bInit] = wbm_getWorldFrameFromFixLnk('l_sole',qjInit);
     else
-        [w_R_bInit,x_bInit] = wbm_getWorldFrameFromFixedLink('r_sole',qjInit);
+        [x_bInit,w_R_bInit] = wbm_getWorldFrameFromFixLnk('r_sole',qjInit);
     end
     
     wbm_setWorldFrame(w_R_bInit,x_bInit,[0 0 -9.81]')
     
-   [~,basePoseInit,~,~]          = wbm_getState();
-   chiInit                       = [basePoseInit; qjInit; dx_bInit; w_omega_bInit; dqjInit];
+    [basePoseInit,~,~,~]         = wbm_getState();
+    chiInit                      = [basePoseInit; qjInit; dx_bInit; w_omega_bInit; dqjInit];
 
     CONFIG.initState             = robotState(chiInit,CONFIG);
     CONFIG.initDynamics          = robotDynamics(CONFIG.initState,CONFIG);

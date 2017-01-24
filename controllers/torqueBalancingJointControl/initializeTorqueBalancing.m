@@ -46,7 +46,7 @@ CONFIG.pinv_damp          = 5e-6;
 %% Forward dynamics integration setup
 % CONFIG.integrateWithFixedStep will use a Euler forward integrator instead
 % of ODE15s to integrate the forward dynamics. It may be useful for debug.
-CONFIG.integrateWithFixedStep    = 0;                                      %either 0 or 1
+CONFIG.integrateWithFixedStep = 0;                                         %either 0 or 1
 
 % The fixed step integration needs a desingularization of system mass matrix
 % in order to converge to a solution
@@ -75,7 +75,7 @@ plot_set
 CONFIG.figureCont = 1;
 
 %% Initialize the robot model
-wbm_modelInitialise('icubGazeboSim');
+wbm_modelInitialize('icubGazeboSim');
 CONFIG.ndof = 25;
 
 %% Initial joints position [deg]
@@ -102,6 +102,9 @@ elseif CONFIG.feet_on_ground(1) == 0 && CONFIG.feet_on_ground(2) == 1
     rightLegInit = [  25.5   15   0  -18.5  -5.5  0]';
 end
 
+% feet size
+CONFIG.footSize  = [-0.07 0.07;       % xMin, xMax
+                    -0.03 0.03];      % yMin, yMax
 % joints configuration [rad]
 CONFIG.qjInit = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
 

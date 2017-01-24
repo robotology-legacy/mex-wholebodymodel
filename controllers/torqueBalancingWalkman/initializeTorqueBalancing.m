@@ -18,7 +18,7 @@ close  all
 clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation
-CONFIG.demo_movements                        = 0;                          %either 0 or 1
+CONFIG.demo_movements                        = 1;                          %either 0 or 1
 CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left foot,right foot]
 CONFIG.use_QPsolver                          = 0;                          %either 0 or 1
 
@@ -31,7 +31,7 @@ CONFIG.visualize_joints_dynamics             = 1;                          %eith
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 10;
+CONFIG.tEnd                                  = 5;
 CONFIG.sim_step                              = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -44,7 +44,7 @@ CONFIG.reg_HessianQP      = 1e-3;
 %% Forward dynamics integration setup
 % CONFIG.integrateWithFixedStep will use a Euler forward integrator instead
 % of ODE15s to integrate the forward dynamics. It may be useful for debug.
-CONFIG.integrateWithFixedStep    = 0;                                      %either 0 or 1
+CONFIG.integrateWithFixedStep = 0;                                         %either 0 or 1
 
 % The fixed step integration needs a desingularization of system mass matrix
 % in order to converge to a solution
@@ -73,7 +73,7 @@ plot_set
 CONFIG.figureCont = 1;
 
 %% Initialize the robot model
-wbm_modelInitialise('bigman');
+wbm_modelInitialize('bigman');
 CONFIG.ndof = 25;
 
 %% Initial joints position [deg]
@@ -100,8 +100,11 @@ elseif CONFIG.feet_on_ground(1) == 0 && CONFIG.feet_on_ground(2) == 1
     rightLegInit = [  25.5   15   0  -18.5  -5.5  0]';
 end
 
+% feet size
+CONFIG.footSize  = [-0.16 0.16;       % xMin, xMax
+                    -0.075 0.075];    % yMin, yMax
 % joints configuration [rad]
-CONFIG.qjInit = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
+CONFIG.qjInit    = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
 
 %% Paths definition and initialize the forward dynamics integration
 % add the required paths. This procedure will make the paths consistent for

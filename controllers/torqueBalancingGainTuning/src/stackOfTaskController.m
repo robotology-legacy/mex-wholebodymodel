@@ -22,7 +22,6 @@ function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FO
 % ------------Initialization----------------
 %% Config parameters
 pinv_tol            = CONFIG.pinv_tol;
-pinv_damp           = CONFIG.pinv_damp;
 feet_on_ground      = CONFIG.feet_on_ground;
 ndof                = CONFIG.ndof;
 

@@ -17,9 +17,7 @@ function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
 waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 %% Robot Configuration
-ndof                  = CONFIG.ndof;
 gain                  = CONFIG.gainsInit;
-qjInit                = CONFIG.qjInit;
 
 % CoM initial position
 CONFIG.xCoMRef        = CONFIG.initForKinematics.xCoM;

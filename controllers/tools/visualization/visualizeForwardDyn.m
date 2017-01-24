@@ -132,7 +132,7 @@ if sum(CONFIG.feet_on_ground) == 2
     title('Left foot CoP')
     xlabel('Y direction [m]')
     ylabel('X direction [m]')
-    axis([-0.1 0.1 -0.1 0.1])
+    axis([CoP(1,1)+CONFIG.footSize(2,1) CoP(1,1)+CONFIG.footSize(2,2) CoP(2,1)+CONFIG.footSize(1,1) CoP(2,1)+CONFIG.footSize(1,2)])
     
     figure(figureCont)
     subplot(1,2,2)
@@ -144,7 +144,7 @@ if sum(CONFIG.feet_on_ground) == 2
     title('Right foot CoP')
     xlabel('Y direction [m]')
     ylabel('X direction [m]')
-    axis([-0.1 0.1 -0.1 0.1])
+    axis([CoP(3,1)+CONFIG.footSize(2,1) CoP(3,1)+CONFIG.footSize(2,2) CoP(4,1)+CONFIG.footSize(1,1) CoP(4,1)+CONFIG.footSize(1,2)])
     
 else
     figure(figureCont)
@@ -156,7 +156,7 @@ else
     title('Foot CoP')
     xlabel('Y direction [m]')
     ylabel('X direction [m]')
-    axis([-0.1 0.1 -0.1 0.1])
+    axis([CoP(1,1)+CONFIG.footSize(2,1) CoP(1,1)+CONFIG.footSize(2,2) CoP(2,1)+CONFIG.footSize(1,1) CoP(2,1)+CONFIG.footSize(1,2)])
     
 end
 

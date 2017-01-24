@@ -34,8 +34,8 @@ M                                = wbm_massMatrix(w_R_b,x_b,qj);
 M(7:end,7:end)                   = M(7:end,7:end) + massCorr.*eye(ndof);
 
 % generalized bias forces, Coriolis and gravity
-h                                = wbm_generalisedBiasForces(w_R_b,x_b,qj,dqj,[dx_b;w_omega_b]);
-g                                = wbm_generalisedBiasForces(w_R_b,x_b,qj,zeros(ndof,1),zeros(6,1));
+h                                = wbm_generalizedBiasForces(w_R_b,x_b,qj,dqj,[dx_b;w_omega_b]);
+g                                = wbm_generalizedBiasForces(w_R_b,x_b,qj,zeros(ndof,1),zeros(6,1));
 C_nu                             = h-g;
 
 % centroidal momentum
@@ -43,14 +43,14 @@ H                                = wbm_centroidalMomentum(w_R_b,x_b,qj,dqj,[dx_b
 
 % Jacobians and dJ_nu
 JCoM                             = wbm_jacobian(w_R_b,x_b,qj,'com');
-dJCoM_nu                         = wbm_djdq(w_R_b,x_b,qj,dqj,[dx_b;w_omega_b],'com');
+dJCoM_nu                         = wbm_dJdq(w_R_b,x_b,qj,dqj,[dx_b;w_omega_b],'com');
 Jc                               = zeros(6*CONFIG.numConstraints,6+ndof);
 dJc_nu                           = zeros(6*CONFIG.numConstraints,1);
 
 for i=1:CONFIG.numConstraints
     
     Jc(6*(i-1)+1:6*i,:)          = wbm_jacobian(w_R_b,x_b,qj,CONFIG.constraintLinkNames{i});
-    dJc_nu(6*(i-1)+1:6*i,:)      = wbm_djdq(w_R_b,x_b,qj,dqj,[dx_b;w_omega_b],CONFIG.constraintLinkNames{i});
+    dJc_nu(6*(i-1)+1:6*i,:)      = wbm_dJdq(w_R_b,x_b,qj,dqj,[dx_b;w_omega_b],CONFIG.constraintLinkNames{i});
 end
 
 % centroidal momentum Jacobian

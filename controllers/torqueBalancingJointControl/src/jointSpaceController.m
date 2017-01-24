@@ -30,8 +30,8 @@ M                = DYNAMICS.M;
 Jc               = DYNAMICS.Jc;
 dqj              = DYNAMICS.nu(7:end);
 g                = DYNAMICS.g;
-C_nu              = DYNAMICS.C_nu;
-dJc_nu            = DYNAMICS.dJc_nu;
+C_nu             = DYNAMICS.C_nu;
+dJc_nu           = DYNAMICS.dJc_nu;
 Mj               = M(7:end,7:end);
 
 %% Gains and references

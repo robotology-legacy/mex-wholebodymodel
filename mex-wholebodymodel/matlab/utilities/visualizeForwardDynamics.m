@@ -53,7 +53,7 @@ else
     [~,qjInit,~,~]   = stateDemux([xout(1,:)';zeros(6+ndof,1)],CONFIG);
 end
 
-[R,p]            = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
+[p,R]                = wbm_getWorldFrameFromFixLnk('l_sole',qjInit);
 
 wbm_setWorldFrame(R,p,[ 0,0,-9.81]');
 wbm_updateState(qjInit,zeros(CONFIG.ndof,1),zeros(6,1));

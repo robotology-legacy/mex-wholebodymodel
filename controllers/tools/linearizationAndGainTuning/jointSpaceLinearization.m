@@ -26,14 +26,14 @@ pinv_damp          = CONFIG.pinv_damp;
 %% Initialize the robot configuration
 if  feet_on_ground(1) == 1
     
-    [w_R_b,x_b] = wbm_getWorldFrameFromFixedLink('l_sole',qjConfig);
+    [x_b,w_R_b] = wbm_getWorldFrameFromFixLnk('l_sole',qjConfig);
 else
-    [w_R_b,x_b] = wbm_getWorldFrameFromFixedLink('r_sole',qjConfig);
+    [x_b,w_R_b] = wbm_getWorldFrameFromFixLnk('r_sole',qjConfig);
 end
 
 wbm_setWorldFrame(w_R_b,x_b,[0 0 -9.81]')
 
-[~,basePose,~,~]   = wbm_getState();
+[basePose,~,~,~]   = wbm_getState();
 chi                = [basePose; qjConfig; zeros(6,1); zeros(ndof,1)];
 
 % robot state, dynamics and forward kinematics
