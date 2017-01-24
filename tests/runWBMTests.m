@@ -15,11 +15,11 @@ try
     % for example by checking a condition with an assert
     WBMTests
 catch ME
-    disp(getReport(ME,'extended'));
+    disp(getReport(ME, 'extended'));
     warning('mex-wholebodymodel matlab tests failed. Exiting matlab.');
     exit(1)
 end
 
 % if we arrive at this point all test went well
-disp('mex-wholebodymodel tests: all test completed successfully!')
+disp('mex-wholebodymodel tests: all tests completed successfully!')
 exit(0)

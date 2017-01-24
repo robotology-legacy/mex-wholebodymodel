@@ -1,0 +1,118 @@
+Legend of abbreviations and acronyms which are used for the variable names:
+
+    H         ...  homogeneous transformation (matrix)
+    R         ...  rotation (matrix)
+    T         ...  transformation (matrix)
+    adj       ...  adjacency (matrix)
+    arr       ...  array
+    atf       ...  arms and torso free
+    b         ...  base
+    bf        ...  base frame
+    bgn       ...  begin
+    c...      ...  cell array
+    cfrict    ...  Coulomb friction
+    chn       ...  chain
+    chnt      ...  chain tree
+    cmo       ...  column major order
+    cols      ...  columns
+    config    ...  configuration
+    cstr      ...  constraint
+    ctrl      ...  control
+    d...      ...  derivative (dot) of a variable, like dv of v (= v_dot), etc.
+    df, dflt  ...  default
+    dp        ...  data point
+    ds        ...  dimensions
+    dstv      ...  derivative of state vector
+    fb        ...  floating base
+    fcn       ...  function
+    fh...     ...  function handle OR file handle
+    fix       ...  fixed
+    fk        ...  forward kinematic(s)
+    flt, fltg ...  floating
+    fltb      ...  floating base
+    frict     ...  friction
+    fwnd      ...  figure window
+    g         ...  gravity acceleration (vector)
+    h...      ...  "handle" to an object, e.g. hFig = handle to the figure object
+    h_c       ...  centroidal momentum (vector)
+    hgt       ...  height
+    idx       ...  index(es)
+    jlim, jl  ...  joint limit(s)
+    jnt       ...  joint
+    jpos      ...  joint position(s)
+    ker       ...  kernel (null space)
+    len       ...  length
+    ll        ...  lower limit(s)
+    lmts      ...  limits
+    ln        ...  line
+    lnk       ...  link
+    lnkfr     ...  link frame (frame to a specified link in the current joint of the robot)
+    lwr       ...  lower
+    m...      ...  "member", 'm' declares that this variable is a private member variable, e.g. "mwbm", "mstv", etc.
+    mult      ...  multiplier(s)
+    ndof      ...  number degrees of freedom
+    noi       ...  number of iterations OR number of integrations
+    nw        ...  new world
+    o         ...  orthogonal
+    ofs       ...  offset(s)
+    on        ...  orthonormal
+    onb       ...  orthonormal basis
+    op        ...  operator
+    or        ...  orientation
+    ow        ...  old world
+    p         ...  position OR translation (vector)
+    params    ...  parameters
+    pl        ...  payload
+    plds      ...  payloads
+    pos       ...  position(s)
+    pris      ...  prismatic
+    prop      ...  propert(y/ies)
+    pt        ...  point
+    q_j       ...  joint angle(s)
+    qt, q     ...  quaternion
+    quat      ...  quaternion
+    r         ...  root
+    rax       ...  rotation axis
+    ref       ...  reference
+    resv      ...  result vector (boolean)
+    rev       ...  revolute
+    ridx      ...  row index(es)
+    rlnk      ...  root link OR reference link
+    rmo       ...  row major order
+    rpts      ...  repeats
+    sc        ...  scalar OR scaled
+    scn       ...  scene
+    sf        ...  scale factor(s)
+    shp       ...  shape
+    st        ...  state
+    stm       ...  state matrix
+    stp       ...  state parameter(s)
+    str       ...  string
+    stv       ...  state vector
+    stvqT     ...  state vector-quaternion transformation [VQS-Transformation of the current state vector] (vector) (*)
+    sz        ...  size(s)
+    tr        ...  translation(s) OR trace
+    trans     ...  translation(s)
+    trq       ...  torque
+    trqs      ...  torques
+    tt        ...  tool-tip
+    ul        ...  upper limit(s)
+    upr       ...  upper
+    v         ...  vector
+    veT       ...  vector Euler-angle transformation [translation with Euler angles] (vector)
+    vel       ...  velocit(y/ies)
+    vfrict    ...  viscous friction
+    vpos      ...  vector position [translation] (vector)
+    vqT       ...  vector-quaternion transformation [VQS-Transformation] (vector) (*)
+    vtr       ...  vector translation (vector)
+    vtx       ...  vert(ex/ices)
+    vxT       ...  vector axis-angle transformation [translation with axis angles] (vector)
+    w         ...  world
+    wbm       ...  whole body model
+    wf, WF    ...  world frame
+    wf_T_b    ...  transformation FROM the 'base' TO the 'world frame'
+    wid       ...  width
+
+
+
+(*) ... Without scale factor S. This is the same as if scale S = 1.

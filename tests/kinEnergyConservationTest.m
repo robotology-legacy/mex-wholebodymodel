@@ -1,13 +1,13 @@
-function [] = kinEnergyConservationTest( params )
+function kinEnergyConservationTest(params)
 rng(0)
 clear wholeBodyModel;
 
 %% initialise mexWholeBodyModel
 if( params.isURDF )
-    wbm_modelInitialiseFromURDF(params.urdfFilePath);
+    wbm_modelInitializeFromURDF(params.urdfFilePath);
     robotDisplayName = params.urdfFilePath;
 else
-    wbm_modelInitialise(params.yarpRobotName);
+    wbm_modelInitialize(params.yarpRobotName);
     robotDisplayName = params.yarpRobotName;
 end
 
@@ -39,7 +39,7 @@ disp(params.dqjInit');
 wbm_setWorldFrame(eye(3),[0 0 0]',[0 0 0]');
 wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit]);
 
-[qj,T_bInit,dqj,vb] = wbm_getState();
+[T_bInit,qj,vb,dqj] = wbm_getState();
 [Ptemp,Rtemp]       = frame2posrot(T_bInit);
 params.chiInit      = [T_bInit;params.qjInit;...
                        params.dx_bInit;params.omega_bInit;params.dqjInit];
@@ -91,15 +91,19 @@ for tCnt = 1:length(t)
     [chiDot(tCnt,:),hOut(tCnt,:),gOut(tCnt,:),~,kinEnergy(tCnt) ] = forwardDynamics_kinEnergyTest(t(tCnt,:),chi(tCnt,:)',params);
 end
 
-if( params.plot )
-    figure
-    plot(t,kinEnergy,'b');
-    hold on;
-    %plot(t,kinEnergy2,'r');
-    xlabel('Time t(sec)');
-    ylabel(' (J)');
-    title(['Kinetic Energy for ',robotDisplayName]);
-end
+% Matlab R2014b and newer does not support anymore the figure function under the "-nojvm" startup option.
+% For more information, see "Changes to -nojvm Startup Option" in the MATLAB Release Notes,
+% <http://www.mathworks.com/help/matlab/release-notes.html#btsurqv-6>.
+%
+% if( params.plot )
+%     figure
+%     plot(t,kinEnergy,'b');
+%     hold on;
+%     %plot(t,kinEnergy2,'r');
+%     xlabel('Time t(sec)');
+%     ylabel(' (J)');
+%     title(['Kinetic Energy for ',robotDisplayName]);
+% end
 
 kinEnergyMaxErrRel = max(abs(kinEnergy-kinEnergy(1)))/kinEnergy(1);
 

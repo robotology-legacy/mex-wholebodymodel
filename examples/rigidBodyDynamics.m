@@ -11,7 +11,7 @@ close all;
 %% The function is searching the file in the current working
 %% directory, so make sure that you are launching the script
 %% in the directory where rigidBody.urdf is found
-wbm_modelInitialiseFromURDF('rigidBody.urdf');
+wbm_modelInitializeFromURDF('rigidBody.urdf');
 
 %% the number of (internal) dofs is 0 for a rigid body
 %% we set the state to some random values, just to show how to
@@ -32,7 +32,7 @@ wbm_updateState(qj,dqj,[dx_b;omega_W]);
 M = wbm_massMatrix();
 
 % and the generalized bias forces (coriolis + gravity forces)
-h = wbm_generalisedBiasForces();
+h = wbm_generalizedBiasForces();
 
 % We can check them by printing them:
 disp(M)
@@ -49,4 +49,3 @@ world_T_frame = wbm_forwardKinematics('root_link');
 % and the last 4 elements are the quaternion corresponding to the rotation between the frame and the world frame
 % for more info, check wbm_forwardKinematics options
 disp(world_T_frame)
-
