@@ -108,21 +108,21 @@ CONFIG.qjInit    = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]
 
 % list of joints/links used for robot simulator
 CONFIG.linkList     = cell(15,1);
-CONFIG.linkList{1}  = 'Waist'  ;
+CONFIG.linkList{1}  = 'Waist';
 CONFIG.linkList{2}  = 'RHipMot';
-CONFIG.linkList{3}  = 'RThighLowLeg' ;
-CONFIG.linkList{4}  = 'r_sole'      ;
-CONFIG.linkList{5}  = 'LHipMot'     ;
-CONFIG.linkList{6}  = 'LThighLowLeg' ;
-CONFIG.linkList{7}  = 'l_sole'      ;
-CONFIG.linkList{8}  = 'neck_1'      ;
-CONFIG.linkList{9}  = 'r_shoulder_1';
-CONFIG.linkList{10} = 'r_elbow_1'   ;
-CONFIG.linkList{11} = 'r_gripper'   ;
-CONFIG.linkList{12} = 'l_shoulder_1';
-CONFIG.linkList{13} = 'l_elbow_1'   ;
-CONFIG.linkList{14} = 'l_gripper'   ;
-CONFIG.linkList{15} = 'com'         ;
+CONFIG.linkList{3}  = 'RLowLeg';
+CONFIG.linkList{4}  = 'r_sole';
+CONFIG.linkList{5}  = 'LHipMot';
+CONFIG.linkList{6}  = 'LLowLeg';
+CONFIG.linkList{7}  = 'l_sole';
+CONFIG.linkList{8}  = 'DWYTorso';
+CONFIG.linkList{9}  = 'RShp';
+CONFIG.linkList{10} = 'RElb';
+CONFIG.linkList{11} = 'l_hand_upper_right_link';
+CONFIG.linkList{12} = 'LShp';
+CONFIG.linkList{13} = 'LElb';
+CONFIG.linkList{14} = 'l_hand_upper_left_link';
+CONFIG.linkList{15} = 'com';
 
 %% Paths definition and initialize the forward dynamics integration
 % add the required paths. This procedure will make the paths consistent for

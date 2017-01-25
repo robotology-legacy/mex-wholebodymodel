@@ -18,7 +18,23 @@ and this project does not adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.1] - 2014-11-15
 ### Added
-- First version of mex-wholebodymodel, compatible with wholebodyinterface v0.1 . 
+- First version of mex-wholebodymodel, compatible with wholebodyinterface v0.1. 
 
 [Unreleased]: https://github.com/robotology/mex-wholebodymodel/compare/v0.1...HEAD
 [0.1]: https://github.com/robotology/mex-wholebodymodel/compare/9fe87c...v0.1
+
+## [0.2] - 2017-01-25
+### Added
+- New version of mex-wholebodymodel. A complete refactory of the toolbox has been done.
+
+[0.1]: https://github.com/robotology/mex-wholebodymodel/compare/v0.1...HEAD
+[0.2]: https://github.com/robotology/mex-wholebodymodel/compare/9fe87c...v0.1
+
+### Renamed
+- The following WBM-wrappers have been renamed: 
+- The output of the following functions changed order:
+
+### Moved
+- The controllers have been refactored and moved on a different branch, called `WBM-controllers`; 
+
+
