@@ -106,24 +106,6 @@ CONFIG.footSize  = [-0.16 0.16;       % xMin, xMax
 % joints configuration [rad]
 CONFIG.qjInit    = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
 
-% list of joints/links used for robot simulator
-CONFIG.linkList     = cell(15,1);
-CONFIG.linkList{1}  = 'Waist';
-CONFIG.linkList{2}  = 'RHipMot';
-CONFIG.linkList{3}  = 'RLowLeg';
-CONFIG.linkList{4}  = 'r_sole';
-CONFIG.linkList{5}  = 'LHipMot';
-CONFIG.linkList{6}  = 'LLowLeg';
-CONFIG.linkList{7}  = 'l_sole';
-CONFIG.linkList{8}  = 'DWYTorso';
-CONFIG.linkList{9}  = 'RShp';
-CONFIG.linkList{10} = 'RElb';
-CONFIG.linkList{11} = 'l_hand_upper_right_link';
-CONFIG.linkList{12} = 'LShp';
-CONFIG.linkList{13} = 'LElb';
-CONFIG.linkList{14} = 'l_hand_upper_left_link';
-CONFIG.linkList{15} = 'com';
-
 %% Paths definition and initialize the forward dynamics integration
 % add the required paths. This procedure will make the paths consistent for
 % any starting folder.

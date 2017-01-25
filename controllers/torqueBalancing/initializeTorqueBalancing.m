@@ -31,7 +31,7 @@ CONFIG.visualize_joints_dynamics             = 1;                          %eith
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 5;
+CONFIG.tEnd                                  = 10;
 CONFIG.sim_step                              = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -105,24 +105,6 @@ CONFIG.footSize  = [-0.07 0.07;       % xMin, xMax
                     -0.03 0.03];      % yMin, yMax
 % joints configuration [rad]
 CONFIG.qjInit    = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
-
-% list of joints/links used for robot simulator
-CONFIG.linkList     = cell(15,1);
-CONFIG.linkList{1}  = 'root_link'   ;
-CONFIG.linkList{2}  = 'r_hip_1'     ;
-CONFIG.linkList{3}  = 'r_lower_leg' ;
-CONFIG.linkList{4}  = 'r_sole'      ;
-CONFIG.linkList{5}  = 'l_hip_1'     ;
-CONFIG.linkList{6}  = 'l_lower_leg' ;
-CONFIG.linkList{7}  = 'l_sole'      ;
-CONFIG.linkList{8}  = 'neck_1'      ;
-CONFIG.linkList{9}  = 'r_shoulder_1';
-CONFIG.linkList{10} = 'r_elbow_1'   ;
-CONFIG.linkList{11} = 'r_gripper'   ;
-CONFIG.linkList{12} = 'l_shoulder_1';
-CONFIG.linkList{13} = 'l_elbow_1'   ;
-CONFIG.linkList{14} = 'l_gripper'   ;
-CONFIG.linkList{15} = 'com'         ;
 
 %% Paths definition and initialize the forward dynamics integration
 % add the required paths. This procedure will make the paths consistent for

@@ -21,9 +21,37 @@ initState                        = CONFIG.initState;
 
 %% Robot simulator
 if CONFIG.visualize_robot_simulator == 1
+    % list of joints used in the visualizer
+    CONFIG.mdlLdr           = iDynTree.ModelLoader();
+    CONFIG.consideredJoints = iDynTree.StringVector();
     
-    references        = trajectoryGenerator(CONFIG.initForKinematics.xCoM,t,CONFIG);
-    CONFIG.figureCont = visualizeSimulation(t,chi,CONFIG,references);
+    CONFIG.consideredJoints.push_back('torso_pitch');
+    CONFIG.consideredJoints.push_back('torso_roll');
+    CONFIG.consideredJoints.push_back('torso_yaw');
+    CONFIG.consideredJoints.push_back('l_shoulder_pitch');
+    CONFIG.consideredJoints.push_back('l_shoulder_roll');
+    CONFIG.consideredJoints.push_back('l_shoulder_yaw');
+    CONFIG.consideredJoints.push_back('l_elbow');
+    CONFIG.consideredJoints.push_back('l_wrist_prosup');
+    CONFIG.consideredJoints.push_back('r_shoulder_pitch');
+    CONFIG.consideredJoints.push_back('r_shoulder_roll');
+    CONFIG.consideredJoints.push_back('r_shoulder_yaw');
+    CONFIG.consideredJoints.push_back('r_elbow');
+    CONFIG.consideredJoints.push_back('r_wrist_prosup');
+    CONFIG.consideredJoints.push_back('l_hip_pitch');
+    CONFIG.consideredJoints.push_back('l_hip_roll');
+    CONFIG.consideredJoints.push_back('l_hip_yaw');
+    CONFIG.consideredJoints.push_back('l_knee');
+    CONFIG.consideredJoints.push_back('l_ankle_pitch');
+    CONFIG.consideredJoints.push_back('l_ankle_roll');
+    CONFIG.consideredJoints.push_back('r_hip_pitch');
+    CONFIG.consideredJoints.push_back('r_hip_roll');
+    CONFIG.consideredJoints.push_back('r_hip_yaw');
+    CONFIG.consideredJoints.push_back('r_knee');
+    CONFIG.consideredJoints.push_back('r_ankle_pitch');
+    CONFIG.consideredJoints.push_back('r_ankle_roll');
+    
+    CONFIG.figureCont = visualizeSimulation_iDyntree(chi,CONFIG);
 end
 
 %% Forward dynamics results
@@ -53,7 +81,7 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
     % generate the vectors from forward dynamics
     for time = 1:length(t)
         
-        [~,visual]          = forwardDynamics(t(time), chi(time,:)', CONFIG);
+        [~,visual]          = forwardDynamics(t(time), chi(time,:)',CONFIG);
         
         % joints dynamics
         qj(:,time)          = visual.qj;

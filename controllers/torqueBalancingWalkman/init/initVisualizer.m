@@ -21,9 +21,37 @@ initState                        = CONFIG.initState;
 
 %% Robot simulator
 if CONFIG.visualize_robot_simulator == 1
+    % list of joints used in the visualizer
+    CONFIG.mdlLdr           = iDynTree.ModelLoader();
+    CONFIG.consideredJoints = iDynTree.StringVector();
     
-    references        = trajectoryGenerator(CONFIG.initForKinematics.xCoM,t,CONFIG);
-    CONFIG.figureCont = visualizeSimulation(t,chi,CONFIG,references);
+    CONFIG.consideredJoints.push_back('WaistSag');
+    CONFIG.consideredJoints.push_back('WaistLat');
+    CONFIG.consideredJoints.push_back('WaistYaw');
+    CONFIG.consideredJoints.push_back('LShSag');
+    CONFIG.consideredJoints.push_back('LShLat');
+    CONFIG.consideredJoints.push_back('LShYaw');
+    CONFIG.consideredJoints.push_back('LElbj');
+    CONFIG.consideredJoints.push_back('LForearmPlate');
+    CONFIG.consideredJoints.push_back('RShSag');
+    CONFIG.consideredJoints.push_back('RShLat');
+    CONFIG.consideredJoints.push_back('RShYaw');
+    CONFIG.consideredJoints.push_back('RElbj');
+    CONFIG.consideredJoints.push_back('RForearmPlate');
+    CONFIG.consideredJoints.push_back('LHipSag');
+    CONFIG.consideredJoints.push_back('LHipLat');
+    CONFIG.consideredJoints.push_back('LHipYaw');
+    CONFIG.consideredJoints.push_back('LKneeSag');
+    CONFIG.consideredJoints.push_back('LAnkSag');
+    CONFIG.consideredJoints.push_back('LAnkLat');
+    CONFIG.consideredJoints.push_back('RHipSag');
+    CONFIG.consideredJoints.push_back('RHipLat');
+    CONFIG.consideredJoints.push_back('RHipYaw');
+    CONFIG.consideredJoints.push_back('RKneeSag');
+    CONFIG.consideredJoints.push_back('RAnkSag');
+    CONFIG.consideredJoints.push_back('RAnkLat');
+    
+    CONFIG.figureCont = visualizeSimulation_iDyntree(chi,CONFIG);
 end
 
 %% Forward dynamics results
