@@ -1,4 +1,4 @@
-clear
+clearvars;
 close all;
 
 fprintf('Running initialiseTest\n');

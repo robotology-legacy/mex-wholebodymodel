@@ -94,26 +94,26 @@ ModelState::~ModelState()
     delete robotWBIModel;
     robotWBIModel = 0;
   }
-#ifdef DEBUG
+//#ifdef DEBUG
   mexPrintf("robotWBIModel deleted.\n");
-#endif
+//#endif
 
   if (sqj_dot != 0) {
     delete[] sqj_dot;
     sqj_dot = 0;
   }
-#ifdef DEBUG
+//#ifdef DEBUG
   mexPrintf("sqj_dot deleted.\n");
-#endif
+//#endif
 
   if (sqj != 0) {
     delete[] sqj;
     sqj = 0;
   }
-#ifdef DEBUG
+//#ifdef DEBUG
   mexPrintf("sqj deleted.\n");
   mexPrintf("ModelState destructor returning.\n");
-#endif
+//#endif
 }
 
 ModelState *ModelState::getInstance(std::string robotName)

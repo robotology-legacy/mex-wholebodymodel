@@ -1,5 +1,5 @@
 function [dchi, h, g, fc, kinEnergy] = forwardDynamics_kinEnergyTest(t, chi, param)
-    %FORWARDDYNAMICS Forward dynamics of the wholeBodyModel
+    % FORWARDDYNAMICS Forward dynamics of the wholeBodyModel
     %
     %   This is the forward dynamics of the model loaded in the
     %   wholeBodyInterface from the URDF description. The dynamic model is
