@@ -39,7 +39,7 @@ double *ModelDJdq::dJdq   = 0;
 ModelDJdq::ModelDJdq() : ModelComponent(6, 1, 1)
 {
 #ifdef DEBUG
-  mexPrintf("ModelGeneralizedBiasForces constructed.\n");
+  mexPrintf("ModelDJdq constructed.\n");
 #endif
 }
 
@@ -104,16 +104,18 @@ bool ModelDJdq::computeFast(int nrhs, const mxArray **prhs)
   vb     = modelState->vb();
   refLnk = mxArrayToString(prhs[1]);
 
-  std::string com("com");
+  std::string strCom("com");
   int refLnkID = -1; // if refLnk = "com"
 
-  if (com.compare(refLnk) != 0) {
-    // get the index number ...
-    robotModel->getFrameList().idToIndex(refLnk, refLnkID);
+  // try to get the index number ...
+  if (strCom.compare(refLnk) != 0) {
+    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "dJdq call: Link ID does not exist.");
+    }
   }
 
   if ( !robotModel->computeDJdq(qj, wf_H_b, qj_dot, vb, refLnkID, dJdq) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI DJDq call.");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI dJdq call.");
   }
   return true;
 }
@@ -143,6 +145,15 @@ bool ModelDJdq::processArguments(int nrhs, const mxArray **prhs)
   vb     = mxGetPr(prhs[5]);
   refLnk = mxArrayToString(prhs[6]);
 
+  std::string strCom("com");
+  int refLnkID = -1; // if refLnk = "com"
+
+  if (strCom.compare(refLnk) != 0) {
+    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "dJdq call: Link ID does not exist.");
+    }
+  }
+
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
@@ -157,15 +168,8 @@ bool ModelDJdq::processArguments(int nrhs, const mxArray **prhs)
 
   wf_H_b = wbi::Frame(rot3d, ppos);
 
-  std::string com("com");
-  int refLnkID = -1; // if refLnk = "com"
-
-  if (com.compare(refLnk) != 0) {
-    robotModel->getFrameList().idToIndex(refLnk, refLnkID);
-  }
-
   if ( !robotModel->computeDJdq(qj, wf_H_b, qj_dot, vb, refLnkID, dJdq) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI DJDq call.");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI dJdq call.");
   }
   return true;
 }

@@ -16,7 +16,7 @@ try
     WBMTests
 catch ME
     disp(getReport(ME, 'extended'));
-    warning('mex-wholebodymodel matlab tests failed. Exiting matlab.');
+    warning('mex-wholebodymodel matlab tests failed! Exiting matlab.');
     exit(1)
 end
 

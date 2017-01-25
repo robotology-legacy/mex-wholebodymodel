@@ -109,23 +109,18 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray **prhs)
   qj     = modelState->qj();
   refLnk = mxArrayToString(prhs[1]);
 
-  std::string com("com");
+  std::string strCom("com");
   int refLnkID = -1; // if refLnk = "com"
 
-  if (com.compare(refLnk) != 0) {
+  if (strCom.compare(refLnk) != 0) {
     if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "jacobian call Link ID does not exist.");
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "jacobian call: Link ID does not exist.");
     }
-  }
-  
-  if (com.compare(refLnk) != 0) {
-    robotModel->getFrameList().idToIndex(refLnk, refLnkID);
   }
 
   if ( !(robotModel->computeJacobian(qj, wf_H_b, refLnkID, J_rmo)) ) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the jacobian call.");
   }
-
   // since Matlab uses the column-major order for multi-dimensional arrays,
   // we have to make an array-transposition ...
   reorderMatrixInColMajor(J_rmo, wf_J_lnk, 6, nCols);
@@ -156,6 +151,15 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray *prhs[])
   qj     = mxGetPr(prhs[3]);
   refLnk = mxArrayToString(prhs[4]);
 
+  std::string strCom("com");
+  int refLnkID = -1; // if refLnk = "com"
+
+  if (strCom.compare(refLnk) != 0) {
+    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "jacobian call: Link ID does not exist.");
+    }
+  }
+
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
@@ -169,19 +173,6 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray *prhs[])
   wbi::Rotation rot3d(R_rmo);
 
   wf_H_b = wbi::Frame(rot3d, ppos);
-
-  std::string com("com");
-  int refLnkID = -1; // if refLnk = "com"
-  
-  if (com.compare(refLnk) != 0) {
-    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "jacobian call Link ID does not exist.");
-    }
-  }
-
-  if (com.compare(refLnk) != 0) {
-    robotModel->getFrameList().idToIndex(refLnk, refLnkID);
-  }
 
   if ( !(robotModel->computeJacobian(qj, wf_H_b, refLnkID, J_rmo)) ) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the jacobian call.");
