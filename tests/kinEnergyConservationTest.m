@@ -1,6 +1,6 @@
 function kinEnergyConservationTest(params)
 rng(0)
-clear wholeBodyModel;
+clear mexWholeBodyModel;
 
 %% initialise mexWholeBodyModel
 if( params.isURDF )

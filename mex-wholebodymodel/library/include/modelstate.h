@@ -107,9 +107,9 @@ namespace mexWBIComponent
       delete *pp;
       *pp = 0;
 
-    #ifdef DEBUG
+    //#ifdef DEBUG
       mexPrintf("Object deleted.\n");
-    #endif
+    //#endif
     }
   };
 
