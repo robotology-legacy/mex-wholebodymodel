@@ -72,7 +72,7 @@ ModelSetWorldFrame         *ComponentManager::modelSetWorldFrame = 0;
 ModelTransformationMatrix  *ComponentManager::modelTransformationMatrix = 0;
 ModelUpdateState           *ComponentManager::modelUpdateState = 0;
 
-int ComponentManager::numDof = 0;
+int ComponentManager::nDof = 0;
 std::map<std::string, ModelComponent*> ComponentManager::componentList;
 
 ComponentManager *ComponentManager::getInstance(std::string robotName)
@@ -81,7 +81,7 @@ ComponentManager *ComponentManager::getInstance(std::string robotName)
     componentManager = new ComponentManager(robotName);
   }
 #ifdef DEBUG
-  mexPrintf("ComponentManager initialised.\n");
+  mexPrintf("ComponentManager initialized.\n");
 #endif
 
   return componentManager;
@@ -97,7 +97,7 @@ ComponentManager::ComponentManager(std::string robotName)
 #ifdef DEBUG
   mexPrintf("ComponentManager constructed.\n");
 #endif
-  initialise(robotName);
+  initialize(robotName);
 
   componentList["centroidal-momentum"]   = modelCentroidalMomentum;
   componentList["coriolis-forces"]       = modelCoriolisBiasForces;
@@ -152,7 +152,7 @@ ComponentManager::~ComponentManager()
   cleanup();
 }
 
-void ComponentManager::initialise(std::string robotName)
+void ComponentManager::initialize(std::string robotName)
 {
   modelState = ModelState::getInstance(robotName);
 

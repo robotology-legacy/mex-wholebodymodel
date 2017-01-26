@@ -1,5 +1,5 @@
 function [t, stmChi] = fastIntForwardDynamics(fhTrqControl, tspan, stvChi_0, robot_model, robot_config, ode_opt)
-    if ~isa(fhCtrlTrqs, 'function_handle')
+    if ~isa(fhTrqControl, 'function_handle')
         error('fastIntForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE)
     end
     if ( (robot_config.stvLen == 0) || (robot_config.nCstrs == 0) )

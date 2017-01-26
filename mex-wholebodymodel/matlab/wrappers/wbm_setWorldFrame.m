@@ -26,4 +26,3 @@ function wbm_setWorldFrame(varargin)
             error('wbm_setWorldFrame: %s\n', wbm_errorMsg());
     end
 end
-

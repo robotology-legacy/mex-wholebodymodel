@@ -23,6 +23,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     dp        ...  data point
     ds        ...  dimensions
     dstv      ...  derivative of state vector
+    ex, exc   ...  exception
     fb        ...  floating base
     fcn       ...  function
     fh...     ...  function handle OR file handle
@@ -31,6 +32,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     flt, fltg ...  floating
     fltb      ...  floating base
     frict     ...  friction
+    frm       ...  frame
     fwnd      ...  figure window
     g         ...  gravity acceleration (vector)
     h...      ...  "handle" to an object, e.g. hFig = handle to the figure object
@@ -61,6 +63,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     or        ...  orientation
     ow        ...  old world
     p         ...  position OR translation (vector)
+    p...      ...  pointer to an object/variable/array (only in C++)
     params    ...  parameters
     pl        ...  payload
     plds      ...  payloads
@@ -79,11 +82,13 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ridx      ...  row index(es)
     rlnk      ...  root link OR reference link
     rmo       ...  row major order
+    rotm      ...  rotation matrix
     rpts      ...  repeats
     sc        ...  scalar OR scaled
     scn       ...  scene
     sf        ...  scale factor(s)
     shp       ...  shape
+    skewm     ...  skew-symmetric matrix
     st        ...  state
     stm       ...  state matrix
     stp       ...  state parameter(s)
@@ -91,6 +96,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     stv       ...  state vector
     stvqT     ...  state vector-quaternion transformation [VQS-Transformation of the current state vector] (vector) (*)
     sz        ...  size(s)
+    tform     ...  transformation matrix
     tr        ...  translation(s) OR trace
     trans     ...  translation(s)
     trq       ...  torque

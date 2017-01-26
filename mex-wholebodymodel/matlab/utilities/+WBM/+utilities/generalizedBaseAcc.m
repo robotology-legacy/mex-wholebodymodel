@@ -1,13 +1,14 @@
-function dv_b = generalizedBaseAcc(M, c_qv, ddq_j)
-    % GENERALIZEDBASEACC computes the generalized floating base acceleration for
-    % a hybrid-dynamic system.
+function dv_b = generalizedBaseAcc(M, c_qv, ddq_j, ndof)
+    % GENERALIZEDBASEACC computes the generalized floating base acceleration for a hybrid-dynamic
+    % system.
     %
-    % Useful e.g. in inverse dynamics, when the base acceleration is unknown.
+    % Useful for example in inverse dynamics, when the base acceleration is unknown.
     %
     %   INPUT ARGUMENTS:
     %       M     -- ((nDoF+6) x (nDoF+6)) floating base mass matrix
     %       c_qv  -- ((nDoF+6) x 1) generalized bias force vector
     %       ddq_j -- (nDoF x 1) joint angle acceleration vector (rad/s^2)
+    %       ndof  -- number of degrees of freedom of the robot (optional)
     %
     %   OUTPUT ARGUMENTS:
     %       dv_b -- (6 x 1) generalized base acceleration vector.
@@ -22,7 +23,11 @@ function dv_b = generalizedBaseAcc(M, c_qv, ddq_j)
     %       p. 119, eq. (7.1) & (7.2).
     %
     % Author: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
-    n = size(M,2);
+    if exist('ndof', 'var')
+        n = ndof + 6;
+    else
+        n = size(M,2);
+    end
 
     h_0  = c_qv(1:6,1);
     M_00 = M(1:6,1:6);

@@ -1,4 +1,4 @@
-clear
+clearvars;
 close all;
 
 %% initialise mexWholeBodyModel

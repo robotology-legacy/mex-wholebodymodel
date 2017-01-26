@@ -108,7 +108,7 @@ bool ModelTransformationMatrix::computeFast(int nrhs, const mxArray **prhs)
 
   wbi::Frame frm3d_H;
   if ( !robotModel->computeH(qj, wf_H_b, refLnkID, frm3d_H) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the computeH call.");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeH call.");
   }
 
   double H_rmo[16]; // transformation matrix in "row major order"
@@ -127,10 +127,10 @@ bool ModelTransformationMatrix::processArguments(int nrhs, const mxArray **prhs)
     return false;
   }
 #endif
-  size_t numDof = modelState->dof();
+  size_t nDof = modelState->dof();
 
   if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||
-       mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || !mxIsChar(prhs[4]) )
+       mxGetM(prhs[3]) != nDof || mxGetN(prhs[3]) != 1 || !mxIsChar(prhs[4]) )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state argument dimensions/components in ModelTransformationMatrix call.");
   }
@@ -154,7 +154,7 @@ bool ModelTransformationMatrix::processArguments(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
-  for (size_t i=0; i < numDof; i++) {
+  for (size_t i=0; i < nDof; i++) {
     mexPrintf(" %f", *(qj + i));
   }
 #endif
@@ -167,7 +167,7 @@ bool ModelTransformationMatrix::processArguments(int nrhs, const mxArray **prhs)
 
   wbi::Frame frm3d_H;
   if ( !robotModel->computeH(qj, wf_H_b, refLnkID, frm3d_H) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the computeH call.");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeH call.");
   }
 
   double H_rmo[16]; // transformation matrix in "row major order"

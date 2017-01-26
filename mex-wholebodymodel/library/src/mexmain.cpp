@@ -38,60 +38,60 @@ using namespace mexWBIComponent;
  * To properly destroy, call ComponentManager::deleteInstance()
  * and then set this pointer to 0.
  */
-static ComponentManager *componentManagerLocalPointerCopy = 0;
+static ComponentManager *pCompManager = 0;
 
 // Cleanup function to call when matlab exits or mex clears
-void MEXWBM_Matlab_ExitFcn(void)
+void mexWbmExit(void)
 {
 #ifdef DEBUG
   mexPrintf("Try to delete ComponentManager...\n");
 #endif
   ComponentManager::deleteInstance();
-  componentManagerLocalPointerCopy = 0;
+  pCompManager = 0;
 }
 
 //=========================================================================================================================
 // Entry point function to library
 void mexFunction(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs)
 {
-  if (componentManagerLocalPointerCopy == 0) {
-    // initialisation of the component, i.e first call after a 'close all' or matlab start
+  if (pCompManager == 0) {
+    // initialization of the component, i.e first call after a 'close all' or matlab start
     if (nrhs < 1) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Initialisation has not been performed correctly.");
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Initialization has not been performed correctly.");
     }
     // check to be sure input is of type char
     if ( !(mxIsChar(prhs[0])) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Initialisation must include component.");
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Initialization must include component.");
     }
 
     if (nrhs == 2) {
       if ( !(mxIsChar(prhs[1])) ) {
-        mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Initialisation must include component and a robot name.");
+        mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Initialization must include component and a robot name.");
       }
-      componentManagerLocalPointerCopy = ComponentManager::getInstance(mxArrayToString(prhs[1]));
+      pCompManager = ComponentManager::getInstance(mxArrayToString(prhs[1]));
     }
     else {
-      componentManagerLocalPointerCopy = ComponentManager::getInstance();
+      pCompManager = ComponentManager::getInstance();
     }
 
     // register function to call on Matlab close / mex clear
     // to proper deallocate all the memory
-    mexAtExit(MEXWBM_Matlab_ExitFcn);
+    mexAtExit(mexWbmExit);
   }
   else {
-    componentManagerLocalPointerCopy = ComponentManager::getInstance();
+    pCompManager = ComponentManager::getInstance();
   }
 
 #ifdef DEBUG
-  mexPrintf("Starting to process function...\n");
+  mexPrintf("Start to process function...\n");
 #endif
 
   if (nrhs < 1) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Required Component must be named.");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Required component must be named.");
   }
   // check to be sure input is of type char
   if ( !(mxIsChar(prhs[0])) ) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Input must be of type string.");
   }
-  componentManagerLocalPointerCopy->processFunctionCall(nlhs, plhs, nrhs, prhs);
+  pCompManager->processFunctionCall(nlhs, plhs, nrhs, prhs);
 }

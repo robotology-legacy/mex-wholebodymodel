@@ -83,10 +83,10 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray **prhs)
     return false;
   }
 #endif
-  size_t numDof = modelState->dof();
+  size_t nDof = modelState->dof();
 
   if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||
-       mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || !mxIsChar(prhs[4]) )
+       mxGetM(prhs[3]) != nDof || mxGetN(prhs[3]) != 1 || !mxIsChar(prhs[4]) )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
   }
@@ -110,7 +110,7 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
-  for (size_t i=0; i < numDof; i++) {
+  for (size_t i=0; i < nDof; i++) {
     mexPrintf(" %f", *(qj + i));
   }
 #endif
@@ -123,7 +123,7 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray **prhs)
 
   double vxT_lnk[7]; // vector axis-angle transformation (from ref. link to world frame)
   if ( !(robotModel->forwardKinematics(qj, wf_H_b, refLnkID, vxT_lnk)) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the forwardKinematics call.");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI forwardKinematics call.");
   }
 
   int i;
@@ -181,7 +181,7 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray **prhs)
 
   double vxT_lnk[7]; // vector axis-angle transformation (from ref. link to world frame)
   if ( !(robotModel->forwardKinematics(qj, wf_H_b, refLnkID, vxT_lnk)) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the forwardKinematics call.");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI forwardKinematics call.");
   }
 
   int i;

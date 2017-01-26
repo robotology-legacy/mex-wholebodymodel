@@ -34,7 +34,7 @@ using namespace mexWBIComponent;
 ModelState *ModelState::modelState = 0;
 wbi::iWholeBodyModel *ModelState::robotWBIModel = 0;
 
-size_t ModelState::numDof = 0;
+size_t ModelState::nDof = 0;
 std::string ModelState::currRobotName = "";
 
 double ModelState::svb[6]   = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -70,11 +70,11 @@ ModelState::ModelState(std::string robotName)
   else {
     robotModel(robotName);
   }
-  numDof = robotWBIModel->getDoFs();
+  nDof = robotWBIModel->getDoFs();
 
   if ( (sqj == 0) && (sqj_dot == 0) ) {
-    sqj     = new double[numDof];
-    sqj_dot = new double[numDof];
+    sqj     = new double[nDof];
+    sqj_dot = new double[nDof];
 
   #ifdef DEBUG
     mexPrintf("Allocated sqj & sqj_dot.\n");
@@ -94,26 +94,26 @@ ModelState::~ModelState()
     delete robotWBIModel;
     robotWBIModel = 0;
   }
-//#ifdef DEBUG
+#ifdef DEBUG
   mexPrintf("robotWBIModel deleted.\n");
-//#endif
+#endif
 
   if (sqj_dot != 0) {
     delete[] sqj_dot;
     sqj_dot = 0;
   }
-//#ifdef DEBUG
+#ifdef DEBUG
   mexPrintf("sqj_dot deleted.\n");
-//#endif
+#endif
 
   if (sqj != 0) {
     delete[] sqj;
     sqj = 0;
   }
-//#ifdef DEBUG
+#ifdef DEBUG
   mexPrintf("sqj deleted.\n");
   mexPrintf("ModelState destructor returning.\n");
-//#endif
+#endif
 }
 
 ModelState *ModelState::getInstance(std::string robotName)
@@ -137,8 +137,8 @@ bool ModelState::setState(double *qj_t, double *qj_dot_t, double *vb_t)
 #ifdef DEBUG
   mexPrintf("Trying to update state.\n");
 #endif
-  memcpy(sqj, qj_t, sizeof(double)*numDof);
-  memcpy(sqj_dot, qj_dot_t, sizeof(double)*numDof);
+  memcpy(sqj, qj_t, sizeof(double)*nDof);
+  memcpy(sqj_dot, qj_dot_t, sizeof(double)*nDof);
   memcpy(svb, vb_t, sizeof(double)*6);
 
   return true;
@@ -156,7 +156,7 @@ double *ModelState::qj()
 
 void ModelState::qj(double *qj_t)
 {
-  memcpy(qj_t, sqj, sizeof(double)*numDof);
+  memcpy(qj_t, sqj, sizeof(double)*nDof);
 }
 
 double *ModelState::qj_dot()
@@ -166,7 +166,7 @@ double *ModelState::qj_dot()
 
 void ModelState::qj_dot(double *qj_dot_t)
 {
-  memcpy(qj_dot_t, sqj_dot, sizeof(double)*numDof);
+  memcpy(qj_dot_t, sqj_dot, sizeof(double)*nDof);
 }
 
 double *ModelState::vb()
@@ -191,7 +191,7 @@ void ModelState::g(double *g_t)
 
 size_t ModelState::dof()
 {
-  return numDof;
+  return nDof;
 }
 
 wbi::iWholeBodyModel *ModelState::robotModel()
@@ -239,11 +239,11 @@ void ModelState::robotModel(std::string robotName)
   robotWBIModel->addJoints(robMainJointIDList);
 
   if ( !robotWBIModel->init() ) {
-    mexPrintf("WBI unable to initialise (usually means unable to connect to chosen robot).\n");
+    mexPrintf("WBI unable to initialize (usually means unable to connect to chosen robot).\n");
   }
 
   // update the number of dofs
-  numDof = robotWBIModel->getDoFs();
+  nDof = robotWBIModel->getDoFs();
 
   mexPrintf("mexWholeBodyModel started with robot: %s, Num of Joints: %d\n", robotName.c_str(), robotWBIModel->getDoFs());
 }
@@ -275,11 +275,11 @@ void ModelState::robotModelFromURDF(std::string urdfFileName)
   robotWBIModel->addJoints(RobotURDFJoints);
 
   if ( !robotWBIModel->init() ) {
-    mexPrintf("WBI unable to initialise (usually means unable to connect to chosen robot).\n");
+    mexPrintf("WBI unable to initialize (usually means unable to connect to chosen robot).\n");
   }
 
   // update the number of dofs
-  numDof = robotWBIModel->getDoFs();
+  nDof = robotWBIModel->getDoFs();
 
   mexPrintf("mexWholeBodyModel started with robot loaded from URDF file: %s, Num of Joints: %d\n", urdfFileName.c_str(), robotWBIModel->getDoFs());
 }

@@ -30,31 +30,24 @@ function [wf_p_b, wf_R_b] = wbm_getWorldFrameFromFixLnk(varargin)
 end
 
 
-function [wf_p_b, wf_R_b] = computeNewWorld2Base(varargin)
+function [nw_p_b, nw_R_b] = computeNewWorld2Base(urdf_fixed_link, q_j)
     [ow_vqT_b,~,~,~] = wbm_getState(); % vector-quaternion transformation (from base to old world)
-    [ow_p_b, ow_R_b] = frame2posrot(ow_vqT_b);
 
-    % homogeneous transformation matrix H (from base to old world):
-    ow_H_b = eye(4,4);
-    ow_H_b(1:3,1:3) = ow_R_b;
-    ow_H_b(1:3,4)   = ow_p_b;
+    % get the homogeneous transformation matrix H (from base to old world):
+    [ow_p_b, ow_R_b] = WBM.utilities.frame2posRotm(ow_vqT_b);
+    ow_H_b = WBM.utilities.posRotm2tform(ow_p_b, ow_R_b);
 
     % get the VQ-Transformation to the old world of the reference (contact) link:
-    if (nargin == 1)
-        ow_vqT_rlnk = wbm_forwardKinematics(varargin{1});
+    if ~exist('q_j', 'var')
+        ow_vqT_rlnk = wbm_forwardKinematics(urdf_fixed_link);
     else
-        ow_vqT_rlnk = wbm_forwardKinematics(ow_R_b, ow_p_b, varargin{2}, varargin{1});
+        ow_vqT_rlnk = wbm_forwardKinematics(ow_R_b, ow_p_b, q_j, urdf_fixed_link);
     end
 
     % compute the new homogeneous transformation matrix H (from base to new world):
-    [ow_p_rlnk, ow_R_rlnk] = frame2posrot(ow_vqT_rlnk);
-    ow_H_rlnk = eye(4,4);
-    ow_H_rlnk(1:3,1:3) = ow_R_rlnk;
-    ow_H_rlnk(1:3,4)   = ow_p_rlnk;
-
+    ow_H_rlnk = WBM.utilities.frame2tform(ow_vqT_rlnk);
     nw_H_b = ow_H_rlnk \ ow_H_b;
 
-    % get the new position and rotation (from base to world frame):
-    wf_p_b = nw_H_b(1:3,4);
-    wf_R_b = nw_H_b(1:3,1:3);
+    % get the new position and rotation (from base to new world):
+    [nw_p_b, nw_R_b] = WBM.utilities.tform2posRotm(nw_H_b);
 end

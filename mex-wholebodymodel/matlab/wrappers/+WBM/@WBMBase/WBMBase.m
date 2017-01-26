@@ -212,13 +212,7 @@ classdef WBMBase < handle
         end
 
         function dv_b = generalizedBaseAcc(obj, M, c_qv, ddq_j)
-            n = obj.mwbm_model.ndof + 6;
-
-            h_0  = c_qv(1:6,1);
-            M_00 = M(1:6,1:6);
-            M_01 = M(1:6,7:n);
-
-            dv_b = -M_00 \ (M_01*ddq_j + h_0);
+            dv_b = WBM.utilities.generalizedBaseAcc(M, c_qv, ddq_j, obj.mwbm_model.ndof);
         end
 
         tau_j = inverseDynamics(obj, varargin)
@@ -381,7 +375,7 @@ classdef WBMBase < handle
             end
             epsilon = 1e-12; % min. value to treat a number as zero ...
 
-            % Compute the friction forces (torques) F(dq) with a simplified model:
+            % Compute the friction forces (torques) F(dq_j) with a simplified model:
             % Further details about the computation are available in:
             %   [1] Modelling and Control of Robot Manipulators, L. Sciavicco & B. Siciliano, 2nd Edition, Springer, 2008,
             %       p. 133 & p. 141.
@@ -389,12 +383,12 @@ classdef WBMBase < handle
             %       pp. 188-189, eq. (6.110)-(6.112).
             %   [3] Robotics, Vision & Control: Fundamental Algorithms in Matlab, Peter I. Corke, Springer, 2011,
             %       pp. 201-202, eq. (9.4) & (9.5).
-            if (sum(dq_j ~= 0) <= epsilon) % if dq_j = 0:
+            if (sum(dq_j ~= 0) <= epsilon) % if dq_j = 0
                 tau_fr = zeros(obj.mwbm_model.ndof,1);
                 return
             end
-            tau_vf = -obj.mwbm_model.frict_coeff.v .* dq_j;       % viscous friction torques
             tau_cf = -obj.mwbm_model.frict_coeff.c .* sign(dq_j); % Coulomb friction torques
+            tau_vf = -obj.mwbm_model.frict_coeff.v .* dq_j;       % viscous friction torques
             tau_fr =  tau_vf + tau_cf;                            % friction torques
         end
 
@@ -614,7 +608,7 @@ classdef WBMBase < handle
 
             % get the transformation values from the reference link (contact link)
             % to the old world:
-            if (nargin == 2)
+            if ~exist('q_j', 'var')
                 ow_vqT_rlnk = obj.forwardKinematics(urdf_link_name);
             else
                 ow_vqT_rlnk = obj.forwardKinematics(ow_R_b, ow_p_b, q_j, urdf_link_name);

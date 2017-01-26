@@ -1,6 +1,6 @@
 function kinEnergyConservationTest(params)
-rng(0)
-clear mexWholeBodyModel;
+rng(0, 'v5uniform');     % control random number generation
+clear mexWholeBodyModel; % remove the subroutine from the system memory ...
 
 %% initialise mexWholeBodyModel
 if( params.isURDF )
@@ -39,8 +39,9 @@ disp(params.dqjInit');
 wbm_setWorldFrame(eye(3),[0 0 0]',[0 0 0]');
 wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit]);
 
-[T_bInit,qj,vb,dqj] = wbm_getState();
-[Ptemp,Rtemp]       = frame2posrot(T_bInit);
+[T_bInit,~,~,~] = wbm_getState();
+%[T_bInit,qj,vb,dqj] = wbm_getState();
+%[Ptemp,Rtemp]       = frame2posrot(T_bInit);
 params.chiInit      = [T_bInit;params.qjInit;...
                        params.dx_bInit;params.omega_bInit;params.dqjInit];
 
@@ -63,27 +64,27 @@ options = odeset('RelTol',1e-5,'AbsTol',1e-7);
 %% plot results
 ndof = params.ndof;
 
-params.demux.baseOrientationType = 1;  % sets the base orientation in stateDemux.m as positions + quaternions (1) or transformation matrix (0)
-[basePose,qj,baseVelocity,dqj]   = stateDemux(chi,params);
+%params.demux.baseOrientationType = 1;  % sets the base orientation in stateDemux.m as positions + quaternions (1) or transformation matrix (0)
+%[basePose,qj,baseVelocity,dqj]   = stateDemux(chi,params);
 
 % position and orientation
-x_b     = basePose(1:3,:);
+%x_b     = basePose(1:3,:);
 
 % normalize quaternions to avoid numerical errors
 % qt_b = qt_b/norm(qt_b);
-qt_b    = basePose(4:7,:);
+%qt_b    = basePose(4:7,:);
 
 % linear and angular velocity
-dx_b    = baseVelocity(1:3,:);
-omega_W = baseVelocity(4:6,:);
+%dx_b    = baseVelocity(1:3,:);
+%omega_W = baseVelocity(4:6,:);
 
-x         = [x_b' qt_b' qj'];
-v         = [dx_b' omega_W' dqj' ];
+%x         = [x_b' qt_b' qj'];
+%v         = [dx_b' omega_W' dqj' ];
 kinEnergy = zeros(length(t),1);
 chiDot    = zeros(length(t),size(chi,2));
 hOut      = zeros(length(t),ndof+6);
 gOut      = zeros(length(t),ndof+6);
-fc        = zeros(length(t),ndof+6);
+%fc        = zeros(length(t),ndof+6);
 
 wbm_setWorldFrame(eye(3),[0 0 0]', [0 0 0]');
 
@@ -181,5 +182,4 @@ end
 %     xlabel('X(m)');
 %     ylabel('Y(m)');
 %     zlabel('Z(m)');
-
 end

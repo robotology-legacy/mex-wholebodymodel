@@ -30,7 +30,7 @@ using namespace mexWBIComponent;
 
 ModelJacobian *ModelJacobian::modelJacobian = 0;
 
-size_t  ModelJacobian::numDof   = 0;
+size_t  ModelJacobian::nDof     = 0;
 int     ModelJacobian::nCols    = 0;
 double *ModelJacobian::qj       = 0;
 char   *ModelJacobian::refLnk   = 0;
@@ -57,8 +57,8 @@ bool ModelJacobian::allocateReturnSpace(int nlhs, mxArray **plhs)
 #ifdef DEBUG
   mexPrintf("Trying to allocateReturnSpace in ModelJacobian.\n");
 #endif
-  numDof = modelState->dof();
-  nCols  = (int)numDof + 6;
+  nDof = modelState->dof();
+  nCols  = (int)nDof + 6;
 
   plhs[0] = mxCreateDoubleMatrix(6, nCols, mxREAL);
   wf_J_lnk = mxGetPr(plhs[0]);
@@ -119,7 +119,7 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray **prhs)
   }
 
   if ( !(robotModel->computeJacobian(qj, wf_H_b, refLnkID, J_rmo)) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the jacobian call.");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeJacobian call.");
   }
   // since Matlab uses the column-major order for multi-dimensional arrays,
   // we have to make an array-transposition ...
@@ -139,7 +139,7 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray *prhs[])
   }
 #endif
   if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||
-       mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 || !mxIsChar(prhs[4]) )
+       mxGetM(prhs[3]) != nDof || mxGetN(prhs[3]) != 1 || !mxIsChar(prhs[4]) )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
   }
@@ -163,7 +163,7 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray *prhs[])
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
-  for (size_t i=0; i < numDof; i++) {
+  for (size_t i=0; i < nDof; i++) {
     mexPrintf(" %f", *(qj + i));
   }
 #endif
@@ -175,7 +175,7 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray *prhs[])
   wf_H_b = wbi::Frame(rot3d, ppos);
 
   if ( !(robotModel->computeJacobian(qj, wf_H_b, refLnkID, J_rmo)) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the jacobian call.");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeJacobian call.");
   }
   reorderMatrixInColMajor(J_rmo, wf_J_lnk, 6, nCols); // put the output matrix in "column major order"
 

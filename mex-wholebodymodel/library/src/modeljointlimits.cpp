@@ -47,10 +47,10 @@ bool ModelJointLimits::allocateReturnSpace(int nlhs, mxArray **plhs)
   if (nlhs != 2) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "2 output arguments required for joint limits.");
   }
-  int numDof = modelState->dof();
+  int nDof = modelState->dof();
 
-  plhs[0] = mxCreateDoubleMatrix(numDof, 1, mxREAL);
-  plhs[1] = mxCreateDoubleMatrix(numDof, 1, mxREAL);
+  plhs[0] = mxCreateDoubleMatrix(nDof, 1, mxREAL);
+  plhs[1] = mxCreateDoubleMatrix(nDof, 1, mxREAL);
 
   jntlim_lower = mxGetPr(plhs[0]);
   jntlim_upper = mxGetPr(plhs[1]);
