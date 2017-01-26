@@ -38,7 +38,7 @@ function [nw_p_b, nw_R_b] = computeNewWorld2Base(urdf_fixed_link, q_j)
     ow_H_b = WBM.utilities.posRotm2tform(ow_p_b, ow_R_b);
 
     % get the VQ-Transformation to the old world of the reference (contact) link:
-    if (nargin == 1)
+    if ~exist('q_j', 'var')
         ow_vqT_rlnk = wbm_forwardKinematics(urdf_fixed_link);
     else
         ow_vqT_rlnk = wbm_forwardKinematics(ow_R_b, ow_p_b, q_j, urdf_fixed_link);

@@ -608,7 +608,7 @@ classdef WBMBase < handle
 
             % get the transformation values from the reference link (contact link)
             % to the old world:
-            if (nargin == 2)
+            if ~exist('q_j', 'var')
                 ow_vqT_rlnk = obj.forwardKinematics(urdf_link_name);
             else
                 ow_vqT_rlnk = obj.forwardKinematics(ow_R_b, ow_p_b, q_j, urdf_link_name);

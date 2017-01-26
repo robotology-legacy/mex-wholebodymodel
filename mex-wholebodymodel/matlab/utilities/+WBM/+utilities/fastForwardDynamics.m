@@ -1,8 +1,8 @@
 function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, robot_config)
     ndof    = robot_model.ndof;
     nCstrs  = robot_config.nCstrs;
-    frict_v = robot_model.frict_coeff.v;
     frict_c = robot_model.frict_coeff.c;
+    frict_v = robot_model.frict_coeff.v;
 
     % get the state parameters from the current state vector "stvChi" ...
     stp = WBM.utilities.fastGetStateParams(stvChi, robot_config.stvLen, ndof);

@@ -1,8 +1,8 @@
 function c_qv = wbm_generalizedBiasForces(varargin)
     % WBM_GENERALIZEDBIASFORCES computes the generalized bias forces C(q_j,dq_j) in the dynamics of
     % rigid-body systems.
-    % It accounts the Coriolis, centrifugal and gravity forces, which are depending on the joint angles
-    % q_j, the joint velocities dq_j and the floating base velocity v_b.
+    % It accounts the Coriolis, centrifugal and gravity forces, which are depending on the joint
+    % angles q_j, the joint velocities dq_j and the floating base velocity v_b.
     %
     % For further details see:
     %   [1] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008, p. 40.

@@ -1,5 +1,5 @@
 function tau_fr = wbm_frictionForces(dq_j, frict_c, frict_v)
-    % WBM_FRICTIONFORCES computes the friction forces (torques) F(dq_j) with a simplified model.
+    % WBM_FRICTIONFORCES computes the forces (torques) of friction F(dq_j) with a simple model.
     %
     % This function depends on the joint angle acceleration dq_j and on the friction coefficients of
     % the joints.
@@ -13,7 +13,7 @@ function tau_fr = wbm_frictionForces(dq_j, frict_c, frict_v)
     %           frict_v -- (nDoF x 1) viscous friction coefficient vector of the joints
     %
     %   OUTPUT ARGUMENTS:
-    %       tau_fr -- (nDoF x 1) friction force (torque) vector with negative values.
+    %       tau_fr -- (nDoF x 1) friction force (torque) vector with negated values.
     %
     % Further details about the calculation are available in:
     %   [1] Modelling and Control of Robot Manipulators, L. Sciavicco & B. Siciliano, 2nd Edition, Springer, 2008,
