@@ -608,10 +608,10 @@ classdef WBMBase < handle
 
             % get the transformation values from the reference link (contact link)
             % to the old world:
-            if ~exist('q_j', 'var')
-                ow_vqT_rlnk = obj.forwardKinematics(urdf_link_name);
+            if (nargin == 2)
+                ow_vqT_rlnk = forwardKinematics(obj, urdf_link_name);
             else
-                ow_vqT_rlnk = obj.forwardKinematics(ow_R_b, ow_p_b, q_j, urdf_link_name);
+                ow_vqT_rlnk = forwardKinematics(obj, ow_R_b, ow_p_b, q_j, urdf_link_name);
             end
 
             % compute the homogeneous transformation matrix H from the base to
