@@ -165,7 +165,10 @@ The coordinate frame called base_link is rigidly attached to the robot root body
       <geometry name="Waist_visual">
         <mesh filename="meshes/Waist.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.5 0.5 0.5 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -198,7 +201,10 @@ and to define the end effectors of the robot-->
       <geometry name="DWL_visual">
         <mesh filename="meshes/TorsoRoll.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
@@ -218,7 +224,10 @@ and to define the end effectors of the robot-->
       <geometry name="DWS_visual">
         <mesh filename="meshes/TorsoYawPitch.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
@@ -238,7 +247,10 @@ and to define the end effectors of the robot-->
       <geometry name="DWYTorso_visual">
         <mesh filename="meshes/NewChest.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="blue"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.0 0.2 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
@@ -259,7 +271,10 @@ and to define the end effectors of the robot-->
       <geometry name="TorsoProtections_visual">
         <mesh filename="meshes/ProtectionSystem.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
@@ -280,7 +295,10 @@ and to define the end effectors of the robot-->
       <geometry name="backpack_visual">
         <box size="0.16 0.3 0.22"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
@@ -342,7 +360,10 @@ and to define the end effectors of the robot-->
       <geometry name="NeckYaw_visual">
         <mesh filename="meshes/NeckYaw.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.5 0.5 0.5 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
@@ -362,7 +383,10 @@ and to define the end effectors of the robot-->
       <geometry name="NeckPitch_visual">
         <mesh filename="meshes/NeckPitch.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.5 0.5 0.5 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
@@ -429,7 +453,10 @@ and to define the end effectors of the robot-->
       <geometry name="RHipMot_visual">
         <mesh filename="meshes/HipRoll.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -449,7 +476,10 @@ and to define the end effectors of the robot-->
       <geometry name="RThighUpLeg_visual">
         <mesh filename="meshes/HipYaw.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -469,7 +499,10 @@ and to define the end effectors of the robot-->
       <geometry name="RThighLowLeg_visual">
         <mesh filename="meshes/HipPitch.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.5 0.5 0.5 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -489,7 +522,10 @@ and to define the end effectors of the robot-->
       <geometry name="RLowLeg_visual">
         <mesh filename="meshes/KneePitchCalf.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -509,7 +545,10 @@ and to define the end effectors of the robot-->
       <geometry name="RFootmot_visual">
         <mesh filename="meshes/AnklePitch.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -529,7 +568,10 @@ and to define the end effectors of the robot-->
       <geometry name="RFoot_visual">
         <mesh filename="meshes/NewFoot.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <!--<origin xyz="0 0 0" rpy="0 0 0"/>
@@ -554,7 +596,10 @@ and to define the end effectors of the robot-->
       <geometry name="LHipMot_visual">
         <mesh filename="meshes/HipRoll.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -574,7 +619,10 @@ and to define the end effectors of the robot-->
       <geometry name="LThighUpLeg_visual">
         <mesh filename="meshes/HipYaw.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -594,7 +642,10 @@ and to define the end effectors of the robot-->
       <geometry name="LThighLowLeg_visual">
         <mesh filename="meshes/HipPitch.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.5 0.5 0.5 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -614,7 +665,10 @@ and to define the end effectors of the robot-->
       <geometry name="LLowLeg_visual">
         <mesh filename="meshes/KneePitchCalf.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -634,7 +688,10 @@ and to define the end effectors of the robot-->
       <geometry name="LFootmot_visual">
         <mesh filename="meshes/AnklePitch.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -654,7 +711,10 @@ and to define the end effectors of the robot-->
       <geometry name="LFoot_visual">
         <mesh filename="meshes/NewFoot.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <!--
@@ -871,7 +931,10 @@ and to define the end effectors of the robot-->
       <geometry name="RShp_visual">
         <mesh filename="meshes/ShoulderPitch.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -891,7 +954,10 @@ and to define the end effectors of the robot-->
       <geometry name="RShr_visual">
         <mesh filename="meshes/TopUpperArm.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -911,7 +977,10 @@ and to define the end effectors of the robot-->
       <geometry name="RShy_visual">
         <mesh filename="meshes/BottomUpperArm.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -931,7 +1000,10 @@ and to define the end effectors of the robot-->
       <geometry name="RElb_visual">
         <mesh filename="meshes/Elbow.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -952,7 +1024,10 @@ and to define the end effectors of the robot-->
       <geometry name="LShp_visual">
         <mesh filename="meshes/ShoulderPitch.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -972,7 +1047,10 @@ and to define the end effectors of the robot-->
       <geometry name="LShr_visual">
         <mesh filename="meshes/TopUpperArm.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -992,7 +1070,10 @@ and to define the end effectors of the robot-->
       <geometry name="LShy_visual">
         <mesh filename="meshes/BottomUpperArm.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1012,7 +1093,10 @@ and to define the end effectors of the robot-->
       <geometry name="LElb_visual">
         <mesh filename="meshes/Elbow.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1170,7 +1254,10 @@ and to define the end effectors of the robot-->
       <geometry name="LForearm_visual">
         <mesh filename="meshes/Forearm.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1190,7 +1277,10 @@ and to define the end effectors of the robot-->
       <geometry name="LWrMot2_visual">
         <mesh filename="meshes/ForearmPitch.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1210,7 +1300,10 @@ and to define the end effectors of the robot-->
       <geometry name="LWrMot3_visual">
         <mesh filename="meshes/ForearmRoll.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="blue"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.0 0.2 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1231,7 +1324,10 @@ and to define the end effectors of the robot-->
       <geometry name="RForearm_visual">
         <mesh filename="meshes/Forearm.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1251,7 +1347,10 @@ and to define the end effectors of the robot-->
       <geometry name="RWrMot2_visual">
         <mesh filename="meshes/ForearmPitch.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1271,7 +1370,10 @@ and to define the end effectors of the robot-->
       <geometry name="RWrMot3_visual">
         <mesh filename="meshes/ForearmRoll.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="blue"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.0 0.2 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1357,7 +1459,10 @@ and to define the end effectors of the robot-->
       <geometry name="RSoftHandLink_visual">
         <mesh filename="meshes/SoftHandOpen.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.5 0.5 0.5 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
@@ -1383,7 +1488,10 @@ and to define the end effectors of the robot-->
       <geometry name="LSoftHandLink_visual">
         <mesh filename="meshes/SoftHandOpen.STL" scale="0.001 -0.001 0.001"/>
       </geometry>
-      <material name="grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.5 0.5 0.5 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
@@ -1488,7 +1596,10 @@ and to define the end effectors of the robot-->
       <geometry>
         <mesh filename="meshes/Head.STL" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="dark_grey"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.3 0.3 0.3 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1508,7 +1619,10 @@ and to define the end effectors of the robot-->
       <geometry>
         <mesh filename="meshes/hokuyo_link.STL"/>
       </geometry>
-      <material name="black"/>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.0 0.0 0.0 1" />
+      </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0.01885 0 -0.02119"/>

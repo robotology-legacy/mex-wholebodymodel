@@ -7,7 +7,7 @@ function [basePose,jointAngles,baseVelocity,jointsVelocity] = stateDemux(state,p
 % state(8+nDof:10+nDof)    =  I_v_b,     i.e. base linear velocity w.r.t. inertial frame
 % state(11+nDof:13+nDof)   =  I_omega_b, i.e. base angular velocity w.r.t. inertial frame
 % state(14+nDof:13+2*nDof) =  qjDot,     i.e. joint angles
-include WBM.utilities.quat2rotm;
+import WBM.utilities.quat2rotm;
 
 nDof            = param.ndof;
 I_p_b           = state(1:3,:);

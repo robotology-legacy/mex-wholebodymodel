@@ -43,7 +43,7 @@ if CONFIG.feet_on_ground(1) == 1
     subplot(1,2,1)
     hold all
     grid on
-    plot(t,poseFeet(1:3,:)-poseFeet(1:3,1))
+    plot(t,poseFeet(1:3,:))
     title('Left Foot Position')
     xlabel(' Time [s]')
     ylabel('Position [m]')
@@ -52,7 +52,7 @@ if CONFIG.feet_on_ground(1) == 1
     subplot(1,2,2)
     hold all
     grid on
-    plot(t,poseFeet(4:6,:)-poseFeet(4:6,1))
+    plot(t,poseFeet(4:6,:))
     title('Left Foot Orientation')
     xlabel('Time [s]')
     ylabel('Angle [rad]')
