@@ -86,7 +86,7 @@ namespace mexWBIComponent
       static ModelState *modelState;
       static wbi::iWholeBodyModel *robotWBIModel;
 
-      static size_t numDof;
+      static size_t nDof;
       static std::string currRobotName;
 
       // state variables:
@@ -107,9 +107,9 @@ namespace mexWBIComponent
       delete *pp;
       *pp = 0;
 
-    //#ifdef DEBUG
+    #ifdef DEBUG
       mexPrintf("Object deleted.\n");
-    //#endif
+    #endif
     }
   };
 

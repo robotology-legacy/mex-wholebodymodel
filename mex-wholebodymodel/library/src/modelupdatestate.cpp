@@ -82,9 +82,9 @@ bool ModelUpdateState::allocateReturnSpace(int nlhs, mxArray **plhs)
 
 bool ModelUpdateState::setState(int nrhs, const mxArray **prhs)
 {
-  size_t numDof = modelState->dof();
+  size_t nDof = modelState->dof();
 
-  if ( mxGetM(prhs[1]) != numDof || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != numDof ||
+  if ( mxGetM(prhs[1]) != nDof || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != nDof ||
        mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != 6 || mxGetN(prhs[3]) != 1 )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/inputs.");

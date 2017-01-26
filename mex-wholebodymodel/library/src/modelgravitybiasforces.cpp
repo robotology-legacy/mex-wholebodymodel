@@ -62,9 +62,9 @@ bool ModelGravityBiasForces::allocateReturnSpace(int nlhs, mxArray **plhs)
 #ifdef DEBUG
   mexPrintf("Trying to allocateReturnSpace in ModelGravityBiasForces.\n");
 #endif
-  int numDof = modelState->dof();
+  int nDof = modelState->dof();
 
-  plhs[0] = mxCreateDoubleMatrix(numDof+6, 1, mxREAL);
+  plhs[0] = mxCreateDoubleMatrix(nDof+6, 1, mxREAL);
   g_q = mxGetPr(plhs[0]);
 
   return true;
@@ -108,10 +108,10 @@ bool ModelGravityBiasForces::processArguments(int nrhs, const mxArray **prhs)
     return false;
   }
 #endif
-  size_t numDof = modelState->dof();
+  size_t nDof = modelState->dof();
 
   if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 ||
-       mxGetM(prhs[3]) != numDof || mxGetN(prhs[3]) != 1 )
+       mxGetM(prhs[3]) != nDof || mxGetN(prhs[3]) != 1 )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state argument dimensions in ModelGravityBiasForces call.");
   }
@@ -126,7 +126,7 @@ bool ModelGravityBiasForces::processArguments(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
-  for (size_t i=0; i < numDof; i++) {
+  for (size_t i=0; i < nDof; i++) {
     mexPrintf(" %f", *(qj + i));
   }
 #endif

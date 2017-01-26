@@ -45,7 +45,7 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
     Jc_t      =  Jc.';
     JcMinv    =  Jc / M;
     Upsilon_c =  JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix"?)
-    tau_fr    =  calcFrictionForces(stp.dq_j, frict_v, frict_c); % friction torques (negative values)
+    tau_fr    =  wbm_frictionForces(stp.dq_j, frict_c, frict_v); % friction torques (negative values)
     tau_gen   =  vertcat(zeros(6,1), tau + tau_fr); % generalized force tau_gen = tau + (-tau_fr)
     % calculate the contact forces ...
     f_c = Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq);
@@ -66,18 +66,4 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
 
     dstvChi = vertcat(dx, dv);
     %kinEnergy = 0.5*nu.'*M*nu;
-end
-%% END of fastForwardDynamics.
-
-
-function tau_fr = calcFrictionForces(dq_j, frict_v, frict_c)
-    epsilon = 1e-12; % min. value to treat a number as zero ...
-
-    if (sum(dq_j ~= 0) <= epsilon) % if dq_j = 0:
-        tau_fr = zeros(size(dq_j,1),1);
-        return
-    end
-    tau_vf = -frict_v .* dq_j;       % viscous friction torques
-    tau_cf = -frict_c .* sign(dq_j); % Coulomb friction torques
-    tau_fr =  tau_vf + tau_cf;       % friction torques
 end

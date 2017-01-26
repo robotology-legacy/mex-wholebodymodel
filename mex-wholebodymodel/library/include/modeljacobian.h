@@ -53,7 +53,7 @@ namespace mexWBIComponent
 
       static ModelJacobian *modelJacobian;
 
-      static size_t numDof;
+      static size_t nDof;
       static int    nCols;
       static double *J_rmo; // Jacobian in "row major order"
 

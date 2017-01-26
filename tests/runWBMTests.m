@@ -16,10 +16,10 @@ try
     WBMTests
 catch exc
     disp(getReport(exc, 'extended'));
-    warning('mex-wholeBodyModel matlab tests failed! Exiting matlab.');
+    warning('mex-WholeBodyModel tests: Matlab tests failed! Exiting Matlab.');
     clearExit(1);
 end
 
 % if we arrive at this point all test went well
-disp('mex-wholeBodyModel tests: All tests completed successfully!')
+disp('mex-WholeBodyModel tests: All tests completed successfully!')
 clearExit(0);

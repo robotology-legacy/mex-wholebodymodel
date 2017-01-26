@@ -84,12 +84,9 @@ bool ModelGetFloatingBaseState::compute(int nrhs, const mxArray **prhs)
   wf_H_b = modelState->getBase2WorldTransformation();
 
 #ifdef DEBUG
-  mexPrintf("Inside getState - RootWorldRotoTrans:\n");
+  mexPrintf("Inside of getFloatingBaseState - transformation:\n");
   mexPrintf("wf_H_b\n");
   mexPrintf( (wf_H_b.R.toString()).c_str() );
-  mexPrintf(" = \n");
-  mexPrintf("wf_H_lnk\n");
-  mexPrintf( ((modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str() );
   mexPrintf("\n\n");
 #endif
 
@@ -140,20 +137,17 @@ bool ModelGetFloatingBaseState::computeFast(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   wf_H_b = modelState->getBase2WorldTransformation();
 
-  mexPrintf("Inside getState - RootWorldRotoTrans:\n");
+  mexPrintf("Inside of getFloatingBaseState - transformation:\n");
   mexPrintf("wf_H_b\n");
   mexPrintf( (wf_H_b.R.toString()).c_str() );
-  mexPrintf(" = \n");
-  mexPrintf("wf_H_lnk\n");
-  mexPrintf( ((modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str() );
   mexPrintf("\n\n");
 #endif
   double rotm[9];
 
-  (modelState->getBase2WorldTransformation()).R.getDcm(rotm);
+  wf_H_b.R.getDcm(rotm);
   reorderMatrixInColMajor(rotm, wf_R_b); // matrix in "column major order"
 
-  memcpy(wf_p_b, (modelState->getBase2WorldTransformation()).p, 3*sizeof(double));
+  memcpy(wf_p_b, wf_H_b.p, 3*sizeof(double));
   modelState->vb(vb);
 
   return true;

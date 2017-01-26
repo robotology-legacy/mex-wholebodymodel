@@ -115,7 +115,7 @@ bool ModelDJdq::computeFast(int nrhs, const mxArray **prhs)
   }
 
   if ( !robotModel->computeDJdq(qj, wf_H_b, qj_dot, vb, refLnkID, dJdq) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI dJdq call.");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeDJdq call.");
   }
   return true;
 }
@@ -127,10 +127,10 @@ bool ModelDJdq::processArguments(int nrhs, const mxArray **prhs)
     return false;
   }
 #endif
-  size_t numDof = modelState->dof();
+  size_t nDof = modelState->dof();
 
-  if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != numDof ||
-       mxGetN(prhs[3]) != 1 || mxGetM(prhs[4]) != numDof || mxGetN(prhs[4]) != 1 || mxGetM(prhs[5]) != 6 ||
+  if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != nDof ||
+       mxGetN(prhs[3]) != 1 || mxGetM(prhs[4]) != nDof || mxGetN(prhs[4]) != 1 || mxGetM(prhs[5]) != 6 ||
        mxGetN(prhs[5]) != 1 || !(mxIsChar(prhs[6])) )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/inputs.");
@@ -157,7 +157,7 @@ bool ModelDJdq::processArguments(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
-  for (size_t i=0; i < numDof; i++) {
+  for (size_t i=0; i < nDof; i++) {
     mexPrintf(" %f", *(qj + i));
   }
 #endif
@@ -169,7 +169,7 @@ bool ModelDJdq::processArguments(int nrhs, const mxArray **prhs)
   wf_H_b = wbi::Frame(rot3d, ppos);
 
   if ( !robotModel->computeDJdq(qj, wf_H_b, qj_dot, vb, refLnkID, dJdq) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI dJdq call.");
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeDJdq call.");
   }
   return true;
 }

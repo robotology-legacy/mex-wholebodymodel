@@ -107,10 +107,10 @@ bool ModelCentroidalMomentum::processArguments(int nrhs, const mxArray **prhs)
     return false;
   }
 #endif
-  size_t numDof = modelState->dof();
+  size_t nDof = modelState->dof();
 
-  if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != numDof ||
-       mxGetN(prhs[3]) != 1 || mxGetM(prhs[4]) != numDof || mxGetN(prhs[4]) != 1 || mxGetM(prhs[5]) != 6 || mxGetN(prhs[5]) != 1 )
+  if ( mxGetM(prhs[1]) != 9 || mxGetN(prhs[1]) != 1 || mxGetM(prhs[2]) != 3 || mxGetN(prhs[2]) != 1 || mxGetM(prhs[3]) != nDof ||
+       mxGetN(prhs[3]) != 1 || mxGetM(prhs[4]) != nDof || mxGetN(prhs[4]) != 1 || mxGetM(prhs[5]) != 6 || mxGetN(prhs[5]) != 1 )
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state argument dimensions in ModelCentroidalMomentum call.");
   }
@@ -126,7 +126,7 @@ bool ModelCentroidalMomentum::processArguments(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
-  for (size_t i=0; i < numDof; i++) {
+  for (size_t i=0; i < nDof; i++) {
     mexPrintf(" %f", qj[i]);
   }
 #endif

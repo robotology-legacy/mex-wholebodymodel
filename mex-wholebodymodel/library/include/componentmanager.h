@@ -74,7 +74,7 @@ namespace mexWBIComponent
 
     private:
       ComponentManager(std::string robotName);
-      void initialise(std::string robotName);
+      void initialize(std::string robotName);
 
       static void cleanup();
 
@@ -101,7 +101,7 @@ namespace mexWBIComponent
       static ModelTransformationMatrix  *modelTransformationMatrix;
       static ModelUpdateState           *modelUpdateState;
 
-      static int numDof;
+      static int nDof;
       static std::map<std::string, ModelComponent*> componentList;
   };
 

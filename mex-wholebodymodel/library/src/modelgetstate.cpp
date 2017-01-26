@@ -67,12 +67,12 @@ bool ModelGetState::allocateReturnSpace(int nlhs, mxArray **plhs)
   if (nlhs != 4) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumOutputs", "4 output arguments required for ModelGetState.");
   }
-  int numDof = modelState->dof();
+  int nDof = modelState->dof();
 
-  plhs[0] = mxCreateDoubleMatrix(7, 1, mxREAL);      // vqT_b
-  plhs[1] = mxCreateDoubleMatrix(numDof, 1, mxREAL); // qj
-  plhs[2] = mxCreateDoubleMatrix(6, 1, mxREAL);      // vb
-  plhs[3] = mxCreateDoubleMatrix(numDof, 1, mxREAL); // qj_dot
+  plhs[0] = mxCreateDoubleMatrix(7, 1, mxREAL);    // vqT_b
+  plhs[1] = mxCreateDoubleMatrix(nDof, 1, mxREAL); // qj
+  plhs[2] = mxCreateDoubleMatrix(6, 1, mxREAL);    // vb
+  plhs[3] = mxCreateDoubleMatrix(nDof, 1, mxREAL); // qj_dot
 
   vqT_b  = mxGetPr(plhs[0]);
   qj     = mxGetPr(plhs[1]);
@@ -90,12 +90,9 @@ bool ModelGetState::compute(int nrhs, const mxArray **prhs)
   wf_H_b = modelState->getBase2WorldTransformation();
 
 #ifdef DEBUG
-  mexPrintf("Inside getState - RootWorldRotoTrans:\n");
+  mexPrintf("Inside of getState - transformation:\n");
   mexPrintf("wf_H_b\n");
   mexPrintf((wf_H_b.R.toString()).c_str());
-  mexPrintf(" = \n");
-  mexPrintf("wf_H_lnk\n");
-  mexPrintf(( (modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str());
   mexPrintf("\n\n");
 #endif
 
@@ -132,16 +129,13 @@ bool ModelGetState::computeFast(int nrhs, const mxArray **prhs)
   wf_H_b = modelState->getBase2WorldTransformation();
 
 #ifdef DEBUG
-  mexPrintf("Inside of getState - RootWorldRotoTrans:\n");
+  mexPrintf("Inside of getState - transformation:\n");
   mexPrintf("wf_H_b\n");
   mexPrintf((wf_H_b.R.toString()).c_str());
-  mexPrintf(" = \n");
-  mexPrintf("wf_H_lnk\n");
-  mexPrintf(( (modelState->getReferenceToWorldFrameRotoTrans()).R.toString()).c_str());
   mexPrintf("\n\n");
 #endif
 
-  (modelState->getBase2WorldTransformation()).R.getQuaternion(quat_b[1], quat_b[2], quat_b[3], quat_b[0]);
+  wf_H_b.R.getQuaternion(quat_b[1], quat_b[2], quat_b[3], quat_b[0]);
 
 #ifdef DEBUG
   std::stringstream ssR;
