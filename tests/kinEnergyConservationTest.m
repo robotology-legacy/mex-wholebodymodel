@@ -41,7 +41,7 @@ wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit
 
 [T_bInit,~,~,~] = wbm_getState();
 %[T_bInit,qj,vb,dqj] = wbm_getState();
-%[Ptemp,Rtemp]       = frame2posrot(T_bInit);
+%[Ptemp,Rtemp]       = WBM.utilities.frame2posRotm(T_bInit);
 params.chiInit      = [T_bInit;params.qjInit;...
                        params.dx_bInit;params.omega_bInit;params.dqjInit];
 
