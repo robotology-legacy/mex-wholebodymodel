@@ -15,6 +15,8 @@ function figureCont = visualizeJointDynamics(varargin)
 %
 
 % ------------Initialization----------------
+import WBM.utilities.getJointAnnotationNameICub;
+
 % setup parameters
 t           = varargin{1};
 CONFIG      = varargin{2};
@@ -58,7 +60,7 @@ for k=1:5
     grid on
     xlabel('Time [s]')
     ylabel('Angle [deg]')
-    name = whatname('left_arm',k);
+    name = getJointAnnotationNameICub('left_arm',k);
     title(name)
     
     % RIGHT ARM
@@ -80,7 +82,7 @@ for k=1:5
     grid on
     xlabel('Time [s]')
     ylabel('Angle [deg]')
-    name = whatname('right_arm',k);
+    name = getJointAnnotationNameICub('right_arm',k);
     title(name)
 end
 
@@ -105,7 +107,7 @@ for k=1:6
     grid on
     xlabel('Time [s]')
     ylabel('Angle [deg]')
-    name = whatname('left_leg',k);
+    name = getJointAnnotationNameICub('left_leg',k);
     title(name)
     
     % RIGHT LEG
@@ -126,7 +128,7 @@ for k=1:6
     grid on
     xlabel('Time [s]')
     ylabel('Angle [deg]')
-    name = whatname('right_leg',k);
+    name = getJointAnnotationNameICub('right_leg',k);
     title(name)
 end
 
@@ -153,7 +155,7 @@ for k=1:3
     grid on
     xlabel('Time [s]')
     ylabel('Angle [deg]')
-    name = whatname('torso',k);
+    name = getJointAnnotationNameICub('torso',k);
     title(name)
 end
 

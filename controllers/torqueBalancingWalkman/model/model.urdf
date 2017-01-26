@@ -136,6 +136,9 @@
   <material name="blue">
     <color rgba="0.0 0.2 0.3 1"/>
   </material>
+  <material name="black">
+    <color rgba="0.0 0.0 0.0 1"/>
+  </material>
   <!-- ************ BIGMAN BASE ************** -->
   <!-- 
   ROS urdf definition of the BIGMAN humanoid robot by Istituto Italiano di Tecnologia

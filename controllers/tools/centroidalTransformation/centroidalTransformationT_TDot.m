@@ -7,10 +7,12 @@ function [T, dT] = centroidalTransformationT_TDot(xCoM,x_b,dxCoM,dx_b,M)
 % The output are the transformation matrix T and its derivative, dT.
 
 % ------------Initialization----------------
+import WBM.utilities.skewm;
+
 %% T calculation
 r       = xCoM - x_b;
 
-X       = [eye(3),skew(r)';
+X       = [eye(3),skewm(r)';
            zeros(3),eye(3)];
 
 Mbj     = M(1:6,7:end);
@@ -26,11 +28,11 @@ T       = [X,Js;
 dr      = dxCoM - dx_b;
 mdr     = M(1,1)*dr;
 
-dX      = [zeros(3),skew(dr)';
+dX      = [zeros(3),skewm(dr)';
            zeros(3),zeros(3)];
 
-dMb     = [zeros(3),skew(mdr)';
-           skew(mdr),zeros(3)];
+dMb     = [zeros(3),skewm(mdr)';
+           skewm(mdr),zeros(3)];
 
 inv_dMb = -Mb\dMb/Mb;
 

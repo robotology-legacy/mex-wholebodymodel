@@ -20,6 +20,8 @@ function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FO
 %
 
 % ------------Initialization----------------
+import WBM.utilities.skewm;
+
 %% Config parameters
 pinv_tol            = CONFIG.pinv_tol;
 feet_on_ground      = CONFIG.feet_on_ground;
@@ -82,9 +84,9 @@ x_LFoot              = poseLFoot_ang(1:3);
 r_RF                 = x_RFoot - xCoM;       % Application point of the contact force on the right foot w.r.t. CoM
 r_LF                 = x_LFoot - xCoM;       % Application point of the contact force on the left  foot w.r.t. CoM
 AL                   = [eye(3),    zeros(3);
-                        skew(r_LF),eye(3)];
+                        skewm(r_LF),eye(3)];
 AR                   = [eye(3),    zeros(3);
-                        skew(r_RF),eye(3)];
+                        skewm(r_RF),eye(3)];
 
 % One foot or two feet on ground selector
 if      sum(feet_on_ground) == 2

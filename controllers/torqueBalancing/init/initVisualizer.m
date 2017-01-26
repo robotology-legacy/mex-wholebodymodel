@@ -22,6 +22,8 @@ initState                        = CONFIG.initState;
 %% Robot simulator
 if CONFIG.visualize_robot_simulator == 1
     % list of joints used in the visualizer
+    CONFIG.modelName        = 'iCub';
+    CONFIG.setCamera        = [1,0,0.5];
     CONFIG.mdlLdr           = iDynTree.ModelLoader();
     CONFIG.consideredJoints = iDynTree.StringVector();
     

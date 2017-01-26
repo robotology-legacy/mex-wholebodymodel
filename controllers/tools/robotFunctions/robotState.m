@@ -21,6 +21,7 @@ function STATE = robotState(chi,CONFIG)
 % Config parameters
 % CONFIG.demux.baseOrientationType sets the base orientation in stateDemux.m
 % as positions + quaternions (1) or transformation matrix (0)
+import WBM.utilities.frame2posRotm;
 CONFIG.demux.baseOrientationType = 1;
 
 %% STATE DEMUX
@@ -37,7 +38,7 @@ qt_b                             = basePose(4:7,:);
 % state velocity
 dx_b                             = baseVelocity(1:3,:);
 w_omega_b                        = baseVelocity(4:6,:);
-[~,w_R_b]                        = frame2posrot(basePose);
+[~,w_R_b]                        = frame2posRotm(basePose);
 nu                               = [dx_b;w_omega_b;dqj];
 
 %% Define the output structure

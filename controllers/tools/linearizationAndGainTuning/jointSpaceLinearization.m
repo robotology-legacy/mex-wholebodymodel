@@ -16,6 +16,8 @@ function linearization = jointSpaceLinearization(CONFIG,qjConfig)
 % Genova, May 2016
 
 % ------------Initialization----------------
+import WBM.utilities.skewm;
+
 %% Config parameters
 gainsInit          = CONFIG.gainsInit;
 pinv_tol           = CONFIG.pinv_tol;
@@ -70,16 +72,16 @@ if sum(feet_on_ground) == 1
     
     r              = x_Foot - xCoM;
     A              = [eye(3)   zeros(3);
-                      skew(r)  eye(3) ];
+                      skewm(r)  eye(3) ];
     pinvA          = eye(6)/A;
     
 else
     rR             = x_RFoot - xCoM;
     rL             = x_LFoot - xCoM;
     AL             = [ eye(3),  zeros(3);
-                       skew(rL),  eye(3)];
+                       skewm(rL),  eye(3)];
     AR             = [ eye(3),  zeros(3);
-                       skew(rR),  eye(3)];
+                       skewm(rR),  eye(3)];
     A              = [AL, AR];
     pinvA          = pinv(A,pinv_tol);
 end

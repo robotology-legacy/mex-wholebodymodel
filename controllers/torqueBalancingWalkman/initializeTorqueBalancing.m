@@ -20,7 +20,7 @@ clc
 %% Configure the simulation
 CONFIG.demo_movements                        = 1;                          %either 0 or 1
 CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left foot,right foot]
-CONFIG.use_QPsolver                          = 0;                          %either 0 or 1
+CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
 
 %% Visualization setup
 % robot simulator
@@ -77,15 +77,15 @@ wbm_modelInitialize('bigman');
 CONFIG.ndof = 25;
 
 %% Initial joints position [deg]
-leftArmInit  = [ -20  30  0  45  0]';
-rightArmInit = [ -20  30  0  45  0]';
-torsoInit    = [ -10   0  0]';
+leftArmInit  = [ 0  -8  0  0  0]';
+rightArmInit = [ 0   8  0  0  0]';
+torsoInit    = [ 0   0  0]';
 
 if sum(CONFIG.feet_on_ground) == 2
     
     % initial conditions for balancing on two feet
-    leftLegInit  = [  25.5   0   0  -18.5  -5.5  0]';
-    rightLegInit = [  25.5   0   0  -18.5  -5.5  0]';
+    leftLegInit  = [ 0   0   0   0   0  0 ]';
+    rightLegInit = [ 0   0   0   0   0  0 ]';
     
 elseif CONFIG.feet_on_ground(1) == 1 && CONFIG.feet_on_ground(2) == 0
     
@@ -113,9 +113,9 @@ codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
 utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/tools'];
 robot_root   = [utility_root, filesep, '/robotFunctions'];
 plots_root   = [utility_root, filesep, '/visualization'];
-src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing/src'];
-config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing/config'];
-init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing/init'];
+src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman/src'];
+config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman/config'];
+init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman/init'];
 
 % add the paths
 addpath(utility_root);

@@ -73,6 +73,6 @@ gainsInit.KSdes              = gainsInit.impedances;
 gainsInit.KDdes              = 2*sqrt(gainsInit.KSdes);
 
 % gains for feet correction to avoid numerical intrgration errors
-gainsInit.corrPosFeet        = 10;
+gainsInit.corrPosFeet        = 100;
 
 end

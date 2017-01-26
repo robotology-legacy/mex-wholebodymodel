@@ -14,6 +14,7 @@ function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
 
 % ------------Initialization----------------
 % update the waitbar
+import WBM.utilities.dQuat;
 waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 %% Robot Configuration
@@ -68,7 +69,7 @@ fc              = controlParam.fc;
 
 %% State derivative (dchi) computation
 b_omega_w       = transpose(w_R_b)*w_omega_b;
-dq_b            = quaternionDerivative(b_omega_w,qt_b);
+dq_b            = dQuat(qt_b,b_omega_w);
 nu              = [dx_b;dq_b;dqj];
 dnu             = M\(Jc'*fc + [zeros(6,1); tau]-h);
 % state derivative

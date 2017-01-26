@@ -15,6 +15,8 @@ function fcDes = QPSolver(controlParam,CONFIG,FORKINEMATICS)
 
 % ------------Initialization----------------
 %% Config parameters
+import WBM.utilities.frame2posRotm;
+
 regHessianQP         = CONFIG.reg_HessianQP;
 feet_on_ground       = CONFIG.feet_on_ground;
 
@@ -36,8 +38,8 @@ poseLFoot_qt         = FORKINEMATICS.poseLFoot_qt;
 e1                   = [1;0;0];
 e2                   = [0;1;0];
 e3                   = [0;0;1];
-[~,w_R_RFoot]        = frame2posrot(poseRFoot_qt);
-[~,w_R_LFoot]        = frame2posrot(poseLFoot_qt);
+[~,w_R_RFoot]        = frame2posRotm(poseRFoot_qt);
+[~,w_R_LFoot]        = frame2posRotm(poseLFoot_qt);
 
 % the friction cone is approximated by using linear interpolation of the circle.
 % numberOfPoints defines the number of points used to interpolate the circle in

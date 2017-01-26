@@ -13,6 +13,9 @@ function FORKINEMATICS = robotForKinematics(STATE,DYNAMICS)
 % Genova, May 2016
 
 % ------------Initialization----------------
+import WBM.utilities.frame2posRotm;
+import WBM.utilities.rotm2eulAngVelTF;
+
 % State parameters
 w_R_b          = STATE.w_R_b;
 x_b            = STATE.x_b;
@@ -37,14 +40,14 @@ dxCoM                            = dposeCoM(1:3);
 
 %% Feet orientation using Euler angles
 % feet current position and orientation (rotation matrix)
-[x_Lfoot,b_R_Lfoot]              = frame2posrot(poseLFoot_qt);
-[x_Rfoot,b_R_Rfoot]              = frame2posrot(poseRFoot_qt);
+[x_Lfoot,b_R_Lfoot]              = frame2posRotm(poseLFoot_qt);
+[x_Rfoot,b_R_Rfoot]              = frame2posRotm(poseRFoot_qt);
 
 % orientation is parametrized with euler angles
-[TLfoot,theta_Lfoot]             = parametrization(b_R_Lfoot);
-[TRfoot,theta_Rfoot]             = parametrization(b_R_Rfoot);
-poseLFoot_ang                    = [x_Lfoot; theta_Lfoot'];
-poseRFoot_ang                    = [x_Rfoot; theta_Rfoot'];
+[theta_Lfoot,TLfoot]             = rotm2eulAngVelTF(b_R_Lfoot);
+[theta_Rfoot,TRfoot]             = rotm2eulAngVelTF(b_R_Rfoot);
+poseLFoot_ang                    = [x_Lfoot; theta_Lfoot];
+poseRFoot_ang                    = [x_Rfoot; theta_Rfoot];
 
 %% Define the output structure
 FORKINEMATICS.xCoM               = xCoM;

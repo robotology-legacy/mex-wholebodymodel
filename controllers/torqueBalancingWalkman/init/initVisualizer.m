@@ -22,6 +22,8 @@ initState                        = CONFIG.initState;
 %% Robot simulator
 if CONFIG.visualize_robot_simulator == 1
     % list of joints used in the visualizer
+    CONFIG.modelName        = 'Walkman';
+    CONFIG.setCamera        = [2,0,0.2];
     CONFIG.mdlLdr           = iDynTree.ModelLoader();
     CONFIG.consideredJoints = iDynTree.StringVector();
     

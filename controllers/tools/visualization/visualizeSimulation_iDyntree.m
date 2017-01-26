@@ -31,10 +31,25 @@ model = mdlLdr.model();
 
 % open the visualizer
 viz   = iDynTree.Visualizer();
-
 viz.init();
-viz.addModel(model,'icub');
+viz.addModel(model,CONFIG.modelName);
 viz.draw();
+
+%% Setup environment and lights     
+% disable environmental features     
+env = viz.enviroment();        
+env.setElementVisibility('root_frame',false);        
+ 
+% set lights
+sun      = viz.enviroment().lightViz('sun');     
+lightDir = iDynTree.Direction();     
+lightDir.fromMatlab([-1 0 -1]/sqrt(2));     
+sun.setDirection(lightDir);
+
+% set camera     
+cam = viz.camera();     
+cam.setPosition(iDynTree.Position(CONFIG.setCamera(1),CONFIG.setCamera(2),CONFIG.setCamera(3)));     
+cam.setTarget(iDynTree.Position(0.4,0,0.5));           
 
 %% Robot simulation
 for i=init_time:end_time
@@ -68,4 +83,5 @@ for i=init_time:end_time
     pause(max(0,0.01-t))
 end
 
+pause()
 

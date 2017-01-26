@@ -55,7 +55,7 @@ CONFIG.reg_HessianQP       = 1e-3;
 % run the simulation with CONFIG.linearizationDebug = 1 to verify that the
 % joint space linearization is performed properly, and to check the
 % controlled system's stability
-CONFIG.linearizationDebug  = 0;                                            %either 0 or 1
+CONFIG.linearizationDebug  = 1;                                            %either 0 or 1
 
 % enter in debug mode
 if CONFIG.linearizationDebug == 1
