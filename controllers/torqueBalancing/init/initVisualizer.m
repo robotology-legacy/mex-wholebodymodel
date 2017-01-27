@@ -25,35 +25,37 @@ if CONFIG.visualize_robot_simulator == 1
     CONFIG.modelName        = 'iCub';
     CONFIG.setCamera        = [1,0,0.5];
     CONFIG.mdlLdr           = iDynTree.ModelLoader();
-    CONFIG.consideredJoints = iDynTree.StringVector();
+    consideredJoints        = iDynTree.StringVector();
     
-    CONFIG.consideredJoints.push_back('torso_pitch');
-    CONFIG.consideredJoints.push_back('torso_roll');
-    CONFIG.consideredJoints.push_back('torso_yaw');
-    CONFIG.consideredJoints.push_back('l_shoulder_pitch');
-    CONFIG.consideredJoints.push_back('l_shoulder_roll');
-    CONFIG.consideredJoints.push_back('l_shoulder_yaw');
-    CONFIG.consideredJoints.push_back('l_elbow');
-    CONFIG.consideredJoints.push_back('l_wrist_prosup');
-    CONFIG.consideredJoints.push_back('r_shoulder_pitch');
-    CONFIG.consideredJoints.push_back('r_shoulder_roll');
-    CONFIG.consideredJoints.push_back('r_shoulder_yaw');
-    CONFIG.consideredJoints.push_back('r_elbow');
-    CONFIG.consideredJoints.push_back('r_wrist_prosup');
-    CONFIG.consideredJoints.push_back('l_hip_pitch');
-    CONFIG.consideredJoints.push_back('l_hip_roll');
-    CONFIG.consideredJoints.push_back('l_hip_yaw');
-    CONFIG.consideredJoints.push_back('l_knee');
-    CONFIG.consideredJoints.push_back('l_ankle_pitch');
-    CONFIG.consideredJoints.push_back('l_ankle_roll');
-    CONFIG.consideredJoints.push_back('r_hip_pitch');
-    CONFIG.consideredJoints.push_back('r_hip_roll');
-    CONFIG.consideredJoints.push_back('r_hip_yaw');
-    CONFIG.consideredJoints.push_back('r_knee');
-    CONFIG.consideredJoints.push_back('r_ankle_pitch');
-    CONFIG.consideredJoints.push_back('r_ankle_roll');
-    
-    CONFIG.figureCont = visualizeSimulation_iDyntree(chi,CONFIG);
+    consideredJoints.push_back('torso_pitch');
+    consideredJoints.push_back('torso_roll');
+    consideredJoints.push_back('torso_yaw');
+    consideredJoints.push_back('l_shoulder_pitch');
+    consideredJoints.push_back('l_shoulder_roll');
+    consideredJoints.push_back('l_shoulder_yaw');
+    consideredJoints.push_back('l_elbow');
+    consideredJoints.push_back('l_wrist_prosup');
+    consideredJoints.push_back('r_shoulder_pitch');
+    consideredJoints.push_back('r_shoulder_roll');
+    consideredJoints.push_back('r_shoulder_yaw');
+    consideredJoints.push_back('r_elbow');
+    consideredJoints.push_back('r_wrist_prosup');
+    consideredJoints.push_back('l_hip_pitch');
+    consideredJoints.push_back('l_hip_roll');
+    consideredJoints.push_back('l_hip_yaw');
+    consideredJoints.push_back('l_knee');
+    consideredJoints.push_back('l_ankle_pitch');
+    consideredJoints.push_back('l_ankle_roll');
+    consideredJoints.push_back('r_hip_pitch');
+    consideredJoints.push_back('r_hip_roll');
+    consideredJoints.push_back('r_hip_yaw');
+    consideredJoints.push_back('r_knee');
+    consideredJoints.push_back('r_ankle_pitch');
+    consideredJoints.push_back('r_ankle_roll');
+
+    % load the model from .urdf
+    CONFIG.mdlLdr.loadReducedModelFromFile('../models/icub/model.urdf',consideredJoints);
+    visualizeSimulation_iDyntree(chi,CONFIG);
 end
 
 %% Forward dynamics results

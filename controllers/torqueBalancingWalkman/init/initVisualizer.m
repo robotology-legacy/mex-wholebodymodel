@@ -25,35 +25,37 @@ if CONFIG.visualize_robot_simulator == 1
     CONFIG.modelName        = 'Walkman';
     CONFIG.setCamera        = [2,0,0.2];
     CONFIG.mdlLdr           = iDynTree.ModelLoader();
-    CONFIG.consideredJoints = iDynTree.StringVector();
+    consideredJoints        = iDynTree.StringVector();
     
-    CONFIG.consideredJoints.push_back('WaistSag');
-    CONFIG.consideredJoints.push_back('WaistLat');
-    CONFIG.consideredJoints.push_back('WaistYaw');
-    CONFIG.consideredJoints.push_back('LShSag');
-    CONFIG.consideredJoints.push_back('LShLat');
-    CONFIG.consideredJoints.push_back('LShYaw');
-    CONFIG.consideredJoints.push_back('LElbj');
-    CONFIG.consideredJoints.push_back('LForearmPlate');
-    CONFIG.consideredJoints.push_back('RShSag');
-    CONFIG.consideredJoints.push_back('RShLat');
-    CONFIG.consideredJoints.push_back('RShYaw');
-    CONFIG.consideredJoints.push_back('RElbj');
-    CONFIG.consideredJoints.push_back('RForearmPlate');
-    CONFIG.consideredJoints.push_back('LHipSag');
-    CONFIG.consideredJoints.push_back('LHipLat');
-    CONFIG.consideredJoints.push_back('LHipYaw');
-    CONFIG.consideredJoints.push_back('LKneeSag');
-    CONFIG.consideredJoints.push_back('LAnkSag');
-    CONFIG.consideredJoints.push_back('LAnkLat');
-    CONFIG.consideredJoints.push_back('RHipSag');
-    CONFIG.consideredJoints.push_back('RHipLat');
-    CONFIG.consideredJoints.push_back('RHipYaw');
-    CONFIG.consideredJoints.push_back('RKneeSag');
-    CONFIG.consideredJoints.push_back('RAnkSag');
-    CONFIG.consideredJoints.push_back('RAnkLat');
-    
-    CONFIG.figureCont = visualizeSimulation_iDyntree(chi,CONFIG);
+    consideredJoints.push_back('WaistSag');
+    consideredJoints.push_back('WaistLat');
+    consideredJoints.push_back('WaistYaw');
+    consideredJoints.push_back('LShSag');
+    consideredJoints.push_back('LShLat');
+    consideredJoints.push_back('LShYaw');
+    consideredJoints.push_back('LElbj');
+    consideredJoints.push_back('LForearmPlate');
+    consideredJoints.push_back('RShSag');
+    consideredJoints.push_back('RShLat');
+    consideredJoints.push_back('RShYaw');
+    consideredJoints.push_back('RElbj');
+    consideredJoints.push_back('RForearmPlate');
+    consideredJoints.push_back('LHipSag');
+    consideredJoints.push_back('LHipLat');
+    consideredJoints.push_back('LHipYaw');
+    consideredJoints.push_back('LKneeSag');
+    consideredJoints.push_back('LAnkSag');
+    consideredJoints.push_back('LAnkLat');
+    consideredJoints.push_back('RHipSag');
+    consideredJoints.push_back('RHipLat');
+    consideredJoints.push_back('RHipYaw');
+    consideredJoints.push_back('RKneeSag');
+    consideredJoints.push_back('RAnkSag');
+    consideredJoints.push_back('RAnkLat');
+
+    % load the model from .urdf
+    CONFIG.mdlLdr.loadReducedModelFromFile('../models/walkman/model.urdf',consideredJoints); 
+    visualizeSimulation_iDyntree(chi,CONFIG);
 end
 
 %% Forward dynamics results

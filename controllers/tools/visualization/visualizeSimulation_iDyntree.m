@@ -1,4 +1,4 @@
-function figureCont = visualizeSimulation_iDyntree(chi,CONFIG)
+function [] = visualizeSimulation_iDyntree(chi,CONFIG)
 %VISUALIZESIMULATION_IDYNTREE calls iDyntree visualizer to simulate robot
 %                             movements.
 %
@@ -13,9 +13,8 @@ function figureCont = visualizeSimulation_iDyntree(chi,CONFIG)
 
 % ------------Initialization----------------
 %% initial parameters
-figureCont       = CONFIG.figureCont;
-mdlLdr           = CONFIG.mdlLdr;
-consideredJoints = CONFIG.consideredJoints;
+mdlLdr     = CONFIG.mdlLdr;
+model      = mdlLdr.model();
 
 % get the joint position
 CONFIG.demux.baseOrientationType = 1;
@@ -24,10 +23,6 @@ CONFIG.demux.baseOrientationType = 1;
 % visualization time
 init_time  = 1;
 end_time   = length(qj(1,:));
-
-% load the model from .urdf
-mdlLdr.loadReducedModelFromFile('model/model.urdf',consideredJoints);
-model = mdlLdr.model();
 
 % open the visualizer
 viz   = iDynTree.Visualizer();

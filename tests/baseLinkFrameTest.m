@@ -2,6 +2,8 @@ clearvars;
 close all;
 
 %% initialise mexWholeBodyModel
+import WBM.utilities.frame2posRotm;
+
 wbm_modelInitialize('icubGazeboSim');
 
 %% setup params
@@ -48,7 +50,7 @@ wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
 
 [T_b_Got,~,~,~] = wbm_getState();
 
-[posGot,rotGot] = frame2posrot(T_b_Got);
+[posGot,rotGot] = frame2posRotm(T_b_Got);
 fprintf('Post convertion rotation \n');
 disp(rotGot);
 %fprintf('Post position \n');
