@@ -18,12 +18,14 @@ function figureCont = initVisualizer(t,chi,CONFIG)
 %% Configuration parameters
 ndof                             = CONFIG.ndof;
 initState                        = CONFIG.initState;
+figureCont                       = CONFIG.figureCont;
 
 %% Robot simulator
 if CONFIG.visualize_robot_simulator == 1
     % list of joints used in the visualizer
     CONFIG.modelName        = 'Walkman';
-    CONFIG.setCamera        = [2,0,0.2];
+    CONFIG.setPos           = [1.7,0,1];
+    CONFIG.setCamera        = [0.4,0,1];
     CONFIG.mdlLdr           = iDynTree.ModelLoader();
     consideredJoints        = iDynTree.StringVector();
     
@@ -54,7 +56,12 @@ if CONFIG.visualize_robot_simulator == 1
     consideredJoints.push_back('RAnkLat');
 
     % load the model from .urdf
-    CONFIG.mdlLdr.loadReducedModelFromFile('../models/walkman/model.urdf',consideredJoints); 
+    CONFIG.mdlLdr.loadReducedModelFromFile('../models/walkman/model.urdf',consideredJoints);
+        
+    % set lights
+    CONFIG.lightDir = iDynTree.Direction();     
+    CONFIG.lightDir.fromMatlab([0.5 0 0.5]/sqrt(2)); 
+    
     visualizeSimulation_iDyntree(chi,CONFIG);
 end
 

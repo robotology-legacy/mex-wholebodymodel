@@ -127,7 +127,7 @@
 ####################################################
 -->
   <!-- ***********  MODEL COLORS *********** -->
-  <material name="grey">
+<!--<material name="grey">
     <color rgba="0.5 0.5 0.5 1"/>
   </material>
   <material name="dark_grey">
@@ -138,7 +138,7 @@
   </material>
   <material name="black">
     <color rgba="0.0 0.0 0.0 1"/>
-  </material>
+  </material>-->
   <!-- ************ BIGMAN BASE ************** -->
   <!-- 
   ROS urdf definition of the BIGMAN humanoid robot by Istituto Italiano di Tecnologia
@@ -167,7 +167,7 @@ The coordinate frame called base_link is rigidly attached to the robot root body
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.5 0.5 0.5 1" />
+        <color rgba="0.5 0.5 0.5 1"/>
       </material>
     </visual>
     <collision>
@@ -203,7 +203,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -226,7 +226,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -249,7 +249,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.0 0.2 0.3 1" />
+        <color rgba="0.0 0.2 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -266,16 +266,16 @@ and to define the end effectors of the robot-->
       <mass value="4.7"/>
       <inertia ixx="0.14773769" ixy="0.0" ixz="-0.029780072" iyy="0.16085511" iyz="0.0" izz="0.15409381"/>
     </inertial>
-    <visual>
+<!--<visual>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
       <geometry name="TorsoProtections_visual">
         <mesh filename="meshes/ProtectionSystem.STL" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
-    </visual>
+    </visual>-->
     <collision>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
       <geometry name="TorsoProtections_collision">
@@ -297,7 +297,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -362,7 +362,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.5 0.5 0.5 1" />
+        <color rgba="0.5 0.5 0.5 1"/>
       </material>
     </visual>
     <collision>
@@ -385,7 +385,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.5 0.5 0.5 1" />
+        <color rgba="0.5 0.5 0.5 1"/>
       </material>
     </visual>
     <collision>
@@ -455,7 +455,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -478,7 +478,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -524,7 +524,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -547,7 +547,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -570,7 +570,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -598,7 +598,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -621,7 +621,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -644,7 +644,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.5 0.5 0.5 1" />
+        <color rgba="0.5 0.5 0.5 1"/>
       </material>
     </visual>
     <collision>
@@ -667,7 +667,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -690,7 +690,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -713,7 +713,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -933,7 +933,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -956,7 +956,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -979,7 +979,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1002,7 +1002,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1026,7 +1026,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1049,7 +1049,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1072,7 +1072,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1095,7 +1095,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1256,7 +1256,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1279,7 +1279,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1302,7 +1302,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.0 0.2 0.3 1" />
+        <color rgba="0.0 0.2 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1326,7 +1326,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1349,7 +1349,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1372,7 +1372,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.0 0.2 0.3 1" />
+        <color rgba="0.0 0.2 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1461,7 +1461,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.5 0.5 0.5 1" />
+        <color rgba="0.5 0.5 0.5 1"/>
       </material>
     </visual>
     <collision>
@@ -1490,7 +1490,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.5 0.5 0.5 1" />
+        <color rgba="0.5 0.5 0.5 1"/>
       </material>
     </visual>
     <collision>
@@ -1598,7 +1598,7 @@ and to define the end effectors of the robot-->
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.3 0.3 0.3 1" />
+        <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
@@ -1614,16 +1614,16 @@ and to define the end effectors of the robot-->
       <mass value="0.057654"/>
       <inertia ixx="3.7174E-05" ixy="4.9927E-08" ixz="1.1015E-05" iyy="4.2412E-05" iyz="-9.8165E-09" izz="4.167E-05"/>
     </inertial>
-    <visual>
+<!--<visual>
       <origin rpy="1.5707963267949 0 1.5707963267949" xyz="0 0 0"/>
       <geometry>
         <mesh filename="meshes/hokuyo_link.STL"/>
       </geometry>
       <material name="material.metal">
         <texture />
-        <color rgba="0.0 0.0 0.0 1" />
+        <color rgba="0.0 0.0 0.0 1"/>
       </material>
-    </visual>
+    </visual>-->
     <collision>
       <origin rpy="0 0 0" xyz="0.01885 0 -0.02119"/>
       <geometry>

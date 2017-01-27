@@ -23,7 +23,8 @@ initState                        = CONFIG.initState;
 if CONFIG.visualize_robot_simulator == 1
     % list of joints used in the visualizer
     CONFIG.modelName        = 'iCub';
-    CONFIG.setCamera        = [1,0,0.5];
+    CONFIG.setPos           = [1,0,0.5];    
+    CONFIG.setCamera        = [0.4,0,0.5];
     CONFIG.mdlLdr           = iDynTree.ModelLoader();
     consideredJoints        = iDynTree.StringVector();
     
@@ -55,6 +56,11 @@ if CONFIG.visualize_robot_simulator == 1
 
     % load the model from .urdf
     CONFIG.mdlLdr.loadReducedModelFromFile('../models/icub/model.urdf',consideredJoints);
+            
+    % set lights
+    CONFIG.lightDir = iDynTree.Direction();     
+    CONFIG.lightDir.fromMatlab([-0.5 0 -0.5]/sqrt(2)); 
+    
     visualizeSimulation_iDyntree(chi,CONFIG);
 end
 

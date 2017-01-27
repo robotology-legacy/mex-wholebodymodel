@@ -26,12 +26,12 @@ CONFIG.use_QPsolver                          = 1;                          %eith
 % robot simulator
 CONFIG.visualize_robot_simulator             = 1;                          %either 0 or 1
 % forward dynamics integration results
-CONFIG.visualize_integration_results         = 1;                          %either 0 or 1
-CONFIG.visualize_joints_dynamics             = 1;                          %either 0 or 1
+CONFIG.visualize_integration_results         = 0;                          %either 0 or 1
+CONFIG.visualize_joints_dynamics             = 0;                          %either 0 or 1
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 5;
+CONFIG.tEnd                                  = 1;
 CONFIG.sim_step                              = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -77,8 +77,8 @@ wbm_modelInitialize('bigman');
 CONFIG.ndof = 25;
 
 %% Initial joints position [deg]
-leftArmInit  = [ 0  -8  0  0  0]';
-rightArmInit = [ 0   8  0  0  0]';
+leftArmInit  = [ 0  8  0  0  0]';
+rightArmInit = [ 0 -8  0  0  0]';
 torsoInit    = [ 0   0  0]';
 
 if sum(CONFIG.feet_on_ground) == 2

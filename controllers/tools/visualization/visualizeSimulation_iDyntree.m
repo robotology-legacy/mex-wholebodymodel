@@ -36,15 +36,13 @@ env = viz.enviroment();
 env.setElementVisibility('root_frame',false);        
  
 % set lights
-sun      = viz.enviroment().lightViz('sun');     
-lightDir = iDynTree.Direction();     
-lightDir.fromMatlab([-1 0 -1]/sqrt(2));     
-sun.setDirection(lightDir);
+sun = viz.enviroment().lightViz('sun');         
+sun.setDirection(CONFIG.lightDir);
 
 % set camera     
 cam = viz.camera();     
-cam.setPosition(iDynTree.Position(CONFIG.setCamera(1),CONFIG.setCamera(2),CONFIG.setCamera(3)));     
-cam.setTarget(iDynTree.Position(0.4,0,0.5));           
+cam.setPosition(iDynTree.Position(CONFIG.setPos(1),CONFIG.setPos(2),CONFIG.setPos(3)));     
+cam.setTarget(iDynTree.Position(CONFIG.setCamera(1),CONFIG.setCamera(2),CONFIG.setCamera(3)));           
 
 %% Robot simulation
 for i=init_time:end_time
