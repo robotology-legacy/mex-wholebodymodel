@@ -7,7 +7,15 @@ function [ qDot ] = quaternionDerivative( omega, q )
 %   quaternion comes from https://www-sop.inria.fr/act_recherche/formulaire/uploads/phd-425.pdf
 %   page 101.
 
-K = 1;
+K = 10;
+
+if abs(1-norm(q)) > 0.5
+    error('Quaternion left SO(3): abs((1-norm(q))) > 0.5') 
+end
+
+if abs(1-norm(q)) > 1e-3
+    disp('Quaternion is leaving SO(3): abs((1-norm(q))) > 1e-3');
+end
 
 omegaCross  = [0 -omega';omega -skew(omega)];
 qDot        = 0.5*omegaCross * q + K*(1-norm(q)) * q;
