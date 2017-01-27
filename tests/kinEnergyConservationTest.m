@@ -1,6 +1,6 @@
 function kinEnergyConservationTest(params)
 rng(0, 'v5uniform');     % control random number generation
-clear mexWholeBodyModel; % remove the subroutine from the system memory ...
+%clear mexWholeBodyModel; % remove the subroutine from the system memory ...
 
 %% initialise mexWholeBodyModel
 if( params.isURDF )

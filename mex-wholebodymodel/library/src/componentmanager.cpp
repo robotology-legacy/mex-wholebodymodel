@@ -72,7 +72,6 @@ ModelSetWorldFrame         *ComponentManager::modelSetWorldFrame = 0;
 ModelTransformationMatrix  *ComponentManager::modelTransformationMatrix = 0;
 ModelUpdateState           *ComponentManager::modelUpdateState = 0;
 
-int ComponentManager::nDof = 0;
 std::map<std::string, ModelComponent*> ComponentManager::componentList;
 
 ComponentManager *ComponentManager::getInstance(std::string robotName)
@@ -98,27 +97,18 @@ ComponentManager::ComponentManager(std::string robotName)
   mexPrintf("ComponentManager constructed.\n");
 #endif
   initialize(robotName);
-
-  componentList["centroidal-momentum"]   = modelCentroidalMomentum;
-  componentList["coriolis-forces"]       = modelCoriolisBiasForces;
-  componentList["dJdq"]                  = modelDJdq;
-  componentList["forward-kinematics"]    = modelForwardKinematics;
-  componentList["generalized-forces"]    = modelGeneralizedBiasForces;
-  componentList["get-base-state"]        = modelGetFloatingBaseState;
-  componentList["get-state"]             = modelGetState;
-  componentList["gravity-forces"]        = modelGravityBiasForces;
-  componentList["inverse-dynamics"]      = modelInverseDynamics;
-  componentList["jacobian"]              = modelJacobian;
-  componentList["joint-limits"]          = modelJointLimits;
-  componentList["mass-matrix"]           = modelMassMatrix;
-  componentList["model-initialize"]      = modelInitialize;
-  componentList["model-initialize-urdf"] = modelInitializeURDF;
-  componentList["set-world-frame"]       = modelSetWorldFrame;
-  componentList["transformation-matrix"] = modelTransformationMatrix;
-  componentList["update-state"]          = modelUpdateState;
 }
 
 void ComponentManager::cleanup()
+{
+  deleteComponents();
+  ModelState::deleteInstance();
+#ifdef DEBUG
+  mexPrintf("ComponentManager destructed.\n");
+#endif
+}
+
+void ComponentManager::deleteComponents()
 {
   ModelCentroidalMomentum::deleteInstance();
   ModelCoriolisBiasForces::deleteInstance();
@@ -137,11 +127,6 @@ void ComponentManager::cleanup()
   ModelSetWorldFrame::deleteInstance();
   ModelTransformationMatrix::deleteInstance();
   ModelUpdateState::deleteInstance();
-
-  ModelState::deleteInstance();
-#ifdef DEBUG
-  mexPrintf("ComponentManager destructed.\n");
-#endif
 }
 
 ComponentManager::~ComponentManager()
@@ -155,7 +140,12 @@ ComponentManager::~ComponentManager()
 void ComponentManager::initialize(std::string robotName)
 {
   modelState = ModelState::getInstance(robotName);
+  initComponents();
+  initComponentList();
+}
 
+void ComponentManager::initComponents()
+{
   modelCentroidalMomentum    = ModelCentroidalMomentum::getInstance();
   modelCoriolisBiasForces    = ModelCoriolisBiasForces::getInstance();
   modelDJdq                  = ModelDJdq::getInstance();
@@ -175,24 +165,69 @@ void ComponentManager::initialize(std::string robotName)
   modelUpdateState           = ModelUpdateState::getInstance();
 }
 
+void ComponentManager::initComponentList()
+{
+  componentList["centroidal-momentum"]   = modelCentroidalMomentum;
+  componentList["coriolis-forces"]       = modelCoriolisBiasForces;
+  componentList["dJdq"]                  = modelDJdq;
+  componentList["forward-kinematics"]    = modelForwardKinematics;
+  componentList["generalized-forces"]    = modelGeneralizedBiasForces;
+  componentList["get-base-state"]        = modelGetFloatingBaseState;
+  componentList["get-state"]             = modelGetState;
+  componentList["gravity-forces"]        = modelGravityBiasForces;
+  componentList["inverse-dynamics"]      = modelInverseDynamics;
+  componentList["jacobian"]              = modelJacobian;
+  componentList["joint-limits"]          = modelJointLimits;
+  componentList["mass-matrix"]           = modelMassMatrix;
+  componentList["model-initialize"]      = modelInitialize;
+  componentList["model-initialize-urdf"] = modelInitializeURDF;
+  componentList["set-world-frame"]       = modelSetWorldFrame;
+  componentList["transformation-matrix"] = modelTransformationMatrix;
+  componentList["update-state"]          = modelUpdateState;
+}
+
 bool ComponentManager::processFunctionCall(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs)
 {
 #ifdef DEBUG
   mexPrintf("Trying to parse mex-arguments...\n");
 #endif
   ModelComponent *activeComponent;
-  char *str = mxArrayToString(prhs[0]);
+  char *strKeyName = mxArrayToString(prhs[0]);
+  std::string strInitKey = "model-initialize";
+  std::string strInitUrdfKey = "model-initialize-urdf";
+
+  // check if a new robot model will be initialized ...
+  if ( !strInitKey.compare(strKeyName) || !strInitUrdfKey.compare(strKeyName) ) {
+    if ( !mxIsChar(prhs[1]) ) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
+    }
+    std::string newRobotName  = mxArrayToString(prhs[1]);
+    std::string currRobotName = modelState->robotName();
+
+    if (currRobotName.compare(newRobotName) != 0) {
+      // the model names are different ...
+      mexPrintf("\nNew robot model: %s\n", newRobotName.c_str());
+
+      // reset the component list and all components:
+      mexPrintf("Resetting all components...\n");
+      deleteComponents();
+      componentList.clear();
+
+      initComponents();
+      initComponentList();
+    }
+  }
 
 #ifdef DEBUG
-  mexPrintf("Searching for the component '%s', of size %d\n", str, sizeof(str));
+  mexPrintf("Searching for the component '%s', of size %d.\n", strKeyName, sizeof(strKeyName));
 #endif
 
-  std::map<std::string, ModelComponent*>::iterator search = componentList.find(str);
-  if (search == componentList.end()) {
+  std::map<std::string, ModelComponent*>::iterator comp = componentList.find(strKeyName);
+  if (comp == componentList.end()) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Requested component not found. Please request a valid component.");
   }
 
-  activeComponent = search->second;
+  activeComponent = comp->second;
   if (nlhs != (int)activeComponent->numReturns()) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Error in number of returned parameters in requested component, check the documentations.");
   }

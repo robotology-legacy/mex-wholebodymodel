@@ -60,28 +60,27 @@ void mexFunction(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs)
       mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Initialization has not been performed correctly.");
     }
     // check to be sure input is of type char
-    if ( !(mxIsChar(prhs[0])) ) {
+    if ( !mxIsChar(prhs[0]) ) {
       mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Initialization must include component.");
     }
 
     if (nrhs == 2) {
-      if ( !(mxIsChar(prhs[1])) ) {
+      if ( !mxIsChar(prhs[1]) ) {
         mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Initialization must include component and a robot name.");
       }
       pCompManager = ComponentManager::getInstance(mxArrayToString(prhs[1]));
     }
     else {
+      // initialize with default configuration ...
       pCompManager = ComponentManager::getInstance();
     }
 
     // register function to call on Matlab close / mex clear
     // to proper deallocate all the memory
     mexAtExit(mexWbmExit);
+    return;
   }
-  else {
-    pCompManager = ComponentManager::getInstance();
-  }
-
+  // else, the ComponentManager is already initalized ...
 #ifdef DEBUG
   mexPrintf("Start to process function...\n");
 #endif
@@ -90,7 +89,7 @@ void mexFunction(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs)
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Required component must be named.");
   }
   // check to be sure input is of type char
-  if ( !(mxIsChar(prhs[0])) ) {
+  if ( !mxIsChar(prhs[0]) ) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:inputNotString", "Input must be of type string.");
   }
   pCompManager->processFunctionCall(nlhs, plhs, nrhs, prhs);

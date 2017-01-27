@@ -66,12 +66,14 @@ ModelState::ModelState(std::string robotName)
 {
   if (isRobotNameAFile(robotName)) {
     robotModelFromURDF(robotName);
+    return;
   }
-  else {
-    robotModel(robotName);
-  }
-  nDof = robotWBIModel->getDoFs();
+  // else ...
+  robotModel(robotName);
+}
 
+void ModelState::initState()
+{
   if ( (sqj == 0) && (sqj_dot == 0) ) {
     sqj     = new double[nDof];
     sqj_dot = new double[nDof];
@@ -82,6 +84,17 @@ ModelState::ModelState(std::string robotName)
   }
 
   sg[0] = 0.0f; sg[1] = 0.0f; sg[2] = -9.81f;
+}
+
+void ModelState::initRobotModel(const wbi::IDList &jntIDList)
+{
+  robotWBIModel->addJoints(jntIDList);
+
+  if ( !robotWBIModel->init() ) {
+    mexPrintf("WBI unable to initialize (usually means, unable to connect to chosen robot).\n");
+  }
+  // update the number of DoFs ...
+  nDof = robotWBIModel->getDoFs();
 }
 
 ModelState::~ModelState()
@@ -98,6 +111,15 @@ ModelState::~ModelState()
   mexPrintf("robotWBIModel deleted.\n");
 #endif
 
+  deleteState();
+
+#ifdef DEBUG
+  mexPrintf("ModelState destructor returning.\n");
+#endif
+}
+
+void ModelState::deleteState()
+{
   if (sqj_dot != 0) {
     delete[] sqj_dot;
     sqj_dot = 0;
@@ -112,7 +134,6 @@ ModelState::~ModelState()
   }
 #ifdef DEBUG
   mexPrintf("sqj deleted.\n");
-  mexPrintf("ModelState destructor returning.\n");
 #endif
 }
 
@@ -147,6 +168,26 @@ bool ModelState::setState(double *qj_t, double *qj_dot_t, double *vb_t)
 void ModelState::setGravity(double *pg)
 {
   memcpy(sg, pg, sizeof(double)*3);
+}
+
+void ModelState::setBase2WorldTransformation(wbi::Frame frm3d_H)
+{
+  wf_H_b = frm3d_H;
+}
+
+wbi::Frame ModelState::getBase2WorldTransformation()
+{
+  return wf_H_b;
+}
+
+wbi::iWholeBodyModel *ModelState::robotModel()
+{
+  return robotWBIModel;
+}
+
+std::string ModelState::robotName()
+{
+  return currRobotName;
 }
 
 double *ModelState::qj()
@@ -194,16 +235,12 @@ size_t ModelState::dof()
   return nDof;
 }
 
-wbi::iWholeBodyModel *ModelState::robotModel()
-{
-  return robotWBIModel;
-}
-
 void ModelState::robotModel(std::string robotName)
 {
   if (robotWBIModel != 0) {
-    mexPrintf("Deleting older version of the robot model.\n");
+    mexPrintf("Deleting previous version of the robot model.\n");
     delete robotWBIModel;
+    deleteState();
   }
   // set YARP_ROBOT_NAME enviromental variable to
   // load the robot-specific configuration files
@@ -225,76 +262,48 @@ void ModelState::robotModel(std::string robotName)
   yarpWbiOptions.fromConfigFile(wbiConfFile);
 
   // never get the limits from getLimitsFromControlBoard
-  // when using mex-wholebodymodel
+  // when using mex-WholeBodyModel
   yarpWbiOptions.unput("getLimitsFromControlBoard");
 
   robotWBIModel = new yarpWbi::yarpWholeBodyModel(localName.c_str(), yarpWbiOptions);
 
-  wbi::IDList robMainJointIDList;
-  std::string robMainJointIDListName = "ROBOT_MEX_WBI_TOOLBOX";
-  if ( !yarpWbi::loadIdListFromConfig(robMainJointIDListName, yarpWbiOptions, robMainJointIDList) ) {
-    fprintf(stderr, "[ERR] mex-wholebodymodel: failed to load (WBI) ID joint list with name: %s\n", robMainJointIDListName.c_str());
+  wbi::IDList robJntIDLst;
+  std::string robJntIDLstName = "ROBOT_MEX_WBI_TOOLBOX";
+  if ( !yarpWbi::loadIdListFromConfig(robJntIDLstName, yarpWbiOptions, robJntIDLst) ) {
+    fprintf(stderr, "[ERR] mexWholeBodyModel: Failed to load (WBI) joint-ID list with name \"%s\".\n", robJntIDLstName.c_str());
   }
 
-  robotWBIModel->addJoints(robMainJointIDList);
-
-  if ( !robotWBIModel->init() ) {
-    mexPrintf("WBI unable to initialize (usually means unable to connect to chosen robot).\n");
-  }
-
-  // update the number of dofs
-  nDof = robotWBIModel->getDoFs();
-
-  mexPrintf("mexWholeBodyModel started with robot: %s, Num of Joints: %d\n", robotName.c_str(), robotWBIModel->getDoFs());
+  initRobotModel(robJntIDLst);
+  initState(); // initialize the state variables ...
+  mexPrintf("mexWholeBodyModel started with robot: %s, Num of Joints: %d\n", robotName.c_str(), (int)nDof);
 }
 
 void ModelState::robotModelFromURDF(std::string urdfFileName)
 {
   if (robotWBIModel != 0) {
-    mexPrintf("Deleting older version of the robot model.\n");
+    mexPrintf("Deleting previous version of the robot model.\n");
     delete robotWBIModel;
+    deleteState();
   }
   std::string localName = "mexWBModel";
   yarp::os::Property yarpWbiOptions;
 
   // overwrite the robot parameter that could be present in wbi_conf_file
-  currRobotName = "robotLoadedDirectlyFromURDFfile";
+  currRobotName = "robot_loaded_from_URDF_file";
   yarpWbiOptions.put("robot", currRobotName);
   yarpWbiOptions.put("urdf", urdfFileName.c_str());
   robotWBIModel = new yarpWbi::yarpWholeBodyModel(localName.c_str(), yarpWbiOptions);
 
-  wbi::IDList RobotURDFJoints;
+  wbi::IDList urdfJntIDLst;
   std::vector<std::string> dofsFromURDF;
 
   iDynTree::dofsListFromURDF(urdfFileName, dofsFromURDF);
 
   for (size_t dof=0; dof < dofsFromURDF.size(); dof++) {
-    RobotURDFJoints.addID(dofsFromURDF[dof]);
+    urdfJntIDLst.addID(dofsFromURDF[dof]);
   }
 
-  robotWBIModel->addJoints(RobotURDFJoints);
-
-  if ( !robotWBIModel->init() ) {
-    mexPrintf("WBI unable to initialize (usually means unable to connect to chosen robot).\n");
-  }
-
-  // update the number of dofs
-  nDof = robotWBIModel->getDoFs();
-
-  mexPrintf("mexWholeBodyModel started with robot loaded from URDF file: %s, Num of Joints: %d\n", urdfFileName.c_str(), robotWBIModel->getDoFs());
-}
-
-std::string ModelState::robotName()
-{
-  return currRobotName;
-}
-
-wbi::Frame ModelState::getBase2WorldTransformation()
-{
-  return wf_H_b;
-}
-
-void ModelState::setBase2WorldTransformation(wbi::Frame frm3d_H)
-{
-  wf_H_b = frm3d_H;
+  initRobotModel(urdfJntIDLst);
+  initState(); // initialize the state variables ...
+  mexPrintf("mexWholeBodyModel started with robot loaded from URDF file: %s, Num of Joints: %d\n", urdfFileName.c_str(), (int)nDof);
 }
