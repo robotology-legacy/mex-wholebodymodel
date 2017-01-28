@@ -49,8 +49,8 @@ disp(rot'*rot);
 wbm_updateState(params.qjInit,zeros(params.ndof,1),zeros(6,1));
 
 [T_b_Got,~,~,~] = wbm_getState();
+[posGot,rotGot] = WBM.utilities.frame2posRotm(T_b_Got);
 
-[posGot,rotGot] = frame2posRotm(T_b_Got);
 fprintf('Post convertion rotation \n');
 disp(rotGot);
 %fprintf('Post position \n');

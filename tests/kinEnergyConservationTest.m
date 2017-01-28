@@ -1,6 +1,6 @@
 function kinEnergyConservationTest(params)
 rng(0, 'v5uniform');     % control random number generation
-clear mexWholeBodyModel; % remove the subroutine from the system memory ...
+%clear mexWholeBodyModel; % remove the subroutine from the system memory ...
 
 %% initialise mexWholeBodyModel
 if( params.isURDF )
@@ -40,8 +40,11 @@ wbm_setWorldFrame(eye(3),[0 0 0]',[0 0 0]');
 wbm_updateState(params.qjInit,params.dqjInit,[params.dx_bInit;params.omega_bInit]);
 
 [T_bInit,~,~,~] = wbm_getState();
-params.chiInit  = [T_bInit;params.qjInit;...
-                   params.dx_bInit;params.omega_bInit;params.dqjInit];
+
+%[T_bInit,qj,vb,dqj] = wbm_getState();
+%[Ptemp,Rtemp]       = WBM.utilities.frame2posRotm(T_bInit);
+params.chiInit      = [T_bInit;params.qjInit;...
+                       params.dx_bInit;params.omega_bInit;params.dqjInit];
 
 %% contact constraints (no constraint, free floating system)
 params.constraintLinkNames = {};

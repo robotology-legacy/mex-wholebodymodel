@@ -56,15 +56,11 @@ void ModelInitializeURDF::deleteInstance()
 
 bool ModelInitializeURDF::compute(int nrhs, const mxArray **prhs)
 {
-  if ( !mxIsChar(prhs[1]) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
-  }
   std::string robotName = mxArrayToString(prhs[1]);
 
   if (robotName.compare(modelState->robotName()) != 0) {
     modelState->robotModelFromURDF(robotName);
   }
-
   mexPrintf("Robot name set as: %s\n", (modelState->robotName()).c_str());
   return true;
 }

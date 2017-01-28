@@ -46,25 +46,27 @@ namespace mexWBIComponent
 
       bool setState(double *qj_t, double *qj_dot_t, double *vb_t);
 
-      void setBase2WorldTransformation(wbi::Frame frm3d_H);
       void setGravity(double *pg);
-
+      void setBase2WorldTransformation(wbi::Frame frm3d_H);
       wbi::Frame getBase2WorldTransformation();
+
+      wbi::iWholeBodyModel *robotModel();
+      std::string robotName();
 
       double *qj();
       double *qj_dot();
       double *vb();
       double *g();
+      size_t dof();
 
       void qj(double *qj_t);
       void qj_dot(double *qj_dot_t);
       void vb(double *vb_t);
       void g(double *g_t);
-      size_t dof();
 
       /**
       * Load a robot model from a yarpWholeBodyInterface
-      * configuration, specifyng the YARP_ROBOT_NAME
+      * configuration, specified by YARP_ROBOT_NAME
       */
       void robotModel(std::string robotName);
 
@@ -75,13 +77,14 @@ namespace mexWBIComponent
       */
       void robotModelFromURDF(std::string urdfFileName);
 
-      wbi::iWholeBodyModel *robotModel();
-      std::string robotName();
-
       ~ModelState();
 
     private:
       ModelState(std::string robotName);
+
+      static void initRobotModel(const wbi::IDList &jntIDList);
+      static void initState();
+      static void deleteState();
 
       static ModelState *modelState;
       static wbi::iWholeBodyModel *robotWBIModel;
