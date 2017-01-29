@@ -26,12 +26,12 @@ CONFIG.use_QPsolver                          = 1;                          %eith
 % robot simulator
 CONFIG.visualize_robot_simulator             = 1;                          %either 0 or 1
 % forward dynamics integration results
-CONFIG.visualize_integration_results         = 0;                          %either 0 or 1
-CONFIG.visualize_joints_dynamics             = 0;                          %either 0 or 1
+CONFIG.visualize_integration_results         = 1;                          %either 0 or 1
+CONFIG.visualize_joints_dynamics             = 1;                          %either 0 or 1
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 1;
+CONFIG.tEnd                                  = 10;
 CONFIG.sim_step                              = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%

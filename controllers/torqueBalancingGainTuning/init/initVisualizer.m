@@ -18,6 +18,7 @@ function figureCont = initVisualizer(t,chi,CONFIG)
 %% Configuration parameters
 ndof                             = CONFIG.ndof;
 initState                        = CONFIG.initState;
+figureCont                       = CONFIG.figureCont;
 
 %% Robot simulator
 if CONFIG.visualize_robot_simulator == 1
