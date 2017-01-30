@@ -25,11 +25,16 @@ and this project does not adheres to [Semantic Versioning](http://semver.org/).
 - New version of mex-wholebodymodel. A complete refactory of the toolbox has been done.
 
 ### Renamed
-- The following WBM-wrappers have been renamed: 
-- The output of the following functions changed order:
+- WBM-wrappers functions have been renamed, and some of the outputs are listed in a different way.
 
 ### Moved
-- The controllers have been refactored and moved on a different branch, called `WBM-controllers`; 
+- WBM-based controllers have been refactored and moved on a different branch, called `WBM-Controllers`; 
+
+### Removed and merged 
+- Utility functions have been merged with WMB-class/utilities. Unnecessary or repeated functions have been removed.
+
+### New visualizer
+- New toolbox for visualize robot simulation bades on iDyntree library. For further info, see README.
 
 [Unreleased]: https://github.com/robotology/mex-wholebodymodel/compare/v0.1...HEAD
 [0.1]: https://github.com/robotology/mex-wholebodymodel/compare/9fe87c...v0.1
