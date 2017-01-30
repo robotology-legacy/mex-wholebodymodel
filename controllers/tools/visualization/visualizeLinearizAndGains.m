@@ -15,7 +15,7 @@ function figureCont = visualizeLinearizAndGains(t,CONFIG,ddqjNonLin,ddqjLin)
 %
 
 % ------------Initialization----------------
-import WBM.utilities.getJointAnnotationNameICub;
+import WBM.utilities.getJointAnnotationICub;
 
 % initial parameters
 figureCont = CONFIG.figureCont;
@@ -35,7 +35,7 @@ if CONFIG.linearizationDebug  == 1
         grid on
         xlabel('Time [s]')
         ylabel('Joint Acc [rad/s^2]')
-        name = getJointAnnotationNameICub('left_arm',k);
+        name = getJointAnnotationICub('left_arm',k);
         title(name)
         legend('Lin Acc','NonLin Acc')
         
@@ -49,7 +49,7 @@ if CONFIG.linearizationDebug  == 1
         grid on
         xlabel('Time [s]')
         ylabel('Joint Acc [rad/s^2]')
-        name = getJointAnnotationNameICub('right_arm',k);
+        name = getJointAnnotationICub('right_arm',k);
         title(name)
         legend('Lin Acc','NonLin Acc')
     end
@@ -68,7 +68,7 @@ if CONFIG.linearizationDebug  == 1
         grid on
         xlabel('Time [s]')
         ylabel('Joint Acc [rad/s^2]')
-        name = getJointAnnotationNameICub('left_leg',k);
+        name = getJointAnnotationICub('left_leg',k);
         title(name)
         legend('Lin Acc','NonLin Acc')
         
@@ -82,7 +82,7 @@ if CONFIG.linearizationDebug  == 1
         grid on
         xlabel('Time [s]')
         ylabel('Joint Acc [rad/s^2]')
-        name = getJointAnnotationNameICub('right_leg',k);
+        name = getJointAnnotationICub('right_leg',k);
         title(name)
         legend('Lin Acc','NonLin Acc')
     end
@@ -101,7 +101,7 @@ if CONFIG.linearizationDebug  == 1
         grid on
         xlabel('Time [s]')
         ylabel('Joint Acc [rad/s^2]')
-        name = getJointAnnotationNameICub('torso',k);
+        name = getJointAnnotationICub('torso',k);
         title(name)
         legend('Lin Acc','NonLin Acc')
     end
