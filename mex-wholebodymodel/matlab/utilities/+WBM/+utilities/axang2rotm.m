@@ -5,9 +5,9 @@ function dcm = axang2rotm(axang)
     dcm = zeros(3,3);
     u   = axang(1:3,1); % rotation axis vector
 
-    n2 = u.'*u;
-    if (n2 > 1)
-        u = u./sqrt(n2); % normalize u
+    n = u.'*u;
+    if (n > 1)
+        u = u./sqrt(n); % normalize u
     end
     % axis elements:
     u_1    = u(1,1);

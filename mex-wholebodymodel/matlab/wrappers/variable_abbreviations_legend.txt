@@ -23,6 +23,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     dp        ...  data point
     ds        ...  dimensions
     dstv      ...  derivative of state vector
+    et        ...  elapsed time
     ex, exc   ...  exception
     fb        ...  floating base
     fcn       ...  function
@@ -37,6 +38,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     g         ...  gravity acceleration (vector)
     h...      ...  "handle" to an object, e.g. hFig = handle to the figure object
     h_c       ...  centroidal momentum (vector)
+    hf        ...  half
     hgt       ...  height
     idx       ...  index(es)
     jlim, jl  ...  joint limit(s)

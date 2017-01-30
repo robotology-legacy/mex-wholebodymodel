@@ -15,7 +15,7 @@ function quat = eul2quat(eul, sequence)
     %       9th AAS/AIAA Astrodynamics Specialist Conference, AAS 99-139, 1999, <http://hanspeterschaub.info/Papers/mtb1.pdf>,
     %       p. 7, equations (26a)-(26d).
     %   [2] GitHub: ShoolCode/ASEN 5010-Spacecraft Attitude Dynamics and Control/AIAA Software (2nd)/Matlab Toolbox,
-    %           <https://github.com/ZachDischner/SchoolCode/tree/master/ASEN 5010-Spacecraft Attitude Dynamics and Control/AIAA Software (2nd)/Matlab Toolbox/>
+    %       <https://github.com/ZachDischner/SchoolCode/tree/master/ASEN 5010-Spacecraft Attitude Dynamics and Control/AIAA Software (2nd)/Matlab Toolbox/>
     %   [3] Optimal Spacecraft Rotational Maneuvers, John L. Junkins & James D. Turner, Elsevier, 1986, pp. 31-34, table 2.2.
     %   [4] Shuttle Program. Euler Angles, Quaternions, and Transformation Matrices Working Relationships, D. M. Henderson, NASA, Mission Planning and Analysis Division,
     %       N77-31234/6, 1977, <http://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19770024290.pdf>, pp. 25-27, Appendix A - eq. (10) & (12).

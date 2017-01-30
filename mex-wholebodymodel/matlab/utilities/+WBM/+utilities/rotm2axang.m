@@ -28,7 +28,8 @@ function axang = rotm2axang(rotm)
         else
             u = vertcat(rotm(3,1), rotm(3,2), rotm(3,3)+1);
         end
-        axang(1:3,1) = u./norm(u); % normalize
+        n = u.'*u;
+        axang(1:3,1) = u./sqrt(n); % normalize
         axang(4,1)   = pi;
     else % general case, tr ~= 3 and tr ~= -1:
         axang(4,1) = acos((tr - 1)*0.5); % rotation angle theta within the range (0, pi).

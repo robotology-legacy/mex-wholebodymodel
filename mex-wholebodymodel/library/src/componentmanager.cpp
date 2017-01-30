@@ -208,8 +208,10 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray **plhs, int nrhs, c
       // the model names are different ...
       mexPrintf("\nNew robot model: %s\n", newRobotName.c_str());
 
-      // reset the component list and all components:
+      // reset all components and the component list:
+    #ifdef DEBUG
       mexPrintf("Resetting all components...\n");
+    #endif
       deleteComponents();
       componentList.clear();
 

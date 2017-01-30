@@ -1,6 +1,6 @@
-function deul = dEuler(eul, omega, sequence)
+function de = deul(eul, omega, sequence)
     if (size(omega,1) ~= 3)
-        error('dEuler: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+        error('deul: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
 
     if ~exist('sequence', 'var')
@@ -9,5 +9,5 @@ function deul = dEuler(eul, omega, sequence)
     end
 
     B_inv = WBM.utilities.eul2angRateTF(eul, sequence);
-    deul  = B_inv*omega;
+    de    = B_inv*omega;
 end
