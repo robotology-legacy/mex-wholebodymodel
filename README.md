@@ -16,20 +16,19 @@ An example on how to use mex-wholebodymodel to compute the dynamics quantities o
 a rigid body is available at [examples/rigidBodyDynamics.m](examples/rigidBodyDynamics.m).
 
 ## Controllers
-In branch [WBMToolbox-controllers](https://github.com/robotology/mex-wholebodymodel/tree/WBMToolbox-controllers) the user can find different whole-body controllers implemented using the mex-wholebodymodel interface. The "official" version is
-in the folder [controllers/torqueBalancing](https://github.com/robotology/mex-wholebodymodel/tree/WBMToolbox-controllers/controllers/torqueBalancing), but also other balancing controllers are available. 
-Matlab tools for visualization, inverse kinematics and so on are available in [controllers/tools](https://github.com/robotology/mex-wholebodymodel/tree/WBMToolbox-controllers/controllers/tools) folder.
-For more informations about the balancing controller check the relative [README](https://github.com/robotology/mex-wholebodymodel/tree/WBMToolbox-controllers/controllers/torqueBalancing).
+In [controllers](/controllers) folder the user can find different whole-body controllers implemented using the mex-wholebodymodel interface. The "official" version is in the directory [controllers/torqueBalancing](/controllers/torqueBalancing), but also other balancing controllers are available. 
+Matlab tools for visualization, inverse kinematics, etc. are available in [controllers/tools](/controllers/tools) folder.
+For more informations about the balancing controller check the relative [README](/controllers/torqueBalancing).
 
 ### Simulations
-Please note that simulations of inverse dynamics results are performed using [iDyntree](https://github.com/robotology/iDyntree) visualizer. In order to be able to use it, enable the `IDYNTREE_USES_MATLAB` and `IDYNTREE_USES_IRRLICHT` options in CMake.
-If irrlicht library is not installed in your computer, install it using `sudo apt install libirrlicht-dev`.
+Please note that the simulations of the inverse dynamics results are performed by using the [iDyntree](https://github.com/robotology/iDyntree) visualizer. In order to be able to use it, enable the options `IDYNTREE_USES_MATLAB` and `IDYNTREE_USES_IRRLICHT` in CMake.
+If the _irrlicht library_ is not installed on your computer, install it by applying `sudo apt install libirrlicht-dev`.
 
-## Mex-wholebodymodel
-This folder contains matlab utilities and wrappers and the toolbox C++ library.
+## mex-wholebodymodel
+This folder contains all wrapper and utility functions for Matlab and also the C++ library for the mex-subroutine.
 
 ## Tests
-To verify regression in the code when the user modifies it, some regression tests have been implemented in this repository.
+To verify regression in the code, when the user modifies it, some regression tests have been implemented in this repository.
 
 ### Run tests
 Tests use `ctest` infrastructure.
