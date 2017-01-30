@@ -80,7 +80,7 @@ void mexFunction(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs)
     mexAtExit(mexWbmExit);
     return;
   }
-  // else, the ComponentManager is already initalized ...
+  // else, the ComponentManager is already initialized ...
 #ifdef DEBUG
   mexPrintf("Start to process function...\n");
 #endif

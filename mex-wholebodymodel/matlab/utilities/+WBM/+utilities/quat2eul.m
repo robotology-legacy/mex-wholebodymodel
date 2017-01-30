@@ -9,9 +9,9 @@ function eul = quat2eul(quat, sequence)
     end
     eul = zeros(3,1);
 
-    n2 = quat.'*quat;
-    if (n2 > 1)
-        quat = quat./sqrt(n2); % normalize
+    qnorm = quat.'*quat;
+    if (qnorm > 1)
+        quat = quat./sqrt(qnorm); % normalize
     end
     % scalar part:
     q_0 = quat(1,1);
@@ -27,7 +27,7 @@ function eul = quat2eul(quat, sequence)
     %       9th AAS/AIAA Astrodynamics Specialist Conference, AAS 99-139, 1999, <http://hanspeterschaub.info/Papers/mtb1.pdf>,
     %       pp. 4-6, equations (15)-(17) & (18)-(20) by applying the homogeneous equation (6) with table 2.1 on p. 24 in [3].
     %   [2] GitHub: ShoolCode/ASEN 5010-Spacecraft Attitude Dynamics and Control/AIAA Software (2nd)/Matlab Toolbox,
-    %           <https://github.com/ZachDischner/SchoolCode/tree/master/ASEN 5010-Spacecraft Attitude Dynamics and Control/AIAA Software (2nd)/Matlab Toolbox/>
+    %       <https://github.com/ZachDischner/SchoolCode/tree/master/ASEN 5010-Spacecraft Attitude Dynamics and Control/AIAA Software (2nd)/Matlab Toolbox/>
     %   [3] Optimal Spacecraft Rotational Maneuvers, John L. Junkins & James D. Turner, Elsevier, 1986, p. 28 - eq. (2.55), p. 24 - table 2.1.
     %   [4] Shuttle Program. Euler Angles, Quaternions, and Transformation Matrices Working Relationships, D. M. Henderson, NASA, Mission Planning and Analysis Division,
     %       N77-31234/6, 1977, <http://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19770024290.pdf>, p. 7 - eq. (15), pp. 25-27 - Appendix A - eq. (10) & (12).

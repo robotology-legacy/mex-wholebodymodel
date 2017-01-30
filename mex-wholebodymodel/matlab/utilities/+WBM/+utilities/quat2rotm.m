@@ -4,9 +4,9 @@ function dcm = quat2rotm(quat)
     end
     dcm = zeros(3,3);
 
-    n2 = quat.'*quat;
-    if (n2 > 1)
-        quat = quat./sqrt(n2); % normalize
+    qnorm = quat.'*quat;
+    if (qnorm > 1)
+        quat = quat./sqrt(qnorm); % normalize
     end
     % scalar (real) part:
     q_0 = quat(1,1);
@@ -21,7 +21,7 @@ function dcm = quat2rotm(quat)
     %       R(s,r) = I + (2*s)*S_r + 2*(S_r*S_r),
     %
     % where s denotes the scalar part of the given quaternion, S_r is the skew-symmetric matrix of
-    % the vector part r of the quaternion, and I = eye(3,3).
+    % the vector part r of the quaternion, and I is a (3x3) identity matrix.
     % For more details about the parametrization formula, please check:
     %   [1] CONTRIBUTIONS TO THE AUTOMATIC CONTROL OF AERIAL VEHICLES, Minh Duc HUA, PhD-Thesis, 2009,
     %       <https://www-sop.inria.fr/act_recherche/formulaire/uploads/phd-425.pdf>, p. 101, eq. (3.7) & (3.8).

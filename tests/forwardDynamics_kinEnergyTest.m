@@ -85,7 +85,7 @@ function [dchi, h, g, fc, kinEnergy] = forwardDynamics_kinEnergyTest(t, chi, par
 
     b_R_w   = w_R_b';
     omega_b = b_R_w*omega_W;
-    dqt_b   = WBM.utilities.dQuat(qt_b, omega_b);
+    dqt_b   = WBM.utilities.dquat(qt_b, omega_b);
 
     dx        = [dx_b;dqt_b;dqj];
     dv        = M\(Jc'*fc + [tau+tauDamp; zeros(6,1)]-h);

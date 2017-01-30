@@ -1,6 +1,6 @@
-function quat = quatMult(q1, q2)
+function quat = quatmult(q1, q2)
     if ( (size(q1,1) ~= 4) || (size(q2,1) ~= 4) )
-        error('quatMult: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+        error('quatmult: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
     quat = zeros(4,1);
 

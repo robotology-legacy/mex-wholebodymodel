@@ -1,9 +1,9 @@
-function quat = quatDiv(q1, q2)
+function quat = quatdiv(q1, q2)
     if ( (size(q1,1) ~= 4) || (size(q2,1) ~= 4) )
-        error('quatDiv: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+        error('quatdiv: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
-    quat1  = zeros(4,1);
-    n2_inv = 1/(q2.'*q2); % the .' is crucial to avoid computing the conjugate!
+    quat   = zeros(4,1);
+    qn_inv = 1/(q2.'*q2); % the .' is crucial to avoid computing the conjugate!
 
     %% Calculate the division of two quaternions q1 and q2 with q = q1/q2.
     % The division can be calculated by multiplication of the inverse.
@@ -13,8 +13,8 @@ function quat = quatDiv(q1, q2)
     % Note: This function uses the premultiplication q = q2^(-1)*q1.
     % This can be done either by calling,
     %
-    %   q2_inv = quatInv(q2);
-    %   quat   = quatMult(q2_inv, q1);
+    %   q2_inv = quatinv(q2);
+    %   quat   = quatmult(q2_inv, q1);
     %
     % or alternatively, directly in transformation form (which is faster):
     %   scalar part:
@@ -30,9 +30,9 @@ function quat = quatDiv(q1, q2)
     %   [3] Aircraft Control and Simulation: Dynamics, Controls Design, and Autonomous Systems, Stevens & Lewis & Johnson,
     %       3rd Edition, Wiley-Blackwell, 2015, pp. 46-48.
     % scalar part:
-    quat(1,1) = (q2(1,1)*q1(1,1) + q2(2,1)*q1(2,1) + q2(3,1)*q1(3,1) + q2(4,1)*q1(4,1))*n2_inv;
+    quat(1,1) = (q2(1,1)*q1(1,1) + q2(2,1)*q1(2,1) + q2(3,1)*q1(3,1) + q2(4,1)*q1(4,1))*qn_inv;
     % vector part:
-    quat(2,1) = (q2(1,1)*q1(2,1) - q2(2,1)*q1(1,1) - q2(3,1)*q1(4,1) + q2(4,1)*q1(3,1))*n2_inv;
-    quat(3,1) = (q2(1,1)*q1(3,1) + q2(2,1)*q1(4,1) - q2(3,1)*q1(1,1) - q2(4,1)*q1(2,1))*n2_inv;
-    quat(4,1) = (q2(1,1)*q1(4,1) - q2(2,1)*q1(3,1) + q2(3,1)*q1(2,1) - q2(4,1)*q1(1,1))*n2_inv;
+    quat(2,1) = (q2(1,1)*q1(2,1) - q2(2,1)*q1(1,1) - q2(3,1)*q1(4,1) + q2(4,1)*q1(3,1))*qn_inv;
+    quat(3,1) = (q2(1,1)*q1(3,1) + q2(2,1)*q1(4,1) - q2(3,1)*q1(1,1) - q2(4,1)*q1(2,1))*qn_inv;
+    quat(4,1) = (q2(1,1)*q1(4,1) - q2(2,1)*q1(3,1) + q2(3,1)*q1(2,1) - q2(4,1)*q1(1,1))*qn_inv;
 end
