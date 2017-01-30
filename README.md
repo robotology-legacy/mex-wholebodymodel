@@ -3,7 +3,7 @@ Matlab MEX interface to the wholeBodyModel C++ interface, implemented to be able
 
 ## Installation
 It is recommended to install the `mex-wholebodymodel` throught the [`codyco-superbuild`](https://github.com/robotology/codyco-superbuild/).
-Once you installed the `codyco-superbuild`, the `mex-wholebodymodel` files should have been installed in
+Once you have installed the `codyco-superbuild`, the `mex-wholebodymodel` files should have been installed in
 `${CODYCO_SUPERBUILD_ROOT}/build/install/mex` and its subdirectories (for the `mex-wholebodymodel`, this directories are `mexwbi-wrappers` and `mexwbi-utilities`).
 To execute scripts that use `mex-wholebodymodel`, make sure that this directories are part of your [MATLAB search path](http://www.mathworks.com/help/matlab/ref/path.html). 
 To this purpose, run only once the script `startup_mexWholeBodyModel.m` in `${CODYCO_SUPERBUILD_ROOT}/build/install/mex`. 
