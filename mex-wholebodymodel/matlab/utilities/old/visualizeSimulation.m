@@ -1,13 +1,14 @@
-function figureCont = visualizeSimulation( varargin )
+function figureCont = visualizeSimulation(varargin)
 %VISUALIZESIMULATION is the iCub MATLAB simulator.
 %
-%   VISUALIZESIMULATION generates a simulation from the forward dynamics
-%   integration of the iCub robot. There are two simulations. The one on the
-%   left is performed considering the robot not attached to the ground, i.e.
-%   free floating. The one on the right is performed considering also the
-%   contacts the robot exerts with the environment, i.e. it is a constrained
-%   floating base system.
+% VISUALIZESIMULATION generates a simulation from the forward dynamics
+% integration of the iCub robot. There are two simulations. The one on the
+% left is performed considering the robot not attached to the ground, i.e.
+% free floating. The one on the right is performed considering also the
+% contacts the robot exerts with the environment, i.e. it is a constrained
+% floating base system.
 %
+% * CURRENT VISUALIZER: FROM visualizeForwardDynamics.m *
 
 % ------------Initialization----------------
 %% Initial parameters
@@ -17,11 +18,11 @@ CONFIG     = varargin{3};
 references = varargin{4};
 
 if nargin == 5
-jetsIntensitiesByWeight = varargin{5};
+    jetsIntensitiesByWeight = varargin{5};
 end
 
-figureCont = CONFIG.figureCont;
 % Configure the visualization
+figureCont                          = CONFIG.figureCont;
 CONFIG.visualiser.computeKinematics = true;
 CONFIG.visualiser.saveKinematics    = false;
 CONFIG.visualiser.timeStep          = 0.05;
@@ -31,17 +32,18 @@ CONFIG.visualiser.useSavedData      = false;
 %% Use recorded data
 if CONFIG.visualiser.useSavedData
 
-    fileName               = 'helicoidal.mat';
-    STORED_DATA            = load(fileName);
-    CONFIG.fileName        = fileName;
-    t                      = STORED_DATA.time.Data;
-    chi                    = STORED_DATA.state.Data;
-    references             = STORED_DATA.desired_x_dx_ddx_dddx_CoM.Data;
-    CONFIG.state0          = STORED_DATA.state0;
+    fileName                = 'helicoidal.mat';
+    STORED_DATA             = load(fileName);
+    CONFIG.fileName         = fileName;
+    t                       = STORED_DATA.time.Data;
+    chi                     = STORED_DATA.state.Data;
+    references              = STORED_DATA.desired_x_dx_ddx_dddx_CoM.Data;
+    CONFIG.state0           = STORED_DATA.state0;
 end
 
 %% Make a video of the simulation
-CONFIG.visualiser.makeVideo          = false;
+CONFIG.visualiser.makeVideo = false;
+
 if CONFIG.visualiser.makeVideo
     CONFIG.visualiser.video.filename = 'robotSim';
 end
@@ -87,6 +89,8 @@ end
 
 %% Visualize the robot simulation
 visualizeForwardDynamics(robotConfiguration_t,t,CONFIG,references);
+
+% figures counter
 figureCont = figureCont +1;
 
 end

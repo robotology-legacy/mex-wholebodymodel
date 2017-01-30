@@ -10,6 +10,9 @@ function visualizeForwardDynamics( varargin )
 %
 
 % ------------Initialization----------------
+import WBM.utilities.frame2posRotm;
+import WBM.utilities.roty;
+
 text.color    = [1 1 1];
 text.fontSize = 22;
 xout          = varargin{1};
@@ -53,28 +56,13 @@ else
     [~,qjInit,~,~]   = stateDemux([xout(1,:)';zeros(6+ndof,1)],CONFIG);
 end
 
-[R,p]            = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
+[p,R]                = wbm_getWorldFrameFromFixLnk('l_sole',qjInit);
 
 wbm_setWorldFrame(R,p,[ 0,0,-9.81]');
 wbm_updateState(qjInit,zeros(CONFIG.ndof,1),zeros(6,1));
 
 % the list of link/joint names that are used to construct the robot in the visualizer
-L     = cell(15,1);
-L{1}  = 'root_link'   ;
-L{2}  = 'r_hip_1'     ;
-L{3}  = 'r_lower_leg' ;
-L{4}  = 'r_sole'      ;
-L{5}  = 'l_hip_1'     ;
-L{6}  = 'l_lower_leg' ;
-L{7}  = 'l_sole'      ;
-L{8}  = 'neck_1'      ;
-L{9}  = 'r_shoulder_1';
-L{10} = 'r_elbow_1'   ;
-L{11} = 'r_gripper'   ;
-L{12} = 'l_shoulder_1';
-L{13} = 'l_elbow_1'   ;
-L{14} = 'l_gripper'   ;
-L{15} = 'com'         ;
+L      = CONFIG.linkList;
 
 % RELATED TO WORLD REFERENCE FRAME ISSUE
 % since for now the world reference frame is that of the codyco_balancing_world,
@@ -92,8 +80,8 @@ kin_noBpos = zeros(size(xout,1),7,n_plot);
 if CONFIG.visualiser.computeKinematics
     for jj=1:n_plot
         for ii=1:n % at each instance
-            [pB,R]               = frame2posrot(squeeze(q(ii,:)'));
-            [pB_noBpos,R_noBpos] = frame2posrot(squeeze(q_noBpos(ii,:)'));
+            [pB,R]               = frame2posRotm(squeeze(q(ii,:)'));
+            [pB_noBpos,R_noBpos] = frame2posRotm(squeeze(q_noBpos(ii,:)'));
             kin(ii,:,jj)         = (wbm_forwardKinematics(R,pB,qj(ii,:)',L{jj}))'; % forward kinematics for the list of joints/links
             kin_noBpos(ii,:,jj)  = (wbm_forwardKinematics(R_noBpos,pB_noBpos,qj(ii,:)',L{jj}))'; % forward kinematics for the list of joints/links
         end
@@ -162,7 +150,7 @@ z(1)   = kin(1,3,1);
 pos(1) = plot3(x(1),y(1),z(1),'w*');
 % plot the joints and CoM
 for jj=2:n_plot
-    [Ptemp,~] = frame2posrot(kin(1,:,jj)');
+    [Ptemp,~] = frame2posRotm(kin(1,:,jj)');
     x(jj)     = Ptemp(1);
     y(jj)     = Ptemp(2);
     z(jj)     = Ptemp(3);
@@ -378,14 +366,14 @@ for ii=2:n % the visualization instance
                 ith_axis = abs(CONFIG.jets.axes(ithJet));
                 ith_dir  = sign(CONFIG.jets.axes(ithJet));
                 if num_figure == 1
-                    [w_p_b,w_R_b] = frame2posrot(squeeze(q(ii,:)'));
+                    [w_p_b,w_R_b] = frame2posRotm(squeeze(q(ii,:)'));
                 else
-                    [w_p_b,w_R_b] = frame2posrot(squeeze(q_noBpos(ii,:)'));
+                    [w_p_b,w_R_b] = frame2posRotm(squeeze(q_noBpos(ii,:)'));
                 end
                 
                 kinTmp = (wbm_forwardKinematics(w_R_b,w_p_b,qj(ii,:)',CONFIG.jets.frames{ithJet}))'; % forward kinematics for the list of joints/links
                 
-                [w_p_link,w_R_link] = frame2posrot(kinTmp);
+                [w_p_link,w_R_link] = frame2posRotm(kinTmp);
                 
                 [xT, yT, zT] = cylinder(1.3*F+jetsIntensities(ii,ithJet)*tCy);
                 CoordT_i = roty(pi/2)*fromMesh2sortedVector(xT,yT,zT);
@@ -437,7 +425,7 @@ for ii=2:n % the visualization instance
             else
                 kin_tmp = kin_noBpos(ii,:,jj);
             end
-            [Ptemp,~] = frame2posrot(kin_tmp);
+            [Ptemp,~] = frame2posRotm(kin_tmp);
             x(jj) = Ptemp(1);
             y(jj) = Ptemp(2);
             z(jj) = Ptemp(3);
