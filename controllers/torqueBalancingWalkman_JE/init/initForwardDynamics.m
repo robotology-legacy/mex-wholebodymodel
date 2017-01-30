@@ -19,6 +19,8 @@ qjInit                       = CONFIG.qjInit;
 dqjInit                      = zeros(ndof,1);
 dx_bInit                     = zeros(3,1);
 w_omega_bInit                = zeros(3,1);
+thetaInit                    = qjInit;
+dthetaInit                   = dqjInit;
 
 %% Contact constraints definition
 if sum(feet_on_ground) == 2
@@ -52,6 +54,7 @@ wbm_setWorldFrame(w_R_bInit,x_bInit,[0 0 -9.81]')
 % initial state (floating base + joints)
 [basePoseInit,~,~,~]          = wbm_getState();
 chiInit                       = [basePoseInit; qjInit; dx_bInit; w_omega_bInit; dqjInit];
+chi_jeInit                    = [chiInit; thetaInit; dthetaInit];      
 
 %% Initial gains
 % the initial gains are defined before the numerical integration
@@ -71,9 +74,9 @@ forwardDynFunc        = @(t,chi)forwardDynamics(t,chi,CONFIG);
 
 % either fixed step integrator or ODE15s
 if CONFIG.integrateWithFixedStep == 1
-    [t,chi]           = euleroForward(forwardDynFunc,chiInit,CONFIG.tEnd,CONFIG.tStart,CONFIG.sim_step);
+    [t,chi]           = euleroForward(forwardDynFunc,chi_jeInit,CONFIG.tEnd,CONFIG.tStart,CONFIG.sim_step);
 else
-    [t,chi]           = ode15s(forwardDynFunc,CONFIG.tStart:CONFIG.sim_step:CONFIG.tEnd,chiInit,CONFIG.options);
+    [t,chi]           = ode15s(forwardDynFunc,CONFIG.tStart:CONFIG.sim_step:CONFIG.tEnd,chi_jeInit,CONFIG.options);
 end
 
 delete(CONFIG.wait)

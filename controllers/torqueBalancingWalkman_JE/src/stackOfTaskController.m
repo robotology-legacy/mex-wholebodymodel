@@ -1,4 +1,4 @@
-function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE,theta,dtheta)
+function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE,theta,ELASTICITY)
 %STACKOFTASKCONTROLLER implements a momentum-based control algorithm in order
 %                      to control the robot iCub.
 %

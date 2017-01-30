@@ -1,4 +1,4 @@
-function controlParam  = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,theta,dtheta)
+function controlParam  = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,theta,ELASTICITY)
 %RUNCONTROLLER  is the initialization function for iCub balancing controllers
 %               in MATLAB.
 %
@@ -43,7 +43,7 @@ deltaPoseRFoot        = TR*(poseRFoot_ang-initForKinematics.poseRFoot_ang);
 deltaPoseLFoot        = TL*(poseLFoot_ang-initForKinematics.poseLFoot_ang);
 
 %% BALANCING CONTROLLER: the current version uses a stack of task approach
-controlParam          = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE,theta,dtheta);
+controlParam          = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE,theta,ELASTICITY);
 
 if  use_QPsolver == 1                 
     % quadratic programming solver for the nullspace of contact forces
@@ -53,7 +53,7 @@ end
 controlParam.u        = controlParam.uModel + controlParam.Sigma*controlParam.fcDes;
 
 %% Backstepping on the motor dynamics: desired torques (tau)
-controlParam.tau      = motorController();
+controlParam.tau = motorController(theta,ELASTICITY,STATE);
 
 %% Feet pose correction
 % this will avoid numerical errors during the forward dynamics integration

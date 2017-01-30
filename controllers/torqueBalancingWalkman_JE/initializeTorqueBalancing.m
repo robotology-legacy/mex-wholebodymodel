@@ -113,9 +113,9 @@ codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
 utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/tools'];
 robot_root   = [utility_root, filesep, '/robotFunctions'];
 plots_root   = [utility_root, filesep, '/visualization'];
-src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman/src'];
-config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman/config'];
-init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman/init'];
+src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman_JE/src'];
+config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman_JE/config'];
+init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman_JE/init'];
 
 % add the paths
 addpath(utility_root);

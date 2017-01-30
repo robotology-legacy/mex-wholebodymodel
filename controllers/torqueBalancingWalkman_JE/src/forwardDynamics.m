@@ -20,8 +20,12 @@ waitbar(t/CONFIG.tEnd,CONFIG.wait)
 %% Robot Configuration
 ndof                  = CONFIG.ndof;
 chi                   = chi_je(1:(13+2*ndof));
+
+% motor configuration
 theta                 = chi_je(14+2*ndof:14+3*ndof);
 dtheta                = chi_je(15+3*ndof:end);
+ELASTICITY            = addElasticJoints();
+
 gain                  = CONFIG.gainsInit;
 qjInit                = CONFIG.qjInit;
 
@@ -66,7 +70,7 @@ trajectory.jointReferences.qjRef   = qjInit;
 trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(CONFIG.xCoMRef,t,CONFIG);
 
 %% Torque balancing controller
-controlParam    = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,theta,dtheta);
+controlParam    = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,theta,ELASTICITY);
 tau             = controlParam.tau;
 fc              = controlParam.fc;
 u               = controlParam.u;
