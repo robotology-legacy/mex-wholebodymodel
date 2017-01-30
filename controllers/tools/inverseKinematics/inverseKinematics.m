@@ -18,7 +18,7 @@ function [dchi, visualizeIkinParam] = inverseKinematics(t,chi,CONFIG)
 %
 
 % ------------Initialization----------------
-import WBM.utilities.dQuat;
+import WBM.utilities.dquat;
 waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 % Config parameters
@@ -131,7 +131,7 @@ dnuMom             = pinv(JMomTasks,pinv_tol)*MomErrorDynamics + NullMom*dnuPost
 dnu                = pinv(Jc,pinv_tol)*feetErrorDynamics + NullFeet*dnuMom;
 
 %% State derivative
-dqt_base           = dQuat(basePose(4:end),transpose(w_R_b)*nuBase(4:end));
+dqt_base           = dquat(basePose(4:end),transpose(w_R_b)*nuBase(4:end));
 dchi               = [nuBase(1:3); dqt_base; dqj; dnu];
 
 %% Parameters for visualization
