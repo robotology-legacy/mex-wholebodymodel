@@ -17,7 +17,6 @@ endif()
 find_package(ICUB                   REQUIRED)
 find_package(YARP                   REQUIRED)
 find_package(YCM                    REQUIRED)
-find_package(Eigen3                 REQUIRED)
 find_package(TinyXML                REQUIRED)
 find_package(iDynTree 0.3.9         REQUIRED)
 find_package(wholeBodyInterface     REQUIRED)
@@ -56,5 +55,3 @@ add_subdirectory(tests)
 # STARTUP mexWholeBodyModel
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/.startup_mexWholeBodyModel.m.in ${CMAKE_BINARY_DIR}/startup_mexWholeBodyModel.m)
 install(FILES ${CMAKE_BINARY_DIR}/startup_mexWholeBodyModel.m DESTINATION mex)
-
-
