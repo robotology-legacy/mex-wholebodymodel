@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -20,52 +21,49 @@
 #ifndef MODELJACOBIAN_H
 #define MODELJACOBIAN_H
 
+// global includes
+
+// library includes
+
+// local includes
 #include "modelcomponent.h"
-#include "wbi/iWholeBodyModel.h"
-#include "wbi/wbiUtil.h"
 
-
-//local includes
-#include "mexwholebodymodelsettings.h"
-
-
-namespace mexWBIComponent{
-class ModelJacobian : public ModelComponent
+namespace mexWBIComponent
 {
-public:
+  class ModelJacobian : public ModelComponent
+  {
+    public:
+      static ModelJacobian *getInstance();
 
+      /**
+       * Delete the (static) instance of this component,
+       * and set the instance pointer to 0.
+       */
+      static void deleteInstance();
 
-  static ModelJacobian* getInstance();
+      virtual bool allocateReturnSpace(int nlhs, mxArray **plhs);
+      virtual bool compute(int, const mxArray**);
+      virtual bool computeFast(int, const mxArray**);
 
-  /**
-   * Delete the (static) instance of this component,
-   * and set the instance pointer to NULL.
-   */
-  static void deleteInstance();
+      virtual ~ModelJacobian();
 
-//   virtual const int numReturns();
-//   virtual bool display(int, const mxArray *[]);
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
-  virtual bool allocateReturnSpace(int, mxArray *[]);
+    private:
+      ModelJacobian();
+      bool processArguments(int, const mxArray**);
 
-  virtual ~ModelJacobian();
-private:
-  ModelJacobian();
-  static ModelJacobian* modelJacobian;
+      static ModelJacobian *modelJacobian;
 
-  bool processArguments(int, const mxArray *[]);
+      static size_t nDof;
+      static int    nCols;
+      static double *J_rmo; // Jacobian in "row major order"
 
-//<<<<<< HEAD
-  double *j_colMajor;
-  double *j_rowMajor;//[6*(6+MEX_WBMODEL_MAX_NUM_JOINTS)];
-//=======
-//   double *j;
-//   double *temporaryJacobian;
-// >>>>>>> 2079d9e9aecaad2016bf292be94bc8c6b2688f1a
-  double *qj;
-  char * refLink;
+      // inputs:
+      static double *qj;
+      static char   *refLnk;
+      // output:
+      static double *wf_J_lnk; // Jacobian (from ref. link to world frame)
+  };
 
-};
 }
+
 #endif // MODELJACOBIAN_H

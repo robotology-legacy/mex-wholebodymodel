@@ -17,5 +17,4 @@
  * Public License for more details
  */
 
-
 #define MEX_WBMODEL_MAX_NUM_JOINTS 35

@@ -1,41 +1,48 @@
-set(SOURCES src/componentmanager.cpp
-            src/mexmain.cpp
-            src/modelcentroidalmomentum.cpp
+set(SOURCES src/mexmain.cpp
+            src/componentmanager.cpp
+            src/modelstate.cpp
             src/modelcomponent.cpp
+            src/modelcentroidalmomentum.cpp
+            src/modelcoriolisbiasforces.cpp
             src/modeldjdq.cpp
             src/modelforwardkinematics.cpp
-            src/modelgeneralisedbiasforces.cpp
+            src/modelgeneralizedbiasforces.cpp
+            src/modelgetfloatingbasestate.cpp
             src/modelgetstate.cpp
-            src/modelinitialise.cpp
-            src/modelinitialiseurdf.cpp
+            src/modelgravitybiasforces.cpp
+            src/modelinitialize.cpp
+            src/modelinitializeurdf.cpp
+            src/modelinversedynamics.cpp
             src/modeljacobian.cpp
             src/modeljointlimits.cpp
             src/modelmassmatrix.cpp
             src/modelsetworldframe.cpp
-            src/modelstate.cpp
+            src/modeltransformationmatrix.cpp
             src/modelupdatestate.cpp
-            src/modelvisualizetrajectory.cpp
 )
             
 set(HEADERS include/componentmanager.h
+            include/modelstate.h
+            include/modelcomponent.h
             include/mexwholebodymodelsettings.h
             include/modelcentroidalmomentum.h
-            include/modelcomponent.h
+            include/modelcoriolisbiasforces.h
             include/modeldjdq.h
             include/modelforwardkinematics.h
-            include/modelgeneralisedbiasforces.h
+            include/modelgeneralizedbiasforces.h
+            include/modelgetfloatingbasestate.h
             include/modelgetstate.h
-            include/modelinitialise.h
-            include/modelinitialiseurdf.h
+            include/modelgravitybiasforces.h
+            include/modelinitialize.h
+            include/modelinitializeurdf.h
+            include/modelinversedynamics.h
             include/modeljacobian.h
             include/modeljointlimits.h
             include/modelmassmatrix.h
             include/modelsetworldframe.h
-            include/modelstate.h
+            include/modeltransformationmatrix.h
             include/modelupdatestate.h
-            include/modelvisualizetrajectory.h
 )
-
 
 source_group("Source Files" FILES ${SOURCES})
 source_group("Headers Files" FILES ${HEADERS})
@@ -46,7 +53,6 @@ include(iCubOptions)
 
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ICUB_LINK_FLAGS}")
 
-
 #Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include
                     ${wholeBodyInterface_INCLUDE_DIRS}
@@ -54,8 +60,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include
                     ${iDynTree_INCLUDE_DIRS}
                     ${paramHelp_INCLUDE_DIRS}
                     ${skinDynLib_INCLUDE_DIRS}
-                    ${ctrlLib_INCLUDE_DIRS}
-                    ${EIGEN3_INCLUDE_DIR})
+                    ${ctrlLib_INCLUDE_DIRS})
 
 include_directories(${Matlab_INCLUDE_DIRS})
 include_directories(${YARP_INCLUDE_DIRS})

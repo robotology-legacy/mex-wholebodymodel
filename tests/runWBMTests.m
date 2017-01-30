@@ -14,12 +14,12 @@ try
     % in this list. To make a test fail, just raise an exception,
     % for example by checking a condition with an assert
     WBMTests
-catch ME
-    disp(getReport(ME,'extended'));
-    warning('mex-wholebodymodel matlab tests failed. Exiting matlab.');
-    exit(1)
+catch exc
+    disp(getReport(exc, 'extended'));
+    warning('mex-WholeBodyModel tests: Matlab tests failed! Exiting Matlab.');
+    clearExit(1);
 end
 
 % if we arrive at this point all test went well
-disp('mex-wholebodymodel tests: all test completed successfully!')
-exit(0)
+disp('mex-WholeBodyModel tests: All tests completed successfully!')
+clearExit(0);

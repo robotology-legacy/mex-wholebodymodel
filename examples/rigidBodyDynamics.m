@@ -11,14 +11,14 @@ close all;
 %% The function is searching the file in the current working
 %% directory, so make sure that you are launching the script
 %% in the directory where rigidBody.urdf is found
-wbm_modelInitialiseFromURDF('rigidBody.urdf');
+wbm_modelInitializeFromURDF('rigidBody.urdf');
 
 %% the number of (internal) dofs is 0 for a rigid body
 %% we set the state to some random values, just to show how to
 %% get the dynamics quantities
 w_R_b   = eye(3,3); % rotation matrix that transforms a vector in the base frame to the world frame
-x_b     = [1;2;3]; % position of the link frame origin wrt to the world frame
-qj      = zeros(0,1);  % joint positions
+x_b     = [1;2;3];  % position of the link frame origin wrt to the world frame
+qj      = zeros(0,1); % joint positions
 dqj     = zeros(0,1); % joint velocities
 grav    = [0;0;-9.8]; % gravity in world frame
 dx_b    = [0.4;0.5;0.6]; % derivative in the position of the link frame origin wrt to the world frame
@@ -32,7 +32,7 @@ wbm_updateState(qj,dqj,[dx_b;omega_W]);
 M = wbm_massMatrix();
 
 % and the generalized bias forces (coriolis + gravity forces)
-h = wbm_generalisedBiasForces();
+h = wbm_generalizedBiasForces();
 
 % We can check them by printing them:
 disp(M)
@@ -49,4 +49,3 @@ world_T_frame = wbm_forwardKinematics('root_link');
 % and the last 4 elements are the quaternion corresponding to the rotation between the frame and the world frame
 % for more info, check wbm_forwardKinematics options
 disp(world_T_frame)
-
