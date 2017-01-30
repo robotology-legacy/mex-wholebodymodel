@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -20,38 +21,46 @@
 #ifndef MODELDJDQ_H
 #define MODELDJDQ_H
 
+// global includes
+
+// library includes
+
+// local includes
 #include "modelcomponent.h"
 
 namespace mexWBIComponent
 {
-class ModelDjDq : public ModelComponent
-{
-public:
-   static ModelDjDq* getInstance(void);
-  /**
-   * Delete the (static) instance of this component,
-   * and set the instance pointer to NULL.
-   */
-  static void deleteInstance();
+  class ModelDJdq : public ModelComponent
+  {
+    public:
+      static ModelDJdq *getInstance(void);
 
-  virtual bool allocateReturnSpace(int, mxArray*[]);
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
+      /**
+       * Delete the (static) instance of this component,
+       * and set the instance pointer to 0.
+       */
+      static void deleteInstance();
 
-    //virtual bool display(int, const mxArray *[]);
-  virtual ~ModelDjDq();
+      virtual bool allocateReturnSpace(int nlhs, mxArray **plhs);
+      virtual bool compute(int nrhs, const mxArray **prhs);
+      virtual bool computeFast(int nrhs, const mxArray **prhs);
 
-private:
-  ModelDjDq(void);
-  static ModelDjDq *modelDjDq;
-  bool processArguments(int, const mxArray *[]);
+      virtual ~ModelDJdq();
 
-  double *qj;
-  double *qjDot;
-  double *vb;
-  double *Djdq;
-  char *refLink;
-};
+    private:
+      ModelDJdq(void);
+      bool processArguments(int nrhs, const mxArray **prhs);
+
+      static ModelDJdq *modelDJdq;
+
+      // inputs:
+      static double *qj;
+      static double *qj_dot;
+      static double *vb;
+      static char   *refLnk;
+      // output:
+      static double *dJdq;
+  };
 
 }
 

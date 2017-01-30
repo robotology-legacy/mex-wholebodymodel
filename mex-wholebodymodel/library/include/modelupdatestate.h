@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Authors: Naveen Kuppuswamy
  * email: naveen.kuppuswamy@iit.it
+ * modified by: Martin Neururer; email: martin.neururer@gmail.com; date: June, 2016 & January, 2017
  *
  * The development of this software was supported by the FP7 EU projects
  * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b))
@@ -27,34 +28,32 @@
 // local includes
 #include "modelcomponent.h"
 
-namespace mexWBIComponent{
-
-class ModelUpdateState : public ModelComponent
+namespace mexWBIComponent
 {
-public:
-  static ModelUpdateState* getInstance();
+  class ModelUpdateState : public ModelComponent
+  {
+    public:
+      static ModelUpdateState *getInstance();
 
-  /**
-   * Delete the (static) instance of this component,
-   * and set the instance pointer to NULL.
-   */
-  static void deleteInstance();
+      /**
+       * Delete the (static) instance of this component,
+       * and set the instance pointer to 0.
+       */
+      static void deleteInstance();
 
-  virtual bool allocateReturnSpace(int, mxArray*[]);
-//   virtual bool display(int, const mxArray *[]);
-  virtual bool compute(int, const mxArray *[]);
-  virtual bool computeFast(int, const mxArray *[]);
+      virtual bool allocateReturnSpace(int nlhs, mxArray **plhs);
+      virtual bool compute(int nrhs, const mxArray **prhs);
+      virtual bool computeFast(int nrhs, const mxArray **prhs);
 
-  virtual ~ModelUpdateState();
-private:
-  ModelUpdateState();
-  static ModelUpdateState *modelUpdateState;
-//   const int numReturnArguments;
+      virtual ~ModelUpdateState();
 
-  bool setState(int, const mxArray *[]);
-//   wbi::Frame updateBaseFrame(double *);
-  Eigen::Matrix4d H_w2b;
-};
+    private:
+      ModelUpdateState();
+      bool setState(int nrhs, const mxArray **prhs);
+
+      static ModelUpdateState *modelUpdateState;
+  };
+
 }
 
 #endif // MODELUPDATESTATE_H
