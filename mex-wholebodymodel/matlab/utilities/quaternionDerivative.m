@@ -1,4 +1,4 @@
-function [ qDot ] = quaternionDerivative( omega, q )
+function [ qDot ] = quaternionDerivative( omega, q, gainQuaternion )
 %QUATERNIONDERIVATIVE Function to compute the numerical derivative of a
 %quaternion from angular velocity as a vector
 %   Computes a derivate of quaternion using the classical form and includes
@@ -7,7 +7,11 @@ function [ qDot ] = quaternionDerivative( omega, q )
 %   quaternion comes from https://www-sop.inria.fr/act_recherche/formulaire/uploads/phd-425.pdf
 %   page 101.
 
-K = 10;
+if nargin > 2
+    K = gainQuaternion;
+else
+    K = 1;
+end
 
 if abs(1-norm(q)) > 0.5
     error('Quaternion left SO(3): abs((1-norm(q))) > 0.5') 
