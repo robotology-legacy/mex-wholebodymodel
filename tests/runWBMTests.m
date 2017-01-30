@@ -9,6 +9,7 @@ addpathWBMTests
 % we need to use custom functions because the Matlab Unit Testing
 % framework was introduced in Matlab 2013a, and we need to support
 % also Matlab 2012x
+tic;
 try
     % if you want to add new tests, just add the name of the script
     % in this list. To make a test fail, just raise an exception,
@@ -19,7 +20,9 @@ catch exc
     warning('mex-WholeBodyModel tests: Matlab tests failed! Exiting Matlab.');
     clearExit(1);
 end
+et = toc();
 
 % if we arrive at this point all test went well
 disp('mex-WholeBodyModel tests: All tests completed successfully!')
+fprintf('elapsed time: %f seconds.\n', et);
 clearExit(0);

@@ -5,11 +5,11 @@ function axang = quat2axang(quat)
     axang   = zeros(4,1);
     epsilon = 1e-12; % min. value to treat a number as zero ...
 
-    n2 = quat.'*quat;
-    if (n2 > 1)
+    qnorm = quat.'*quat;
+    if (qnorm > 1)
         % if the quaternion is not normalized, i.e. if the scalar part q_s > 1,
         % then acos and sqrt will produce errors ...
-        quat = quat./sqrt(n2); % normalize
+        quat = quat./sqrt(qnorm); % normalize
     end
 
     %% Translate the given quaternion to the axis-angle representation (u, theta):

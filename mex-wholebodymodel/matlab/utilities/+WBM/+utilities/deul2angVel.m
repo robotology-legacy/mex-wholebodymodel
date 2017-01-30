@@ -1,6 +1,6 @@
-function omega = dEuler2angVel(deul, eul, sequence)
+function omega = deul2angVel(deul, eul, sequence)
     if (size(deul,1) ~= 3)
-        error('dEuler2angVel: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+        error('deul2angVel: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
 
     if ~exist('sequence', 'var')

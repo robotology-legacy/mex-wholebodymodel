@@ -1,16 +1,16 @@
-function plotQuat(vqT, twait)
+function plotquat(vqT, twait)
     if ~exist('twait', 'var')
         % use the default time duration of waiting (in seconds) ...
         twait = 0.0005;
     end
 
     if ~ismatrix(vqT)
-        error('plotQuat: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+        error('plotquat: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
     % the matrix-dimension must be of m-by-7:
     [nRows, nCols] = size(vqT);
     if (nCols ~= 7)
-        error('plotQuat: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+        error('plotquat: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
     end
     lin_width = 1;
     mkr_size  = 8.5;
