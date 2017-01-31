@@ -1,8 +1,9 @@
-function ELASTICITY            = addElasticJoints(CONFIG)
+function ELASTICITY = addElasticJoints(CONFIG)
 
-ndof = CONFIG.ndof;
-ELASTICITY.B  = eye(ndof);
-ELASTICITY.KS = eye(ndof);
-ELASTICITY.KD = eye(ndof);
-ELASTICITY.KS_gain = eye(ndof);
-ELASTICITY.KD_gain = eye(ndof);
+ndof                 = CONFIG.ndof;
+ELASTICITY.B         = 0.1*eye(ndof);
+ELASTICITY.KS        = 0.1*eye(ndof);
+ELASTICITY.KD        = 0.1*eye(ndof);
+ELASTICITY.KD_gain   = 0.1*eye(ndof);
+
+end

@@ -1,4 +1,4 @@
-function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE,theta,ELASTICITY)
+function controlParam = stackOfTaskController(varargin)
 %STACKOFTASKCONTROLLER implements a momentum-based control algorithm in order
 %                      to control the robot iCub.
 %
@@ -20,6 +20,18 @@ function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FO
 %
 
 % ------------Initialization----------------
+CONFIG        = varargin{1};
+gain          = varargin{2};
+trajectory    = varargin{3}; 
+DYNAMICS      = varargin{4};
+FORKINEMATICS = varargin{5};
+STATE         = varargin{6};
+
+if nargin == 8
+    theta       = varargin{7};
+    ELASTICITY  = varargin{8};
+end
+
 import WBM.utilities.skewm;
 
 %% Config parameters
@@ -136,7 +148,13 @@ posturalCorr       =  NullLambdaDamp*Mbar;
 impedances         =  impedances*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
 dampings           =  dampings*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
 
-uModel             =  pinvLambda*(JcMinv*h - dJc_nu) + ELASTICITY.KS*(qj-theta)+ELASTICITY.KD*dqj + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
+if CONFIG.consider_el_joints == 1
+    controlParam.ddtheta_ref = zeros(ndof,1);
+    controlParam.dtheta_ref  =  pinvLambda*(JcMinv*h - dJc_nu) + ELASTICITY.KS*(qj-theta)+ELASTICITY.KD*dqj + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
+                                + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
+end
+
+tauModel           =  pinvLambda*(JcMinv*h - dJc_nu) + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
                       + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
 
 %% Desired contact forces computation
@@ -147,7 +165,7 @@ f0                 = zeros(6,1);
 
 if  sum(feet_on_ground) == 2
     
-    f0             = -pinv(SigmaNA,pinv_tol)*(uModel+Sigma*fcHDot);
+    f0             = -pinv(SigmaNA,pinv_tol)*(tauModel+Sigma*fcHDot);
 end
 
 fcDes              = fcHDot + NullA*f0;
@@ -157,7 +175,7 @@ controlParam.fcHDot   = fcHDot;
 controlParam.HDotDes  = HDotDes;
 controlParam.fcDes    = fcDes;
 controlParam.f_grav   = f_grav;
-controlParam.uModel   = uModel;
+controlParam.tauModel = tauModel;
 controlParam.Sigma    = Sigma;
 controlParam.f0       = f0;
 controlParam.NullA    = NullA;

@@ -1,5 +1,10 @@
-function tau = motorController(dtheta,thetaRef,theta,ELASTICITY,STATE)
+function tau = motorController(dtheta,theta,ELASTICITY,STATE,controlParam)
 
 qj  = STATE.qj;
 dqj = STATE.dqj;
-tau = u -ELASTICITY.KD*dqj + ELASTICITY.KS*(theta-qj) -ELASTICITY.KS_gain*(theta-thetaRef)  -ELASTICITY.KD_gain*dtheta;
+
+u   = controlParam.ddtheta_ref - ELASTICITY.KD_gain*(dtheta-controlParam.dtheta_ref);
+tau = u + ELASTICITY.KD*(dtheta-dqj) - ELASTICITY.KS*(theta-qj); 
+
+end
+

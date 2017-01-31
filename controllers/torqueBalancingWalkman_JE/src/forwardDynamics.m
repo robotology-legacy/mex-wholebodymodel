@@ -1,4 +1,4 @@
-function [dchi_je,visualization] = forwardDynamics(t,chi_je,CONFIG)
+function [dchi_total,visualization] = forwardDynamics(t,chi_total,CONFIG)
 %FORWARDDYNAMICS is the function that will be integrated in the forward
 %                dynamics integrator.
 %
@@ -14,17 +14,19 @@ function [dchi_je,visualization] = forwardDynamics(t,chi_je,CONFIG)
 
 % ------------Initialization----------------
 % update the waitbar
-import WBM.utilities.dQuat;
+import WBM.utilities.dquat;
 waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 %% Robot Configuration
 ndof                  = CONFIG.ndof;
-chi                   = chi_je(1:(13+2*ndof));
+chi                   = chi_total(1:(13+2*ndof));
 
-% motor configuration
-theta                 = chi_je(14+2*ndof:14+3*ndof);
-dtheta                = chi_je(15+3*ndof:end);
-ELASTICITY            = addElasticJoints();
+if CONFIG.consider_el_joints == 1
+     % motor configuration
+     theta                 = chi_total(14+2*ndof:13+3*ndof);
+     dtheta                = chi_total(14+3*ndof:end);
+     ELASTICITY            = addElasticJoints(CONFIG);
+end
 
 gain                  = CONFIG.gainsInit;
 qjInit                = CONFIG.qjInit;
@@ -70,25 +72,32 @@ trajectory.jointReferences.qjRef   = qjInit;
 trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(CONFIG.xCoMRef,t,CONFIG);
 
 %% Torque balancing controller
-controlParam    = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,theta,ELASTICITY);
+controlParam    = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,dtheta,theta,ELASTICITY);
 tau             = controlParam.tau;
 fc              = controlParam.fc;
-u               = controlParam.u;
 
 %% State derivative (dchi) computation
 b_omega_w       = transpose(w_R_b)*w_omega_b;
-dq_b            = dQuat(qt_b,b_omega_w);
+dq_b            = dquat(qt_b,b_omega_w);
 nu              = [dx_b;dq_b;dqj];
-dnu             = M\(Jc'*fc + [zeros(6,1); (u+ELASTICITY.KS*(theta-qj)-ELASTICITY.KD*dqj)]-h);
-% state derivative
-dchi            = [nu;dnu];
 
-%% Motor dynamics
-ddtheta         = ELASTICITY.B\(tau-u+ELASTICITY.KS*(qj-theta)+ELASTICITY.KD*dqj);
+if CONFIG.consider_el_joints == 1
 
-%% State derivative
-dchi_je          = [dchi;dtheta;ddtheta];
+    dnu             = M\(Jc'*fc + [zeros(6,1);(ELASTICITY.KS*(theta-qj)+ELASTICITY.KD*(dtheta-dqj))]-h);
+    % state derivative
+    dchi            = [nu;dnu];
+    % motor dynamics
+    ddtheta         = ELASTICITY.B\(tau+ELASTICITY.KS*(qj-theta)+ELASTICITY.KD*(dqj-dtheta));
+    % total state derivative
+    dchi_total      = [dchi;dtheta;ddtheta];
 
+else
+    dnu             = M\(Jc'*fc + [zeros(6,1);tau]-h);
+    % state derivative
+    dchi            = [nu;dnu];
+    dchi_total      = dchi;
+end
+    
 %% Parameters for visualization
 visualization.qj          = qj;
 visualization.jointRef    = trajectory.jointReferences;

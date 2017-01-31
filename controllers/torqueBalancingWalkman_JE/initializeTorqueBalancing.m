@@ -18,9 +18,10 @@ close  all
 clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation
-CONFIG.demo_movements                        = 1;                          %either 0 or 1
+CONFIG.demo_movements                        = 0;                          %either 0 or 1
 CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left foot,right foot]
-CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
+CONFIG.use_QPsolver                          = 0;                          %either 0 or 1
+CONFIG.consider_el_joints                    = 1;                          %either 0 or 1
 
 %% Visualization setup
 % robot simulator
@@ -31,7 +32,7 @@ CONFIG.visualize_joints_dynamics             = 1;                          %eith
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 10;
+CONFIG.tEnd                                  = 1;
 CONFIG.sim_step                              = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -113,6 +114,7 @@ codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
 utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/tools'];
 robot_root   = [utility_root, filesep, '/robotFunctions'];
 plots_root   = [utility_root, filesep, '/visualization'];
+EJoints_root = [utility_root, filesep, '/elasticJoints'];
 src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman_JE/src'];
 config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman_JE/config'];
 init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman_JE/init'];
@@ -124,6 +126,7 @@ addpath(plots_root);
 addpath(src_root);
 addpath(config_root);
 addpath(init_root);
+addpath(EJoints_root);
 
 %% INITIALIZATION
 % initialize the forward dynamics

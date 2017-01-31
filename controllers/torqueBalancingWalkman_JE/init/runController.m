@@ -1,4 +1,4 @@
-function controlParam  = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,theta,ELASTICITY)
+function controlParam  = runController(varargin)
 %RUNCONTROLLER  is the initialization function for iCub balancing controllers
 %               in MATLAB.
 %
@@ -13,6 +13,19 @@ function controlParam  = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CO
 % Genova, May 2016
 
 % ------------Initialization----------------
+gain          = varargin{1};
+trajectory    = varargin{2}; 
+DYNAMICS      = varargin{3};
+FORKINEMATICS = varargin{4};
+CONFIG        = varargin{5};
+STATE         = varargin{6};
+
+if nargin == 9
+    dtheta      = varargin{7};
+    theta       = varargin{8};
+    ELASTICITY  = varargin{9};
+end
+
 %% Feet correction gains
 KpFeet                = gain.corrPosFeet;
 KdFeet                = 2*sqrt(KpFeet);
@@ -50,10 +63,12 @@ if  use_QPsolver == 1
     controlParam.fcDes = QPSolver(controlParam,CONFIG,FORKINEMATICS);
 end
 
-controlParam.u        = controlParam.uModel + controlParam.Sigma*controlParam.fcDes;
-
-%% Backstepping on the motor dynamics: desired torques (tau)
-controlParam.tau = motorController(theta,ELASTICITY,STATE);
+if CONFIG.consider_el_joints == 1
+    % backstepping on the motor dynamics: desired MOTOR torques (always called tau)
+    controlParam.tau   = motorController(dtheta,theta,ELASTICITY,STATE,controlParam);
+else
+    controlParam.tau   = controlParam.tauModel + controlParam.Sigma*controlParam.fcDes;
+end
 
 %% Feet pose correction
 % this will avoid numerical errors during the forward dynamics integration
@@ -71,6 +86,8 @@ elseif feet_on_ground(1) == 1 && feet_on_ground(2) == 1
 end
 
 %% Contact forces computation
-controlParam.fc      = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*controlParam.u -dJc_nu -KdFeet.*v_feet-KpFeet.*deltaPoseFeet);
-
+if CONFIG.consider_el_joints == 1
+    controlParam.fc      = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*(ELASTICITY.KS*(theta-STATE.qj)+ELASTICITY.KD*(dtheta-STATE.dqj)) -dJc_nu -KdFeet.*v_feet-KpFeet.*deltaPoseFeet);
+else
+    controlParam.fc      = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*controlParam.tau -dJc_nu -KdFeet.*v_feet-KpFeet.*deltaPoseFeet);
 end
