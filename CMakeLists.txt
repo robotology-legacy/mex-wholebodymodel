@@ -5,6 +5,10 @@ cmake_minimum_required(VERSION 2.8)
 
 PROJECT(mexWholeBodyModel)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${YARP_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ICUB_MODULE_PATH})
+
 # Look for dependencies
 find_package(Matlab REQUIRED
                     MX_LIBRARY
@@ -22,9 +26,6 @@ find_package(iDynTree 0.3.9         REQUIRED)
 find_package(wholeBodyInterface     REQUIRED)
 find_package(yarpWholeBodyInterface REQUIRED)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${YARP_MODULE_PATH})
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ICUB_MODULE_PATH})
 
 include(YCMDefaultDirs)
 include(YarpInstallationHelpers)
@@ -50,7 +51,10 @@ enable_testing()
 
 # Subdirectories
 add_subdirectory(mex-wholebodymodel)
-add_subdirectory(tests)
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
 
 # STARTUP mexWholeBodyModel
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/.startup_mexWholeBodyModel.m.in ${CMAKE_BINARY_DIR}/startup_mexWholeBodyModel.m)
