@@ -21,13 +21,38 @@ if exist(mexWrapDir, 'dir')
     addpath(mexWrapDir);
 end
 
-fileDir               = userpath;
+fileDir = userpath;
 pathSeparatorLocation = strfind(fileDir, pathsep);
 
 if isempty(fileDir)
-    error('Empty userpath. Please set the userpath before running this script');
+    answer=input('Empty userpath. Do you want mex-wholeBodyModel to reset the userpath for you? Y/N ','s');
+
+    if strcmp(answer,'Y')|| strcmp(answer,'y')
+       userpath('reset');
+       disp('Resetting userpath..');
+       fileDir = userpath;
+    else
+       error('Please set the userpath before running this script');
+    end
+      
 elseif size(pathSeparatorLocation, 2) > 1
-    error('Multiple userpaths. Please set a single userpath before running this script');
+    answer=input('Multiple userpaths. Do you want mex-wholeBodyModel to reset the userpath for you? Y/N','s');
+
+    if strcmp(answer,'Y')|| strcmp(answer,'y')
+       userpath('reset');
+       disp('Resetting userpath..');
+       fileDir = userpath;
+    else
+       error('Please set a single userpath before running this script');
+    end
+end
+
+pathSeparatorLocation = strfind(fileDir, pathsep);
+
+if isempty(fileDir)
+    error('userpath is still empty. Please set the userpath before running this script');
+elseif size(pathSeparatorLocation, 2) > 1
+    error('There are still userpaths. Please set a single userpath before running this script');
 end
 
 if (~isempty(pathSeparatorLocation))
