@@ -6,8 +6,6 @@ cmake_minimum_required(VERSION 2.8)
 PROJECT(mexWholeBodyModel)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${YARP_MODULE_PATH})
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ICUB_MODULE_PATH})
 
 # Look for dependencies
 find_package(Matlab REQUIRED
@@ -26,6 +24,8 @@ find_package(iDynTree 0.3.9         REQUIRED)
 find_package(wholeBodyInterface     REQUIRED)
 find_package(yarpWholeBodyInterface REQUIRED)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${YARP_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ICUB_MODULE_PATH})
 
 include(YCMDefaultDirs)
 include(YarpInstallationHelpers)
