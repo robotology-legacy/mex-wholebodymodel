@@ -13,7 +13,7 @@
 %
 
 % ------------Initialization----------------
-clear %all
+clear  all
 close  all
 clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
