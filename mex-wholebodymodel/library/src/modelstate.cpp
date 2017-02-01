@@ -56,7 +56,8 @@ bool isRobotNameAFile(const char *pstrRobotName)
     if (pos != std::string::npos) {
       // if '.' was found ...
       std::string ext = fn.substr(pos+1, len - pos);
-      if (ext.size() > 2) {
+      len = ext.size();
+      if ( (len > 2) && (len < 5) ) {
         return true;
       }
     }
