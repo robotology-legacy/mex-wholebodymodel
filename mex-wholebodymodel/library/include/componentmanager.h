@@ -22,6 +22,7 @@
 #define COMPONENTNMAINTAINER_H
 
 // global includes
+#include <cstring>
 #include <mex.h>
 
 // library includes
@@ -57,10 +58,17 @@ namespace mexWBIComponent
 
 namespace mexWBIComponent
 {
+  struct cmp_str : public std::binary_function<const char*, const char*, bool>
+  {
+    bool operator()(const char *pstr1, const char *pstr2) {
+      return strcmp(pstr1, pstr2) < 0;
+    }
+  };
+
   class ComponentManager
   {
     public:
-      static ComponentManager *getInstance(std::string robotName = "icub");
+      static ComponentManager *getInstance(const char *pstrRobotName = "icub");
 
       bool processFunctionCall(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs);
 
@@ -73,13 +81,17 @@ namespace mexWBIComponent
       ~ComponentManager();
 
     private:
-      ComponentManager(std::string robotName);
+      ComponentManager(const char *pstrRobotName);
 
-      static void initialize(std::string robotName);
+      static void initialize(const char *pstrRobotName);
+      static void reinitialize(const mxArray **prhs);
       static void initComponents();
       static void initComponentList();
       static void deleteComponents();
       static void cleanup();
+
+      static bool executeComputation(ModelComponent *pActiveComp, int nlhs, mxArray **plhs,
+                                     int nrhs, const mxArray **prhs);
 
       static ComponentManager *componentManager;
 
@@ -94,8 +106,6 @@ namespace mexWBIComponent
       static ModelGetFloatingBaseState  *modelGetFloatingBaseState;
       static ModelGetState              *modelGetState;
       static ModelGravityBiasForces     *modelGravityBiasForces;
-      static ModelInitialize            *modelInitialize;
-      static ModelInitializeURDF        *modelInitializeURDF;
       static ModelInverseDynamics       *modelInverseDynamics;
       static ModelJacobian              *modelJacobian;
       static ModelJointLimits           *modelJointLimits;
@@ -104,7 +114,10 @@ namespace mexWBIComponent
       static ModelTransformationMatrix  *modelTransformationMatrix;
       static ModelUpdateState           *modelUpdateState;
 
-      static std::map<std::string, ModelComponent*> componentList;
+      static const char *pcstrInitKey;
+      static const char *pcstrInitURDFKey;
+
+      static std::map<const char*, ModelComponent*, cmp_str> componentList;
   };
 
 }

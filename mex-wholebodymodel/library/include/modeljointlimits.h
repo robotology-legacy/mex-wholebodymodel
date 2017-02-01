@@ -49,6 +49,7 @@ namespace mexWBIComponent
 
     private:
       ModelJointLimits();
+      bool getJointLimits(double *pJntlim_lwr, double *pJntlim_upr);
 
       static ModelJointLimits *modelJointLimits;
 

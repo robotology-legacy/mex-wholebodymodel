@@ -35,7 +35,7 @@ namespace mexWBIComponent
   class ModelState
   {
     public:
-      static ModelState *getInstance(std::string robotName = "icubGazeboSim");
+      static ModelState *getInstance(const char* pstrRobotName = "icubGazeboSim");
       static void initModelState();
 
       /**
@@ -51,7 +51,7 @@ namespace mexWBIComponent
       wbi::Frame getBase2WorldTransformation();
 
       wbi::iWholeBodyModel *robotModel();
-      std::string robotName();
+      char *robotName();
 
       double *qj();
       double *qj_dot();
@@ -64,33 +64,33 @@ namespace mexWBIComponent
       void vb(double *vb_t);
       void g(double *g_t);
 
+      ~ModelState();
+
+    private:
+      ModelState(const char *pstrRobotName);
+
+      static void initRobotModel(const wbi::IDList &jntIDList);
+      static void initState();
+
       /**
       * Load a robot model from a yarpWholeBodyInterface
       * configuration, specified by YARP_ROBOT_NAME
       */
-      void robotModel(std::string robotName);
+      static void robotModel(const char *pstrRobotName);
 
       /**
       * Load a robot model from a URDF file path.
       * Using this function, all the dofs of the URDF
       * are automatically added to the interface.
       */
-      void robotModelFromURDF(std::string urdfFileName);
-
-      ~ModelState();
-
-    private:
-      ModelState(std::string robotName);
-
-      static void initRobotModel(const wbi::IDList &jntIDList);
-      static void initState();
-      static void deleteState();
+      static void robotModelFromURDF(const char *pstrURDFileName);
 
       static ModelState *modelState;
       static wbi::iWholeBodyModel *robotWBIModel;
 
       static size_t nDof;
-      static std::string currRobotName;
+      static char *pstrCurrRobotName;
+      static const char *pcstrLocalName; // local name of the interface (used as stem of port names)
 
       // state variables:
       static double *sqj, *sqj_dot, svb[6], sg[3];
