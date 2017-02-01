@@ -27,6 +27,6 @@ ELASTICITY.KS        = 1000*eye(ndof);
 ELASTICITY.KD        = 1000*eye(ndof);
 
 % contorl gains
-ELASTICITY.KD_gain   = 100*eye(ndof);
+ELASTICITY.KD_gain   = 1000*eye(ndof);
 
 end
