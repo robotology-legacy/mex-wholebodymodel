@@ -67,7 +67,7 @@ if CONFIG.visualize_robot_simulator == 1
 end
 
 %% Forward dynamics results
-if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamics == 1
+if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamics == 1 || CONFIG.visualize_motors_dynamics == 1
     
     CONFIG.wait = waitbar(0,'Generating the results...');
     set(0,'DefaultFigureWindowStyle','Docked');

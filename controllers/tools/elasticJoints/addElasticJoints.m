@@ -13,18 +13,20 @@ function ELASTICITY = addElasticJoints(CONFIG)
 % ------------Initialization----------------
 %% Configure parameters
 ndof                 = CONFIG.ndof;
+% reduction ratio
+r                    = 100;
 
 %% Motor dynamics
 % motor inertia
-ELASTICITY.B         = 1e-5*eye(ndof);
+ELASTICITY.B         = 5.480e-5*(r^2)*eye(ndof);
 
 % stiffness
-ELASTICITY.KS        = 1e4*eye(ndof);
+ELASTICITY.KS        = 1000*eye(ndof);
 
 % damping
-ELASTICITY.KD        = 10*eye(ndof);
+ELASTICITY.KD        = 1000*eye(ndof);
 
 % contorl gains
-ELASTICITY.KD_gain   = 10000*eye(ndof);
+ELASTICITY.KD_gain   = 100*eye(ndof);
 
 end
