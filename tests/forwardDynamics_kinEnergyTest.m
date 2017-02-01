@@ -19,6 +19,9 @@ function [dchi, h, g, fc, kinEnergy] = forwardDynamics_kinEnergyTest(t, chi, par
     %   dqj:      the joint velocities (R^ndof)
     %
 
+    import WBM.utilities.dQuat;
+    import WBM.utilities.quat2rotm;
+    
     %% extraction of state
     ndof = param.ndof;
 
