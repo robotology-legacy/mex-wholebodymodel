@@ -14,6 +14,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     chn       ...  chain
     chnt      ...  chain tree
     cmo       ...  column major order
+    cmp       ...  compare
     cols      ...  columns
     config    ...  configuration
     cstr      ...  constraint
@@ -67,11 +68,13 @@ Legend of abbreviations and acronyms which are used for the variable names:
     p         ...  position OR translation (vector)
     p...      ...  pointer to an object/variable/array (only in C++)
     params    ...  parameters
+    pcstr...  ...  pointer to a constant null-terminated string (C++)
     pl        ...  payload
     plds      ...  payloads
     pos       ...  position(s)
     pris      ...  prismatic
     prop      ...  propert(y/ies)
+    pstr...   ...  pointer to a null-terminated string (C++)
     pt        ...  point
     q_j       ...  joint angle(s)
     qt, q     ...  quaternion
