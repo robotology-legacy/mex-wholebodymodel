@@ -83,16 +83,16 @@ bool ModelJointLimits::compute(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("ModelJointLimits performing compute.\n");
 #endif
-  robotModel = modelState->robotModel();
-  robotModel->getJointLimits(jntlim_lower, jntlim_upper);
-
-  return true;
+  return getJointLimits(jntlim_lower, jntlim_upper);
 }
 
 bool ModelJointLimits::computeFast(int nrhs, const mxArray **prhs)
 {
-  robotModel = modelState->robotModel();
-  robotModel->getJointLimits(jntlim_lower, jntlim_upper);
+  return getJointLimits(jntlim_lower, jntlim_upper);
+}
 
-  return true;
+bool ModelJointLimits::getJointLimits(double *pJntlim_lwr, double *pJntlim_upr)
+{
+  robotModel = modelState->robotModel();
+  return robotModel->getJointLimits(pJntlim_lwr, pJntlim_upr);
 }

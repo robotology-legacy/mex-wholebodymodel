@@ -10,8 +10,6 @@ set(SOURCES src/mexmain.cpp
             src/modelgetfloatingbasestate.cpp
             src/modelgetstate.cpp
             src/modelgravitybiasforces.cpp
-            src/modelinitialize.cpp
-            src/modelinitializeurdf.cpp
             src/modelinversedynamics.cpp
             src/modeljacobian.cpp
             src/modeljointlimits.cpp
@@ -33,8 +31,6 @@ set(HEADERS include/componentmanager.h
             include/modelgetfloatingbasestate.h
             include/modelgetstate.h
             include/modelgravitybiasforces.h
-            include/modelinitialize.h
-            include/modelinitializeurdf.h
             include/modelinversedynamics.h
             include/modeljacobian.h
             include/modeljointlimits.h
