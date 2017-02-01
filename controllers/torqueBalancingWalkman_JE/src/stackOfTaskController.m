@@ -1,37 +1,23 @@
-function controlParam = stackOfTaskController(varargin)
-%STACKOFTASKCONTROLLER implements a momentum-based control algorithm in order
-%                      to control the robot iCub.
+function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE,theta,ELASTICITY)
+%STACKOFTASKCONTROLLER implements a momentum-based control algorithm for
+%                      floating base robots.
 %
 % STACKOFTASKCONTROLLER computes the desired control torques at joints
-% using a task-based approach. The first task is the control of robot's
-% momentum, while the second task is a postural task.
+% using a task-based approach. The first task is the achievement of a 
+% desired robot momentum, while the second task is a postural task.
 %
 % controlParam = STACKOFTASKCONTROLLER(CONFIG, gain, trajectory,
-% DYNAMICS,FORKINEMATICS,STATE) takes as input the structure CONFIG,
-% which contains all the configuration parameters, while the other
-% structures contain the control gains, the desired trajectory, the robot
-% dynamics, forward kinematics and state.
-% The output is the structure controlParam which contains the desired
-% control torques, the desired contact forces and others parameters used
-% for visualization and QP solver.
+% DYNAMICS,FORKINEMATICS,STATE) takes as input the robot configuration,
+% control gains, reference trajectory, and robot forward kinematics,
+% dynamics and state.
+% The output controlParam contains desired control torques and contact 
+% forces and others parameters used for visualization and QP solver.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
 
 % ------------Initialization----------------
-CONFIG        = varargin{1};
-gain          = varargin{2};
-trajectory    = varargin{3}; 
-DYNAMICS      = varargin{4};
-FORKINEMATICS = varargin{5};
-STATE         = varargin{6};
-
-if nargin == 8
-    theta       = varargin{7};
-    ELASTICITY  = varargin{8};
-end
-
 import WBM.utilities.skewm;
 
 %% Config parameters
@@ -148,14 +134,10 @@ posturalCorr       =  NullLambdaDamp*Mbar;
 impedances         =  impedances*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
 dampings           =  dampings*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
 
-if CONFIG.consider_el_joints == 1
-    controlParam.ddtheta_ref = zeros(ndof,1);
-    controlParam.dtheta_ref  =  pinvLambda*(JcMinv*h - dJc_nu) + ELASTICITY.KS*(qj-theta)+ELASTICITY.KD*dqj + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
-                                + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
-end
-
-tauModel           =  pinvLambda*(JcMinv*h - dJc_nu) + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
-                      + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
+% reference for motor variables and contact forces nullspace
+controlParam.ddtheta_ref  = zeros(ndof,1);
+tauModel                  = pinvLambda*(JcMinv*h - dJc_nu) + ELASTICITY.KS*(qj-theta)+ELASTICITY.KD*dqj + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
+                           + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
 
 %% Desired contact forces computation
 fcHDot             = pinvA*(HDotDes - f_grav);

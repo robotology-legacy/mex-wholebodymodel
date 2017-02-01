@@ -1,12 +1,14 @@
 %% INITIALIZETORQUEBALANCING
 %
-% This is the initialization script for torque balancing simulation of the robot
-% iCub using Matlab.
-% The user can set the parameters below to generate different simulations.
-% The forward dynamics integration is available for both the robot balancing
-% on one foot and two feet, and for the robot standing or moving, following
-% a CoM trajectory. It is also possible to use a QP program to ensure the
-% contact forces at feet are inside the friction cones.
+% This is the initialization script for torque balancing simulations of 
+% floating base robots using Matlab.
+%
+% Forward dynamics integration is available for the robot balancing on one 
+% foot or two feet (6 or 12 contact constraints, respectively). The controller 
+% ensures stability properties of the system around any set point in case of 
+% k=1 (see [Nava et al, IROS 2016]. 
+% Contact forces are evaluated though QP solver to ensure unilateral constraints, 
+% and to constrain them inside the friction cones.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016

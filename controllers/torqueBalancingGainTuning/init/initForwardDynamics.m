@@ -1,11 +1,11 @@
 function [] = initForwardDynamics(CONFIG)
-%INITFORWARDDYNAMICS setups the forward dynamics integration of the robot 
-%                    iCub using MATLAB.
+%INITFORWARDDYNAMICS configures the forward dynamics integration by setting
+%                    state initial conditions, control gains, etc.  
 %
 % [] = INITFORWARDDYNAMICS(CONFIG) takes as input the structure CONFIG 
-% containing all the configuration parameters. It has no output. The 
+% containing the initial user-defined parameters. It has no output. The 
 % forward dynamics integration will be performed following the options 
-% the user specified in the initialization file.
+% the user specified in the initialization script.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016

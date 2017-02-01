@@ -1,32 +1,28 @@
-function [dchi_total,visualization] = forwardDynamics(t,chi_total,CONFIG)
-%FORWARDDYNAMICS is the function that will be integrated in the forward
-%                dynamics integrator.
+function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
+%FORWARDDYNAMICS computes the forward dynamics of floating base robots
+%                given initial conditions, contact forces and torques. 
 %
 % [dchi,visualization] = FORWARDDYNAMICS(t,chi,CONFIG) takes as input the
-% current time step, t; the robot state, chi [13+2*ndof x 1]; the structure
-% CONFIG which contains the user-defined parameters.
+% current time step, t; the state, chi [13+2*ndof x 1]; the structure
+% CONFIG which contains initial conditions and user-defined parameters.
 % The output are the vector to be integrated, dchi [13+2*ndof x1] and the
-% structure visualization which contains all the parameters used for
-% generating the plots in the visualizer.
+% structure visualization which is used for plotting results in the visualizer.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 
 % ------------Initialization----------------
-% update the waitbar
 import WBM.utilities.dquat;
 waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
 %% Robot Configuration
 ndof                  = CONFIG.ndof;
-chi                   = chi_total(1:(13+2*ndof));
+chi_robot             = chi(1:(13+2*ndof));
 
-if CONFIG.consider_el_joints == 1
-     % motor configuration
-     theta                 = chi_total(14+2*ndof:13+3*ndof);
-     dtheta                = chi_total(14+3*ndof:end);
-     ELASTICITY            = addElasticJoints(CONFIG);
-end
+% motor configuration
+theta                 = chi(14+2*ndof:13+3*ndof);
+dtheta                = chi(14+3*ndof:end);
+ELASTICITY            = addElasticJoints(CONFIG);
 
 gain                  = CONFIG.gainsInit;
 qjInit                = CONFIG.qjInit;
@@ -35,7 +31,7 @@ qjInit                = CONFIG.qjInit;
 CONFIG.xCoMRef        = CONFIG.initForKinematics.xCoM;
 
 %% Robot State
-STATE                 = robotState(chi,CONFIG);
+STATE                 = robotState(chi_robot,CONFIG);
 w_R_b                 = STATE.w_R_b;
 w_omega_b             = STATE.w_omega_b;
 qt_b                  = STATE.qt_b;
@@ -73,32 +69,26 @@ trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(CONFIG.xCoMRef,t,CONFIG
 
 %% Torque balancing controller
 controlParam    = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,dtheta,theta,ELASTICITY);
-tau             = controlParam.tau;
+tau_m           = controlParam.tau_m;
 fc              = controlParam.fc;
 
 %% State derivative (dchi) computation
 b_omega_w       = transpose(w_R_b)*w_omega_b;
 dq_b            = dquat(qt_b,b_omega_w);
 nu              = [dx_b;dq_b;dqj];
-
-if CONFIG.consider_el_joints == 1
-
-    dnu             = M\(Jc'*fc + [zeros(6,1);(ELASTICITY.KS*(theta-qj)+ELASTICITY.KD*(dtheta-dqj))]-h);
-    % state derivative
-    dchi            = [nu;dnu];
-    % motor dynamics
-    ddtheta         = ELASTICITY.B\(tau+ELASTICITY.KS*(qj-theta)+ELASTICITY.KD*(dqj-dtheta));
-    % total state derivative
-    dchi_total      = [dchi;dtheta;ddtheta];
-
-else
-    dnu             = M\(Jc'*fc + [zeros(6,1);tau]-h);
-    % state derivative
-    dchi            = [nu;dnu];
-    dchi_total      = dchi;
-end
+dnu             = M\(Jc'*fc + [zeros(6,1);(ELASTICITY.KS*(theta-qj)+ELASTICITY.KD*(dtheta-dqj))]-h);
+    
+% state derivative   
+dchi_robot      = [nu;dnu];
+% motor derivative
+ddtheta         = ELASTICITY.B\(tau_m+ELASTICITY.KS*(qj-theta)+ELASTICITY.KD*(dqj-dtheta));
+% total state derivative
+dchi            = [dchi_robot;dtheta;ddtheta];
     
 %% Parameters for visualization
+visualization.theta       = theta;
+visualization.dtheta      = dtheta;
+visualization.dtheta_ref  = controlParam.dtheta_ref;
 visualization.qj          = qj;
 visualization.jointRef    = trajectory.jointReferences;
 visualization.xCoM        = xCoM;
@@ -107,6 +97,6 @@ visualization.H           = H;
 visualization.HRef        = [m*trajectory.desired_x_dx_ddx_CoM(:,2);zeros(3,1)];
 visualization.fc          = fc;
 visualization.f0          = controlParam.f0;
-visualization.tau         = tau;
+visualization.tau_m       = tau_m;
 
 end

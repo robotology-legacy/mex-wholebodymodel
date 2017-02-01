@@ -1,13 +1,13 @@
 function controlParam  = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE)
-%RUNCONTROLLER  is the initialization function for iCub balancing controllers
-%               in MATLAB.
+%RUNCONTROLLER  initializes balancing controllers. Default controller uses
+%               "stack of tasks" approach.
 %
 % controlParam  = RUNCONTROLLER(gains,trajectory,DYNAMICS,FORKINEMATICS,
-% CONFIG,STATE) takes as input the control gains, the joint reference 
-% trajectory, all the configuration parameters and the robot dynamics, 
-% forward kinematics and state. The output is the structure controlparam 
-% which contains the control torques tau, the contact forces fc and other 
-% parameters for visualization.
+% CONFIG,STATE) takes as input control gains, joint reference trajectory, 
+% and the robot dynamics, forward kinematicsn, state and user-defined 
+% configuration. The output is structure controlparam which contains the 
+% control torques tau, the contact forces fc, parameters for visualizing the 
+% results, etc.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016

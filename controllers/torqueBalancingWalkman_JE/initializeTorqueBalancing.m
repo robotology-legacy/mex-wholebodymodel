@@ -1,27 +1,31 @@
 %% INITIALIZETORQUEBALANCING
 %
-% This is the initialization script for torque balancing simulation of the robot
-% iCub using Matlab.
-% The user can set the parameters below to generate different simulations.
-% The forward dynamics integration is available for both the robot balancing
-% on one foot and two feet, and for the robot standing or moving, following
-% a CoM trajectory. It is also possible to use a QP program to ensure the
-% contact forces at feet are inside the friction cones.
+% This is the initialization script for torque balancing simulations of 
+% floating base robots using Matlab.
+%
+% Forward dynamics integration is available for the robot balancing on one 
+% foot or two feet (6 or 12 contact constraints, respectively). The controller 
+% ensures stability properties of the system around any set point in case of 
+% k=1 (see [Nava et al, IROS 2016]. 
+% Contact forces are evaluated though QP solver to ensure unilateral constraints, 
+% and to constrain them inside the friction cones.
+%
+% This version has been modified in order to consider joints elasticity in
+% the model.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 %
 
 % ------------Initialization----------------
-clear %all
+clear  all
 close  all
 clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation
-CONFIG.demo_movements                        = 0;                          %either 0 or 1
+CONFIG.demo_movements                        = 1;                          %either 0 or 1
 CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left foot,right foot]
-CONFIG.use_QPsolver                          = 0;                          %either 0 or 1
-CONFIG.consider_el_joints                    = 1;                          %either 0 or 1
+CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
 
 %% Visualization setup
 % robot simulator
@@ -29,10 +33,11 @@ CONFIG.visualize_robot_simulator             = 1;                          %eith
 % forward dynamics integration results
 CONFIG.visualize_integration_results         = 1;                          %either 0 or 1
 CONFIG.visualize_joints_dynamics             = 1;                          %either 0 or 1
+CONFIG.visualize_motors_dynamics             = 1;
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 1;
+CONFIG.tEnd                                  = 10;
 CONFIG.sim_step                              = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -80,7 +85,7 @@ CONFIG.ndof = 25;
 %% Initial joints position [deg]
 leftArmInit  = [ 0  8  0  0  0]';
 rightArmInit = [ 0 -8  0  0  0]';
-torsoInit    = [ 0   0  0]';
+torsoInit    = [ 0  0  0]';
 
 if sum(CONFIG.feet_on_ground) == 2
     
@@ -102,8 +107,9 @@ elseif CONFIG.feet_on_ground(1) == 0 && CONFIG.feet_on_ground(2) == 1
 end
 
 % feet size
-CONFIG.footSize  = [-0.16 0.16;       % xMin, xMax
-                    -0.075 0.075];    % yMin, yMax
+CONFIG.footSize  = [-0.16  0.16;       % xMin, xMax
+                    -0.075 0.075];     % yMin, yMax
+                
 % joints configuration [rad]
 CONFIG.qjInit    = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
 

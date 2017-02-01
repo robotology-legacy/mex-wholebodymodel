@@ -1,14 +1,15 @@
 function figureCont = initVisualizer(t,chi,CONFIG)
-%INITVISUALIZER is the main function for visualizing the results of iCub forward
-%               dynamics integration in MATLAB.
+%INITVISUALIZER initializes the visualization of forward dynamics
+%               integration results.
 %
-% INITVISUALIZER visualizes some outputs from the forward dynamics
-% integration (e.g. the robot state, contact forces, control torques...).
+% INITVISUALIZER visualizes results of the forward dynamics
+% integration (e.g. the robot state, contact forces, control torques...) 
+% and initialize robot simulator.
 %
 % figureCont = INITVISUALIZER(t,chi,CONFIG) takes as input the integration
-% time t, the robot state chi and the structure CONFIG containing all the
-% utility parameters. The output is a counter for the automatic correction
-% of figures numbers in case a new figure is added.
+% time t, the robot state chi and the robot configuration. The output is a
+% counter for the automatic correction of figures numbers in case a new 
+% figure is added.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -16,9 +17,9 @@ function figureCont = initVisualizer(t,chi,CONFIG)
 
 % ------------Initialization----------------
 %% Configuration parameters
-ndof                             = CONFIG.ndof;
-initState                        = CONFIG.initState;
-figureCont                       = CONFIG.figureCont;
+ndof                        = CONFIG.ndof;
+initState                   = CONFIG.initState;
+figureCont                  = CONFIG.figureCont;
 
 %% Robot simulator
 if CONFIG.visualize_robot_simulator == 1
@@ -76,10 +77,15 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
     qjInit        = zeros(ndof,length(t));
     qjRef         = zeros(ndof,length(t));
     
+    % motors variables
+    theta         = zeros(ndof,length(t));
+    dtheta        = zeros(ndof,length(t));
+    dtheta_ref     = zeros(ndof,length(t));
+    
     % contact forces and torques initialization
     fc            = zeros(6*CONFIG.numConstraints,length(t));
     f0            = zeros(6*CONFIG.numConstraints,length(t));
-    tau           = zeros(ndof,length(t));
+    tau_m         = zeros(ndof,length(t));
     tau_norm      = zeros(length(t),1);
     
     % forward kinematics initialization
@@ -99,12 +105,17 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
         qjInit(:,time)      = initState.qj;
         qjRef(:,time)       = visual.jointRef.qjRef;
         
+        % motor dynamics
+        theta(:,time)       = visual.theta;
+        dtheta(:,time)      = visual.dtheta;
+        dtheta_ref(:,time)  = visual.dtheta_ref;
+        
         %% Other parameters
         % contact forces and torques
         fc(:,time)          = visual.fc;
         f0(:,time)          = visual.f0;
-        tau(:,time)         = visual.tau;
-        tau_norm(time)      = norm(visual.tau);
+        tau_m(:,time)         = visual.tau_m;
+        tau_norm(time)      = norm(visual.tau_m);
         
         % forward kinematics
         xCoM(:,time)        = visual.xCoM;
@@ -139,7 +150,13 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
         CONFIG.figureCont = visualizeJointDynamics(t,CONFIG,qj,qjRef);
     end
     
-    figureCont = CONFIG.figureCont;
+    %% Motors dynamics
+    if CONFIG.visualize_motors_dynamics == 1
+        
+        CONFIG.figureCont = visualizeMotorsDynamics(t,CONFIG,theta,dtheta_ref,dtheta);
+    end
+    
+    figureCont     = CONFIG.figureCont;
     set(0,'DefaultFigureWindowStyle','Normal');
     
 end

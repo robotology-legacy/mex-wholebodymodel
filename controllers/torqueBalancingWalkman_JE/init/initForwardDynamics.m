@@ -1,11 +1,11 @@
 function [] = initForwardDynamics(CONFIG)
-%INITFORWARDDYNAMICS setups the forward dynamics integration of the robot 
-%                    iCub using MATLAB.
+%INITFORWARDDYNAMICS configures the forward dynamics integration by setting
+%                    state initial conditions, control gains, etc.  
 %
 % [] = INITFORWARDDYNAMICS(CONFIG) takes as input the structure CONFIG 
-% containing all the configuration parameters. It has no output. The 
+% containing the initial user-defined parameters. It has no output. The 
 % forward dynamics integration will be performed following the options 
-% the user specified in the initialization file.
+% the user specified in the initialization script.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -19,6 +19,11 @@ qjInit                       = CONFIG.qjInit;
 dqjInit                      = zeros(ndof,1);
 dx_bInit                     = zeros(3,1);
 w_omega_bInit                = zeros(3,1);
+
+% initialize motor state
+thetaInit                    = qjInit;
+dthetaInit                   = dqjInit;
+chi_motorInit                = [thetaInit;dthetaInit];
 
 %% Contact constraints definition
 if sum(feet_on_ground) == 2
@@ -51,16 +56,10 @@ wbm_setWorldFrame(w_R_bInit,x_bInit,[0 0 -9.81]')
 
 % initial state (floating base + joints)
 [basePoseInit,~,~,~]          = wbm_getState();
-chiInit                       = [basePoseInit; qjInit; dx_bInit; w_omega_bInit; dqjInit];
+chi_robotInit                 = [basePoseInit; qjInit; dx_bInit; w_omega_bInit; dqjInit];
 
-% initial state adjusted to consider joints elasticity
-if CONFIG.consider_el_joints == 1
-    thetaInit                    = qjInit;
-    dthetaInit                   = dqjInit;
-    chi_totalInit                = [chiInit; thetaInit; dthetaInit];
-else
-    chi_totalInit                = chiInit;
-end
+%% Initial state that consider also joints elasticity
+chiInit                       = [chi_robotInit; chi_motorInit];
 
 %% Initial gains
 % the initial gains are defined before the numerical integration
@@ -68,7 +67,7 @@ CONFIG.gainsInit              = gains(CONFIG);
 
 %% Initial dynamics and forward kinematics
 % initial state
-CONFIG.initState              = robotState(chiInit,CONFIG);
+CONFIG.initState              = robotState(chi_robotInit,CONFIG);
 % initial dynamics
 CONFIG.initDynamics           = robotDynamics(CONFIG.initState,CONFIG);
 % initial forward kinematics
@@ -80,9 +79,9 @@ forwardDynFunc        = @(t,chi)forwardDynamics(t,chi,CONFIG);
 
 % either fixed step integrator or ODE15s
 if CONFIG.integrateWithFixedStep == 1
-    [t,chi]           = euleroForward(forwardDynFunc,chi_totalInit,CONFIG.tEnd,CONFIG.tStart,CONFIG.sim_step);
+    [t,chi]           = euleroForward(forwardDynFunc,chiInit,CONFIG.tEnd,CONFIG.tStart,CONFIG.sim_step);
 else
-    [t,chi]           = ode15s(forwardDynFunc,CONFIG.tStart:CONFIG.sim_step:CONFIG.tEnd,chi_totalInit,CONFIG.options);
+    [t,chi]           = ode15s(forwardDynFunc,CONFIG.tStart:CONFIG.sim_step:CONFIG.tEnd,chiInit,CONFIG.options);
 end
 
 delete(CONFIG.wait)
