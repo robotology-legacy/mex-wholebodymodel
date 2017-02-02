@@ -189,10 +189,10 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray **plhs, int nrhs, c
   mexPrintf("Trying to parse mex-arguments...\n");
 #endif
   char *pstrKeyName = mxArrayToString(prhs[0]);
-  size_t cmplen = sizeof(pcstrInitKey) + 1;
+  size_t cmplen = 10; // num. of chars to compare
 
   if ( (strncmp(pstrKeyName, pcstrInitKey, cmplen) != 0) &&
-       (strncmp(pstrKeyName, pcstrInitURDFKey, cmplen) != 0) )
+       (strncmp(pstrKeyName, pcstrInitURDFKey, cmplen) != 0) ) // everything that starts with "model-init" will be ignored
   {
   #ifdef DEBUG
     mexPrintf("Searching for component '%s'.\n", pstrKeyName);
@@ -202,8 +202,8 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray **plhs, int nrhs, c
       return executeComputation(comp->second, nlhs, plhs, nrhs, prhs);
     }
   }
-  else if ( !strncmp(pstrKeyName, pcstrInitKey, cmplen) ||
-            !strncmp(pstrKeyName, pcstrInitURDFKey, cmplen) )
+  else if ( !strcmp(pstrKeyName, pcstrInitKey) ||
+            !strcmp(pstrKeyName, pcstrInitURDFKey) )
   {
     // reinitialize the whole body model either with a new robot model
     // from the yarp-WBI directory, or specified by an URDF file:
