@@ -36,16 +36,8 @@ namespace mexWBIComponent
   {
     public:
       static ModelState *getInstance(const char* pstrRobotName = "icubGazeboSim");
-      static void initModelState();
-
-      /**
-      * Delete the (static) instance of this component,
-      * and set the instance pointer to 0.
-      */
-      static void deleteInstance();
 
       bool setState(double *qj_t, double *qj_dot_t, double *vb_t);
-
       void setGravity(double *pg);
       void setBase2WorldTransformation(wbi::Frame frm3d_H);
       wbi::Frame getBase2WorldTransformation();
@@ -63,6 +55,12 @@ namespace mexWBIComponent
       void qj_dot(double *qj_dot_t);
       void vb(double *vb_t);
       void g(double *g_t);
+
+      /**
+      * Delete the (static) instance of this component,
+      * and set the instance pointer to 0.
+      */
+      static void deleteInstance();
 
       ~ModelState();
 
