@@ -49,7 +49,7 @@ namespace mexWBIComponent
 
     private:
       ModelGeneralizedBiasForces();
-      bool processArguments(int nrhs, const mxArray **prhs);
+      static bool processArguments(int nrhs, const mxArray **prhs);
 
       static ModelGeneralizedBiasForces *modelGeneralizedBiasForces;
 

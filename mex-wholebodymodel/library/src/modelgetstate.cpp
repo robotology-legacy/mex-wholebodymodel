@@ -19,6 +19,7 @@
  */
 
 // global includes
+#include <cstring>
 
 // library includes
 
@@ -87,37 +88,7 @@ bool ModelGetState::compute(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("ModelGetState performing compute.\n");
 #endif
-  wf_H_b = modelState->getBase2WorldTransformation();
-
-#ifdef DEBUG
-  mexPrintf("Inside of getState - transformation:\n");
-  mexPrintf("wf_H_b\n");
-  mexPrintf((wf_H_b.R.toString()).c_str());
-  mexPrintf("\n\n");
-#endif
-
-  wf_H_b.R.getQuaternion(quat_b[1], quat_b[2], quat_b[3], quat_b[0]);
-
-#ifdef DEBUG
-  std::stringstream ssR;
-  ssR << "quaternion: [" << quat_b[0] << "," << quat_b[1] << "," << quat_b[2] << "," << quat_b[3] << "]\n";
-  std::string sR = ssR.str();
-  mexPrintf(sR.c_str());
-#endif
-
-  int i;
-  for (i=0; i < 3; i++) {
-    *(vqT_b + i) = *(wf_H_b.p + i);
-  }
-
-  for (i=0; i < 4; i++) {
-    *(vqT_b + (3+i)) = *(quat_b + i);
-  }
-
-  modelState->qj(qj);
-  modelState->vb(vb);
-  modelState->qj_dot(qj_dot);
-
+  getStateValues();
   return true;
 }
 
@@ -126,6 +97,12 @@ bool ModelGetState::computeFast(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("ModelGetState performing computeFast.\n");
 #endif
+  getStateValues();
+  return true;
+}
+
+void ModelGetState::getStateValues()
+{
   wf_H_b = modelState->getBase2WorldTransformation();
 
 #ifdef DEBUG
@@ -144,18 +121,12 @@ bool ModelGetState::computeFast(int nrhs, const mxArray **prhs)
   mexPrintf(sR.c_str());
 #endif
 
-  int i;
-  for (i=0; i < 3; i++) {
-    *(vqT_b + i) = *(wf_H_b.p + i);
-  }
+  // get the values for the VQ-Transformation ...
+  memcpy(vqT_b, wf_H_b.p, sizeof(double)*3);
+  memcpy((vqT_b + 3), quat_b, sizeof(double)*4);
 
-  for (i=0; i < 4; i++) {
-    *(vqT_b + (3+i)) = *(quat_b + i);
-  }
-
+  // get the remaining state values ...
   modelState->qj(qj);
   modelState->vb(vb);
   modelState->qj_dot(qj_dot);
-
-  return true;
 }

@@ -50,7 +50,7 @@ namespace mexWBIComponent
 
   private:
     ModelMassMatrix();
-    bool processArguments(int nrhs, const mxArray **prhs);
+    static bool processArguments(int nrhs, const mxArray **prhs);
 
     static ModelMassMatrix *modelMassMatrix;
 

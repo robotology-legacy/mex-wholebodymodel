@@ -109,14 +109,7 @@ bool ModelJacobian::computeFast(int nrhs, const mxArray **prhs)
   qj     = modelState->qj();
   refLnk = mxArrayToString(prhs[1]);
 
-  std::string strCom("com");
-  int refLnkID = -1; // if refLnk = "com"
-
-  if (strCom.compare(refLnk) != 0) {
-    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "jacobian call: Link ID does not exist.");
-    }
-  }
+  int refLnkID = getRefLinkID();
 
   if ( !(robotModel->computeJacobian(qj, wf_H_b, refLnkID, J_rmo)) ) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeJacobian call.");
@@ -151,15 +144,6 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray *prhs[])
   qj     = mxGetPr(prhs[3]);
   refLnk = mxArrayToString(prhs[4]);
 
-  std::string strCom("com");
-  int refLnkID = -1; // if refLnk = "com"
-
-  if (strCom.compare(refLnk) != 0) {
-    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "jacobian call: Link ID does not exist.");
-    }
-  }
-
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
@@ -174,10 +158,24 @@ bool ModelJacobian::processArguments(int nrhs, const mxArray *prhs[])
 
   wf_H_b = wbi::Frame(rot3d, ppos);
 
+  int refLnkID = getRefLinkID();
+
   if ( !(robotModel->computeJacobian(qj, wf_H_b, refLnkID, J_rmo)) ) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeJacobian call.");
   }
   reorderMatrixInColMajor(J_rmo, wf_J_lnk, 6, nCols); // put the output matrix in "column major order"
 
   return true;
+}
+
+int ModelJacobian::getRefLinkID()
+{
+  std::string strCom("com");
+  int refLnkID = -1; // if refLnk = "com"
+
+  if (strCom.compare(refLnk) != 0) {
+    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "jacobian call: Link ID does not exist.");
+    }
+  }
 }

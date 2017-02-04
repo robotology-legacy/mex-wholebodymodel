@@ -81,6 +81,21 @@ bool ModelGetFloatingBaseState::compute(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("ModelGetFloatingBaseState performing compute.\n");
 #endif
+  computeDCM();
+  return true;
+}
+
+bool ModelGetFloatingBaseState::computeFast(int nrhs, const mxArray **prhs)
+{
+#ifdef DEBUG
+  mexPrintf("ModelGetFloatingBaseState performing computeFast.\n");
+#endif
+  computeDCM();
+  return true;
+}
+
+void ModelGetFloatingBaseState::computeDCM()
+{
   wf_H_b = modelState->getBase2WorldTransformation();
 
 #ifdef DEBUG
@@ -118,37 +133,11 @@ bool ModelGetFloatingBaseState::compute(int nrhs, const mxArray **prhs)
   mexPrintf(sR.c_str());
 #endif
 
-  // since the values in the array are stored in row-major order and Matlab
-  // uses the column-major order for multi-dimensional arrays, we have to
-  // make an array-transposition ...
+  // since the values in the array are stored in row-major order and
+  // Matlab uses the column-major order for multi-dimensional arrays,
+  // --> put matrix in "column major order":
   reorderMatrixInColMajor(rotm, wf_R_b);
 
-  memcpy(wf_p_b, wf_H_b.p, 3*sizeof(double));
+  memcpy(wf_p_b, wf_H_b.p, sizeof(double)*3);
   modelState->vb(vb);
-
-  return true;
-}
-
-bool ModelGetFloatingBaseState::computeFast(int nrhs, const mxArray **prhs)
-{
-#ifdef DEBUG
-  mexPrintf("ModelGetFloatingBaseState performing computeFast.\n");
-#endif
-#ifdef DEBUG
-  wf_H_b = modelState->getBase2WorldTransformation();
-
-  mexPrintf("Inside of getFloatingBaseState - transformation:\n");
-  mexPrintf("wf_H_b\n");
-  mexPrintf( (wf_H_b.R.toString()).c_str() );
-  mexPrintf("\n\n");
-#endif
-  double rotm[9];
-
-  wf_H_b.R.getDcm(rotm);
-  reorderMatrixInColMajor(rotm, wf_R_b); // matrix in "column major order"
-
-  memcpy(wf_p_b, wf_H_b.p, 3*sizeof(double));
-  modelState->vb(vb);
-
-  return true;
 }

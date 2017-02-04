@@ -48,6 +48,7 @@ namespace mexWBIComponent
 
     private:
       ModelGetFloatingBaseState();
+      static void computeDCM();
 
       static ModelGetFloatingBaseState *modelGetFloatingBaseState;
 

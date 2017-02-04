@@ -49,7 +49,7 @@ ModelCoriolisBiasForces : public ModelComponent
 
     private:
       ModelCoriolisBiasForces();
-      bool processArguments(int nrhs, const mxArray **prhs);
+      static bool processArguments(int nrhs, const mxArray **prhs);
 
       static ModelCoriolisBiasForces *modelCoriolisBiasForces;
 

@@ -98,15 +98,6 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray **prhs)
   qj     = mxGetPr(prhs[3]);
   refLnk = mxArrayToString(prhs[4]);
 
-  std::string strCom("com");
-  int refLnkID = -1; // if refLnk = "com"
-
-  if (strCom.compare(refLnk) != 0) {
-    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "forwardKinematics call: Link ID does not exist.");
-    }
-  }
-
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
@@ -121,33 +112,7 @@ bool ModelForwardKinematics::processArguments(int nrhs, const mxArray **prhs)
 
   wf_H_b = wbi::Frame(rot3d, ppos);
 
-  double vxT_lnk[7]; // vector axis-angle transformation (from ref. link to world frame)
-  if ( !(robotModel->forwardKinematics(qj, wf_H_b, refLnkID, vxT_lnk)) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI forwardKinematics call.");
-  }
-
-  int i;
-  for (i=0; i < 3; i++) {
-    *(vqT_lnk + i) = *(vxT_lnk + i); // copy position vector
-  }
-
-  double axang[4] = {vxT_lnk[3], vxT_lnk[4], vxT_lnk[5], vxT_lnk[6]}; // axis-angle vector
-  rot3d = wbi::Rotation::axisAngle(axang);
-
-#ifdef DEBUG
-  std::stringstream ssR;
-  ssR << "axis-angle: [" << vxT_lnk[3] << "," << vxT_lnk[4] << "," << vxT_lnk[5] << "," << vxT_lnk[6] << "]\n";
-  std::string sR = ssR.str();
-  mexPrintf(sR.c_str());
-  mexPrintf("rotation:\n");
-  mexPrintf((rot3d.toString()).c_str());
-#endif
-
-  double quat_lnk[4];
-  rot3d.getQuaternion(quat_lnk[1], quat_lnk[2], quat_lnk[3], quat_lnk[0]);
-  for (i=0; i < 4; i++) {
-    *(vqT_lnk + (3+i)) = *(quat_lnk + i); // copy quaternion
-  }
+  computeForwardKin();
   return true;
 }
 
@@ -170,6 +135,16 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray **prhs)
   qj     = modelState->qj();
   refLnk = mxArrayToString(prhs[1]);
 
+  computeForwardKin();
+#ifdef DEBUG
+  mexPrintf("ModelForwardKinematics fast computed.\n");
+#endif
+
+  return true;
+}
+
+void ModelForwardKinematics::computeForwardKin()
+{
   std::string strCom("com");
   int refLnkID = -1; // if refLnk = "com"
 
@@ -184,13 +159,8 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray **prhs)
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI forwardKinematics call.");
   }
 
-  int i;
-  for (i=0; i < 3; i++) {
-    *(vqT_lnk + i) = *(vxT_lnk + i); // copy position vector
-  }
-
-  double axang[4] = {vxT_lnk[3], vxT_lnk[4], vxT_lnk[5], vxT_lnk[6]}; // axis-angle vector
-  wbi::Rotation rot3d = wbi::Rotation::axisAngle(axang);
+  double axang[4];
+  memcpy(axang, (vxT_lnk + 3), sizeof(double)*4); // axis-angle vector
 
 #ifdef DEBUG
   std::stringstream ssR;
@@ -201,14 +171,11 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray **prhs)
   mexPrintf((rot3d.toString()).c_str());
 #endif
 
+  wbi::Rotation rot3d = wbi::Rotation::axisAngle(axang);
+
   double quat_lnk[4];
   rot3d.getQuaternion(quat_lnk[1], quat_lnk[2], quat_lnk[3], quat_lnk[0]);
-  for (i=0; i < 4; i++) {
-    *(vqT_lnk + (3+i)) = *(quat_lnk + i); // copy quaternion
-  }
 
-#ifdef DEBUG
-  mexPrintf("ModelForwardKinematics fast computed.\n");
-#endif
-  return true;
+  memcpy(vqT_lnk, vxT_lnk, sizeof(double)*3);        // copy position vector
+  memcpy((vqT_lnk + 3), quat_lnk, sizeof(double)*4); // copy quaternion
 }

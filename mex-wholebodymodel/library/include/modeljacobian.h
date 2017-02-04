@@ -49,7 +49,8 @@ namespace mexWBIComponent
 
     private:
       ModelJacobian();
-      bool processArguments(int, const mxArray**);
+      static bool processArguments(int, const mxArray**);
+      static int getRefLinkID();
 
       static ModelJacobian *modelJacobian;
 
