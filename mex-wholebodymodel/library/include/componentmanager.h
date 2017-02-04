@@ -70,7 +70,7 @@ namespace mexWBIComponent
     public:
       static ComponentManager *getInstance(const char *pstrRobotName = "icub");
 
-      bool processFunctionCall(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs);
+      static bool processFunctionCall(int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs);
 
       /**
        * Delete the (static) instance of this component,

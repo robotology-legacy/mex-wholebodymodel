@@ -33,7 +33,6 @@ namespace mexWBIComponent
   class ModelMassMatrix : public ModelComponent
   {
   public:
-
     static ModelMassMatrix *getInstance();
 
     /**
