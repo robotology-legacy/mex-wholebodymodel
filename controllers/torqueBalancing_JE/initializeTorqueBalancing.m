@@ -26,8 +26,8 @@ clc
 CONFIG.demo_movements                        = 1;                          %either 0 or 1
 CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left foot,right foot]
 CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
-CONFIG.robot_name                            = 'bigman';
-CONFIG.assume_rigid_joints                   = 1;                          %either 0 or 1
+CONFIG.robot_name                            = 'icubGazeboSim';                       
+CONFIG.assume_rigid_joints                   = 0;                          %either 0 or 1
 
 %% Visualization setup
 % robot simulator
@@ -85,15 +85,15 @@ wbm_modelInitialize(CONFIG.robot_name);
 CONFIG.ndof = 25;
 
 %% Initial joints position [deg]
-leftArmInit  = [ 0  8  0  0  0]';
-rightArmInit = [ 0 -8  0  0  0]';
-torsoInit    = [ 0  0  0]';
+leftArmInit  = [ -20  30  0  45  0]';
+rightArmInit = [ -20  30  0  45  0]';
+torsoInit    = [ -10   0  0]';
 
 if sum(CONFIG.feet_on_ground) == 2
     
     % initial conditions for balancing on two feet
-    leftLegInit  = [ 0   0   0   0   0  0 ]';
-    rightLegInit = [ 0   0   0   0   0  0 ]';
+    leftLegInit  = [  25.5   0   0  -18.5  -5.5  0]';
+    rightLegInit = [  25.5   0   0  -18.5  -5.5  0]';
     
 elseif CONFIG.feet_on_ground(1) == 1 && CONFIG.feet_on_ground(2) == 0
     
@@ -109,9 +109,8 @@ elseif CONFIG.feet_on_ground(1) == 0 && CONFIG.feet_on_ground(2) == 1
 end
 
 % feet size
-CONFIG.footSize  = [-0.16  0.16;       % xMin, xMax
-                    -0.075 0.075];     % yMin, yMax
-                
+CONFIG.footSize  = [-0.07 0.07;       % xMin, xMax
+                    -0.03 0.03];      % yMin, yMax
 % joints configuration [rad]
 CONFIG.qjInit    = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
 
@@ -123,9 +122,9 @@ utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/tools
 robot_root   = [utility_root, filesep, '/robotFunctions'];
 plots_root   = [utility_root, filesep, '/visualization'];
 EJoints_root = [utility_root, filesep, '/elasticJoints'];
-src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman_JE/src'];
-config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman_JE/config'];
-init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingWalkman_JE/init'];
+src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing_JE/src'];
+config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing_JE/config'];
+init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing_JE/init'];
 
 % add the paths
 addpath(utility_root);
