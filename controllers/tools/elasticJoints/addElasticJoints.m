@@ -15,7 +15,6 @@ function ELASTICITY = addElasticJoints(CONFIG)
 ndof                 = CONFIG.ndof;
 robot_name           = CONFIG.robot_name;
 
-
 if strcmp(robot_name,'bigman') == 1
     
     % reduction ratio
@@ -50,7 +49,26 @@ elseif strcmp(robot_name,'icubGazeboSim') == 1
     ELASTICITY.KD        = 0.0001*(r^2)*eye(ndof);
 
     % control gains
-    ELASTICITY.KD_gain   = 10*eye(ndof);    
+    ELASTICITY.KD_gain   = 10*eye(ndof); 
+    
+elseif strcmp(robot_name,'bigman_only_legs') == 1
+    
+    % reduction ratio
+    r                    = 100;
+
+    %% Motor dynamics
+    % motor inertia
+    ELASTICITY.B         = 1e-5*(r^2)*eye(ndof);
+
+    % stiffness
+    ELASTICITY.KS        = 0.001*(r^2)*eye(ndof);
+
+    % damping
+    ELASTICITY.KD        = 0.0001*(r^2)*eye(ndof);
+
+    % control gains
+    ELASTICITY.KD_gain   = 10*eye(ndof);  
+
 end
 
 end

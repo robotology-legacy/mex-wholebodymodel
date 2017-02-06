@@ -23,34 +23,39 @@ dtheta         = 180/pi*dtheta;
 dtheta_ref     = 180/pi*dtheta_ref;
        
 %% Motors dynamics: theta
-for k=1:5
-    
-    % LEFT ARM
-    figure(figureCont)
-    set(gcf,'numbertitle','off','name','Larm motor pos')
-    subplot(3,2,k)
-    plot(t,theta(k+3,:))
-    legend('theta')  
-    grid on
-    xlabel('Time [s]')
-    ylabel('Angle [deg]')
-    name = getJointAnnotationICub('left_arm',k);
-    title(name)
-    
-    % RIGHT ARM
-    figure(figureCont+1)
-    set(gcf,'numbertitle','off','name','Rarm motor pos')
-    subplot(3,2,k)
-    plot(t,theta(k+3+5,:))
-    legend('theta')
-    grid on
-    xlabel('Time [s]')
-    ylabel('Angle [deg]')
-    name = getJointAnnotationICub('right_arm',k);
-    title(name)
-end
+counter = 0;
 
-figureCont = figureCont +2;
+if strcmp(CONFIG.robot_name,'bigman')==1 || strcmp(CONFIG.robot_name,'icubGazeboSim')==1
+    for k=1:5
+    
+        % LEFT ARM
+        figure(figureCont)
+        set(gcf,'numbertitle','off','name','Larm motor pos')
+        subplot(3,2,k)
+        plot(t,theta(k+3,:))
+        legend('theta')  
+        grid on
+        xlabel('Time [s]')
+        ylabel('Angle [deg]')
+        name = getJointAnnotationICub('left_arm',k);
+        title(name)
+    
+        % RIGHT ARM
+        figure(figureCont+1)
+        set(gcf,'numbertitle','off','name','Rarm motor pos')
+        subplot(3,2,k)
+        plot(t,theta(k+3+5,:))
+        legend('theta')
+        grid on
+        xlabel('Time [s]')
+        ylabel('Angle [deg]')
+        name = getJointAnnotationICub('right_arm',k);
+        title(name)
+    end
+
+    figureCont = figureCont +2;
+    counter    = 13;
+end
 
 for k=1:6
     
@@ -58,7 +63,7 @@ for k=1:6
     figure(figureCont)
     set(gcf,'numbertitle','off','name','Lleg motor pos')
     subplot(3,2,k)
-    plot(t,theta(k+13,:))
+    plot(t,theta(k+counter,:))
     legend('theta')
     grid on
     xlabel('Time [s]')
@@ -70,7 +75,7 @@ for k=1:6
     figure(figureCont+1)
     set(gcf,'numbertitle','off','name','Rleg motor pos')
     subplot(3,2,k)
-    plot(t,theta(k+13+6,:))
+    plot(t,theta(k+counter+6,:))
     legend('theta')
     grid on
     xlabel('Time [s]')
@@ -81,54 +86,60 @@ end
 
 figureCont = figureCont +2;
 
-for k=1:3
+if strcmp(CONFIG.robot_name,'bigman')==1 || strcmp(CONFIG.robot_name,'icubGazeboSim')==1
+    for k=1:3
     
-    % TORSO
-    figure(figureCont)
-    set(gcf,'numbertitle','off','name','Torso motor pos')
-    subplot(3,1,k)
-    plot(t,theta(k,:))
-    legend('theta')
-    grid on
-    xlabel('Time [s]')
-    ylabel('Angle [deg]')
-    name = getJointAnnotationICub('torso',k);
-    title(name)
+        % TORSO
+        figure(figureCont)
+        set(gcf,'numbertitle','off','name','Torso motor pos')
+        subplot(3,1,k)
+        plot(t,theta(k,:))
+        legend('theta')
+        grid on
+        xlabel('Time [s]')
+        ylabel('Angle [deg]')
+        name = getJointAnnotationICub('torso',k);
+        title(name)
+    end
+    
+    figureCont = figureCont +1;
 end
 
 %% Motors dynamics: dtheta
-for k=1:5
+if strcmp(CONFIG.robot_name,'bigman')==1 || strcmp(CONFIG.robot_name,'icubGazeboSim')==1
+    for k=1:5
     
-    % LEFT ARM
-    figure(figureCont)
-    set(gcf,'numbertitle','off','name','Larm motor vel')
-    subplot(3,2,k)
-    plot(t,dtheta(k+3,:))
-    hold on
-    plot(t,dtheta_ref(k+3,:),'k')
-    legend('dtheta','dthetaRef')  
-    grid on
-    xlabel('Time [s]')
-    ylabel('Velocity [deg/s]')
-    name = getJointAnnotationICub('left_arm',k);
-    title(name)
+        % LEFT ARM
+        figure(figureCont)
+        set(gcf,'numbertitle','off','name','Larm motor vel')
+        subplot(3,2,k)
+        plot(t,dtheta(k+3,:))
+        hold on
+        plot(t,dtheta_ref(k+3,:),'k')
+        legend('dtheta','dthetaRef')  
+        grid on
+        xlabel('Time [s]')
+        ylabel('Velocity [deg/s]')
+        name = getJointAnnotationICub('left_arm',k);
+        title(name)
     
-    % RIGHT ARM
-    figure(figureCont+1)
-    set(gcf,'numbertitle','off','name','Rarm motor vel')
-    subplot(3,2,k)
-    plot(t,dtheta(k+3+5,:))
-    hold on
-    plot(t,dtheta_ref(k+3+5,:),'k')
-    legend('dtheta','dthetaRef')
-    grid on
-    xlabel('Time [s]')
-    ylabel('Velocity [deg/s]')
-    name = getJointAnnotationICub('right_arm',k);
-    title(name)
-end
+        % RIGHT ARM
+        figure(figureCont+1)
+        set(gcf,'numbertitle','off','name','Rarm motor vel')
+        subplot(3,2,k)
+       plot(t,dtheta(k+3+5,:))
+        hold on
+        plot(t,dtheta_ref(k+3+5,:),'k')
+        legend('dtheta','dthetaRef')
+        grid on
+        xlabel('Time [s]')
+        ylabel('Velocity [deg/s]')
+        name = getJointAnnotationICub('right_arm',k);
+        title(name)
+    end
 
-figureCont = figureCont +2;
+    figureCont = figureCont +2;
+end
 
 for k=1:6
     
@@ -136,9 +147,9 @@ for k=1:6
     figure(figureCont)
     set(gcf,'numbertitle','off','name','Lleg motor vel')
     subplot(3,2,k)
-    plot(t,dtheta(k+13,:))
+    plot(t,dtheta(k+counter,:))
     hold on
-    plot(t,dtheta_ref(k+13,:),'k')
+    plot(t,dtheta_ref(k+counter,:),'k')
     legend('dtheta','dthetaRef')
     grid on
     xlabel('Time [s]')
@@ -150,9 +161,9 @@ for k=1:6
     figure(figureCont+1)
     set(gcf,'numbertitle','off','name','Rleg motor vel')
     subplot(3,2,k)
-    plot(t,dtheta(k+13+6,:))
+    plot(t,dtheta(k+counter+6,:))
     hold on
-    plot(t,dtheta_ref(k+13+6,:),'k')
+    plot(t,dtheta_ref(k+counter+6,:),'k')
     legend('dtheta','dthetaRef')
     grid on
     xlabel('Time [s]')
@@ -163,24 +174,26 @@ end
 
 figureCont = figureCont +2;
 
-for k=1:3
+if strcmp(CONFIG.robot_name,'bigman')==1 || strcmp(CONFIG.robot_name,'icubGazeboSim')==1
+    for k=1:3
     
-    % TORSO
-    figure(figureCont)
-    set(gcf,'numbertitle','off','name','Torso motor vel')
-    subplot(3,1,k)
-    plot(t,dtheta(k,:))
-    hold on
-    plot(t,dtheta_ref(k,:),'k')
-    legend('dtheta','dthetaRef')
-    grid on
-    xlabel('Time [s]')
-    ylabel('Velocity [deg/s]')
-    name = getJointAnnotationICub('torso',k);
-    title(name)
+        % TORSO
+        figure(figureCont)
+        set(gcf,'numbertitle','off','name','Torso motor vel')
+        subplot(3,1,k)
+        plot(t,dtheta(k,:))
+        hold on
+        plot(t,dtheta_ref(k,:),'k')
+        legend('dtheta','dthetaRef')
+        grid on
+        xlabel('Time [s]')
+        ylabel('Velocity [deg/s]')
+        name = getJointAnnotationICub('torso',k);
+        title(name)
+    end
+    
+    figureCont = figureCont +1;
 end
-
-figureCont = figureCont +1;
 
 end
 
