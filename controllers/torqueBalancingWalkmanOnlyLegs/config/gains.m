@@ -64,6 +64,6 @@ gainsInit.momentumGains      = [gainsDCoM zeros(3); zeros(3) gainsDAngMom];
 gainsInit.intMomentumGains   = [gainsPCoM zeros(3); zeros(3) gainsPAngMom];
 
 % gains for feet correction to avoid numerical intrgration errors
-gainsInit.corrPosFeet        = 100;
+gainsInit.corrPosFeet        = 10;
 
 end

@@ -18,17 +18,17 @@ robot_name           = CONFIG.robot_name;
 if strcmp(robot_name,'bigman') == 1
     
     % reduction ratio
-    r                    = 100;
+    p                    = CONFIG.p;
 
     %% Motor dynamics
     % motor inertia
-    ELASTICITY.B         = 5.480e-5*(r^2)*eye(ndof);
+    ELASTICITY.B_xi      = 5.480e-5*(p^2)*eye(ndof);
 
     % stiffness
-    ELASTICITY.KS        = 0.005*(r^2)*eye(ndof);
+    ELASTICITY.KS        = 50*eye(ndof);
 
     % damping
-    ELASTICITY.KD        = 0.0005*(r^2)*eye(ndof);
+    ELASTICITY.KD        = 5*eye(ndof);
 
     % control gains
     ELASTICITY.KD_gain   = 100*eye(ndof);
@@ -36,38 +36,38 @@ if strcmp(robot_name,'bigman') == 1
 elseif strcmp(robot_name,'icubGazeboSim') == 1
     
     % reduction ratio
-    r                    = 100;
+    p                    = CONFIG.p;
 
     %% Motor dynamics
-    % motor inertia
-    ELASTICITY.B         = 1e-5*(r^2)*eye(ndof);
+    % motor inertia (expressed w.r.t. the link side)
+    ELASTICITY.B_xi      = 1e-5*(p^2)*eye(ndof);
 
     % stiffness
-    ELASTICITY.KS        = 0.001*(r^2)*eye(ndof);
+    ELASTICITY.KS        = 10*eye(ndof);
 
     % damping
-    ELASTICITY.KD        = 0.0001*(r^2)*eye(ndof);
+    ELASTICITY.KD        = 1*eye(ndof);
 
     % control gains
-    ELASTICITY.KD_gain   = 10*eye(ndof); 
+    ELASTICITY.KD_gain   = 100*eye(ndof); 
     
 elseif strcmp(robot_name,'bigman_only_legs') == 1
     
     % reduction ratio
-    r                    = 100;
+    p                    = CONFIG.p;
 
     %% Motor dynamics
     % motor inertia
-    ELASTICITY.B         = 1e-5*(r^2)*eye(ndof);
+    ELASTICITY.B_xi      = 5.480e-5*(p^2)*eye(ndof);
 
     % stiffness
-    ELASTICITY.KS        = 0.001*(r^2)*eye(ndof);
+    ELASTICITY.KS        = 100*eye(ndof);
 
     % damping
-    ELASTICITY.KD        = 0.0001*(r^2)*eye(ndof);
+    ELASTICITY.KD        = 5*eye(ndof);
 
     % control gains
-    ELASTICITY.KD_gain   = 10*eye(ndof);  
+    ELASTICITY.KD_gain   = 100*eye(ndof);  
 
 end
 

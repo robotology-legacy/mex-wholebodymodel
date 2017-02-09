@@ -1,4 +1,4 @@
-function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE,theta,ELASTICITY)
+function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE,xi,ELASTICITY)
 %STACKOFTASKCONTROLLER implements a momentum-based control algorithm for
 %                      floating base robots.
 %
@@ -134,14 +134,23 @@ posturalCorr       =  NullLambdaDamp*Mbar;
 impedances         =  impedances*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
 dampings           =  dampings*pinv(posturalCorr,pinv_tol) + 0.01*eye(ndof);
 
-% reference for motor variables and contact forces nullspace
-controlParam.ddtheta_ref  = zeros(ndof,1);
+% compensation for motor variables and contact forces nullspace
+controlParam.error_compens     = zeros(ndof,1);
+
+if sum(CONFIG.feet_on_ground) == 1
+    B2                         = (Jc(:,7:end)-Jc(:,1:6)/Mb*Mbj)/Mbar;
+    pinvB2                     = pinv(B2,pinv_tol);
+    NullB2                     = eye(ndof) - pinvB2*B2;
+    B1                         = Jc(:,1:6)/Mb*transpose(Jc(:,1:6))*pinvA;
+    invB1                      = eye(size(B1,1))/B1;
+    controlParam.error_compens = -ELASTICITY.KD*(transpose(B2)*transpose(invB1)*(invB1)*B2 + NullB2)*Mbar*dqjTilde;
+end
 
 if CONFIG.assume_rigid_joints == 1
     tauModel                  = pinvLambda*(JcMinv*h - dJc_nu) + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
                                 + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
 else
-    tauModel                  = pinvLambda*(JcMinv*h - dJc_nu) + ELASTICITY.KS*(qj-theta)+ELASTICITY.KD*dqj + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
+    tauModel                  = pinvLambda*(JcMinv*h - dJc_nu) + ELASTICITY.KS*(qj-xi)+ELASTICITY.KD*dqj + NullLambda*(h(7:end) -Mbj'/Mb*h(1:6)...
                                 + Mbar*ddqjRef - impedances*posturalCorr*qjTilde - dampings*posturalCorr*dqjTilde);
 end
 

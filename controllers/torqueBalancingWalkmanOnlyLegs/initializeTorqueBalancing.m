@@ -58,7 +58,7 @@ else
     CONFIG.massCorr = 0;
 end
 
-% Integration options. If the intrgration is slow, try to modify these
+% Integration options. If the integration is slow, try to modify these
 % options.
 if CONFIG.demo_movements == 0
     CONFIG.options                   = odeset('RelTol',1e-3,'AbsTol',1e-3);

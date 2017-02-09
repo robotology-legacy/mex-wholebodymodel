@@ -22,6 +22,7 @@ clc
 %% Configure the simulation
 CONFIG.demo_movements                        = 1;                          %either 0 or 1
 CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left foot,right foot]
+CONFIG.robot_name                            = 'icubGazeboSim';            
 
 %% QP solver and gains tuning procedure
 CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
@@ -32,18 +33,18 @@ CONFIG.gains_tuning                          = 1;                          %eith
 CONFIG.visualize_robot_simulator             = 1;                          %either 0 or 1
 % forward dynamics integration results
 CONFIG.visualize_integration_results         = 1;                          %either 0 or 1
-CONFIG.visualize_joints_dynamics             = 1;                          %either 0 or 1
+CONFIG.visualize_joints_dynamics             = 0;                          %either 0 or 1
 % linearization and gains tuning
 CONFIG.visualize_gains_tuning_results        = 1;                          %either 0 or 1; available only if gains_tuning = 1
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 10;
+CONFIG.tEnd                                  = 5;
 CONFIG.sim_step                              = 0.01;
 
 %% Generate the joint references with the inverse kinematics solver
 CONFIG.jointRef_with_ikin                    = 1;                          %either 0 or 1
-CONFIG.visualize_ikin_results                = 1;                          %either 0 or 1
+CONFIG.visualize_ikin_results                = 0;                          %either 0 or 1
 CONFIG.ikin_integration_step                 = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -80,7 +81,7 @@ else
     CONFIG.massCorr = 0;
 end
 
-% Integration options. If the intrgration is slow, try to modify these
+% Integration options. If the integration is slow, try to modify these
 % options.
 if CONFIG.demo_movements == 0
     CONFIG.options                   = odeset('RelTol',1e-3,'AbsTol',1e-3);
@@ -98,7 +99,7 @@ plot_set
 CONFIG.figureCont = 1;
 
 %% Initialize the robot model
-wbm_modelInitialize('icubGazeboSim');
+wbm_modelInitialize(CONFIG.robot_name);
 CONFIG.ndof = 25;
 
 %% Initial joints position [deg]

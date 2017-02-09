@@ -50,7 +50,7 @@ include(CTest)
 enable_testing()
 
 # Subdirectories
-add_subdirectory(mex-wholebodymodel)
+add_subdirectory(wbm-toolbox)
 
 if(BUILD_TESTING)
     add_subdirectory(tests)

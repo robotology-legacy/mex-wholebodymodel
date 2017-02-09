@@ -20,6 +20,7 @@ function figureCont = initVisualizer(t,chi,CONFIG)
 ndof                        = CONFIG.ndof;
 initState                   = CONFIG.initState;
 figureCont                  = CONFIG.figureCont;
+p                           = CONFIG.p;
 
 %% Robot simulator
 if CONFIG.visualize_robot_simulator == 1
@@ -78,9 +79,9 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
     qjRef         = zeros(ndof,length(t));
     
     % motors variables
-    theta         = zeros(ndof,length(t));
-    dtheta        = zeros(ndof,length(t));
-    dtheta_ref     = zeros(ndof,length(t));
+    xi            = zeros(ndof,length(t));
+    dxi           = zeros(ndof,length(t));
+    dxi_ref       = zeros(ndof,length(t));
     
     % contact forces and torques initialization
     fc            = zeros(6*CONFIG.numConstraints,length(t));
@@ -106,16 +107,16 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
         qjRef(:,time)       = visual.jointRef.qjRef;
         
         % motor dynamics
-        theta(:,time)       = visual.theta;
-        dtheta(:,time)      = visual.dtheta;
-        dtheta_ref(:,time)  = visual.dtheta_ref;
+        xi(:,time)          = visual.xi;
+        dxi(:,time)         = visual.dxi;
+        dxi_ref(:,time)     = visual.dxi_ref;
         
         %% Other parameters
         % contact forces and torques
         fc(:,time)          = visual.fc;
         f0(:,time)          = visual.f0;
-        tau_m(:,time)         = visual.tau_m;
-        tau_norm(time)      = norm(visual.tau_m);
+        tau_m(:,time)       = visual.tau_xi/p;
+        tau_norm(time)      = norm(visual.tau_xi/p);
         
         % forward kinematics
         xCoM(:,time)        = visual.xCoM;
@@ -153,7 +154,7 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
     %% Motors dynamics
     if CONFIG.visualize_motors_dynamics == 1
         
-        CONFIG.figureCont = visualizeMotorsDynamics(t,CONFIG,theta,dtheta_ref,dtheta);
+        CONFIG.figureCont = visualizeMotorsDynamics(t,CONFIG,xi,dxi_ref,dxi);
     end
     
     figureCont     = CONFIG.figureCont;

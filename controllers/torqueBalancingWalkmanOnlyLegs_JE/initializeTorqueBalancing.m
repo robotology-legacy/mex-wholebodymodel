@@ -28,18 +28,19 @@ CONFIG.feet_on_ground                        = [1,1];                      %eith
 CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
 CONFIG.robot_name                            = 'bigman_only_legs';
 CONFIG.assume_rigid_joints                   = 0;                          %either 0 or 1
+CONFIG.p                                     = 100;                        %transmission ratio
 
 %% Visualization setup
 % robot simulator
 CONFIG.visualize_robot_simulator             = 1;                          %either 0 or 1
 % forward dynamics integration results
 CONFIG.visualize_integration_results         = 0;                          %either 0 or 1
-CONFIG.visualize_joints_dynamics             = 0;                          %either 0 or 1
+CONFIG.visualize_joints_dynamics             = 1;                          %either 0 or 1
 CONFIG.visualize_motors_dynamics             = 1;
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 1;
+CONFIG.tEnd                                  = 2.5;
 CONFIG.sim_step                              = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -63,7 +64,7 @@ else
     CONFIG.massCorr = 0;
 end
 
-% Integration options. If the intrgration is slow, try to modify these
+% Integration options. If the integration is slow, try to modify these
 % options.
 if CONFIG.demo_movements == 0
     CONFIG.options                   = odeset('RelTol',1e-3,'AbsTol',1e-3);

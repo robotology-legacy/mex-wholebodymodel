@@ -1,10 +1,10 @@
-function [tau_m,dtheta_ref] = motorController(dtheta,theta,ELASTICITY,STATE,controlParam)
+function [tau_xi,dxi_ref] = motorController(dxi,xi,ELASTICITY,STATE,controlParam,CONFIG)
 %MOTORCONTROLLER computes desired motor torques for controlling floating
 %                base robots with elastic joiints.
 %
-% tau = MOTORCONTROLLER(dtheta,theta,ELASTICITY,STATE,controlParam) takes
-% as input the parameters from stack of task controllers, the robot state,
-% the motor state and dynamics.
+% tau = MOTORCONTROLLER(dtheta,theta,ELASTICITY,STATE,controlParam,CONFIG) 
+% takes as input the parameters from stack of task controllers, the robot
+% state, the motor state and dynamics and configuration.
 % The output are the desired motor torques tau_m and the motor reference 
 % velocities, dtheta_ref.
 %
@@ -14,16 +14,20 @@ function [tau_m,dtheta_ref] = motorController(dtheta,theta,ELASTICITY,STATE,cont
 
 % ------------Initialization----------------
 %% Configure parameters
-qj  = STATE.qj;
-dqj = STATE.dqj;
+ndof = CONFIG.ndof;
+qj   = STATE.qj;
+dqj  = STATE.dqj;
 
-% desired reference for motor velocity
-dtheta_ref  = ELASTICITY.KD\(controlParam.tauModel+controlParam.Sigma*controlParam.fcDes);
-ddtheta_ref = ELASTICITY.B/ELASTICITY.KD*controlParam.ddtheta_ref;
+% desired references for motor velocity
+dxi_ref       = ELASTICITY.KD\(controlParam.tauModel+controlParam.Sigma*controlParam.fcDes);
+ddxi_ref      = zeros(ndof,1);
+
+% compensation for stability (proper backstepping)
+error_compens = controlParam.error_compens;
 
 % feedback linearization of motor dynamics
-u     = ddtheta_ref - ELASTICITY.KD_gain*(dtheta-dtheta_ref);
-tau_m = u + ELASTICITY.KD*(dtheta-dqj) + ELASTICITY.KS*(theta-qj); 
+u      = ddxi_ref - ELASTICITY.KD_gain*(dxi-dxi_ref) + error_compens;
+tau_xi = ELASTICITY.B_xi*u + ELASTICITY.KD*(dxi-dqj) + ELASTICITY.KS*(xi-qj); 
 
 end
 

@@ -1,10 +1,10 @@
-function figureCont = visualizeMotorsDynamics(t,CONFIG,theta,dtheta_ref,dtheta)
+function figureCont = visualizeMotorsDynamics(t,CONFIG,xi,dxi_ref,dxi)
 %VISUALIZEMOTORSDYNAMICS visualizes the joint space dynamics of the iCub robot
 %                        from forward dynamics integration.
 %
-% figureCont = VISUALIZEMOTORSDYNAMICS(varargin) takes as inputs the
-% integration time t, a structure CONFIG which contains all the utility
-% parameters, the motor position theta, motro velocities dtheta and
+% figureCont = VISUALIZEMOTORSDYNAMICS(t,CONFIG,xi,dxi_ref,dxi) takes as 
+% inputs the integration time t, a structure CONFIG which contains all the
+% utility parameters, the motor position theta, motro velocities dtheta and
 % their references dtheta_ref.
 % The output is a counter for the automatic correction of figures numbers
 % in case a new figure is added.
@@ -15,12 +15,13 @@ function figureCont = visualizeMotorsDynamics(t,CONFIG,theta,dtheta_ref,dtheta)
 
 % ------------Initialization----------------
 import WBM.utilities.getJointAnnotationICub;
-figureCont     = CONFIG.figureCont;
+figureCont  = CONFIG.figureCont;
+p           = CONFIG.p;
 
-% setup parameters
-theta          = 180/pi*theta;
-dtheta         = 180/pi*dtheta;
-dtheta_ref     = 180/pi*dtheta_ref;
+% setup parameters: convert to motor variables
+theta          = 180/pi*xi*p;
+dtheta         = 180/pi*dxi*p;
+dtheta_ref     = 180/pi*dxi_ref*p;
        
 %% Motors dynamics: theta
 counter = 0;
@@ -36,7 +37,7 @@ if strcmp(CONFIG.robot_name,'bigman')==1 || strcmp(CONFIG.robot_name,'icubGazebo
         legend('theta')  
         grid on
         xlabel('Time [s]')
-        ylabel('Angle [deg]')
+        ylabel('Motor angle [deg]')
         name = getJointAnnotationICub('left_arm',k);
         title(name)
     
@@ -48,7 +49,7 @@ if strcmp(CONFIG.robot_name,'bigman')==1 || strcmp(CONFIG.robot_name,'icubGazebo
         legend('theta')
         grid on
         xlabel('Time [s]')
-        ylabel('Angle [deg]')
+        ylabel('Motor angle [deg]')
         name = getJointAnnotationICub('right_arm',k);
         title(name)
     end
@@ -67,7 +68,7 @@ for k=1:6
     legend('theta')
     grid on
     xlabel('Time [s]')
-    ylabel('Angle [deg]')
+    ylabel('Motor angle [deg]')
     name = getJointAnnotationICub('left_leg',k);
     title(name)
     
@@ -79,7 +80,7 @@ for k=1:6
     legend('theta')
     grid on
     xlabel('Time [s]')
-    ylabel('Angle [deg]')
+    ylabel('Motor angle [deg]')
     name = getJointAnnotationICub('right_leg',k);
     title(name)
 end
@@ -97,7 +98,7 @@ if strcmp(CONFIG.robot_name,'bigman')==1 || strcmp(CONFIG.robot_name,'icubGazebo
         legend('theta')
         grid on
         xlabel('Time [s]')
-        ylabel('Angle [deg]')
+        ylabel('Motor angle [deg]')
         name = getJointAnnotationICub('torso',k);
         title(name)
     end
@@ -119,7 +120,7 @@ if strcmp(CONFIG.robot_name,'bigman')==1 || strcmp(CONFIG.robot_name,'icubGazebo
         legend('dtheta','dthetaRef')  
         grid on
         xlabel('Time [s]')
-        ylabel('Velocity [deg/s]')
+        ylabel('Motor velocity [deg/s]')
         name = getJointAnnotationICub('left_arm',k);
         title(name)
     
@@ -133,7 +134,7 @@ if strcmp(CONFIG.robot_name,'bigman')==1 || strcmp(CONFIG.robot_name,'icubGazebo
         legend('dtheta','dthetaRef')
         grid on
         xlabel('Time [s]')
-        ylabel('Velocity [deg/s]')
+        ylabel('Motor velocity [deg/s]')
         name = getJointAnnotationICub('right_arm',k);
         title(name)
     end
@@ -153,7 +154,7 @@ for k=1:6
     legend('dtheta','dthetaRef')
     grid on
     xlabel('Time [s]')
-    ylabel('Velocity [deg/s]')
+    ylabel('Motor velocity [deg/s]')
     name = getJointAnnotationICub('left_leg',k);
     title(name)
     
@@ -167,7 +168,7 @@ for k=1:6
     legend('dtheta','dthetaRef')
     grid on
     xlabel('Time [s]')
-    ylabel('Velocity [deg/s]')
+    ylabel('Motor velocity [deg/s]')
     name = getJointAnnotationICub('right_leg',k);
     title(name)
 end
@@ -187,7 +188,7 @@ if strcmp(CONFIG.robot_name,'bigman')==1 || strcmp(CONFIG.robot_name,'icubGazebo
         legend('dtheta','dthetaRef')
         grid on
         xlabel('Time [s]')
-        ylabel('Velocity [deg/s]')
+        ylabel('Motor velocity [deg/s]')
         name = getJointAnnotationICub('torso',k);
         title(name)
     end

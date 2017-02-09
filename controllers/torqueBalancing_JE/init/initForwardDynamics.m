@@ -20,10 +20,11 @@ dqjInit                      = zeros(ndof,1);
 dx_bInit                     = zeros(3,1);
 w_omega_bInit                = zeros(3,1);
 
-% initialize motor state
-thetaInit                    = qjInit;
-dthetaInit                   = dqjInit;
-chi_motorInit                = [thetaInit;dthetaInit];
+% initialize motor state (xi = theta/p where theta is the motor angle and p
+% is the transmission ratio)
+xiInit                       = qjInit;
+dxiInit                      = dqjInit;
+chi_motorInit                = [xiInit;dxiInit];
 
 %% Contact constraints definition
 if sum(feet_on_ground) == 2

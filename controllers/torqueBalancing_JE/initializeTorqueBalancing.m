@@ -23,23 +23,24 @@ close  all
 clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation
-CONFIG.demo_movements                        = 1;                          %either 0 or 1
-CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left foot,right foot]
-CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
+CONFIG.demo_movements                        = 0;                          %either 0 or 1
+CONFIG.feet_on_ground                        = [0,1];                      %either 0 or 1; [left foot,right foot]
+CONFIG.use_QPsolver                          = 0;                          %either 0 or 1
 CONFIG.robot_name                            = 'icubGazeboSim';                       
 CONFIG.assume_rigid_joints                   = 0;                          %either 0 or 1
+CONFIG.p                                     = 100;                        %transmission ratio (p = 1/eta)
 
 %% Visualization setup
 % robot simulator
 CONFIG.visualize_robot_simulator             = 1;                          %either 0 or 1
 % forward dynamics integration results
-CONFIG.visualize_integration_results         = 0;                          %either 0 or 1
+CONFIG.visualize_integration_results         = 1;                          %either 0 or 1
 CONFIG.visualize_joints_dynamics             = 0;                          %either 0 or 1
 CONFIG.visualize_motors_dynamics             = 1;
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 2.5;
+CONFIG.tEnd                                  = 10;
 CONFIG.sim_step                              = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -63,7 +64,7 @@ else
     CONFIG.massCorr = 0;
 end
 
-% Integration options. If the intrgration is slow, try to modify these
+% Integration options. If the integration is slow, try to modify these
 % options.
 if CONFIG.demo_movements == 0
     CONFIG.options                   = odeset('RelTol',1e-3,'AbsTol',1e-3);
@@ -125,9 +126,11 @@ EJoints_root = [utility_root, filesep, '/elasticJoints'];
 src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing_JE/src'];
 config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing_JE/config'];
 init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancing_JE/init'];
+centr_root   = [utility_root, filesep, '/centroidalTransformation'];
 
 % add the paths
 addpath(utility_root);
+addpath(centr_root);
 addpath(robot_root);
 addpath(plots_root);
 addpath(src_root);

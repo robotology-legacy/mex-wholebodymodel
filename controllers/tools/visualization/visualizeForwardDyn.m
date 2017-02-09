@@ -112,7 +112,7 @@ set(gcf,'numbertitle','off','name','Norm of torques')
 hold on
 grid on
 plot(t,tau_norm)
-title('Square norm of joints torques')
+title('Square norm of control torques')
 xlabel('Time [s]')
 ylabel('Torque [Nm]')
 
