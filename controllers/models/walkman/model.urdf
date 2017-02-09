@@ -105,6 +105,16 @@
       <mass value="4.7"/>
       <inertia ixx="0.14773769" ixy="0.0" ixz="-0.029780072" iyy="0.16085511" iyz="0.0" izz="0.15409381"/>
     </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+      <geometry name="TorsoProtections_visual">
+        <mesh filename="/meshes/visual/ProtectionSystem.dae" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="material.metal">
+        <texture />
+        <color rgba="0.0 0.2 0.3 1"/>
+      </material>
+    </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
       <geometry name="TorsoProtections_collision">

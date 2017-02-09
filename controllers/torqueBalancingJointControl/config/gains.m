@@ -1,9 +1,9 @@
 function gainsInit = gains(CONFIG)
-%GAINS generates the initial gains matrices for both the momentum task 
+%GAINS generates initial control gains for both the momentum task 
 %(primary task in SoT controller) and the postural task.
 %
 % gains = GAINS(CONFIG) takes as an input the structure CONFIG, which
-% contains all the utility parameters. The output is the structure 
+% contains all the robot configuration parameters. The output is the structure 
 % gainsInit, which contains the initial gains matrices.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)

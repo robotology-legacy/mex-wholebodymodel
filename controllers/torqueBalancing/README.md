@@ -1,4 +1,4 @@
-## torqueBalancing controller using MATLAB 
+## Torque balancing controller using MATLAB 
 This is the controller implemented on the humanoid robot iCub for balancing. The control strategy is `momentum-based`.
 The control objective is the achievement of two different tasks: the primary task is a desired centroidal momentum dynamics. The secondary task is the stability of the robot's zero dynamics. 
 

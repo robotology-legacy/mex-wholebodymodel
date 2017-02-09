@@ -4,7 +4,7 @@ function WBMAssertEqual(val1, val2, errorMsg, tol)
     %   Don't do anything if val1 == val2, print the error message and exit otherwise!
     %
     if (nargin < 3)
-        errorMsg = '';
+        errorMsg = 'Tolerance level exceeded!';
     end
 
     if (nargin < 4)

@@ -1,14 +1,15 @@
 function figureCont = initVisualizer(t,chi,CONFIG)
-%INITVISUALIZER is the main function for visualizing the results of iCub forward
-%               dynamics integration in MATLAB.
+%INITVISUALIZER initializes the visualization of forward dynamics
+%               integration results.
 %
-% INITVISUALIZER visualizes some outputs from the forward dynamics
-% integration (e.g. the robot state, contact forces, control torques...).
+% INITVISUALIZER visualizes results of the forward dynamics
+% integration (e.g. the robot state, contact forces, control torques...) 
+% and initialize robot simulator.
 %
 % figureCont = INITVISUALIZER(t,chi,CONFIG) takes as input the integration
-% time t, the robot state chi and the structure CONFIG containing all the
-% utility parameters. The output is a counter for the automatic correction
-% of figures numbers in case a new figure is added.
+% time t, the robot state chi and the robot configuration. The output is a
+% counter for the automatic correction of figures numbers in case a new 
+% figure is added.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
@@ -157,8 +158,8 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
         
         CONFIG.figureCont = visualizeLinearizAndGains(t,CONFIG,ddqjNonLin,ddqjLin);
     end
-    
-    figureCont = CONFIG.figureCont;
+
+    figureCont     = CONFIG.figureCont;
     set(0,'DefaultFigureWindowStyle','Normal');
     
 end

@@ -1,19 +1,17 @@
 function controlParam = stackOfTaskController(CONFIG,gain,trajectory,DYNAMICS,FORKINEMATICS,STATE)
-%STACKOFTASKCONTROLLER implements a momentum-based control algorithm in order
-%                      to control the robot iCub.
+%STACKOFTASKCONTROLLER implements a momentum-based control algorithm for
+%                      floating base robots.
 %
 % STACKOFTASKCONTROLLER computes the desired control torques at joints
-% using a task-based approach. The first task is the control of robot's
-% momentum, while the second task is a postural task.
+% using a task-based approach. The first task is the achievement of a 
+% desired robot momentum, while the second task is a postural task.
 %
 % controlParam = STACKOFTASKCONTROLLER(CONFIG, gain, trajectory,
-% DYNAMICS,FORKINEMATICS,STATE) takes as input the structure CONFIG,
-% which contains all the configuration parameters, while the other
-% structures contain the control gains, the desired trajectory, the robot
-% dynamics, forward kinematics and state.
-% The output is the structure controlParam which contains the desired
-% control torques, the desired contact forces and others parameters used
-% for visualization and QP solver.
+% DYNAMICS,FORKINEMATICS,STATE) takes as input the robot configuration,
+% control gains, reference trajectory, and robot forward kinematics,
+% dynamics and state.
+% The output controlParam contains desired control torques and contact 
+% forces and others parameters used for visualization and QP solver.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016

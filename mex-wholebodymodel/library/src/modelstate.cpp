@@ -35,7 +35,8 @@ ModelState *ModelState::modelState = 0;
 wbi::iWholeBodyModel *ModelState::robotWBIModel = 0;
 
 size_t ModelState::nDof = 0;
-std::string ModelState::currRobotName = "";
+char   *ModelState::pstrCurrRobotName = 0;
+const char *ModelState::pcstrLocalName = "mexWBModel";
 
 double ModelState::svb[6]   = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 double ModelState::sg[3]    = {0.0f, 0.0f, 0.0f};
@@ -44,32 +45,35 @@ double *ModelState::sqj_dot = 0;
 
 wbi::Frame ModelState::wf_H_b = wbi::Frame();
 
-bool isRobotNameAFile(const std::string &robotName)
+bool isRobotNameAFile(const char *pstrRobotName)
 {
-  // Ugly hack: check the last four char of robotName:
-  // if it ends in .xxx or .xxxx (where xxx or xxxx is is an classical extention)
-  // call the robotModelFromURDF, otherwise the usual robotModel
-  if (robotName.size() < 5) {
-    return false;
-  }
+  std::string fn = pstrRobotName;
+  size_t len = fn.size();
 
-  if ( (robotName[robotName.size()-4] == '.') ||
-       (robotName[robotName.size()-5] == '.') )
-  {
-    return true;
+  if (len > 4) {
+    // extensions with length of 3 or 4 are only allowed:
+    size_t pos = fn.rfind('.', len-4);
+    if (pos != std::string::npos) {
+      // if '.' was found ...
+      std::string ext = fn.substr(pos+1, len - pos);
+      len = ext.size();
+      if ( (len > 2) && (len < 5) ) {
+        return true;
+      }
+    }
   }
-  // else ...
+  // else, it is not a file name ...
   return false;
 }
 
-ModelState::ModelState(std::string robotName)
+ModelState::ModelState(const char *pstrRobotName)
 {
-  if (isRobotNameAFile(robotName)) {
-    robotModelFromURDF(robotName);
+  if (isRobotNameAFile(pstrRobotName)) {
+    robotModelFromURDF(pstrRobotName);
     return;
   }
-  // else ...
-  robotModel(robotName);
+  // else, load the model from the yarp-WBI directory ...
+  robotModel(pstrRobotName);
 }
 
 void ModelState::initState()
@@ -111,15 +115,6 @@ ModelState::~ModelState()
   mexPrintf("robotWBIModel deleted.\n");
 #endif
 
-  deleteState();
-
-#ifdef DEBUG
-  mexPrintf("ModelState destructor returning.\n");
-#endif
-}
-
-void ModelState::deleteState()
-{
   if (sqj_dot != 0) {
     delete[] sqj_dot;
     sqj_dot = 0;
@@ -134,13 +129,14 @@ void ModelState::deleteState()
   }
 #ifdef DEBUG
   mexPrintf("sqj deleted.\n");
+  mexPrintf("ModelState destructor returning.\n");
 #endif
 }
 
-ModelState *ModelState::getInstance(std::string robotName)
+ModelState *ModelState::getInstance(const char *pstrRobotName)
 {
   if (modelState == 0) {
-    modelState = new ModelState(robotName);
+    modelState = new ModelState(pstrRobotName);
   }
   return modelState;
 }
@@ -185,9 +181,9 @@ wbi::iWholeBodyModel *ModelState::robotModel()
   return robotWBIModel;
 }
 
-std::string ModelState::robotName()
+char *ModelState::robotName()
 {
-  return currRobotName;
+  return pstrCurrRobotName;
 }
 
 double *ModelState::qj()
@@ -235,75 +231,64 @@ size_t ModelState::dof()
   return nDof;
 }
 
-void ModelState::robotModel(std::string robotName)
+void ModelState::robotModel(const char *pstrRobotName)
 {
-  if (robotWBIModel != 0) {
-    mexPrintf("Deleting previous version of the robot model.\n");
-    delete robotWBIModel;
-    deleteState();
-  }
-  // set YARP_ROBOT_NAME enviromental variable to
+  pstrCurrRobotName = const_cast<char*>(pstrRobotName);
+
+  // set YARP_ROBOT_NAME environmental variable to
   // load the robot-specific configuration files
   // not a clean solution, see discussion in,
   // https://github.com/robotology/yarp/issues/593
   // and https://github.com/robotology/mex-wholebodymodel/issues/32
-  yarp::os::Network::setEnvironment("YARP_ROBOT_NAME", robotName);
+  yarp::os::Network::setEnvironment("YARP_ROBOT_NAME", pstrCurrRobotName);
 
-  currRobotName = robotName;
-  std::string localName = "mexWBModel";
   yarp::os::ResourceFinder rf;
-  yarp::os::Property yarpWbiOptions;
   // get wbi options from the canonical file
   rf.setVerbose(true);
   rf.setDefaultConfigFile("yarpWholeBodyInterface.ini");
   rf.configure(0, 0);
-
   std::string wbiConfFile = rf.findFile("yarpWholeBodyInterface.ini");
+
+  yarp::os::Property yarpWbiOptions;
   yarpWbiOptions.fromConfigFile(wbiConfFile);
 
   // never get the limits from getLimitsFromControlBoard
   // when using mex-WholeBodyModel
   yarpWbiOptions.unput("getLimitsFromControlBoard");
 
-  robotWBIModel = new yarpWbi::yarpWholeBodyModel(localName.c_str(), yarpWbiOptions);
+  robotWBIModel = new yarpWbi::yarpWholeBodyModel(pcstrLocalName, yarpWbiOptions);
 
-  wbi::IDList robJntIDLst;
-  std::string robJntIDLstName = "ROBOT_MEX_WBI_TOOLBOX";
-  if ( !yarpWbi::loadIdListFromConfig(robJntIDLstName, yarpWbiOptions, robJntIDLst) ) {
-    fprintf(stderr, "[ERR] mexWholeBodyModel: Failed to load (WBI) joint-ID list with name \"%s\".\n", robJntIDLstName.c_str());
+  wbi::IDList robJntIDList;
+  const char *pstrRobJntIDListName = "ROBOT_MEX_WBI_TOOLBOX";
+  if ( !yarpWbi::loadIdListFromConfig(pstrRobJntIDListName, yarpWbiOptions, robJntIDList) ) {
+    fprintf(stderr, "[ERR] mexWholeBodyModel: Failed to load (WBI) joint-ID list with name \"%s\".\n", pstrRobJntIDListName);
   }
 
-  initRobotModel(robJntIDLst);
+  initRobotModel(robJntIDList);
   initState(); // initialize the state variables ...
-  mexPrintf("mexWholeBodyModel started with robot: %s, Num of Joints: %d\n", robotName.c_str(), (int)nDof);
+  mexPrintf("mexWholeBodyModel started with robot: %s, Num of Joints: %d\n", pstrCurrRobotName, (int)nDof);
 }
 
-void ModelState::robotModelFromURDF(std::string urdfFileName)
+void ModelState::robotModelFromURDF(const char *pstrURDFileName)
 {
-  if (robotWBIModel != 0) {
-    mexPrintf("Deleting previous version of the robot model.\n");
-    delete robotWBIModel;
-    deleteState();
-  }
-  std::string localName = "mexWBModel";
-  yarp::os::Property yarpWbiOptions;
+  pstrCurrRobotName = const_cast<char*>("robot_loaded_from_URDF_file");
 
   // overwrite the robot parameter that could be present in wbi_conf_file
-  currRobotName = "robot_loaded_from_URDF_file";
-  yarpWbiOptions.put("robot", currRobotName);
-  yarpWbiOptions.put("urdf", urdfFileName.c_str());
-  robotWBIModel = new yarpWbi::yarpWholeBodyModel(localName.c_str(), yarpWbiOptions);
+  yarp::os::Property yarpWbiOptions;
+  yarpWbiOptions.put("robot", pstrCurrRobotName);
+  yarpWbiOptions.put("urdf", pstrURDFileName);
+  robotWBIModel = new yarpWbi::yarpWholeBodyModel(pcstrLocalName, yarpWbiOptions);
 
-  wbi::IDList urdfJntIDLst;
-  std::vector<std::string> dofsFromURDF;
+  wbi::IDList urdfJntIDList;
+  std::vector<std::string> dofsList;
 
-  iDynTree::dofsListFromURDF(urdfFileName, dofsFromURDF);
+  iDynTree::dofsListFromURDF(pstrURDFileName, dofsList);
 
-  for (size_t dof=0; dof < dofsFromURDF.size(); dof++) {
-    urdfJntIDLst.addID(dofsFromURDF[dof]);
+  for (size_t dof=0; dof < dofsList.size(); dof++) {
+    urdfJntIDList.addID(dofsList[dof]);
   }
 
-  initRobotModel(urdfJntIDLst);
+  initRobotModel(urdfJntIDList);
   initState(); // initialize the state variables ...
-  mexPrintf("mexWholeBodyModel started with robot loaded from URDF file: %s, Num of Joints: %d\n", urdfFileName.c_str(), (int)nDof);
+  mexPrintf("mexWholeBodyModel started with robot loaded from URDF file: %s, Num of Joints: %d\n", pstrURDFileName, (int)nDof);
 }

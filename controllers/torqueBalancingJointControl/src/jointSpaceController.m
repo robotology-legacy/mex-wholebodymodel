@@ -1,18 +1,16 @@
 function  controlParam = jointSpaceController(CONFIG,gains,trajectory,DYNAMICS,STATE)
 %JOINTSPACECONTROLLER implemements a joint space balancing controller for
-%                     the robot iCub.
+%                     floating base robots.
 %
-%   JOINTSPACECONTROLLER computes the control torques at joints reducing the
-%   system to the joint space. It compensates for the gravity terms and
-%   defines the desired control torques at joints oin order to follow a joint
-%   reference trajectory.
+% JOINTSPACECONTROLLER computes joint control torques directly from joint
+% space equations of motion, after considering the contact constraints in
+% the model.
 %
-%   controlParam = JOINTSPACECONTROLLER(config, gains, trajectory, dynamics,
-%   state) takes as input the structure CONFIG, which contains all the
-%   configuration parameters, the desired control gains, the reference
-%   trajectory, the robot dynamics and state.
-%   The output is the structure CONTROLPARAM which contains the desired
-%   control torques and other parameters for visualization.
+% controlParam = JOINTSPACECONTROLLER(CONFIG, gains, trajectory,DYNAMICS,
+% STATE) the robot configuration parameters, control gains, the joint 
+% reference trajectory, and robot dynamics and state.
+% The output controlParam contains the desired control torques 
+% and other parameters for visualization.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016

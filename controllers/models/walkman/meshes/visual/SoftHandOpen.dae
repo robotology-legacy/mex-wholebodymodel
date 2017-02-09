@@ -18,7 +18,7 @@
       <profile_COMMON>
         <technique sid="common">
           <phong>
-            <emission><color>0.2 0.2 0.2 1.0</color></emission><ambient><color>0.0 0.0 0.0 1.0</color></ambient><diffuse><color>0.5696 0.5696 0.5696 1.0</color></diffuse><specular><color>0.11 0.11 0.11 1.0</color></specular><shininess><float>235.0</float></shininess><transparency><float>1.0</float></transparency><index_of_refraction><float>1.0</float></index_of_refraction></phong>
+            <emission><color>0.1 0.3 0.4 1.0</color></emission><ambient><color>0.0 0.0 0.0 1.0</color></ambient><diffuse><color>0.5696 0.5696 0.5696 1.0</color></diffuse><specular><color>0.11 0.11 0.11 1.0</color></specular><shininess><float>235.0</float></shininess><transparency><float>1.0</float></transparency><index_of_refraction><float>1.0</float></index_of_refraction></phong>
         </technique>
         <extra>
           <technique profile="GOOGLEEARTH">
