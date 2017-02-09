@@ -71,8 +71,8 @@ and this project does not adheres to [Semantic Versioning](http://semver.org/).
   a direct call of the function with the full namespace path `WBM.utilities.<function_name>`.
 
 ## Previous (alpha) version:
-### [Unreleased]
-[Unreleased]: https://github.com/robotology/mex-wholebodymodel/compare/v0.1...HEAD
+### [0.1.1]
+[0.1.1]: https://github.com/robotology/mex-wholebodymodel/compare/v0.1...HEAD
 #### Added
 - All the functions take in input the complete state, including the base pose with respect to the world, 
   see [Issue 27](https://github.com/robotology/mex-wholebodymodel/issues/27).
