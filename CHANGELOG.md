@@ -14,7 +14,7 @@ and this project does not adheres to [Semantic Versioning](http://semver.org/).
 #### Renamed Functions
 - **_Wrapper-Function Names:_**
   - wbm_djdq --> wbm_dJdq
-  - wbm_getStates:
+  - wbm_getState:
     - Changed order of the output arguments from [qj, xTb, qjDot, vb] to [vqT_b, q_j, v_b, dq_j], where
       qj = q_j, xTb = vqT_b, qjDot = dq_j and vb = v_b.
   - wbm_getWorldFrameFromFixedLink -->	wbm_getWorldFrameFromFixLnk
