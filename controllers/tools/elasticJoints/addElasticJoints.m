@@ -43,10 +43,10 @@ elseif strcmp(robot_name,'icubGazeboSim') == 1
     ELASTICITY.B_xi      = 1e-5*(p^2)*eye(ndof);
 
     % stiffness
-    ELASTICITY.KS        = 10*eye(ndof);
+    ELASTICITY.KS        = 100*eye(ndof);
 
     % damping
-    ELASTICITY.KD        = 1*eye(ndof);
+    ELASTICITY.KD        = 10*eye(ndof);
 
     % control gains
     ELASTICITY.KD_gain   = 100*eye(ndof); 

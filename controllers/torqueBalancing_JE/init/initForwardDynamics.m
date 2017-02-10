@@ -13,6 +13,7 @@ function [] = initForwardDynamics(CONFIG)
 
 % ------------Initialization----------------
 %% Setup the configuration and state parameters
+global force_feet state com_error;
 feet_on_ground               = CONFIG.feet_on_ground;
 ndof                         = CONFIG.ndof;
 qjInit                       = CONFIG.qjInit;
@@ -82,12 +83,20 @@ forwardDynFunc        = @(t,chi)forwardDynamics(t,chi,CONFIG);
 if CONFIG.integrateWithFixedStep == 1
     [t,chi]           = euleroForward(forwardDynFunc,chiInit,CONFIG.tEnd,CONFIG.tStart,CONFIG.sim_step);
 else
-    [t,chi]           = ode15s(forwardDynFunc,CONFIG.tStart:CONFIG.sim_step:CONFIG.tEnd,chiInit,CONFIG.options);
+    [t,chi,te,ye,ie]           = ode15s(forwardDynFunc,CONFIG.tStart:CONFIG.sim_step:CONFIG.tEnd,chiInit,CONFIG.options);
 end
 
+te
+ye
+ie
 delete(CONFIG.wait)
 
 %% Visualize integration results and robot simulator
-CONFIG.figureCont     = initVisualizer(t,chi,CONFIG);
+% reset global variables
+force_feet = zeros(6,1);
+state      = 1;
+com_error  = zeros(3,1);
+
+CONFIG.figureCont = initVisualizer(t,chi,CONFIG);
 
 end

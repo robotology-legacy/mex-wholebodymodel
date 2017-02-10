@@ -12,9 +12,20 @@ function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
 % Genova, May 2016
 
 % ------------Initialization----------------
+global force_feet com_error state
+
 import WBM.utilities.dquat;
 waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
+% CoM initial position
+CONFIG.xCoMRef = CONFIG.initForKinematics.xCoM;
+
+% reconfigure the system according to the state-machine
+if CONFIG.yoga == 1
+   CONFIG = state_machine(t,CONFIG); 
+end
+
+ [value,isterminal,direction] = event(t,chi);
 %% Robot Configuration
 ndof                  = CONFIG.ndof;
 chi_robot             = chi(1:(13+2*ndof));
@@ -26,9 +37,6 @@ ELASTICITY            = addElasticJoints(CONFIG);
 
 gain                  = CONFIG.gainsInit;
 qjInit                = CONFIG.qjInit;
-
-% CoM initial position
-CONFIG.xCoMRef        = CONFIG.initForKinematics.xCoM;
 
 %% Robot State
 STATE                 = robotState(chi_robot,CONFIG);
@@ -73,6 +81,12 @@ controlParam    = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,ST
 tau_xi          = controlParam.tau_xi;
 fc              = controlParam.fc;
 
+% update global variable
+if CONFIG.yoga == 1
+    force_feet = fc(CONFIG.foot_selector);
+    com_error  = xCoM-CONFIG.xCoMRef;
+end
+
 %% State derivative (dchi) computation
 b_omega_w       = transpose(w_R_b)*w_omega_b;
 dq_b            = dquat(qt_b,b_omega_w);
@@ -100,5 +114,6 @@ visualization.HRef        = [m*trajectory.desired_x_dx_ddx_CoM(:,2);zeros(3,1)];
 visualization.fc          = fc;
 visualization.f0          = controlParam.f0;
 visualization.tau_xi      = tau_xi;
+visualization.state       = state;
 
 end

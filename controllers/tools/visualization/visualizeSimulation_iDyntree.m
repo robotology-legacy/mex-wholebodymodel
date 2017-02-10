@@ -69,8 +69,15 @@ for i=init_time:end_time
     
         odom.init('r_sole','r_sole');
     end
-
+    
     viz.modelViz(0).setPositions(odom.getWorldLinkTransform(model.getDefaultBaseLink()),jointPos);
+         
+    if CONFIG.yoga == 1  
+        if (i >= CONFIG.indexState3) && (CONFIG.left_right_yoga(1) == 0)
+           odom.init('r_sole','r_sole'); 
+        end
+    end
+
     viz.draw();
     t = toc;
     pause(max(0,0.01-t))

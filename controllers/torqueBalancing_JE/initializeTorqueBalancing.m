@@ -21,13 +21,18 @@
 clear  all
 close  all
 clc
+
+%% Global variables
+global force_feet state com_error;
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation
-CONFIG.demo_movements                        = 0;                          %either 0 or 1
-CONFIG.feet_on_ground                        = [0,1];                      %either 0 or 1; [left foot,right foot]
+CONFIG.demo_movements                        = 1;                          %either 0 or 1
+CONFIG.yoga                                  = 1;                          %either 0 or 1
+CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left foot,right foot]
 CONFIG.use_QPsolver                          = 0;                          %either 0 or 1
 CONFIG.robot_name                            = 'icubGazeboSim';                       
-CONFIG.assume_rigid_joints                   = 0;                          %either 0 or 1
+CONFIG.assume_rigid_joints                   = 1;                          %either 0 or 1
 CONFIG.p                                     = 100;                        %transmission ratio (p = 1/eta)
 
 %% Visualization setup
@@ -40,7 +45,7 @@ CONFIG.visualize_motors_dynamics             = 1;
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 10;
+CONFIG.tEnd                                  = 4;
 CONFIG.sim_step                              = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -49,6 +54,18 @@ CONFIG.sim_step                              = 0.01;
 CONFIG.pinv_tol           = 1e-8;
 CONFIG.pinv_damp          = 5e-6;
 CONFIG.reg_HessianQP      = 1e-3;
+
+% a first testing framework for extending YOGA++ demo to matlab controller 
+force_feet = zeros(6,1);
+state      = 1;
+com_error  = zeros(3,1);
+
+if CONFIG.yoga == 1
+    % overwrite configuration 
+    CONFIG.demo_movements  = 0;                      
+    CONFIG.feet_on_ground  = [1,1];
+    CONFIG.left_right_yoga = [0,1];                                        %[left foot, right foot]
+end
 
 %% Forward dynamics integration setup
 % CONFIG.integrateWithFixedStep will use a Euler forward integrator instead
@@ -66,10 +83,12 @@ end
 
 % Integration options. If the integration is slow, try to modify these
 % options.
+eventFunction                        = @(t,chi)event(t,chi);
+
 if CONFIG.demo_movements == 0
-    CONFIG.options                   = odeset('RelTol',1e-3,'AbsTol',1e-3);
+    CONFIG.options                   = odeset('RelTol',1e-3,'AbsTol',1e-3,'Events',eventFunction);
 else
-    CONFIG.options                   = odeset('RelTol',1e-6,'AbsTol',1e-6);
+    CONFIG.options                   = odeset('RelTol',1e-6,'AbsTol',1e-6,'Events',eventFunction);
 end
 
 %% Visualization setup
