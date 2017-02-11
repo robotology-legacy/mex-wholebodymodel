@@ -2,9 +2,9 @@ function  desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG)
 %TRAJECTORYGENERATOR generates a desired CoM trajectory. The default trajectory
 %                    is a sinusoid in the Y direction.
 %
-% desired_x_dx_ddx_CoM = GENERTRAJ(xCoMInit,t,CONFIG) takes as an input
-% the initial CoM position, xCoMInit, the current time t and the structure
-% CONFIG which contains all the user-defined parameters.
+% desired_x_dx_ddx_CoM = TRAJECTORYGENERATOR(xCoMInit,t,CONFIG) takes as an 
+% input the initial CoM position, xCoMInit, the current time t and the structure
+% CONFIG which contains the user-defined parameters.
 % The output desired_x_dx_ddx_CoM is a matrix [3x3] which contains the CoM
 % reference acceleration, velocity and position.
 %

@@ -1,19 +1,17 @@
 function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
-%FORWARDDYNAMICS is the function that will be integrated in the forward
-%                dynamics integrator.
+%FORWARDDYNAMICS computes the forward dynamics of floating base robots
+%                given initial conditions, contact forces and torques. 
 %
 % [dchi,visualization] = FORWARDDYNAMICS(t,chi,CONFIG) takes as input the
-% current time step, t; the robot state, chi [13+2*ndof x 1]; the structure
-% CONFIG which contains the user-defined parameters.
+% current time step, t; the state, chi [13+2*ndof x 1]; the structure
+% CONFIG which contains initial conditions and user-defined parameters.
 % The output are the vector to be integrated, dchi [13+2*ndof x1] and the
-% structure visualization which contains all the parameters used for
-% generating the plots in the visualizer.
+% structure visualization which is used for plotting results in the visualizer.
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, May 2016
 
 % ------------Initialization----------------
-% update the waitbar
 import WBM.utilities.dquat;
 waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
