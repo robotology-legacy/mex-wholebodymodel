@@ -25,7 +25,7 @@ init_time  = 1;
 end_time   = length(qj(1,:));
 
 % open the visualizer
-viz   = iDynTree.Visualizer();
+viz  = iDynTree.Visualizer();
 viz.init();
 viz.addModel(model,CONFIG.modelName);
 viz.draw();
@@ -71,14 +71,8 @@ for i=init_time:end_time
     end
     
     viz.modelViz(0).setPositions(odom.getWorldLinkTransform(model.getDefaultBaseLink()),jointPos);
-         
-    if CONFIG.yoga == 1  
-        if (i >= CONFIG.indexState3) && (CONFIG.left_right_yoga(1) == 0)
-           odom.init('r_sole','r_sole'); 
-        end
-    end
-
     viz.draw();
+    
     t = toc;
     pause(max(0,0.01-t))
 end

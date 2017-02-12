@@ -95,12 +95,7 @@ end
 
 if exitFlag ~= 0
     
-    disp('QP failed with:')
-    disp(exitFlag);
-    disp(iter);
-    disp(auxOutput);
-    disp(lambda);
-    error('QP failed')
+    warning(['QP failed with: ', num2str(exitFlag)])
 end
 
 end

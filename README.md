@@ -18,13 +18,13 @@ a rigid body is available at [examples/rigidBodyDynamics.m](examples/rigidBodyDy
 ## Controllers
 In [controllers](/controllers) folder the user can find different whole-body controllers implemented using the mex-wholebodymodel interface. The "official" version is in the directory [controllers/torqueBalancing](/controllers/torqueBalancing), but also other balancing controllers are available. 
 Matlab tools for visualization, inverse kinematics, etc. are available in [controllers/tools](/controllers/tools) folder.
-For more informations about the balancing controller check the relative [README](/controllers/torqueBalancing).
+For more informations about the main balancing controller check the relative [README](/controllers/torqueBalancing).
 
 ### Simulations
 Please note that the simulations of the inverse dynamics results are performed by using the [iDyntree](https://github.com/robotology/iDyntree) visualizer. In order to be able to use it, enable the options `IDYNTREE_USES_MATLAB` and `IDYNTREE_USES_IRRLICHT` in CMake.
 If the _irrlicht library_ is not installed on your computer, install it by applying `sudo apt install libirrlicht-dev`.
 
-## mex-wholebodymodel
+## Wbm-toolbox
 This folder contains all wrapper and utility functions for Matlab and also the C++ library for the mex-subroutine.
 
 ## Tests

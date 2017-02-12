@@ -29,7 +29,7 @@ CONFIG.robot_name                            = 'icubGazeboSim';
 CONFIG.visualize_robot_simulator             = 1;                          %either 0 or 1
 % forward dynamics integration results
 CONFIG.visualize_integration_results         = 1;                          %either 0 or 1
-CONFIG.visualize_joints_dynamics             = 0;                          %either 0 or 1
+CONFIG.visualize_joints_dynamics             = 1;                          %either 0 or 1
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
@@ -60,12 +60,11 @@ else
     CONFIG.massCorr = 0;
 end
 
-% Integration options. If the integration is slow, try to modify these
-% options.
-if CONFIG.demo_movements == 0
-    CONFIG.options                   = odeset('RelTol',1e-3,'AbsTol',1e-3);
+% Integration options. If the integration is slow, try to modify these options.
+if CONFIG.demo_movements
+    CONFIG.options = odeset('RelTol',1e-6,'AbsTol',1e-6,'InitialStep',CONFIG.sim_step);
 else
-    CONFIG.options                   = odeset('RelTol',1e-6,'AbsTol',1e-6);
+    CONFIG.options = odeset('RelTol',1e-3,'AbsTol',1e-3,'InitialStep',CONFIG.sim_step);
 end
 
 %% Visualization setup
@@ -77,62 +76,34 @@ plot_set
 % number in case new figures are added
 CONFIG.figureCont = 1;
 
-%% Initialize the robot model
-wbm_modelInitialize(CONFIG.robot_name);
-CONFIG.ndof = 25;
-
-%% Initial joints position [deg]
-leftArmInit  = [ -20  30  0  45  0]';
-rightArmInit = [ -20  30  0  45  0]';
-torsoInit    = [ -10   0  0]';
-
-if sum(CONFIG.feet_on_ground) == 2
-    
-    % initial conditions for balancing on two feet
-    leftLegInit  = [  25.5   0   0  -18.5  -5.5  0]';
-    rightLegInit = [  25.5   0   0  -18.5  -5.5  0]';
-    
-elseif CONFIG.feet_on_ground(1) == 1 && CONFIG.feet_on_ground(2) == 0
-    
-    % initial conditions for the robot standing on the left foot
-    leftLegInit  = [  25.5   15   0  -18.5  -5.5  0]';
-    rightLegInit = [  25.5    5   0  -40    -5.5  0]';
-    
-elseif CONFIG.feet_on_ground(1) == 0 && CONFIG.feet_on_ground(2) == 1
-    
-    % initial conditions for the robot standing on the right foot
-    leftLegInit  = [  25.5    5   0  -40    -5.5  0]';
-    rightLegInit = [  25.5   15   0  -18.5  -5.5  0]';
-end
-
-% feet size
-CONFIG.footSize  = [-0.07 0.07;       % xMin, xMax
-                    -0.03 0.03];      % yMin, yMax
-% joints configuration [rad]
-CONFIG.qjInit = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
-
 %% Paths definition and initialize the forward dynamics integration
 % add the required paths. This procedure will make the paths consistent for
 % any starting folder.
-codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
-utility_root = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/tools'];
-robot_root   = [utility_root, filesep, '/robotFunctions'];
-plots_root   = [utility_root, filesep, '/visualization'];
-ikin_root    = [utility_root, filesep, '/inverseKinematics'];
-centr_root   = [utility_root, filesep, '/centroidalTransformation'];
-src_root     = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingJointControl/src'];
-config_root  = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingJointControl/config'];
-init_root    = [codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingJointControl/init'];
+CONFIG.codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
+CONFIG.utility_root = [CONFIG.codyco_root, filesep, '/main/mexWholeBodyModel/controllers/tools'];
+CONFIG.robot_root   = [CONFIG.utility_root, filesep, '/robotFunctions'];
+CONFIG.plots_root   = [CONFIG.utility_root, filesep, '/visualization'];
+CONFIG.ikin_root    = [CONFIG.utility_root, filesep, '/inverseKinematics'];
+CONFIG.centr_root   = [CONFIG.utility_root, filesep, '/centroidalTransformation'];
+CONFIG.src_root     = [CONFIG.codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingJointControl/src'];
+
+CONFIG.config_root  = [CONFIG.codyco_root,  filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingJointControl/',...
+                       filesep, 'app/robots/', filesep, CONFIG.robot_name];
 
 % add the paths
-addpath(utility_root);
-addpath(robot_root);
-addpath(plots_root);
-addpath(src_root);
-addpath(config_root);
-addpath(init_root);
-addpath(centr_root);
-addpath(ikin_root);
+addpath(CONFIG.utility_root);
+addpath(CONFIG.robot_root);
+addpath(CONFIG.plots_root);
+addpath(CONFIG.src_root);
+addpath(CONFIG.centr_root);
+addpath(CONFIG.ikin_root);
+addpath(CONFIG.config_root);
+
+%% Initialize the robot model
+wbm_modelInitialize(CONFIG.robot_name);
+
+% robot initial configuration
+[CONFIG.ndof,CONFIG.qjInit,CONFIG.footSize] = configRobot(CONFIG);
 
 %% INITIALIZATION
 % initialize the forward dynamics
