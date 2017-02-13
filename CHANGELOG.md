@@ -11,28 +11,31 @@ and this project does not adheres to [Semantic Versioning](http://semver.org/).
 - New version of the mexWholeBodyModel (mex-WBM) subroutine for Matlab. Thanks to [@Ganimed](https://github.com/Ganimed), a 
   complete refactory of the toolbox has been done, to speedup and stabilize the call of the kinematic/dynamic functions.
 
+#### New Utility-Functions:
+- A lot of utility-functions were added and moved to the utilities-directory in order to be independent from other
+  third party libriaries, i.e. transformation functions. For further details have a look into the [+utilities](/mex-wholebodymodel/matlab/utilities/+WBM/+utilities/) directory.
+
 #### Renamed Functions
 - **_Wrapper-Function Names:_**
   - wbm_djdq --> wbm_dJdq
-  - wbm_getStates:
+  - wbm_getState:
     - Changed order of the output arguments from [qj, xTb, qjDot, vb] to [vqT_b, q_j, v_b, dq_j], where
       qj = q_j, xTb = vqT_b, qjDot = dq_j and vb = v_b.
   - wbm_getWorldFrameFromFixedLink -->	wbm_getWorldFrameFromFixLnk
     - Changed output order:  [world_R_base, world_p_base] --> [wf_p_b, wf_R_b]
 - **_Utility-Function Names:_**
-  - quaternionDerivative --> dquat
-    - New input arguments: quat, omega, gain (optional), chktol (optional).
-  - frame2posrot --> frame2posRotm
-  - fromSkew2Vector --> skewm2vec
-  - parametrization --> rotm2eulAngVelTF
+  - quaternionDerivative --> WBM.utilities.dquat
+    - Changed order of the input argument from (omega,q) to (quat,omega).
+    - New optional input arguments: gain (optional), chktol (optional).
+  - frame2posrot --> WBM.utilities.frame2posRotm
+  - fromSkew2Vector --> WBM.utilities.skewm2vec
+  - parametrization --> WBM.utilities.rotm2eulAngVelTF
     - New input arguments: rotm, sequence ('ZYX' or 'ZYZ', default 'ZYX'). 
-  - quaternion2dcm --> quat2rotm
-  - skew --> skewm
-  - whatname --> getJointAnnotationICub
-
-#### New Utility-Functions:
-- A lot of utility-functions were added to the utilities-directory in order to be independent from other
-  third party libriaries, i.e. transformation functions. For further details have a look into the [+utilities](/mex-wholebodymodel/matlab/utilities/+WBM/+utilities/) directory.
+  - quaternion2dcm --> WBM.utilities.quat2rotm
+  - skew --> WBM.utilities.skewm
+  - whatname --> WBM.utilities.getJointAnnotationICub
+  - wbm_generalisedBiasForces --> wbm_generalizedBiasForces
+  - wbm_initialise --> wbm_initialise 
   
 #### Renamed Key-Names:
 - generalised-forces --> generalized-forces
