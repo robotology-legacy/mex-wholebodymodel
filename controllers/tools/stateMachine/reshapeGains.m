@@ -1,9 +1,9 @@
 function gains = reshapeGains(gainVect,CONFIG)
 
-gains = CONFIG.gainsInit;
+gains             = CONFIG.gainsInit;
 
-gainsPCoM   = diag(gainVect(1:3));
-gainsDCoM   = 2*sqrt(gainsPCoM);
+gainsPCoM         = diag(gainVect(1:3));
+gainsDCoM         = 2*sqrt(gainsPCoM);
 
 gains.impedances  = diag(gainVect(4:end));
 gains.dampings    = 2*sqrt(gains.impedances);

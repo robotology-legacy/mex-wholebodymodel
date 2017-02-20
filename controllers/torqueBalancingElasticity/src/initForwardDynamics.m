@@ -12,42 +12,43 @@ function [] = initForwardDynamics(CONFIG)
 %
 
 % ------------Initialization----------------
-global force_feet state com_error;
+global force_feet state com_error t_previous dxi_ref_previous ddxi_ref_init;
 
 %% Setup the configuration and state parameters
-CONFIG = configRobot(CONFIG);
+CONFIG_updated               = configRobot(CONFIG);
 
 % initialize motor state (xi = theta/p where theta is the motor angle and p
 % is the transmission ratio)
-xiInit                       = CONFIG.qjInit;
-dxiInit                      = CONFIG.dqjInit;
+xiInit                       = CONFIG_updated.qjInit;
+dxiInit                      = CONFIG_updated.dqjInit;
 chi_motorInit                = [xiInit;dxiInit];
+ddxi_ref_init                = zeros(CONFIG_updated.ndof,1);
 
 %% Initial state that consider also joints elasticity
-chiInit                      = [CONFIG.chi_robotInit; chi_motorInit];
+chiInit                      = [CONFIG_updated.chi_robotInit; chi_motorInit];
 
 %% Forward dynamics integration
 cont      = 0;
 exit      = 0;
 toll      = 0.01;
-tStart    = CONFIG.tStart;
+tStart    = CONFIG_updated.tStart;
 t_total   = [];
 chi_total = [];
 
-while state <= 3 && exit == 0
+while state <= 6 && exit == 0
     
-    CONFIG            = configRobot(CONFIG);
-    CONFIG.wait       = waitbar(0,'Forward dynamics integration...');
-    forwardDynFunc    = @(t,chi)forwardDynamics(t,chi,CONFIG);
+    CONFIG_updated        = configRobot(CONFIG_updated);
+    CONFIG_updated.wait   = waitbar(0,'Forward dynamics integration...');
+    forwardDynFunc        = @(t,chi)forwardDynamics(t,chi,CONFIG_updated);
 
     % either fixed step integrator or ODE15s
-    if CONFIG.integrateWithFixedStep == 1
-        [t,chi]  = euleroForward(forwardDynFunc,chiInit,CONFIG.tEnd,CONFIG.tStart,CONFIG.sim_step);
+    if CONFIG_updated.integrateWithFixedStep == 1
+        [t,chi]  = euleroForward(forwardDynFunc,chiInit,CONFIG_updated.tEnd,CONFIG_updated.tStart,CONFIG_updated.sim_step);
     else
-        [t,chi]  = ode15s(forwardDynFunc,tStart:CONFIG.sim_step:CONFIG.tEnd,chiInit,CONFIG.options);
+        [t,chi]  = ode15s(forwardDynFunc,tStart:CONFIG_updated.sim_step:CONFIG_updated.tEnd,chiInit,CONFIG_updated.options);
     end
     
-    delete(CONFIG.wait)
+    delete(CONFIG_updated.wait)
         
     tStart    = t(end);
     chiInit   = chi(end,:);
@@ -55,14 +56,13 @@ while state <= 3 && exit == 0
     t_total   = [t_total; t];
     chi_total = [chi_total; chi];
 
-    % initial state
-    CONFIG.initState          = robotState(chiInit',CONFIG);  
-    % initial dynamics
-    CONFIG.initDynamics       = robotDynamics(CONFIG.initState,CONFIG);
-    % initial forward kinematics
-    CONFIG.initForKinematics  = robotForKinematics(CONFIG.initState,CONFIG.initDynamics);
-
-    if (strcmp(CONFIG.demo_type,'yoga')) && (cont < 10) && abs(tStart -CONFIG.tEnd)>toll  
+    if (strcmp(CONFIG_updated.demo_type,'yoga')) && (cont < 4) && abs(tStart -CONFIG_updated.tEnd)>toll  
+        % initial state
+        CONFIG_updated.initState          = robotState(transpose(chiInit),CONFIG_updated);  
+        % initial dynamics
+        CONFIG_updated.initDynamics       = robotDynamics(CONFIG_updated.initState,CONFIG_updated);
+        % initial forward kinematics
+        CONFIG_updated.initForKinematics  = robotForKinematics(CONFIG_updated.initState,CONFIG_updated.initDynamics);
     else
         exit = 1;
     end
@@ -70,20 +70,25 @@ end
 
 %% Visualize integration results and robot simulator
 % reset global variables for visualization
-state      = 1;
-force_feet = 0;
-com_error  = zeros(3,1);
+state            = 1;
+force_feet       = 0;
+com_error        = zeros(3,1);
+t_previous       = CONFIG_updated.tStart;
+dxi_ref_previous = dxiInit;
+ddxi_ref_init    = zeros(CONFIG_updated.ndof,1);
 
+disp('Press any key to continue')
 pause()
-CONFIG.figureCont = initVisualizer(t_total,chi_total,CONFIG);
+CONFIG_updated.useForDynamicsForVisual = 1;
+CONFIG_updated.figureCont              = initVisualizer(t_total,chi_total,CONFIG_updated);
 
 %% Remove local paths
-rmpath(CONFIG.utility_root);
-rmpath(CONFIG.robot_root);
-rmpath(CONFIG.plots_root);
-rmpath(CONFIG.src_root);
-rmpath(CONFIG.elastic_root);
-rmpath(CONFIG.state_root);
-rmpath(CONFIG.config_root);
+rmpath(CONFIG_updated.utility_root);
+rmpath(CONFIG_updated.robot_root);
+rmpath(CONFIG_updated.plots_root);
+rmpath(CONFIG_updated.src_root);
+rmpath(CONFIG_updated.elastic_root);
+rmpath(CONFIG_updated.state_root);
+rmpath(CONFIG_updated.config_root);
 
 end

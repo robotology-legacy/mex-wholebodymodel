@@ -33,7 +33,7 @@ viz.draw();
 %% Setup environment and lights     
 % disable environmental features     
 env = viz.enviroment();        
-env.setElementVisibility('root_frame',false);        
+env.setElementVisibility('root_frame',false);   
  
 % set lights
 sun = viz.enviroment().lightViz('sun');         
@@ -77,5 +77,6 @@ for i=init_time:end_time
     pause(max(0,0.01-t))
 end
 
+disp('Press any key to continue')
 pause()
 

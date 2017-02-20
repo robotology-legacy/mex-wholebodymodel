@@ -1,4 +1,4 @@
-function controlParam  = runController(gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,dxi,xi,ELASTICITY)
+function controlParam  = runController(t,gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,dxi,xi,ELASTICITY)
 %RUNCONTROLLER  initializes balancing controllers. Default controller uses
 %               "stack of tasks" approach.
 %
@@ -51,7 +51,7 @@ if  use_QPsolver == 1
 end
 
 % backstepping on the motor dynamics: desired MOTOR torques
-[controlParam.tau_xi,controlParam.dxi_ref] = motorController(dxi,xi,ELASTICITY,STATE,controlParam,CONFIG);
+[controlParam.tau_xi,controlParam.dxi_ref] = motorController(t,dxi,xi,ELASTICITY,STATE,controlParam,CONFIG);
 
 if CONFIG.assume_rigid_joints == 1
     

@@ -15,6 +15,7 @@ function  desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG)
 % ------------Initialization----------------
 % Config parameters
 feet_on_ground             = CONFIG.feet_on_ground;
+demo_movements             = CONFIG.demo_movements;
 
 % Initial parameters
 directionOfOscillation     = [0;0;0];

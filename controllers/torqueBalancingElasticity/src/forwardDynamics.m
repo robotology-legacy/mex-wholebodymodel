@@ -12,18 +12,20 @@ function [dchi,visualization] = forwardDynamics(t,chi,CONFIG)
 % Genova, May 2016
 
 % ------------Initialization----------------
-global force_feet com_error joint_error;
+global force_feet com_error;
 
 import WBM.utilities.dquat;
 waitbar(t/CONFIG.tEnd,CONFIG.wait)
 
+%% Robot Configuration
 % initial references
-CONFIG.xCoMRef = CONFIG.initForKinematics.xCoM;
-CONFIG.qjRef   = CONFIG.qjInit;
-CONFIG.gain    = CONFIG.gainsInit;
+CONFIG.xCoMRef       = CONFIG.initForKinematics.xCoM;
+CONFIG.qjRef         = CONFIG.qjInit;
+CONFIG.gain          = CONFIG.gainsInit;
+CONFIG.foot_selector = 3;
 
 % update configuration
-if strcmp(CONFIG.demo_type,'yoga')
+if strcmp(CONFIG.demo_type,'yoga') && (CONFIG.useForDynamicsForVisual ~= 1)
     
     CONFIG = stateMachine(t,CONFIG);
     
@@ -31,13 +33,10 @@ if strcmp(CONFIG.demo_type,'yoga')
     if sum(CONFIG.feet_on_ground) == 2 && CONFIG.left_right_yoga(1) == 1
         
         CONFIG.foot_selector = 9;
-    else
-        
-        CONFIG.foot_selector = 3;  
     end
 end
 
-%% Robot Configuration
+% robot configuration
 ndof                  = CONFIG.ndof;
 chi_robot             = chi(1:(13+2*ndof));
 
@@ -45,7 +44,6 @@ chi_robot             = chi(1:(13+2*ndof));
 xi                    = chi(14+2*ndof:13+3*ndof);
 dxi                   = chi(14+3*ndof:end);
 ELASTICITY            = addElasticJoints(CONFIG);
-
 
 %% Robot State
 STATE                 = robotState(chi_robot,CONFIG);
@@ -85,7 +83,8 @@ trajectory.jointReferences.qjRef   = CONFIG.qjRef;
 trajectory.desired_x_dx_ddx_CoM    = trajectoryGenerator(CONFIG.xCoMRef,t,CONFIG);
 
 %% Torque balancing controller
-controlParam    = runController(CONFIG.gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,dxi,xi,ELASTICITY);
+controlParam    = runController(t,CONFIG.gain,trajectory,DYNAMICS,FORKINEMATICS,CONFIG,STATE,dxi,xi,ELASTICITY);
+
 % tau_xi = tau_motor * p
 tau_xi          = controlParam.tau_xi;
 fc              = controlParam.fc;
@@ -94,7 +93,6 @@ fc              = controlParam.fc;
 if strcmp(CONFIG.demo_type,'yoga')
     force_feet  = fc(CONFIG.foot_selector);
     com_error   = xCoM-CONFIG.xCoMRef;
-    joint_error = qj-CONFIG.qjRef;
 end
 
 %% State derivative (dchi) computation
@@ -105,12 +103,11 @@ dnu             = M\(Jc'*fc + [zeros(6,1);(ELASTICITY.KS*(xi-qj)+ELASTICITY.KD*(
 
 % state derivative   
 dchi_robot      = [nu;dnu];
-
 % motor derivative
 ddxi            = ELASTICITY.B_xi\(tau_xi+ELASTICITY.KS*(qj-xi)+ELASTICITY.KD*(dqj-dxi));
 % total state derivative
 dchi            = [dchi_robot;dxi;ddxi];
-    
+
 %% Parameters for visualization
 visualization.xi          = xi;
 visualization.dxi         = dxi;

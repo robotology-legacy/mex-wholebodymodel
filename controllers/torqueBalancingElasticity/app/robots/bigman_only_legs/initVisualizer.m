@@ -17,10 +17,9 @@ function figureCont = initVisualizer(t,chi,CONFIG)
 
 % ------------Initialization----------------
 %% Configuration parameters
-ndof                        = CONFIG.ndof;
-initState                   = CONFIG.initState;
-figureCont                  = CONFIG.figureCont;
-p                           = CONFIG.p;
+ndof                             = CONFIG.ndof;
+initState                        = CONFIG.initState;
+figureCont                       = CONFIG.figureCont;
 
 %% Robot simulator
 if CONFIG.visualize_robot_simulator == 1
@@ -55,7 +54,7 @@ if CONFIG.visualize_robot_simulator == 1
 end
 
 %% Forward dynamics results
-if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamics == 1 || CONFIG.visualize_motors_dynamics == 1
+if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamics == 1
     
     CONFIG.wait = waitbar(0,'Generating the results...');
     set(0,'DefaultFigureWindowStyle','Docked');
@@ -65,16 +64,16 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
     qjInit        = zeros(ndof,length(t));
     qjRef         = zeros(ndof,length(t));
     
+    % contact forces and torques initialization
+    fc            = zeros(6*CONFIG.numConstraints,length(t));
+    f0            = zeros(6*CONFIG.numConstraints,length(t));
+    tau           = zeros(ndof,length(t));
+    tau_norm      = zeros(length(t),1);
+    
     % motors variables
     xi            = zeros(ndof,length(t));
     dxi           = zeros(ndof,length(t));
     dxi_ref       = zeros(ndof,length(t));
-    
-    % contact forces and torques initialization
-    fc            = zeros(6*CONFIG.numConstraints,length(t));
-    f0            = zeros(6*CONFIG.numConstraints,length(t));
-    tau_m         = zeros(ndof,length(t));
-    tau_norm      = zeros(length(t),1);
     
     % forward kinematics initialization
     xCoM          = zeros(3,length(t));
@@ -93,17 +92,17 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
         qjInit(:,time)      = initState.qj;
         qjRef(:,time)       = visual.jointRef.qjRef;
         
-        % motor dynamics
-        xi(:,time)       = visual.xi;
-        dxi(:,time)      = visual.dxi;
-        dxi_ref(:,time)  = visual.dxi_ref;
-        
         %% Other parameters
         % contact forces and torques
         fc(:,time)          = visual.fc;
         f0(:,time)          = visual.f0;
-        tau_m(:,time)         = visual.tau_xi/p;
-        tau_norm(time)      = norm(visual.tau_xi/p);
+        tau(:,time)         = visual.tau_xi/CONFIG.p;
+        tau_norm(time)      = norm(visual.tau_xi/CONFIG.p);
+        
+        % motor dynamics
+        xi(:,time)          = visual.xi;
+        dxi(:,time)         = visual.dxi;
+        dxi_ref(:,time)     = visual.dxi_ref;
         
         % forward kinematics
         xCoM(:,time)        = visual.xCoM;
@@ -143,8 +142,8 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
         
         CONFIG.figureCont = visualizeMotorsDynamics(t,CONFIG,xi,dxi_ref,dxi);
     end
-    
-    figureCont     = CONFIG.figureCont;
+  
+    figureCont = CONFIG.figureCont;
     set(0,'DefaultFigureWindowStyle','Normal');
-    
+end
 end

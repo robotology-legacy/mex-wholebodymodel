@@ -1,37 +1,38 @@
 function CONFIG = configRobot(CONFIG_old)
 %CONFIGROBOT setup the initial configuration of the robot.
 %
-% CONFIG = CONFIGROBOT(CONFIG_old) takes as an input the structure 
+% [ndof,qjInit,footSize] = CONFIGROBOT(CONFIG) takes as an input the structure 
 % CONFIG, which contains all the robot configuration parameters. The output 
-% is the same structure properly overwritten. 
+% are the number of degrees of freedom, the initial joints positions and
+% the robot's feet size. 
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, February 2017
 %
 
 % ------------Initialization----------------
+%% Config parameters
 global state contYoga;
 
-CONFIG   = CONFIG_old;
-contYoga = 1;
+CONFIG      = CONFIG_old;
+contYoga    = 1;
 
-%% Config parameters
 % number of dofs
 CONFIG.ndof = 25;
 
 % feet size
 CONFIG.footSize  = [-0.07 0.07;   % xMin, xMax
                     -0.03 0.03];  % yMin, yMax
-
-CONFIG.p         = 100;  %transmission ratio
+                
+CONFIG.p         = 100; %transmission ratio
 CONFIG.dqjInit   = zeros(CONFIG.ndof,1);
 dx_bInit         = zeros(3,1);
-w_omega_bInit    = zeros(3,1);
-
+w_omega_bInit    = zeros(3,1);              
+         
 %% Rewrite configuration parameters according to the current state
 if strcmp(CONFIG.demo_type,'yoga') == 1
-    if state == 1
 
+    if state == 1
         % overwrite configuration                    
         CONFIG.feet_on_ground  = [1,1];
         
@@ -42,21 +43,22 @@ if strcmp(CONFIG.demo_type,'yoga') == 1
         
         CONFIG.feet_on_ground  = [1,1];   
     end
-    SM = initStateMachine(CONFIG, state, 'init');
+    
+    SM               = initStateMachine(CONFIG, state, 'init');
     CONFIG.qjInit    = transpose(SM.qjRef);
     CONFIG.gainsInit = gains(CONFIG);
     CONFIG.gainsInit = reshapeGains(SM.gainsVector,CONFIG);
     
-    %% Tresholds
-    CONFIG.t_treshold     = [1  2    0    0    0];
+    % state tresholds
+    CONFIG.t_treshold     = [1  2    1    0    0];
     CONFIG.f_treshold     = [0  70   0    0    0];
     CONFIG.com_treshold   = [0  0.01 0    0    0];
     CONFIG.joint_treshold = [0  0    0.25 1.1  0];
-    CONFIG.tYoga = 1;
+    CONFIG.t_yoga         = 2;
     
 else
-
-    % initial joints position [deg]
+    
+    % Initial joints position [deg]
     leftArmInit  = [ -20  30  0  45  0]';
     rightArmInit = [ -20  30  0  45  0]';
     torsoInit    = [ -10   0  0]';

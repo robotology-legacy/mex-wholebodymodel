@@ -1,6 +1,6 @@
 function CONFIG_updated = stateMachine(t,CONFIG)
 
-global force_feet state com_error joint_error diffState t_switch contYoga;
+global force_feet state com_error diffState t_switch contYoga;
 import WBM.utilities.rotm2quat;
 previousState  = state;
 CONFIG_updated = CONFIG;
@@ -9,20 +9,22 @@ CONFIG_updated = CONFIG;
 t_treshold     = CONFIG_updated.t_treshold;
 f_treshold     = CONFIG_updated.f_treshold;
 com_treshold   = CONFIG_updated.com_treshold;
-joint_treshold = CONFIG_updated.joint_treshold;
 
 %% Two feet balancing
 if state == 1
    if t >= t_treshold(state)
-       state    = 2;
-       t_switch = t; 
+       state     = 2;
+       t_switch  = t; 
+       if CONFIG.demoOnlyRightFoot
+           state = 8;
+       end
        disp(['Event detected: switching to state ', num2str(state)])
    end
 end
 
 %% CoM transition to stance leg
 if state == 2
-    if  (force_feet < f_treshold(state)) && (norm(com_error) < com_treshold(state))  
+    if  (force_feet < f_treshold(state)) && (norm(com_error(2)) < com_treshold(state))  
        state    = 3;
        t_switch = t;
        disp(['Event detected: switching to state ', num2str(state)])
@@ -31,11 +33,16 @@ end
 
 %% One foot balancing
 if state == 3
-   if  norm(joint_error) < joint_treshold(state)
+   if  t >= t_treshold(state)
        state = 4;
        t_switch = t;
+       
+       if CONFIG.skipYoga
+           state = 5;
+       else
+           disp(['Current yoga phase: ', num2str(contYoga)])
+       end
        disp(['Event detected: switching to state ', num2str(state)])
-       disp(['Current yoga phase: ', num2str(contYoga)])
    end
 end
 
@@ -52,12 +59,12 @@ if state == 4
    gainsVector            = (1-alphaGains)*SM.gainsVector_atPrevState + alphaGains*SM.gainsVector;
    CONFIG_updated.gains   = reshapeGains(gainsVector,CONFIG);
 
-   if  norm(joint_error) < joint_treshold(state) && (t-t_switch) > CONFIG_updated.tYoga
+   if  (t-t_switch) > CONFIG_updated.t_yoga
        contYoga = contYoga + 1;
        t_switch = t;
        disp(['Current yoga phase: ', num2str(contYoga)])
    end
-   if  norm(joint_error) < joint_treshold(state) && contYoga == 8
+   if   (t-t_switch) > CONFIG_updated.t_yoga && contYoga == 8
        state = 5;
        t_switch = t;
        disp(['Event detected: switching to state ', num2str(state)])

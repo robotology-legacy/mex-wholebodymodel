@@ -10,8 +10,6 @@ function CONFIG = configRobot(CONFIG_old)
 %
 
 % ------------Initialization----------------
-global state;
-
 CONFIG = CONFIG_old;
 
 %% Config parameters
@@ -29,23 +27,7 @@ w_omega_bInit    = zeros(3,1);
 
 %% Rewrite configuration parameters according to the current state
 if strcmp(CONFIG.demo_type,'yoga') == 1
-    if state == 1
 
-        % overwrite configuration                    
-        CONFIG.feet_on_ground  = [1,1];
-        
-    elseif state == 3
-        
-        CONFIG.feet_on_ground  = [1,0];
-    elseif state == 6
-        
-        CONFIG.feet_on_ground  = [1,1];   
-    end
-    SM = initStateMachine(CONFIG, state, 'init');
-    CONFIG.qjInit    = transpose(SM.qjRef);
-    CONFIG.gainsInit = gains(CONFIG);
-    CONFIG.gainsInit = reshapeGains(SM.gainsVector,CONFIG);
-    
 else
 
     % initial joints position [deg]

@@ -1,6 +1,6 @@
-function SM = initStateMachine(CONFIG, state, mode)
+function SM = initStateMachine(CONFIG,state,mode)
 
-ndof = CONFIG.ndof;
+ndof     = CONFIG.ndof;
 
 %% CoM and position gains
 gainPCOM = [10   50   10;   % state ==  1  TWO FEET BALANCING
@@ -199,8 +199,8 @@ else
     
     xCoMRef = [(transpose((CONFIG.xCoMRef))+[0.0, 0.00, 0.0]);   %% state ==  1  TWO FEET BALANCING NOT USED
                (transpose((CONFIG.xCoMRef))+[0.0, 0.03, 0.0]);   %% state ==  2  COM TRANSITION TO LEFT FOOT: THIS REFERENCE IS USED AS A DELTA W.R.T. THE POSITION OF THE LEFT FOOT
-               (transpose((CONFIG.xCoMRef))+[0.0, 0.02, 0.0]);   %% state ==  3  LEFT FOOT BALANCING 
-               (transpose((CONFIG.xCoMRef))+[0.0,-0.01, 0.02]);   %% state ==  4  YOGA LEFT FOOT
+               (transpose((CONFIG.xCoMRef))+[0.0, 0.02, 0.00]);  %% state ==  3  LEFT FOOT BALANCING 
+               (transpose((CONFIG.xCoMRef))+[0.03,-0.01, 0.05]); %% state ==  4  YOGA LEFT FOOT
                (transpose((CONFIG.xCoMRef))+[0.0, 0.00, 0.0]);   %% state ==  5  PREPARING FOR SWITCHING
                (transpose((CONFIG.xCoMRef))+[0.0, 0.00, 0.0]);   %% state ==  6  LOOKING FOR CONTACT 
                (transpose((CONFIG.xCoMRef))+[0.0, 0.00, 0.0]);   %% state ==  7  TRANSITION INIT POSITION: THIS REFERENCE IS IGNORED
@@ -221,13 +221,10 @@ else
 end
 
 %% Smoothing times
-SM.smoothingTimeJoints = 2;
+SM.smoothingTimeJoints = 4;
 SM.smoothingTimeGains  = 2;
 SM.smoothingTimeCoM    = 2;
-
-
-%           
-%                  
+                 
 % sm.joints.pointsR = sm.joints.pointsL;
 % 
 % 					 
@@ -244,4 +241,4 @@ SM.smoothingTimeCoM    = 2;
 % end	 
 % 
 % clear q1 q2 q3 q4;
-
+end

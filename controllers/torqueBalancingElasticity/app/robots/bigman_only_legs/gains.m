@@ -37,7 +37,7 @@ if  sum(CONFIG.feet_on_ground) == 1
     gainsPAngMom       = diag([2.5 5 2.5]);
     gainsDAngMom       = 2*sqrt(gainsPAngMom);
     
-    % impedances acting in the null space of the desired contact forces    
+    % impedances acting in the null space of the desired contact forces
     if CONFIG.feet_on_ground(1) == 1
         
         impLeftLeg     = [ 15   15  15  15  5  5];
