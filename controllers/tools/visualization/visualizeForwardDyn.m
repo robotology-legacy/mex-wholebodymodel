@@ -156,7 +156,7 @@ else
     title('Foot CoP')
     xlabel('Y direction [m]')
     ylabel('X direction [m]')
-    axis([CoP(1,1)+CONFIG.footSize(2,1) CoP(1,1)+CONFIG.footSize(2,2) CoP(2,1)+CONFIG.footSize(1,1) CoP(2,1)+CONFIG.footSize(1,2)])
+    axis([poseFeet(1)+CONFIG.footSize(2,1) poseFeet(1)+CONFIG.footSize(2,2) poseFeet(2)+CONFIG.footSize(1,1) poseFeet(2)+CONFIG.footSize(1,2)])
     
 end
 

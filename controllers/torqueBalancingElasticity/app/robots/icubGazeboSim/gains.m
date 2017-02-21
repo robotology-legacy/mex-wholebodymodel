@@ -18,7 +18,7 @@ ndof = CONFIG.ndof;
 if sum(CONFIG.feet_on_ground) == 2
     
     % CoM and angular momentum gains
-    gainsPCoM           = diag([40 45 40]);
+    gainsPCoM           = 4*diag([40 45 40]);
     gainsDCoM           = 2*sqrt(gainsPCoM);
     gainsPAngMom        = diag([1 5 1]);
     gainsDAngMom        = 2*sqrt(gainsPAngMom);

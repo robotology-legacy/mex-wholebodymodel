@@ -29,11 +29,10 @@ com_error     = zeros(3,1);
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation
-CONFIG.demo_movements                        = 1;                          %either 0 or 1
 CONFIG.feet_on_ground                        = [1,0];                      %either 0 or 1; [left foot,right foot]
-CONFIG.use_QPsolver                          = 0;                          %either 0 or 1
+CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
 CONFIG.assume_rigid_joints                   = 0;                          %either 0 or 1
-CONFIG.use_motorReferenceAcc                 = 1;                          %either 0 or 1
+CONFIG.use_motorReferenceAcc                 = 0;                          %either 0 or 1
 
 % robot names: icubGazeboSim, bigman, bigman_only_legs
 CONFIG.robot_name                            = 'icubGazeboSim';  

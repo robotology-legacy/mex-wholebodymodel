@@ -49,7 +49,7 @@ elseif strcmp(robot_name,'icubGazeboSim') == 1
     ELASTICITY.KD        = 1*eye(ndof);
 
     % control gains
-    ELASTICITY.KD_gain   = 50*eye(ndof); 
+    ELASTICITY.KD_gain   = 100*eye(ndof); 
     
 elseif strcmp(robot_name,'bigman_only_legs') == 1
     

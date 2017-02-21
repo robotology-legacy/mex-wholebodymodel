@@ -15,7 +15,6 @@ function  desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG)
 % ------------Initialization----------------
 % Config parameters
 feet_on_ground             = CONFIG.feet_on_ground;
-demo_movements             = CONFIG.demo_movements;
 
 % Initial parameters
 directionOfOscillation     = [0;0;0];
@@ -25,6 +24,7 @@ referenceParams            = [0.0 0.0];   %referenceParams(1) = amplitude of asc
 % NB: IF THE INTEGRATION IS PERFORMED USING ODE15S THIS PARAMETER SHOULD REMAIN ZERO                                           
 noOscillationTime          = 0;           % If params.demo_movements = 1, the variable noOscillationTime is the time, in seconds,
                                           % that the robot waits before starting the left-and-right
+smoothingTime              = 0.5;
 
 %% Trajectory definition
 if  strcmp(CONFIG.demo_type,'movements') == 1
@@ -36,7 +36,7 @@ if  strcmp(CONFIG.demo_type,'movements') == 1
     else
         
         directionOfOscillation = [0;1;0];
-        referenceParams        = [0.015 0.15];
+        referenceParams        = [0.02 0.2];
     end
 end
 
@@ -51,11 +51,17 @@ if size(t,1)==1 && size(t,2)==1
     else
         amplitude  = 0;
     end
-
-    xCoMDes    =  xCoMInit + amplitude*sin(2*pi*frequency*t)*directionOfOscillation;
-    dxCoMDes   =             amplitude*2*pi*frequency*cos(2*pi*frequency*t)*directionOfOscillation;
-    ddxCoMDes  =           - amplitude*(2*pi*frequency)^2*sin(2*pi*frequency*t)*directionOfOscillation;
-
+    
+    if (t-noOscillationTime)<= smoothingTime
+        alpha      = (t-noOscillationTime)/(smoothingTime);
+        xCoMDes    =  (1-alpha)*xCoMInit + (alpha)*(xCoMInit + amplitude*sin(2*pi*frequency*t)*directionOfOscillation);
+        dxCoMDes   =                       (alpha)*amplitude*2*pi*frequency*cos(2*pi*frequency*t)*directionOfOscillation;
+        ddxCoMDes  =                     - (alpha)*amplitude*(2*pi*frequency)^2*sin(2*pi*frequency*t)*directionOfOscillation;
+    else
+        xCoMDes    =  xCoMInit + amplitude*sin(2*pi*frequency*t)*directionOfOscillation;
+        dxCoMDes   =             amplitude*2*pi*frequency*cos(2*pi*frequency*t)*directionOfOscillation;
+        ddxCoMDes  =           - amplitude*(2*pi*frequency)^2*sin(2*pi*frequency*t)*directionOfOscillation;
+    end
     desired_x_dx_ddx_CoM = [xCoMDes dxCoMDes ddxCoMDes];
 else
     

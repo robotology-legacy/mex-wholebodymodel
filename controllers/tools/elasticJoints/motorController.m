@@ -40,11 +40,6 @@ if CONFIG.use_motorReferenceAcc
     ddxi_ref_init    = ddxi_ref;
 end
 
-figure(100)
-plot(t,norm(ddxi_ref),'ob')
-hold on 
-grid on
-
 % feedback linearization of motor dynamics
 u      = ddxi_ref - ELASTICITY.KD_gain*(dxi-dxi_ref) + error_compens;
 tau_xi = ELASTICITY.B_xi*u + ELASTICITY.KD*(dxi-dqj) + ELASTICITY.KS*(xi-qj); 

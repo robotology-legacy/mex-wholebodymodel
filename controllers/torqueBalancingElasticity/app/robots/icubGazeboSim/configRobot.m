@@ -21,8 +21,8 @@ contYoga    = 1;
 CONFIG.ndof = 25;
 
 % feet size
-CONFIG.footSize  = [-0.07 0.07;   % xMin, xMax
-                    -0.03 0.03];  % yMin, yMax
+CONFIG.footSize  = [-0.05  0.10;    % xMin, xMax
+                    -0.025 0.025];  % yMin, yMax
                 
 CONFIG.p         = 100; %transmission ratio
 CONFIG.dqjInit   = zeros(CONFIG.ndof,1);
@@ -59,32 +59,36 @@ if strcmp(CONFIG.demo_type,'yoga') == 1
 else
     
     % Initial joints position [deg]
-    leftArmInit  = [ -20  30  0  45  0]';
-    rightArmInit = [ -20  30  0  45  0]';
-    torsoInit    = [ -10   0  0]';
-
     if sum(CONFIG.feet_on_ground) == 2
     
         % initial conditions for balancing on two feet
-        leftLegInit  = [  25.5   0   0  -18.5  -5.5  0]';
-        rightLegInit = [  25.5   0   0  -18.5  -5.5  0]';
+        leftArmInit   = [ -20  30  0  45  0]';
+        rightArmInit  = [ -20  30  0  45  0]';
+        torsoInit     = [ -10   0  0]';
+        leftLegInit   = [  25.5   0   0  -18.5  -5.5  0]';
+        rightLegInit  = [  25.5   0   0  -18.5  -5.5  0]';
+        % joints configuration [rad]
+        CONFIG.qjInit = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
     
     elseif CONFIG.feet_on_ground(1) == 1 && CONFIG.feet_on_ground(2) == 0
     
         % initial conditions for the robot standing on the left foot
-        leftLegInit  = [  25.5   15   0  -18.5  -5.5  0]';
-        rightLegInit = [  25.5    5   0  -40    -5.5  0]';
+        CONFIG.qjInit = transpose([ 0.0462, -0.5256, -0.0269, ...
+                                    0.1874, 1.6258, 0.2462, 0.3053,-0.0948, ...
+                                   -0.3553, 1.8546, 0.7323, 0.3905,-0.1169, ...
+                                    0.1047, 0.2547, 0.0378, 0.0732, 0.0958, 0.1637, ...
+                                    0.2923, 0.8611, 1.2866,-1.7688, 0.4568,-0.0163]);  
     
     elseif CONFIG.feet_on_ground(1) == 0 && CONFIG.feet_on_ground(2) == 1
     
         % initial conditions for the robot standing on the right foot
-        leftLegInit  = [  25.5    5   0  -40    -5.5  0]';
-        rightLegInit = [  25.5   15   0  -18.5  -5.5  0]';
+        CONFIG.qjInit = transpose([ 0.0462, -0.5256, -0.0269, ...
+                                   -0.3553, 1.8546, 0.7323, 0.3905,-0.1169, ...
+                                    0.1874, 1.6258, 0.2462, 0.3053,-0.0948, ...
+                                    0.2923, 0.8611, 1.2866,-1.7688, 0.4568,-0.0163, ...
+                                    0.1047, 0.2547, 0.0378, 0.0732, 0.0958, 0.1637,]);         
     end
 
-    % joints configuration [rad]
-    CONFIG.qjInit = [torsoInit;leftArmInit;rightArmInit;leftLegInit;rightLegInit]*(pi/180);
-    
     % the initial gains are defined before the numerical integration
     CONFIG.gainsInit = gains(CONFIG);
 end
