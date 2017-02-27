@@ -60,7 +60,7 @@ namespace mexWBIComponent
 {
   struct cmp_str : public std::binary_function<const char*, const char*, bool>
   {
-    bool operator()(const char *pstr1, const char *pstr2) {
+    bool operator()(const char *pstr1, const char *pstr2) const {
       return strcmp(pstr1, pstr2) < 0;
     }
   };
