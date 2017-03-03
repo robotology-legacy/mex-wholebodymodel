@@ -153,12 +153,15 @@ void ModelState::deleteInstance()
 bool ModelState::setState(double *qj_t, double *qj_dot_t, double *vb_t)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to update state.\n");
+  mexPrintf("Try to update state.\n");
 #endif
   memcpy(sqj, qj_t, sizeof(double)*nDof);
   memcpy(sqj_dot, qj_dot_t, sizeof(double)*nDof);
   memcpy(svb, vb_t, sizeof(double)*6);
 
+#ifdef DEBUG
+  mexPrintf("State updated.\n");
+#endif
   return true;
 }
 

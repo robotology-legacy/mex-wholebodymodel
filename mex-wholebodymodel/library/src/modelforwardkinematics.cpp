@@ -136,10 +136,10 @@ bool ModelForwardKinematics::computeFast(int nrhs, const mxArray **prhs)
   refLnk = mxArrayToString(prhs[1]);
 
   computeForwardKin();
+
 #ifdef DEBUG
   mexPrintf("ModelForwardKinematics fast computed.\n");
 #endif
-
   return true;
 }
 

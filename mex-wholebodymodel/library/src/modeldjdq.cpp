@@ -95,7 +95,6 @@ bool ModelDJdq::computeFast(int nrhs, const mxArray **prhs)
   if( !mxIsChar(prhs[1]) ) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
   }
-
   robotModel = modelState->robotModel();
 
   wf_H_b = modelState->getBase2WorldTransformation();

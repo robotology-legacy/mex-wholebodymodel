@@ -96,7 +96,7 @@ bool ModelTransformationMatrix::computeFast(int nrhs, const mxArray **prhs)
   qj     = modelState->qj();
   refLnk = mxArrayToString(prhs[1]);
 
-  computeTransformation();
+  computeTransformationMat();
   return true;
 }
 
@@ -136,11 +136,11 @@ bool ModelTransformationMatrix::processArguments(int nrhs, const mxArray **prhs)
 
   wf_H_b = wbi::Frame(rot3d, ppos);
 
-  computeTransformation();
+  computeTransformationMat();
   return true;
 }
 
-void ModelTransformationMatrix::computeTransformation()
+void ModelTransformationMatrix::computeTransformationMat()
 {
   std::string strCom = "com";
   int refLnkID = -1; // the ID for ref. link "com" is -1

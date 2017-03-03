@@ -178,4 +178,5 @@ int ModelJacobian::getRefLinkID()
       mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "jacobian call: Link ID does not exist.");
     }
   }
+  return refLnkID;
 }

@@ -102,7 +102,6 @@ bool ModelMassMatrix::computeFast(int nrhs, const mxArray **prhs)
 #ifdef DEBUG
   mexPrintf("ModelMassMatrix fast computed.\n");
 #endif
-
   return true;
 }
 
