@@ -1,74 +1,56 @@
-function ELASTICITY = addElasticJoints(CONFIG)
+function [B_xi,KS,KD,damping_xi] = addElasticJoints(MODEL)
 %ADDELASTICJOINTS configure the motor dynamics in case joints elasticity
 %                 is considered in the model.
 %
-% ELASTICITY = ADDELASTICJOINTS(CONFIG) takes as input the robot configuration.
-% The output is a structure containing motors dynamics, stiffness, damping
-% and motor control gains.
+% Format: [B_xi,KS,KD,damping_xi] = ADDELASTICJOINTS(MODEL)
+%
+% Inputs:  - MODEL is a structure defining the robot model;
+%
+% Output:  - B_xi motor intertia matrix (R^(ndof x ndof))
+%          - KS joint stiffness (R^(ndof x ndof))
+%          - KD joint damping (R^(ndof x ndof))
+%          - damping_xi motors velocity control gain (R^(ndof x ndof))
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
-% Genova, May 2016
-%
+% Genova, March 2017
 
-% ------------Initialization----------------
-%% Configure parameters
-ndof                 = CONFIG.ndof;
-robot_name           = CONFIG.robot_name;
+%% ------------Initialization----------------
+% Configure parameters
+ndof                 = MODEL.ndof;
+robot_name           = MODEL.CONFIG.robot_name;
+% transmission ratio
+eta                  = MODEL.eta;
 
-if strcmp(robot_name,'bigman') == 1
-    
-    % reduction ratio
-    p                    = CONFIG.p;
-
-    %% Motor dynamics
-    % motor inertia
-    ELASTICITY.B_xi      = 5.480e-5*(p^2)*eye(ndof);
-
-    % stiffness
-    ELASTICITY.KS        = 50*eye(ndof);
-
-    % damping
-    ELASTICITY.KD        = 5*eye(ndof);
-
+%% Stiffness, dampinf and motor inertia
+if strcmp(robot_name,'bigman')
+    % motor inertia [Kgm^2]
+    B_xi       = 5.480e-5./(eta^2).*eye(ndof);
+    % joint stiffness [Nm/rad]
+    KS         = 50*eye(ndof); 
+    % joint damping [Nms/rad]
+    KD         = 5*eye(ndof); 
     % control gains
-    ELASTICITY.KD_gain   = 100*eye(ndof);
+    damping_xi = 100*eye(ndof);
 
 elseif strcmp(robot_name,'icubGazeboSim') == 1
-    
-    % reduction ratio
-    p                    = CONFIG.p;
-
-    %% Motor dynamics
-    % motor inertia (expressed w.r.t. the link side)
-    ELASTICITY.B_xi      = 1e-5*(p^2)*eye(ndof);
-
-    % stiffness
-    ELASTICITY.KS        = 10*eye(ndof);
-
-    % damping
-    ELASTICITY.KD        = 1*eye(ndof);
-
+    % motor inertia [Kgm^2]
+    B_xi       = 1e-5./(eta^2).*eye(ndof); 
+    % joint stiffness [Nm/rad]
+    KS         = 350*eye(ndof);    
+    % joint damping [Nms/rad]
+    KD         = 1*eye(ndof);   
     % control gains
-    ELASTICITY.KD_gain   = 100*eye(ndof); 
+    damping_xi = 200*eye(ndof);
     
 elseif strcmp(robot_name,'bigman_only_legs') == 1
-    
-    % reduction ratio
-    p                    = CONFIG.p;
-
-    %% Motor dynamics
-    % motor inertia
-    ELASTICITY.B_xi      = 5.480e-5*(p^2)*eye(ndof);
-
-    % stiffness
-    ELASTICITY.KS        = 100*eye(ndof);
-
-    % damping
-    ELASTICITY.KD        = 5*eye(ndof);
-
+    % motor inertia [Kgm^2]
+    B_xi       = 5.480e-5./(eta^2).*eye(ndof);
+    % joint stiffness [Nm/rad]
+    KS         = 50*eye(ndof); 
+    % joint damping [Nms/rad]
+    KD         = 5*eye(ndof);
     % control gains
-    ELASTICITY.KD_gain   = 100*eye(ndof);  
-
+    damping_xi = 100*eye(ndof);
 end
 
 end

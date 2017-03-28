@@ -2,17 +2,22 @@ function [t,chi] = euleroForward(func,chiInit,tmax,tmin,tstep)
 %EULEROFORWARD is a fixed step integrator for integrating the forward
 %              dynamics of the robot iCub in MATLAB.
 %
-%   [t,chi] = EULEROFORWARD(func,chiInit,tmax,tmin,tstep) takes as input
-%   the function to be integrated, FUNC; the initial state of the robot,
-%   CHIINIT; the final and initial time and the time step, TMAX,TMIN,TSTEP.
-%   The outputs are the vector of integration time T and the state of the
-%   robot, CHI.
+% Format: [t,chi] = EULEROFORWARD(func,chiInit,tmax,tmin,tstep)
+%
+% Inputs:  - func function to be integrated;
+%          - chiInit initial state [13+2*ndof x 1];
+%          - tmax max integration time;
+%          - tmin initial integration time;
+%          - tstep integration time step;
+%
+% Output:  - time vector t;
+%          - state vector chi at each instant [13+4*ndof x lenght(t)];
+%
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
-% Genova, May 2016
-%
+% Genova, March 2017
 
-% ------------Initialization----------------
+%% ------------Initialization----------------
 %% Initial conditions
 t                    = transpose(tmin:tstep:tmax);
 dimT                 = length(t);
@@ -21,10 +26,10 @@ chi                  = zeros(variablesToIntegrate,dimT);
 chi(:,1)             = chiInit;
 
 %% Euler fixed step integrator
-for k = 2:dimT
-    
+for k = 2:dimT  
     chi(:,k) = chi(:,k-1) + tstep.*func(t(k-1),chi(:,k-1));
 end
 
-chi = chi.';
+chi = transpose(chi);
+
 end

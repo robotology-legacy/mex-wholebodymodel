@@ -54,7 +54,6 @@ CFoot       =  [ Aineq ;
                  CFoot ];
 
 dConstraints = [zeros(size(Aineq,1), 1); zeros(7,1)];
-
 dConstraints(3 + size(Aineq,1)) = -fZmin;
 
 end

@@ -1,134 +1,132 @@
 %% INITIALIZETORQUEBALANCING
 %
-% This is the initialization script for torque balancing simulations of 
-% floating base robots using Matlab.
+% This is the configuration file for balancing simulations of torque 
+% controlled floating base robots with Series Elastic Actuators using MATLAB. 
 %
-% Forward dynamics integration is available for the robot balancing on one 
-% foot or two feet (6 or 12 contact constraints, respectively). The controller 
-% ensures stability properties of the system around any set point in case of 
-% k=1 (see [Nava et al, IROS 2016]. 
-% Contact forces are evaluated though QP solver to ensure unilateral constraints, 
-% and to constrain them inside the friction cones.
+% List of available simulations:
+%
+%  - One or two feet balancing about a reference point;
+%  - One or two feet tracking of a CoM reference trajectory; 
+%  - Highly dynamic Tai Chi (see also https://www.youtube.com/watch?v=9XRI4BeXN78);
+%  
+% List of available robots:
+%
+%  - iCub;
+%  - Walkman;
+%  - Walkman-only legs;
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
-% Genova, May 2016
+% Genova, March 2017
 %
 
 % ------------Initialization----------------
-clear  all
-close  all
+clear  
+close all
 clc
 
-%% Global variables definition
-global force_feet state com_error;
-
-% first testing framework for extending YOGA++ demo to Matlab controller 
-force_feet    = 0;
-state         = 1;
-com_error     = zeros(3,1);
+%% Global variables (for finite state machine)
+global state;
+% initialize global variables
+state = 1;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% BASIC SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Configure the simulation
 CONFIG.feet_on_ground                        = [1,0];                      %either 0 or 1; [left foot,right foot]
+% use QP for optimizing contact forces and for applying friction cones
+% constaints
 CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
-CONFIG.assume_rigid_joints                   = 0;                          %either 0 or 1
-CONFIG.use_motorReferenceAcc                 = 0;                          %either 0 or 1
-
-% robot names: icubGazeboSim, bigman, bigman_only_legs
+% available robot names: 'icubGazeboSim', 'bigman', 'bigman_only_legs'
 CONFIG.robot_name                            = 'icubGazeboSim';  
-
-% available demos: yoga, balancing, movements
-CONFIG.demo_type                             = 'movements';     
+% available demos: 'yoga', 'balancing', 'movements'
+CONFIG.demo_type                             = 'yoga';  
+% FOR YOGA SIMULATION
+% perform yoga movements while on one foot (default) or skip them 
+CONFIG.yogaMovements                         = 1;                          %either 0 or 1
+% yoga demo using only right foot
+CONFIG.demoOnlyRightFoot                     = 0;                          %either 0 or 1
+% yoga demo on both feet (or only left foot)
+CONFIG.demoAlsoRightFoot                     = 1;                          %either 0 or 1
 
 %% Visualization setup
-% robot simulator
+% robot simulator using iDyntree visualizer
 CONFIG.visualize_robot_simulator             = 1;                          %either 0 or 1
 % forward dynamics integration results
 CONFIG.visualize_integration_results         = 1;                          %either 0 or 1
-CONFIG.visualize_joints_dynamics             = 0;                          %either 0 or 1
-CONFIG.visualize_motors_dynamics             = 1;                          %either 0 or 1
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 2.5;
+CONFIG.tEnd                                  = 80;
 CONFIG.sim_step                              = 0.01;
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%% DEBUGGING %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
+% the controller assumes the robot has rigid joints (comparison with
+% elastic joint controller)
+CONFIG.assume_rigid_joints                   = 0;                          %either 0 or 1
+% the robot is balancing, and upper body joints reference is a configurable
+% step. Not available for 'bigman_only_legs'
+CONFIG.upperBody_stepReference               = 0;                          %either 0 or 1
+CONFIG.stepAmplitude                         = 5;                          %[deg]
+% normalize quaternions to ensure |q_t| == 1
+CONFIG.normalize_quaternions                 = 0;                          %either 0 or 1
+% robot simulation is performed during numerical integration. 
+% WARNING: THIS WILL CONSIDERABLY SLOW DOWN NUMERICAL INTEGRATION!
+CONFIG.visualize_robot_simulator_ONLINE      = 1;                          %either 0 or 1
+% consider joint limits during the simulation
+CONFIG.use_jointLimits                       = 0;                          %either 0 or 1
+% make a video of the iDyntree simulation (offline) 
+CONFIG.makeVideo                             = 0;                          %either 0 or 1
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% ONLY FOR DEVELOPERS
 % tolerances for pseudoinverse and QP
-CONFIG.pinv_tol       = 1e-8;
-CONFIG.pinv_damp      = 5e-6;
-CONFIG.reg_HessianQP  = 1e-3;
-
-% use forward dynamics for visualization
-CONFIG.useForDynamicsForVisual = 0;
-
-if strcmp(CONFIG.demo_type,'yoga') == 1
-    
-    % for now yoga demo is available only for icub
-    if strcmp(CONFIG.robot_name,'icubGazeboSim')
-    else
-        error('For now, yoga demo is available only for robot iCub')
-    end
-    
-    % fixed step is not available if yoga is on
-    CONFIG.integrateWithFixedStep = 0;  
-    
-    % choose the stance leg for yoga++
-    CONFIG.left_right_yoga   = [1,0];                                      %[left foot, right foot]
-    CONFIG.demoOnlyRightFoot = 0;                                          %either 0 or 1
-    CONFIG.demoAlsoRightFoot = 0;                                          %either 0 or 1
-end
+CONFIG.pinv_tol                              = 1e-4;
+CONFIG.pinv_damp                             = 5e-4;
+CONFIG.reg_HessianQP                         = 1e-3;
+% torques saturation
+CONFIG.satTorque                             = inf;                        %[Nm]
 
 %% Forward dynamics integration setup
 % CONFIG.integrateWithFixedStep will use a Euler forward integrator instead
 % of ODE15s to integrate the forward dynamics. It may be useful for debug.
 CONFIG.integrateWithFixedStep = 0;                                         %either 0 or 1
 
-% The fixed step integration needs a desingularization of system mass matrix
-% in order to converge to a solution
-if CONFIG.integrateWithFixedStep
-    
-    CONFIG.massCorr = 0.05;
-else
-    CONFIG.massCorr = 0;
+% event function. Currently, if a discrete event is detected, the integration 
+% stops and it restarts with updated initial conditions, just after the event. 
+eventFunction                 = @(t,chi) eventState(t,chi);
+
+% integration options. If the integration is slow, try to modify these options.
+CONFIG.options                = odeset('RelTol',1e-6,'AbsTol',1e-6,'Events',eventFunction,'InitialStep',CONFIG.sim_step);
+
+%% Resolve option conflicts
+if strcmp(CONFIG.demo_type,'yoga')
+    % fixed step is not available for yoga movements (event function is
+    % not implemented)
+    CONFIG.integrateWithFixedStep  = 0;  
 end
 
-% Integration options. If the integration is slow, try to modify these options.
-% Event function
-eventFunction  = @(t,chi) eventState(t,chi);
-
-if strcmp(CONFIG.demo_type,'balancing') == 1
-    CONFIG.options  = odeset('RelTol',1e-3,'AbsTol',1e-3,'Events',eventFunction,'InitialStep',CONFIG.sim_step);
-else
-    CONFIG.options  = odeset('RelTol',1e-6,'AbsTol',1e-6,'Events',eventFunction,'InitialStep',CONFIG.sim_step);
+if strcmp(CONFIG.robot_name ,'bigman_only_legs')
+    % this robot does not have an upper body!
+    CONFIG.upperBody_stepReference = 0;
 end
 
-%% Visualization setup
-% this script modifies the default MATLAB options for figures and graphics.
-% This will result in a better visualization setup.
-plot_set
+if CONFIG.upperBody_stepReference
+    % for performing this regulation task, the robot should not move
+    CONFIG.demo_type               = 'balancing';
+end
 
-% this is the figure counter. It is used to automatically adapt the figure
-% number in case new figures are added
-CONFIG.figureCont = 1;
-
-%% Paths definition and initialize the forward dynamics integration
-% add the required paths. This procedure will make the paths consistent for
-% any starting folder.
+%% Add required paths
+% this procedure will make the paths consistent for any starting folder.
 CONFIG.codyco_root  = getenv('CODYCO_SUPERBUILD_ROOT');
-CONFIG.utility_root = [CONFIG.codyco_root,  filesep, '/main/mexWholeBodyModel/controllers/tools'];
-CONFIG.robot_root   = [CONFIG.utility_root, filesep, '/robotFunctions'];
-CONFIG.plots_root   = [CONFIG.utility_root, filesep, '/visualization'];
-CONFIG.src_root     = [CONFIG.codyco_root,  filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingElasticity/src'];
-CONFIG.elastic_root = [CONFIG.utility_root, filesep, '/elasticJoints'];
-CONFIG.state_root   = [CONFIG.utility_root, filesep, '/stateMachine'];
-
-CONFIG.config_root  = [CONFIG.codyco_root,  filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingElasticity/',...
+CONFIG.tools_root   = [CONFIG.codyco_root, filesep, '/main/mexWholeBodyModel/controllers/tools'];
+CONFIG.robot_root   = [CONFIG.tools_root,  filesep, '/robotFunctions'];
+CONFIG.plots_root   = [CONFIG.tools_root,  filesep, '/visualization'];
+CONFIG.src_root     = [CONFIG.codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingElasticity/src'];
+CONFIG.elastic_root = [CONFIG.tools_root,  filesep, '/elasticJoints'];
+CONFIG.state_root   = [CONFIG.tools_root,  filesep, '/stateMachine'];
+CONFIG.config_root  = [CONFIG.codyco_root, filesep, '/main/mexWholeBodyModel/controllers/torqueBalancingElasticity/',...
                        filesep, 'app/robots/', filesep, CONFIG.robot_name];
-
 % add the paths
-addpath(CONFIG.utility_root);
+addpath(CONFIG.tools_root);
 addpath(CONFIG.robot_root);
 addpath(CONFIG.plots_root);
 addpath(CONFIG.src_root);
@@ -136,9 +134,8 @@ addpath(CONFIG.elastic_root);
 addpath(CONFIG.state_root);
 addpath(CONFIG.config_root);
 
-%% Initialize the robot model
+%% %%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
+% initialize the robot model
 wbm_modelInitialize(CONFIG.robot_name);
-
-%% INITIALIZATION
-% initialize the forward dynamics
+% initialize the forward dynamics integration
 initForwardDynamics(CONFIG);

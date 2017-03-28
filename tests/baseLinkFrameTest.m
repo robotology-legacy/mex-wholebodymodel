@@ -2,8 +2,6 @@ clearvars;
 close all;
 
 %% initialise mexWholeBodyModel
-import WBM.utilities.frame2posRotm;
-
 wbm_modelInitialize('icubGazeboSim');
 
 %% setup params

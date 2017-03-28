@@ -1,14 +1,27 @@
-function gains = reshapeGains(gainVect,CONFIG)
+function GAINS = reshapeGains(gainVect,MODEL)
+%RESHAPEGAINS reshapes gain matrices for CoM and joint position.
+%
+% Format: GAINS = reshapeGains(gainVect,CONFIG)
+%
+% Inputs:  - gainVect [3+ndof x 1] is a vector containing CoM and joints gains; 
+%          - MODEL is a structure defining the robot model. 
+%
+% Output:  - GAINS it is a structure containing all control gains
+%
+% Author : Gabriele Nava (gabriele.nava@iit.it)
+% Genova, March 2017
 
-gains             = CONFIG.gainsInit;
-
-gainsPCoM         = diag(gainVect(1:3));
-gainsDCoM         = 2*sqrt(gainsPCoM);
-
-gains.impedances  = diag(gainVect(4:end));
-gains.dampings    = 2*sqrt(gains.impedances);
-
-gains.momentumGains      = [gainsDCoM zeros(3); zeros(3) gains.momentumGains(4:end,4:end)];
-gains.intMomentumGains   = [gainsPCoM zeros(3); zeros(3) gains.intMomentumGains(4:end,4:end)];
+%% ------------Initialization----------------
+% initial gains
+GAINS                    = gains(MODEL);
+% update CoM gains
+gainsPCoM                = diag(gainVect(1:3));
+gainsDCoM                = 2*sqrt(gainsPCoM);
+% update impedance and damping
+GAINS.impedances         = diag(gainVect(4:end));
+GAINS.dampings           = 2*sqrt(GAINS.impedances);
+% update momentum gains
+GAINS.momentumGains      = [gainsDCoM zeros(3); zeros(3) GAINS.momentumGains(4:end,4:end)];
+GAINS.intMomentumGains   = [gainsPCoM zeros(3); zeros(3) GAINS.intMomentumGains(4:end,4:end)];
 
 end

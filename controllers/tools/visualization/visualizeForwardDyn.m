@@ -19,6 +19,31 @@ function figureCont = visualizeForwardDyn(t,CONFIG,xCoM,poseFeet,fc,f0,tau_norm,
 % ------------Initialization----------------
 % setup parameters
 figureCont = CONFIG.figureCont;
+%     %% Basic visualization (forward dynamics integration results)
+%     if CONFIG.visualize_integration_results == 1
+%           
+%         CONFIG.figureCont = visualizeForwardDyn(t_total,CONFIG,xCoM,poseFeet,fc,f0,tau_norm,CoP,HErr);
+%     end
+%     
+%     %% Joints positions and position error
+%     if CONFIG.visualize_joints_dynamics == 1
+%         
+%         CONFIG.figureCont = visualizeJointDynamics(t_total,CONFIG,qj,qjRef);
+%     end
+%     
+%     %% Motors dynamics
+%     if CONFIG.visualize_motors_dynamics == 1
+%         
+%         CONFIG.figureCont = visualizeMotorsDynamics(t_total,CONFIG,xi,dxi_ref,dxi);
+%     end
+    
+%         % centers of pressure at feet
+%         CoP(1,time)         =  GRAPHICS.fc(4)/GRAPHICS.fc(3);
+%         CoP(2,time)         = -GRAPHICS.fc(5)/GRAPHICS.fc(3);
+%         if  sum(MODEL.CONFIG.feet_on_ground) == 2         
+%             CoP(3,time)     =  GRAPHICS.fc(10)/GRAPHICS.fc(9);
+%             CoP(4,time)     = -GRAPHICS.fc(11)/GRAPHICS.fc(9);
+%         end 
 
 %% CoM trajectory
 figure(figureCont)

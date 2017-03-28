@@ -1,48 +1,42 @@
-function [tau_xi,dxi_ref] = motorController(t,dxi,xi,ELASTICITY,STATE,controlParam,CONFIG)
+function [tau_xi,dxi_ref] = motorController(DYNAMICS,STATE,GAINS,CONTROLLER)
 %MOTORCONTROLLER computes desired motor torques for controlling floating
-%                base robots with elastic joiints.
+%                base robots with elastic joints.
 %
-% tau = MOTORCONTROLLER(t,dtheta,theta,ELASTICITY,STATE,controlParam,CONFIG) 
-% takes as input the parameters from stack of task controllers, the robot
-% state, the motor state and dynamics and configuration.
-% The output are the desired motor torques tau_m and the motor reference 
-% velocities, dtheta_ref.
+% Format: [tau_xi,dxi_ref] = MOTORCONTROLLER(DYNAMICS,STATE,GAINS,CONTROLLER)
+%
+% Inputs:  - DYNAMICS contains current robot dynamics;
+%          - STATE contains the current system state;
+%          - GAINS is a structure containing all control gains;
+%          - CONTROLLER is a structure containing the control torques, 
+%            and other parameters for controlling the robot.
+%
+% Output:  - tau_xi control torques [ndof x 1] 
+%          - dxi_ref motors reference velocity [ndof x 1] 
+%
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
-% Genova, May 2016
-%
+% Genova, March 2017
 
-% ------------Initialization----------------
-%% Configure parameters
-global  t_previous dxi_ref_previous ddxi_ref_init;
-
-ndof = CONFIG.ndof;
+%% ------------Initialization----------------
+% State parameters
 qj   = STATE.qj;
 dqj  = STATE.dqj;
+dxi  = STATE.dxi;
+xi   = STATE.xi;
+
+% Dynamic parameters
+KS   = DYNAMICS.KS;
+KD   = DYNAMICS.KD;
+B_xi = DYNAMICS.B_xi;
 
 % desired references for motor velocity
-dxi_ref       = ELASTICITY.KD\(controlParam.tauModel+controlParam.Sigma*controlParam.fcDes);
+dxi_ref = KD\(CONTROLLER.tauModel + CONTROLLER.Sigma*CONTROLLER.fcDes);
 
-% compensation for stability (proper backstepping)
-error_compens = controlParam.error_compens;
-ddxi_ref      = zeros(ndof,1);
-
-if CONFIG.use_motorReferenceAcc
-    
-    % motor reference derivative
-    if t > CONFIG.tStart && t~=t_previous
-        ddxi_ref  = (dxi_ref-dxi_ref_previous)/(t-t_previous);
-    else
-        ddxi_ref  = ddxi_ref_init;
-    end
-    t_previous       = t;
-    dxi_ref_previous = dxi_ref; 
-    ddxi_ref_init    = ddxi_ref;
-end
-
-% feedback linearization of motor dynamics
-u      = ddxi_ref - ELASTICITY.KD_gain*(dxi-dxi_ref) + error_compens;
-tau_xi = ELASTICITY.B_xi*u + ELASTICITY.KD*(dxi-dqj) + ELASTICITY.KS*(xi-qj); 
+%% Feedback linearization of motor dynamics
+% control input
+u      =  -GAINS.damping_xi*(dxi-dxi_ref);
+% control torques
+tau_xi =   B_xi*u + KD*(dxi-dqj) + KS*(xi-qj); 
 
 end
 

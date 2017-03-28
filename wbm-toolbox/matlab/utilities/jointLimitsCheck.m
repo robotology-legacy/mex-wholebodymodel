@@ -1,14 +1,15 @@
 function [] = jointLimitsCheck(qj,t)
 %JOINTLIMITSCHECK verifies the joints are inside the joint limits.
 %
-%                 [] = JOINTLIMITSCHECK(qj,t) take as an input the joint
-%                 positions qj and the current time step t. The output is
-%                 an error message only if a joint reaches the limits.
+% Format: [] = JOINTLIMITSCHECK(qj,t)
+%
+% Inputs:  - joint positions qj [ndof x 1]; 
+%          - current time t [s];
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
-% Genova, May 2016
-
-% ------------Initialization----------------
+% Genova, March 2017
+%
+%% ------------Initialization----------------
 % LIMITS CHECK
 [l_min,l_max]  = wbm_jointLimits();
 tol            = 0.01;

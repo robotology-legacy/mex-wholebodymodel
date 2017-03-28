@@ -24,44 +24,31 @@ figureCont                       = CONFIG.figureCont;
 %% Robot simulator
 if CONFIG.visualize_robot_simulator == 1
     % list of joints used in the visualizer
-    CONFIG.modelName        = 'iCub';
-    CONFIG.setPos           = [1,0,0.5];    
-    CONFIG.setCamera        = [0.4,0,0.5];
+    CONFIG.modelName        = 'Walkman';
+    CONFIG.setPos           = [1.7,0,1];
+    CONFIG.setCamera        = [0.4,0,1];
     CONFIG.mdlLdr           = iDynTree.ModelLoader();
     consideredJoints        = iDynTree.StringVector();
-    
-    consideredJoints.push_back('torso_pitch');
-    consideredJoints.push_back('torso_roll');
-    consideredJoints.push_back('torso_yaw');
-    consideredJoints.push_back('l_shoulder_pitch');
-    consideredJoints.push_back('l_shoulder_roll');
-    consideredJoints.push_back('l_shoulder_yaw');
-    consideredJoints.push_back('l_elbow');
-    consideredJoints.push_back('l_wrist_prosup');
-    consideredJoints.push_back('r_shoulder_pitch');
-    consideredJoints.push_back('r_shoulder_roll');
-    consideredJoints.push_back('r_shoulder_yaw');
-    consideredJoints.push_back('r_elbow');
-    consideredJoints.push_back('r_wrist_prosup');
-    consideredJoints.push_back('l_hip_pitch');
-    consideredJoints.push_back('l_hip_roll');
-    consideredJoints.push_back('l_hip_yaw');
-    consideredJoints.push_back('l_knee');
-    consideredJoints.push_back('l_ankle_pitch');
-    consideredJoints.push_back('l_ankle_roll');
-    consideredJoints.push_back('r_hip_pitch');
-    consideredJoints.push_back('r_hip_roll');
-    consideredJoints.push_back('r_hip_yaw');
-    consideredJoints.push_back('r_knee');
-    consideredJoints.push_back('r_ankle_pitch');
-    consideredJoints.push_back('r_ankle_roll');
+
+    consideredJoints.push_back('LHipSag');
+    consideredJoints.push_back('LHipLat');
+    consideredJoints.push_back('LHipYaw');
+    consideredJoints.push_back('LKneeSag');
+    consideredJoints.push_back('LAnkSag');
+    consideredJoints.push_back('LAnkLat');
+    consideredJoints.push_back('RHipSag');
+    consideredJoints.push_back('RHipLat');
+    consideredJoints.push_back('RHipYaw');
+    consideredJoints.push_back('RKneeSag');
+    consideredJoints.push_back('RAnkSag');
+    consideredJoints.push_back('RAnkLat');
 
     % load the model from .urdf
-    CONFIG.mdlLdr.loadReducedModelFromFile('../models/icub/model.urdf',consideredJoints);
-            
+    CONFIG.mdlLdr.loadReducedModelFromFile('../models/walkman/modelOnlyLegs.urdf',consideredJoints);
+        
     % set lights
     CONFIG.lightDir = iDynTree.Direction();     
-    CONFIG.lightDir.fromMatlab([-0.5 0 -0.5]/sqrt(2)); 
+    CONFIG.lightDir.fromMatlab([0.5 0 0.5]/sqrt(2)); 
     
     visualizeSimulation_iDyntree(chi,CONFIG);
 end
@@ -98,7 +85,7 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
     % generate the vectors from forward dynamics
     for time = 1:length(t)
         
-        [~,visual]          = forwardDynamics(t(time), chi(time,:)',CONFIG);
+        [~,visual]          = forwardDynamics(t(time), chi(time,:)', CONFIG);
         
         % joints dynamics
         qj(:,time)          = visual.qj;
@@ -155,7 +142,8 @@ if CONFIG.visualize_integration_results == 1  || CONFIG.visualize_joints_dynamic
         
         CONFIG.figureCont = visualizeMotorsDynamics(t,CONFIG,xi,dxi_ref,dxi);
     end
-
+  
     figureCont = CONFIG.figureCont;
     set(0,'DefaultFigureWindowStyle','Normal');
+end
 end

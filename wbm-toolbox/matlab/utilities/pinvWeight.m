@@ -7,8 +7,8 @@ function [pinvM,NullSpace] = pinvWeight(M,Weight)
 %   x
 %  the solution is x = pinvM(y) + NullSpace(x0) 
 %
-
 [~,n]     = size(M);
 pinvM     = Weight\pinvDamped(M/Weight,1e-4);
 NullSpace = eye(n) - pinvM*M;
+
 end
