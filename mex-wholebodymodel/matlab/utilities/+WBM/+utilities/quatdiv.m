@@ -1,8 +1,6 @@
 function quat = quatdiv(q1, q2)
-    if ( (size(q1,1) ~= 4) || (size(q2,1) ~= 4) )
-        error('quatdiv: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
-    quat   = zeros(4,1);
+    WBM.utilities.checkCVecDs(q1, q2, 4, 4, 'quatdiv');
+
     qn_inv = 1/(q2.'*q2); % the .' is crucial to avoid computing the conjugate!
 
     %% Calculate the division of two quaternions q1 and q2 with q = q1/q2.
@@ -29,6 +27,7 @@ function quat = quatdiv(q1, q2)
     %   [2] Geometric Tools Engine, Documentation: <http://www.geometrictools.com/Documentation/Quaternions.pdf>, p. 2.
     %   [3] Aircraft Control and Simulation: Dynamics, Controls Design, and Autonomous Systems, Stevens & Lewis & Johnson,
     %       3rd Edition, Wiley-Blackwell, 2015, pp. 46-48.
+    quat = zeros(4,1);
     % scalar part:
     quat(1,1) = (q2(1,1)*q1(1,1) + q2(2,1)*q1(2,1) + q2(3,1)*q1(3,1) + q2(4,1)*q1(4,1))*qn_inv;
     % vector part:

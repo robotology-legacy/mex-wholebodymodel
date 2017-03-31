@@ -1,7 +1,6 @@
 function axang = quat2axang(quat)
-    if (size(quat,1) ~= 4)
-        error('quat2axang: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
+    WBM.utilities.checkCVecDim(quat, 4, 'quat2axang');
+
     axang   = zeros(4,1);
     epsilon = 1e-12; % min. value to treat a number as zero ...
 

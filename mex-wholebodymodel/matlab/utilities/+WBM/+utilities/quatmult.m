@@ -1,8 +1,5 @@
 function quat = quatmult(q1, q2)
-    if ( (size(q1,1) ~= 4) || (size(q2,1) ~= 4) )
-        error('quatmult: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
-    quat = zeros(4,1);
+    WBM.utilities.checkCVecDs(q1, q2, 4, 4, 'quatmult');
 
     %% Compute the product of two quaternions q1 and q2 with q = q1*q2:
     %  Note: The quaternion multiplication is in general not commutative.
@@ -19,6 +16,7 @@ function quat = quatmult(q1, q2)
     %   [3] Optimal Spacecraft Rotational Maneuvers, John L. Junkins & James D. Turner, Elsevier, 1986, p. 38, eq. (2.84).
     %   [4] Geometric Tools Engine, Documentation: <http://www.geometrictools.com/Documentation/Quaternions.pdf>, p. 2, eq. (2).
     %   [5] 3D Game Engine Programming, Understanding Quaternions: <http://www.3dgep.com/understanding-quaternions/#Quaternion_Products>.
+    quat = zeros(4,1);
     % scalar part:
     quat(1,1) = q1(1,1)*q2(1,1) - q1(2,1)*q2(2,1) - q1(3,1)*q2(3,1) - q1(4,1)*q2(4,1);
     % vector part:

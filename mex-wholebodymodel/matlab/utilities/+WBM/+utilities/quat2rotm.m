@@ -1,8 +1,5 @@
 function dcm = quat2rotm(quat)
-    if (size(quat,1) ~= 4)
-        error('quat2rotm: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
-    dcm = zeros(3,3);
+    WBM.utilities.checkCVecDim(quat, 4, 'quat2rotm');
 
     qnorm = quat.'*quat;
     if (qnorm > 1)
@@ -34,6 +31,7 @@ function dcm = quat2rotm(quat)
     % Note: The direct assignment is computationally faster than using directly the formula above. Furthermore, if the above formula
     %       will be used, the matrix multiplications are causing accumulative round-off errors in the main diagonal of the DCM-matrix
     %       (around ±0.7*1e-03). To be more accurate, it is better to use the derived transformation matrix of the formula.
+    dcm = zeros(3,3);
     dcm(1,1) = q_0*q_0 + q_1*q_1 - q_2*q_2 - q_3*q_3;
     dcm(1,2) = 2*(q_1*q_2 - q_0*q_3);
     dcm(1,3) = 2*(q_0*q_2 + q_1*q_3);

@@ -16,7 +16,8 @@ icub_config      = wbm_icub.robot_config;
 %  forward dynamics in state-space form. The state-space form reduces, through variable
 %  substitution, the inhomogeneous second-order ODE to a first-order ODE.
 %  For further details see:
-%    Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008, chapter 3, pp. 40-42, formula (3.8).
+%    [1] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008,
+%        chapter 3, pp. 40-42, formula (3.8).
 chi_init = wbm_icub.stvChiInit;
 
 %% Control torques:
@@ -30,24 +31,24 @@ g_init  = wbm_icub.generalizedBiasForces(R_b, p_b, qj_init, zeros(icub_model.ndo
 len = size(g_init,1);
 
 % Function handle (fh) for the torque controller function:
-% Note: This function handle has only a very simple dummy-function as controller
-%       which works in this case. It is advisable for complex scenarios and also
-%		for avoiding integration errors to use a real controller function instead.
-fhTrqControl = @(t, M, c_qv, stp, nu, Jc, djcdq, foot_conf)zeroTrqsController(size(g_init(7:len,1)));
+% Note: This function handle has only a very simple dummy-function as controller (zero
+%       torques) that works in this case. For complex scenarios it is advisable to use
+%       a real controller function instead to avoid integration errors.
+fhTrqControl = @(t, M, c_qv, stp, nu, Jc, djcdq, feet_conf)zeroTrqsController(size(g_init(7:len,1)));
 
-% configuration structure for the feet:
-% Note: This configuration is needed for the extended forward dynamics function.
-%
-% define on which foot the robot is balancing on the ground:
+% Configuration structure for the feet state:
+% Note: The state of the feet configuration is needed for the extended forward dynamics
+%       function with feet pose correction (FPC). It defines the current feet pose and
+%       on which foot the legged robot is currently in contact with the ground.
 feet_on_ground = [true, true]; % [l_foot, r_foot]
-foot_conf = wbm_icub.initFootBalanceConfig(qj_init, feet_on_ground);
+feet_conf = wbm_icub.setFeetConfigState(qj_init, feet_on_ground);
 
 %% ODE-Solver:
-%  Setup the function handle of the form f(t,chi) where chi refers to the dynamic state
+%  Setup the function handle of the form f(t,chi), where chi refers to the dynamic state
 %  of the system. It evaluates the right side of the nonlinear first-order ODEs of the
 %  form chi' = f(t,chi) and returns a vector of rates of change (vector of derivatives)
 %  which will be integrated by the solver.
-fhFwdDyn = @(t, chi)wbm_icub.forwardDynamicsExt(t, chi, fhTrqControl, foot_conf);
+fhFwdDyn = @(t, chi)wbm_icub.forwardDynamicsFPC(t, chi, fhTrqControl, feet_conf);
 
 % specifying the time interval of the integration ...
 sim_time.start = 0.0;
@@ -57,7 +58,7 @@ tspan = sim_time.start:sim_time.step:sim_time.end;
 
 disp('Start the numerical integration...');
 
-ode_options = odeset('RelTol', 1e-3, 'AbsTol', 1e-4);         % setup the error tolerances ...
+ode_options = odeset('RelTol', 1e-4, 'AbsTol', 1e-5);         % setup the error tolerances ...
 [t, chi]    = ode15s(fhFwdDyn, tspan, chi_init, ode_options); % ODE-Solver
 % or, optional:
 %[t, chi] = wbm_icub.intForwardDynamics(fhTrqControl, tspan, chi_init, ode_options, foot_conf);

@@ -197,7 +197,7 @@ classdef WBM < WBM.WBMBase
             JcMinv    = Jc / M; % x*M = Jc --> x = Jc*M^(-1)
             Upsilon_c = JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix"?)
             tau_fr    = frictionForces(obj, dq_j); % friction torques (negative torque values)
-            tau_gen   = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = tau + (-tau_fr)
+            tau_gen   = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S*(tau + (-tau_fr)), S ... joint selection matrix
             % contact (constraint) forces f_c:
             f_c = -(Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq)); % Upsilon_c*f_c = (...) --> f_c = Upsilon_c^(-1)*(...)
 
@@ -210,13 +210,13 @@ classdef WBM < WBM.WBMBase
             acc_data = struct('f_c', f_c, 'tau', tau, 'tau_gen', tau_gen);
         end
 
-        [ddq_j, acc_data] = jointAccelerationsExt(obj, varargin)
+        [ddq_j, acc_data] = jointAccelerationsJSBC(obj, varargin)
 
         dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
 
-        dstvChi = forwardDynamicsExt(obj, t, stvChi, fhTrqControl, foot_conf)
+        dstvChi = forwardDynamicsFPC(obj, t, stvChi, fhTrqControl, feet_conf)
 
-        function [t, stmChi] = intForwardDynamics(obj, fhTrqControl, tspan, stvChi_0, ode_opt, foot_conf)
+        function [t, stmChi] = intForwardDynamics(obj, fhTrqControl, tspan, stvChi_0, ode_opt, feet_conf)
             if ~isa(fhTrqControl, 'function_handle')
                 error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE)
             end
@@ -224,12 +224,12 @@ classdef WBM < WBM.WBMBase
                 error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.VALUE_LTE_ZERO);
             end
 
-            if exist('foot_conf', 'var')
-                if ~isstruct(foot_conf)
+            if exist('feet_conf', 'var')
+                if ~isstruct(feet_conf)
                     error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
                 end
-                % use the extended function ...
-                fhFwdDyn    = @(t, chi)obj.forwardDynamicsExt(t, chi, fhTrqControl, foot_conf);
+                % use the extended function with the feet pose correction ...
+                fhFwdDyn    = @(t, chi)obj.forwardDynamicsFPC(t, chi, fhTrqControl, feet_conf);
                 [t, stmChi] = ode15s(fhFwdDyn, tspan, stvChi_0, ode_opt); % ODE-Solver
                 return
             end
@@ -238,24 +238,27 @@ classdef WBM < WBM.WBMBase
             [t, stmChi] = ode15s(fhFwdDyn, tspan, stvChi_0, ode_opt); % ODE-Solver
         end
 
-        function foot_conf = initFootBalanceConfig(obj, varargin)
+        function feet_conf = setFeetConfigState(obj, varargin)
             switch nargin
                 case 7
-                    qj_init   = varargin{1,1};
-                    veT_lfoot = varargin{1,2};
-                    veT_rfoot = varargin{1,3};
+                    q_j    = varargin{1,1};
+                    veT_lf = varargin{1,2};
+                    veT_rf = varargin{1,3};
 
-                    if ( (size(veT_lfoot,1) ~= 6) || (size(veT_rfoot,1) ~= 6) )
-                        error('WBM::initFootBalanceConfig: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                    if ( (size(veT_lf,1) ~= 6) || (size(veT_rf,1) ~= 6) )
+                        error('WBM::setFeetConfigState: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
                     end
-                    foot_conf.veT_init.l_sole = veT_lfoot;
-                    foot_conf.veT_init.r_sole = veT_rfoot;
+                    feet_conf.pose.veT_lfoot = veT_lf; % l_sole
+                    feet_conf.pose.veT_rfoot = veT_rf; % r_sole
+                    % get the feet orientations ...
+                    eul_lf = veT_lfoot(4:6,1);
+                    eul_rf = veT_rfoot(4:6,1);
 
                     feet_on_ground = varargin{1,4};
                     k_p            = varargin{1,5}; % gain k_p with the desired closed-loop stiffness (1)
                     k_v            = varargin{1,6}; % gain k_v with the desired closed-loop damping (2)
                 case {4, 5}
-                    qj_init        = varargin{1,1};
+                    q_j            = varargin{1,1};
                     feet_on_ground = varargin{1,2};
                     k_p            = varargin{1,3}; % (1)
 
@@ -268,50 +271,53 @@ classdef WBM < WBM.WBMBase
                         k_v = 2*sqrt(k_p);
                     end
                 case 3
-                    qj_init        = varargin{1,1};
+                    q_j            = varargin{1,1};
                     feet_on_ground = varargin{1,2};
 
                     k_p = obj.DF_STIFFNESS; % use the default stiffness value ...
                     k_v = 2*sqrt(k_p); % (3)
                 otherwise
-                    error('WBM::initFootBalanceConfig: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                    error('WBM::setFeetConfigState: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             % some error checks ...
             if ( ~isrow(feet_on_ground) || ~islogical(feet_on_ground) )
-                error('WBM::initFootBalanceConfig: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+                error('WBM::setFeetConfigState: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             if ( ~isreal(k_p) || ~isreal(k_v) ) % no complex values are allowed ...
-                error('WBM::initFootBalanceConfig: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+                error('WBM::setFeetConfigState: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
 
-            %% Setup the configuration structure for the feet:
-            % set the correction values for the feet to avoid numerical integration errors:
-            foot_conf.ctrl_gains.k_p = k_p; % control gain for correcting the feet positions.
-            foot_conf.ctrl_gains.k_v = k_v; % control gain for correcting the velocities.
+            %% Setup the configuration structure for the qualitative state of the feet:
+            % set the correction values (gains) for the feet to avoid numerical integration errors:
+            feet_conf.ctrl_gains.k_p = k_p; % control gain for the feet positions.
+            feet_conf.ctrl_gains.k_v = k_v; % control gain for the feet velocities (linear & angular).
 
-            % define on which foot the robot is balancing on the ground (max. 3 cases):
-            foot_conf.ground.left  = feet_on_ground(1,1);
-            foot_conf.ground.right = feet_on_ground(1,2);
+            % define on which foot the robot is contact with the ground:
+            feet_conf.ground.left  = feet_on_ground(1,1);
+            feet_conf.ground.right = feet_on_ground(1,2);
 
-            if (nargin == 7)
-                return
+            if (nargin ~= 7)
+                % else, calculate the forward kinematic transformations for the feet:
+                stFltb = getFloatingBaseState(obj);
+                wf_R_b_arr = reshape(stFltb.wf_R_b, 9, 1);
+                vqT_lf = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, stFltb.wf_p_b, q_j, 'l_sole');
+                vqT_rf = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, stFltb.wf_p_b, q_j, 'r_sole');
+
+                % extract the positions and transform the orientations into Euler-angles:
+                [p_lf, eul_lf] = WBM.utilities.frame2posEul(vqT_lf);
+                [p_rf, eul_rf] = WBM.utilities.frame2posEul(vqT_rf);
+
+                % set the pose of the feet using vector Euler-angle transformation (veT):
+                feet_conf.pose.veT_lfoot = vertcat(p_lf, eul_lf);
+                feet_conf.pose.veT_rfoot = vertcat(p_rf, eul_rf);
             end
-            % else, get the initial position & orientation of the feet:
-            stFltb = getFloatingBaseState(obj);
-            wf_R_b_arr = reshape(stFltb.wf_R_b, 9, 1);
-            vqT_init_l = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, stFltb.wf_p_b, qj_init, 'l_sole');
-            vqT_init_r = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, stFltb.wf_p_b, qj_init, 'r_sole');
 
-            % extract the positions and Euler-angles from the VQ-Transformations:
-            [p_init_l, eul_init_l] = WBM.utilities.frame2posEul(vqT_init_l);
-            [p_init_r, eul_init_r] = WBM.utilities.frame2posEul(vqT_init_r);
-
-            % transformation vectors (veT - position & Euler-angles):
-            foot_conf.veT_init.l_sole = vertcat(p_init_l, eul_init_l);
-            foot_conf.veT_init.r_sole = vertcat(p_init_r, eul_init_r);
+            % set the angular velocity transformations for the feet:
+            feet_conf.pose.avT_lfoot = WBM.utilities.eul2angVelTF(eul_lf);
+            feet_conf.pose.avT_rfoot = WBM.utilities.eul2angVelTF(eul_rf);
         end
 
-        vis_data = getFwdDynVisualizationData(obj, stmChi, fhTrqControl, foot_conf)
+        vis_data = getFwdDynVisualizationData(obj, stmChi, fhTrqControl, feet_conf)
 
         sim_config = setupSimulation(~, sim_config)
 
@@ -374,18 +380,18 @@ classdef WBM < WBM.WBMBase
             zlabel('$z_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
         end
 
-        function setLinkPayloads(obj, link_names, pl_data)
+        function setPayloadLinks(obj, link_names, pl_data)
             % verify the input types ...
             if ( ~iscell(link_names) || ~ismatrix(pl_data) )
-                error('WBM::setLinkPayloads: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+                error('WBM::setPayloadLinks: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             % check dimensions ...
             [m, n] = size(pl_data);
             if (n ~= 4)
-                error('WBM::setLinkPayloads: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+                error('WBM::setPayloadLinks: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
             if (size(link_names,2) ~= m) % the list must be a row-vector ...
-                error('WBM::setLinkPayloads: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
+                error('WBM::setPayloadLinks: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
             end
 
             obj.mwbm_config.nPlds = m; % number of payloads ...
@@ -643,7 +649,7 @@ classdef WBM < WBM.WBMBase
             %   The transformation matrix X maps the velocities of the geometric Jacobian
             %   in frame {ee} to velocities in frame {tt} and is defined as
             %
-            %                        | I    -I*S(wf_R_ee * ee_p_tt) |
+            %                        | I    -S(wf_R_ee * ee_p_tt)*I |
             %      tt[wf]_X_ee[wf] = |                              |,
             %                        | 0                 I          |
             %
@@ -653,35 +659,31 @@ classdef WBM < WBM.WBMBase
             % For further details see:
             %   [1] Multibody Dynamics Notation, S. Traversaro & A. Saccon, Eindhoven University of Technology,
             %       Department of Mechanical Engineering, 2016, <http://repository.tue.nl/849895>, p. 6, eq. (27).
-            %   [2] Introduction to Robotics: Mechanics and Control, John J. Craig, 3rd Edition, Pearson/Prentice Hall, 2005,
-            %       p. 158, eq. (5.100).
-            %   [3] Robotics, Vision & Control: Fundamental Algorithms in Matlab, Peter I. Corke, Springer, 2011,
-            %       p. 175, eq. (8.4).
+            %   [2] Robotics: Modelling, Planning and Control, B. Siciliano & L. Sciavicco & L. Villani & G. Oriolo,
+            %       Springer, 2010, p. 150, eq. (3.112).
+            %   [3] Introduction to Robotics: Mechanics and Control, John J. Craig, 3rd Edition, Pearson/Prentice Hall, 2005,
+            %       p. 158, eq. (5.103).
             [~, wf_R_ee]    = WBM.utilities.tform2posRotm(wf_H_ee);   % orientation of the end-effector (ee).
             [p_tt, ee_R_tt] = WBM.utilities.frame2posRotm(ee_vqT_tt); % position & orientation of the tool-tip (tt).
 
-            % calculate the position of the tool-tip to the world-frame (wf):
+            % calculate the position from the tool-tip (tt) to the world-frame (wf) ...
             wf_p_tt = wf_R_ee * (ee_R_tt * p_tt); % = wf_R_ee * ee_p_tt
-
-            % compute the skew-symmetric matrix S(p_tt) ...
-            Sp_tt = WBM.utilities.skewm(wf_p_tt);
-            % create the velocity transformation matrix:
-            tt_X_wf = eye(6,6);
-            tt_X_wf(1:3,4:6) = -Sp_tt;
+            % get the velocity transformation matrix ...
+            tt_X_wf = WBM.utilities.adjoint(wf_p_tt);
 
             % compute wf_J_tt by performing velocity addition ...
             wf_J_tt = tt_X_wf * wf_J_ee; % = tt[wf]_X_ee[wf] * ee[wf]_J_ee
         end
 
-        function [chn_q, chn_dq] = getStateChains(obj, chain_names, q_j, dq_j)
+        function [chn_q, chn_dq] = getStateJntChains(obj, chain_names, q_j, dq_j)
             switch nargin
                 case {2, 4}
                     if isempty(chain_names)
-                        error('WBM::getStateChains: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
+                        error('WBM::getJntChainsState: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
                     end
                     % check if the body components are defined ...
                     if isempty(obj.mwbm_config.body)
-                        error('WBM::getStateChains: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
+                        error('WBM::getJntChainsState: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
                     end
 
                     if (nargin == 2)
@@ -690,13 +692,13 @@ classdef WBM < WBM.WBMBase
 
                     len = length(chain_names);
                     if (len > obj.mwbm_config.body.nChains)
-                        error('WBM::getStateChains: %s', WBM.wbmErrorMsg.WRONG_ARR_SIZE);
+                        error('WBM::getJntChainsState: %s', WBM.wbmErrorMsg.WRONG_ARR_SIZE);
                     end
 
                     % get the joint angles and velocities of each chain ...
                     ridx = find(ismember(obj.mwbm_config.body.chains(:,1), chain_names));
                     if ( isempty(ridx) || (length(ridx) ~= len) )
-                        error('WBM::getStateChains: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+                        error('WBM::getJntChainsState: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
                     end
                     chn_q  = cell(len,1); % chains ...
                     chn_dq = chn_q;
@@ -710,7 +712,7 @@ classdef WBM < WBM.WBMBase
                         chn_dq{i,1} = dq_j(start_idx:end_idx,1); % joint velocities
                     end
                 otherwise
-                    error('WBM::getStateChains: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                    error('WBM::getJntChainsState: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
         end
 
@@ -771,10 +773,7 @@ classdef WBM < WBM.WBMBase
             stParams = WBM.wbmStateParams;
 
             if iscolumn(stChi)
-                if (size(stChi,1) ~= len)
-                   error('WBM::getStateParams: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-                end
-
+                WBM.utilities.checkCVecDim(stChi, len, 'WBM::getStateParams');
                 % get the base/joint positions and the base orientation ...
                 stParams.x_b  = stChi(1:3,1);
                 stParams.qt_b = stChi(4:7,1);
@@ -789,7 +788,6 @@ classdef WBM < WBM.WBMBase
                 if (n ~= len)
                     error('WBM::getStateParams: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
                 end
-
                 % extract all values ...
                 stParams.x_b  = stChi(1:m,1:3);
                 stParams.qt_b = stChi(1:m,4:7);
@@ -809,10 +807,7 @@ classdef WBM < WBM.WBMBase
             cutp = obj.mwbm_model.ndof + 7; % 3 + 4 + ndof
 
             if iscolumn(stChi)
-                if (size(stChi,1) ~= len)
-                   error('WBM::getPositions: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-                end
-
+                WBM.utilities.checkCVecDim(stChi, len, 'WBM::getPositions');
                 % extract the base VQS-Transformation (without S)
                 % and the joint positions ...
                 vqT_b = stChi(1:7,1); % [x_b; qt_b]
@@ -823,7 +818,6 @@ classdef WBM < WBM.WBMBase
                 if (n ~= len)
                     error('WBM::getPositions: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
                 end
-
                 vqT_b = stChi(1:m,1:7);    % m -by- [x_b, qt_b]
                 q_j   = stChi(1:m,8:cutp); % m -by- q_j
                 return
@@ -837,7 +831,6 @@ classdef WBM < WBM.WBMBase
             if (n ~= obj.mwbm_config.stvLen)
                 error('WBM::getPositionsData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
-
             cutp   = obj.mwbm_model.ndof + 7; % 3 + 4 + ndof
             stmPos = stmChi(1:m,1:cutp);      % m -by- [x_b, qt_b, q_j]
         end
@@ -847,10 +840,7 @@ classdef WBM < WBM.WBMBase
             ndof  = obj.mwbm_model.ndof;
 
             if iscolumn(stChi)
-                if (size(stChi,1) ~= len)
-                   error('WBM::getMixedVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-                end
-
+                WBM.utilities.checkCVecDim(stChi, len, 'WBM::getMixedVelocities');
                 % extract the velocities ...
                 v_b  = stChi(ndof+8:ndof+13,1); % [dx_b; omega_b]
                 dq_j = stChi(ndof+14:len,1);
@@ -860,7 +850,6 @@ classdef WBM < WBM.WBMBase
                 if (n ~= len)
                     error('WBM::getMixedVelocities: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
                 end
-
                 v_b  = stChi(1:m,ndof+8:ndof+13); % m -by- [dx_b; omega_b]
                 dq_j = stChi(1:m,ndof+14:len,1);  % m -by- dq_j
                 return
@@ -874,9 +863,7 @@ classdef WBM < WBM.WBMBase
             ndof  = obj.mwbm_model.ndof;
 
             if iscolumn(stChi)
-                if (size(stChi,1) ~= len)
-                   error('WBM::getBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-                end
+                WBM.utilities.checkCVecDim(stChi, len, 'WBM::getBaseVelocities');
 
                 v_b = stChi(ndof+8:ndof+13,1); % [dx_b; omega_b]
                 return
@@ -885,7 +872,6 @@ classdef WBM < WBM.WBMBase
                 if (n ~= len)
                     error('WBM::getBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
                 end
-
                 v_b = stChi(1:m,ndof+8:ndof+13); % m -by- [dx_b; omega_b]
                 return
             end

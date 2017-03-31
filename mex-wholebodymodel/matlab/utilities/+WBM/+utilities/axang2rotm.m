@@ -1,10 +1,7 @@
 function dcm = axang2rotm(axang)
-    if (size(axang,1) ~= 4)
-        error('axang2rotm: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
-    dcm = zeros(3,3);
-    u   = axang(1:3,1); % rotation axis vector
+    WBM.utilities.checkCVecDim(axang, 4, 'axang2rotm');
 
+    u = axang(1:3,1); % rotation axis vector
     n = u.'*u;
     if (n > 1)
         u = u./sqrt(n); % normalize u
@@ -30,6 +27,7 @@ function dcm = axang2rotm(axang)
     %   [4] Technical Concepts: Orientation, Rotation, Velocity and Acceleration and the SRM, P. Berner, Version 2.0, 2008,
     %       <http://sedris.org/wg8home/Documents/WG80485.pdf>, pp. 33-34, eq. (1.25) & (1.26).
     % Note: The direct assignment is computationally faster than applying directly the formula above.
+    dcm = zeros(3,3);
     dcm(1,1) = u_1*u_1*vers_t + c_t;
     dcm(1,2) = u_1*u_2*vers_t - u_3*s_t;
     dcm(1,3) = u_1*u_3*vers_t + u_2*s_t;

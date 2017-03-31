@@ -1,7 +1,5 @@
 function omega = deul2angVel(deul, eul, sequence)
-    if (size(deul,1) ~= 3)
-        error('deul2angVel: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
+    WBM.utilities.checkCVecDim(deul, 3, 'deul2angVel');
 
     if ~exist('sequence', 'var')
         % use the default sequence ...

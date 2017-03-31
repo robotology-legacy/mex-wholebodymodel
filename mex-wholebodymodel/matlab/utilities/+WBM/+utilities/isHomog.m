@@ -1,13 +1,11 @@
 function result = isHomog(tform, epsilon)
-    if ( (size(tform,1) ~= 4) || (size(tform,2) ~= 4) )
-        error('isHomog: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-    end
-    result = false;
+    WBM.utilities.checkMatDim(tform, 4, 4, 'isHomog');
 
     if ~exist('epsilon', 'var')
         epsilon = 1e-12; % min. value to treat a number as zero ...
     end
 
+    result = false;
     if (abs(det(tform) - 1) <= epsilon)
         result = true;
     end

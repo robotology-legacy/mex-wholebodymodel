@@ -8,7 +8,7 @@ classdef (Abstract) IWBM < handle
         sim_config@WBM.absSimConfig
         base_tform@double matrix
         tool_tform@double matrix
-        foot_conf@struct
+        feet_conf@struct
         gravity@double    vector
         jlimits@struct
         ndof@uint16       scalar
@@ -43,7 +43,7 @@ classdef (Abstract) IWBM < handle
 
         tau_j = inverseHybridDyn(obj, q_j, dq_j, ddq_j, stFltb)
 
-        [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, foot_conf)
+        [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, feet_conf)
 
         visualizeForwardDyn(obj, stmChi, sim_tstep, vis_ctrl)
 

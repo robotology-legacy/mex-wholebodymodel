@@ -1,6 +1,6 @@
-function vis_data = getFwdDynVisualizationData(obj, stmChi, fhTrqControl, foot_conf)
+function vis_data = getFwdDynVisualizationData(obj, stmChi, fhTrqControl, feet_conf)
     extd = false;
-    if exist('foot_conf', 'var')
+    if exist('feet_conf', 'var')
         % use the extended forward dynamic method ...
         extd = true;
     end
@@ -18,7 +18,7 @@ function vis_data = getFwdDynVisualizationData(obj, stmChi, fhTrqControl, foot_c
     % (dynamic structure) can be generated for the visualization data:
     stvChi = stmChi(1,1:stvLen).';
     if extd
-        fdyn_data = getFDynDataExt(obj, 1, stvChi, fhTrqControl, foot_conf);
+        fdyn_data = getFDynDataExt(obj, 1, stvChi, fhTrqControl, feet_conf);
     else
         fdyn_data = getFDynData(obj, 1, stvChi, fhTrqControl);
     end
@@ -31,7 +31,7 @@ function vis_data = getFwdDynVisualizationData(obj, stmChi, fhTrqControl, foot_c
         for i = 1:noi
             stvChi = stmChi(i,1:stvLen).';
 
-            fdyn_data = getFDynDataExt(obj, i, stvChi, fhTrqControl, foot_conf);
+            fdyn_data = getFDynDataExt(obj, i, stvChi, fhTrqControl, feet_conf);
             vis_data  = setVisData(vis_data, i, fdyn_data, field_names, nFields, ndof, len_fc);
         end
     else
@@ -64,7 +64,7 @@ function fdyn_data = getFDynData(obj, t, stvChi, fhTrqControl)
     fdyn_data.ctrl_data = ctrl_data;
 end
 
-function fdyn_data = getFDynDataExt(obj, t, stvChi, fhTrqControl, foot_conf)
+function fdyn_data = getFDynDataExt(obj, t, stvChi, fhTrqControl, feet_conf)
     % get the state parameters ...
     stp = WBM.utilities.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
     v_b = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
@@ -79,9 +79,9 @@ function fdyn_data = getFDynDataExt(obj, t, stvChi, fhTrqControl, foot_conf)
     [Jc, djcdq] = contactJacobians(obj);
 
     % get the torque forces and the visualization data from the controller:
-    [tau, ctrl_data] = fhTrqControl(t, M, c_qv, stp, nu, Jc, djcdq, foot_conf);
+    [tau, ctrl_data] = fhTrqControl(t, M, c_qv, stp, nu, Jc, djcdq, feet_conf);
     % get the visualization data from the acceleration calculation:
-    [~,fdyn_data] = jointAccelerationsExt(obj, M, c_qv, stp.dq_j, nu, tau, Jc, djcdq, foot_conf); % optimized mode
+    [~,fdyn_data] = jointAccelerationsExt(obj, M, c_qv, stp.dq_j, nu, tau, Jc, djcdq, feet_conf); % optimized mode
     % add the controller data to the visualization data:
     fdyn_data.ctrl_data = ctrl_data;
 end
