@@ -197,7 +197,7 @@ classdef WBM < WBM.WBMBase
             JcMinv    = Jc / M; % x*M = Jc --> x = Jc*M^(-1)
             Upsilon_c = JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix"?)
             tau_fr    = frictionForces(obj, dq_j); % friction torques (negative torque values)
-            tau_gen   = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S*(tau + (-tau_fr)), S ... joint selection matrix
+            tau_gen   = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S_j*(tau + (-tau_fr)), S_j ... joint selection matrix
             % contact (constraint) forces f_c:
             f_c = -(Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq)); % Upsilon_c*f_c = (...) --> f_c = Upsilon_c^(-1)*(...)
 

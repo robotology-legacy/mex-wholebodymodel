@@ -46,7 +46,7 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
     JcMinv    =  Jc / M;
     Upsilon_c =  JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix"?)
     tau_fr    =  wbm_frictionForces(stp.dq_j, frict_c, frict_v); % friction torques (negative values)
-    tau_gen   =  vertcat(zeros(6,1), tau + tau_fr); % generalized force tau_gen = tau + (-tau_fr)
+    tau_gen   =  vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S_j*(tau + (-tau_fr)), S_j ... joint selection matrix
     % calculate the contact forces ...
     f_c = Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq);
 
