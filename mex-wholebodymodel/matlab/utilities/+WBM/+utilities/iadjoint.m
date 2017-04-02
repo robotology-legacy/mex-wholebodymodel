@@ -1,7 +1,7 @@
 function b_X_a = iadjoint(varargin)
     %% Inverse adjoint transformation:
-    %
     %  This matrix describes a coordinate transformation of screws (twists) from frame a to frame b.
+    %
     %  Further details about the transformation matrix can be taken from:
     %   [1] Multibody Dynamics Notation, S. Traversaro & A. Saccon, Eindhoven University of Technology,
     %       Department of Mechanical Engineering, 2016, <http://repository.tue.nl/849895>, p. 7.
