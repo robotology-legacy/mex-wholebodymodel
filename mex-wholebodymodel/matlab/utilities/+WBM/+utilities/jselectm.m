@@ -1,4 +1,10 @@
 function S_j = jselectm(ndof, varargin)
+    %% Joint selection matrix:
+    %  Sources:
+    %   [1] Multibody Dynamics Notation, S. Traversaro & A. Saccon, Eindhoven University of Technology,
+    %       Department of Mechanical Engineering, 2016, <http://repository.tue.nl/849895>, p. 14, eq. (70).
+    %   [2] Partial  Force  Control  of Constrained  Floating-Base  Robots, Andrea Del Prete & N. Mansard &
+    %       F. Nori & G. Metta & L. Natale, CoRR, Volume 1410.4426, 2014, <https://arxiv.org/pdf/1410.4426.pdf>.
     switch nargin
         case 1
             % default - all actuated joints with deactivated floating base:
@@ -27,6 +33,16 @@ function S_j = jselectm(ndof, varargin)
                 else
                     error('jselectm: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
                 end
+            elseif ischar(varargin{1,1})
+                % only the floating base part and all actuated joints are deactivated:
+                sel_type = varargin{1,1};
+
+                if strcmp(sel_type, 'fltb')
+                    S_1 = eye(6,6);
+                    S_2 = zeros(ndof, 6);
+                else
+                    error('jselectm: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+                end
             else
                 error('jselectm: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
@@ -52,7 +68,7 @@ function S_j = jselectm(ndof, varargin)
                                     S_2(idx,idx) = 1;
                                 end
                             case 'fltb'
-                                % selected actuated joints with floating base:
+                                % floating base with selected actuated joints:
                                 S_1 = horzcat(eye(6,6), zeros(6,ndof));
 
                                 S_22 = zeros(ndof,ndof);

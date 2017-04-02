@@ -1,4 +1,16 @@
 function a_cX_b = coadjoint(varargin)
+    %% Coadjoint transformation:
+    %  This matrix describes a coordinate transformation of wrenches from frame b to frame a.
+    %
+    %  Further details about the transformation matrix can be taken from:
+    %   [1] Multibody Dynamics Notation, S. Traversaro & A. Saccon, Eindhoven University of Technology,
+    %       Department of Mechanical Engineering, 2016, <http://repository.tue.nl/849895>, p. 11, eq. (50).
+    %   [2] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008, p. 22, eq. (2.24)-(2.27).
+    %   [3] Robotics: Modelling, Planning and Control, B. Siciliano & L. Sciavicco & L. Villani & G. Oriolo,
+    %       Springer, 2010, p. 151, eq. (3.116).
+    %   [4] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, p. 62, eq. (2.66).
+    %   [5] Introduction to Mechanics and Symmetry: A Basic Exposition of Classical Mechanical Systems, J. E. Marsden & T. Ratiu,
+    %       2nd Edition, Springer, 2009, p. 311, def. (d) Coadjoint Action.
     switch nargin
         case 2
             % general case:

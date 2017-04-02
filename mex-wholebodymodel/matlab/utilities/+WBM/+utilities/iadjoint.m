@@ -1,4 +1,18 @@
 function b_X_a = iadjoint(varargin)
+    %% Inverse adjoint transformation:
+    %
+    %  This matrix describes a coordinate transformation of screws (twists) from frame a to frame b.
+    %  Further details about the transformation matrix can be taken from:
+    %   [1] Multibody Dynamics Notation, S. Traversaro & A. Saccon, Eindhoven University of Technology,
+    %       Department of Mechanical Engineering, 2016, <http://repository.tue.nl/849895>, p. 7.
+    %   [2] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, p. 56.
+    %   [3] Passivity-Based Control and Estimation in Networked Robotics, T. Hatanaka & N. Chopra & M. Fujita & M. W. Spong,
+    %       Springer, 2015, p. 284, eq. (B.35).
+    %   [4] Robotics: Modelling, Planning and Control, B. Siciliano & L. Sciavicco & L. Villani & G. Oriolo,
+    %       Springer, 2010, p. 150, eq. (3.113).
+    %   [5] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008, p. 22, eq. (2.24)-(2.27).
+    %   [6] Modeling, Identification and Control of Robots, W. Khalil & E. Dombre, Kogan Page Science, 2004,
+    %       p. 29, eq. (2.47).
     switch nargin
         case 2
             % general case:
