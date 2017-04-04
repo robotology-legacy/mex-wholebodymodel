@@ -58,7 +58,7 @@ tspan = sim_time.start:sim_time.step:sim_time.end;
 
 disp('Start the numerical integration...');
 
-ode_options = odeset('RelTol', 1e-4, 'AbsTol', 1e-5);         % setup the error tolerances ...
+ode_options = odeset('RelTol', 1e-3, 'AbsTol', 1e-4);         % setup the error tolerances ...
 [t, chi]    = ode15s(fhFwdDyn, tspan, chi_init, ode_options); % ODE-Solver
 % or, optional:
 %[t, chi] = wbm_icub.intForwardDynamics(fhTrqControl, tspan, chi_init, ode_options, foot_conf);

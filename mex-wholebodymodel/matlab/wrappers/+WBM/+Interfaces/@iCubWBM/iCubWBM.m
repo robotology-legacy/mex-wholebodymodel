@@ -81,19 +81,19 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             stFltb = obj.mwbm_icub.getFloatingBaseState();
         end
 
-        function ddq_j = jointAccelerations(obj, q_j, dq_j, tau, stFltb)
+        function ddq_j = jointAccelerations(obj, tau, q_j, dq_j, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            ddq_j = obj.mwmbm_icub.jointAcceleration(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, tau);
+            ddq_j = obj.mwmbm_icub.jointAcceleration(tau, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccelerationsExt(obj, q_j, dq_j, tau, stFltb)
+        function ddq_j = jointAccelerationsFPC(obj, tau, q_j, dq_j, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            ddq_j = obj.mwmbm_icub.jointAccelerationsExt(stFltb.wf_R_b, stFltb.wf_p_b, q_j, ...
-                                                         dq_j, stFltb.v_b, tau, obj.mfeet_conf);
+            ddq_j = obj.mwmbm_icub.jointAccelerationsFPC(obj.mfeet_conf, tau, obj.ZERO_CTC_ACC, stFltb.wf_R_b, ...
+                                                         stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function c_qv = coriolisForces(obj, q_j, dq_j, stFltb)

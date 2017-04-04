@@ -26,7 +26,7 @@ function dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
     % velocities:
     dx = vertcat(stp.dx_b, dqt_b, stp.dq_j);
     % joint acceleration dv:
-    [dv,~] = jointAccelerations(obj, stp.dq_j, tau); % optimized mode
+    [dv,~] = jointAccelerations(obj, tau, stp.dq_j); % optimized mode
 
     dstvChi = vertcat(dx, dv);
     %kinEnergy = 0.5*nu.'*M*nu;

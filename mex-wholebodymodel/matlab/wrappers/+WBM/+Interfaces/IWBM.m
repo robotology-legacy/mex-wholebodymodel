@@ -25,9 +25,9 @@ classdef (Abstract) IWBM < handle
 
         stFltb = getFloatingBaseState(obj)
 
-        ddq_j = jointAccelerations(obj, q_j, dq_j, tau, stFltb)
+        ddq_j = jointAccelerations(obj, tau, q_j, dq_j, stFltb)
 
-        ddq_j = jointAccelerationsExt(obj, q_j, dq_j, tau, stFltb)
+        ddq_j = jointAccelerationsFPC(obj, tau, q_j, dq_j, stFltb)
 
         c_qv = coriolisForces(obj, q_j, dq_j, stFltb)
 

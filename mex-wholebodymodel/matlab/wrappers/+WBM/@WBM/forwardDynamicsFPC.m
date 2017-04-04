@@ -29,8 +29,9 @@ function dstvChi = forwardDynamicsFPC(obj, t, stvChi, fhTrqControl, feet_conf)
 
     % velocities:
     dx = vertcat(stp.dx_b, dqt_b, stp.dq_j);
-    % joint acceleration dv:
-    [dv,~] = jointAccelerationsFPC(obj, M, c_qv, stp.dq_j, nu, tau, Jc, djcdq, feet_conf); % optimized mode
+    % joint acceleration dv (optimized mode):
+    [dv,~] = jointAccelerationsFPC(obj, feet_conf, tau, obj.ZERO_CTC_ACC, ...
+                                   Jc, djcdq, M, c_qv, stp.dq_j, nu);
 
     dstvChi = vertcat(dx, dv);
 end

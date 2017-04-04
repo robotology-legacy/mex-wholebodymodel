@@ -14,18 +14,21 @@ Legend of abbreviations and acronyms which are used for the variable names:
     b          ...  base
     bf         ...  base frame
     bgn        ...  begin
-    c          ...  cartesian
+    c          ...  cartesian OR contact OR constraint
     c...       ...  cell array (begin of variable name)
     cX         ...  co-adjoint transformation (matrix)
     cfrict     ...  Coulomb friction
     chn        ...  chain
     chnt       ...  chain tree
+    clink      ...  contact link
     cmo        ...  column major order
     cmp        ...  compare
     cols       ...  columns
     config     ...  configuration
     cstr       ...  constraint
+    ctc        ...  contact
     ctrl       ...  control
+    cvec       ...  column vector
     d...       ...  derivative (dot) of a variable (begin of variable name), like dv of v (= v_dot), etc.
     df, dflt   ...  default
     dim        ...  dimension
@@ -39,6 +42,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     fh...      ...  function handle OR file handle (begin of variable name)
     fix        ...  fixed
     fk         ...  forward kinematic(s)
+    fld        ...  field
     flt, fltg  ...  floating
     fltb       ...  floating base
     frict      ...  friction
@@ -55,7 +59,8 @@ Legend of abbreviations and acronyms which are used for the variable names:
     jpos       ...  joint position(s)
     ker        ...  kernel (null space)
     len        ...  length
-    ll         ...  lower limit(s)
+    ll         ...  lower limit(s) OR left link
+    llnk       ...  left link
     lmts       ...  limits
     ln         ...  line
     lnk        ...  link
@@ -65,6 +70,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ...m       ...  "matrix" (end of variable name), like "skewm", "adjointm", etc.
     mult       ...  multiplier(s)
     ndof       ...  number degrees of freedom
+    nflds      ...  number of fields
     noi        ...  number of iterations OR number of integrations
     nw         ...  new world
     o          ...  orthogonal
@@ -76,12 +82,14 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ow         ...  old world
     p          ...  position OR translation (vector)
     p...       ...  pointer to an object/variable/array (begin of variable name, only in C++)
+    param, prm ...  parameter
     params     ...  parameters
     pcstr...   ...  pointer to a constant null-terminated string (begin of variable name, C++)
     pl         ...  payload
     plds       ...  payloads
     pos        ...  position(s)
     pris       ...  prismatic
+    prms       ...  parameters
     prop       ...  propert(y/ies)
     pstr...    ...  pointer to a null-terminated string (begin of variable name, C++)
     pt         ...  point
@@ -94,10 +102,12 @@ Legend of abbreviations and acronyms which are used for the variable names:
     resv       ...  result vector (boolean)
     rev        ...  revolute
     ridx       ...  row index(es)
-    rlnk       ...  root link OR reference link
+    rl         ...  right link
+    rlnk       ...  root link OR reference link OR right link
     rmo        ...  row major order
     rotm       ...  rotation matrix
     rpts       ...  repeats
+    rvec       ...  row vector
     sc         ...  scalar OR scaled
     scn        ...  scene
     sf         ...  scale factor(s)
@@ -133,7 +143,6 @@ Legend of abbreviations and acronyms which are used for the variable names:
     wf, WF     ...  world frame
     wf_T_b     ...  transformation FROM the 'base' TO the 'world frame'
     wid        ...  width
-
 
 
 (*) ... Without scale factor S. This is the same as if scale S = 1.

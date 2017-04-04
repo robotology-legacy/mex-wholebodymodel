@@ -51,7 +51,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function ddq_j = accel(obj, q_j, dq_j, tau)
-            ddq_j = obj.mwbm.jointAccelerations(q_j, dq_j, tau);
+            ddq_j = obj.mwbm.jointAccelerations(tau, q_j, dq_j);
         end
 
         function c_qv = corolis(obj, q_j, dq_j)

@@ -45,7 +45,7 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
     Jc_t      =  Jc.';
     JcMinv    =  Jc / M;
     Upsilon_c =  JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix"?)
-    tau_fr    =  wbm_frictionForces(stp.dq_j, frict_c, frict_v); % friction torques (negative values)
+    tau_fr    =  wbm_frictionForces(stp.dq_j, frict_c, frict_v); % friction torques (negated values)
     tau_gen   =  vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S_j*(tau + (-tau_fr)), S_j ... joint selection matrix
     % calculate the contact forces ...
     f_c = Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq);
@@ -61,8 +61,8 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
     % Joint Acceleration q_ddot (derived from the state-space equation):
     % For further details see:
     %   [1] Efficient Dynamic Simulation of Robotic Mechanisms, K. Lilly, Springer, 1992, p. 82, eq. (5.2).
-    dv = M \ (Jc_t*f_c + tau_gen - c_qv);
-    %dv = M \ (Jc.'*f_c + tau_gen - c_qv); % cause Jc.'*f_c round-off errors?
+    dv = M \ (tau_gen + Jc_t*f_c - c_qv);
+    %dv = M \ (tau_gen + Jc.'*f_c - c_qv); % cause Jc.'*f_c round-off errors?
 
     dstvChi = vertcat(dx, dv);
     %kinEnergy = 0.5*nu.'*M*nu;
