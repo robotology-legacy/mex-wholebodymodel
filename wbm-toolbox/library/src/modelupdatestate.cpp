@@ -89,9 +89,6 @@ bool ModelUpdateState::setState(int nrhs, const mxArray **prhs)
   {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/inputs.");
   }
-#ifdef DEBUG
-  mexPrintf("Updating State.\n");
-#endif
   robotModel = modelState->robotModel();
 
   double *pqj, *pqj_dot, *pvb;
@@ -99,10 +96,5 @@ bool ModelUpdateState::setState(int nrhs, const mxArray **prhs)
   pqj_dot = mxGetPr(prhs[2]);
   pvb     = mxGetPr(prhs[3]);
 
-  modelState->setState(pqj, pqj_dot, pvb);
-
-#ifdef DEBUG
-  mexPrintf("State updated.\n");
-#endif
-  return true;
+  return modelState->setState(pqj, pqj_dot, pvb);
 }

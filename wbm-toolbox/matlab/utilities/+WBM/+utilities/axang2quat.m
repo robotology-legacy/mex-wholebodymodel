@@ -1,10 +1,7 @@
 function quat = axang2quat(axang)
-    if (size(axang,1) ~= 4)
-        error('axang2quat: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
-    quat = zeros(4,1);
-    u    = axang(1:3,1); % rotation axis vector
+    WBM.utilities.checkCVecDim(axang, 4, 'axang2quat');
 
+    u = axang(1:3,1); % rotation axis vector
     n = u.'*u; % the .' is crucial to avoid computing the conjugate!
     if (n > 1)
         u = u./sqrt(n); % normalize u
@@ -22,6 +19,7 @@ function quat = axang2quat(axang)
     ang_hf = axang(4,1)*0.5; % rotation angle theta / 2 (in radians)
     s_a = sin(ang_hf);
 
+    quat = zeros(4,1);
     quat(1,1) = cos(ang_hf); % scalar part
     quat(2,1) = u(1,1)*s_a;  % vector part
     quat(3,1) = u(2,1)*s_a;

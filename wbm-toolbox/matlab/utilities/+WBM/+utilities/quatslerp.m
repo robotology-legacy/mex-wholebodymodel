@@ -9,35 +9,30 @@ function qs = quatslerp(q1, q2, t)
     %   [2] Geometric Tools Engine, Documentation: <http://www.geometrictools.com/Documentation/Quaternions.pdf>, p. 6-7, eq. (21).
     %   [3] Animating Rotation with Quaternion Curves, Ken Shoemake, International Conference on Computer Graphics and Interactive Techniques,
     %       Volume 19, Number 3, 1985, <http://run.usc.edu/cs520-s15/assign2/p245-shoemake.pdf>.
-    if ( (size(q1,1) ~= 4) || (size(q2,1) ~= 4) )
-        error('quatslerp: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
+    WBM.utilities.checkCVecDs(q1, q2, 4, 4, 'quatslerp');
+
     if ( (t < 0) || (t > 1) )
         error('quatslerp: Value t is out of range [0,1]!');
     end
-    epsilon = 1e-12; % min. value to treat a number as zero ...
 
+    epsilon = 1e-12; % min. value to treat a number as zero ...
     switch t
         case 0 % special cases:
             qs = q1;
-            return
         case 1
             qs = q2;
-            return
         otherwise
             % compute the cosine of the angle between the two quaternion vectors ...
-            cs_ang = q1.'*q2;
+            c_ang  = q1.'*q2;
+            theta_0 = acos(c_ang); % angle between input vectors q1 and q2
+            theta   = theta_0*t;   % angle between q1 and result qs
 
-            theta_0 = acos(cs_ang); % angle between input vectors q1 and q2
-            theta   = theta_0*t;    % angle between q1 and result qs
-
-            if ((1 - cs_ang) <= epsilon)
+            if ((1 - c_ang) <= epsilon)
                 % If the angle theta is very close to 0 degrees, then
                 % calculate by linear interpolation to avoid divisions
                 % close to 0.
                 qs = q1*(1 - t) + q2*t; % = q1 + t*(q2 - q1)
-
-            elseif ((1 + cs_ang) <= epsilon)
+            elseif ((1 + c_ang) <= epsilon)
                 % If the dot-product (cosine of the angle) is negative, i.e.
                 % the angle theta is very close to 180 degrees the result is
                 % undefined. Thus, the quaternions have opposite handed-ness

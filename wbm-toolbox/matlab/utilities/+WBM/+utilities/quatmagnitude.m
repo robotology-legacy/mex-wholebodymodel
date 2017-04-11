@@ -1,7 +1,5 @@
 function qmag = quatmagnitude(quat)
-    if (size(quat,1) ~= 4)
-        error('quatmagnitude: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
+    WBM.utilities.checkCVecDim(quat, 4, 'quatmagnitude');
 
     %% Compute the magnitude (length) of a quaternion q:
     % Further details can be found in:

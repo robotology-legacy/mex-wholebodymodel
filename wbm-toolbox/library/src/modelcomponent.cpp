@@ -62,7 +62,7 @@ const unsigned int ModelComponent::numAltArguments()
   return numAltArgs;
 }
 
-bool ModelComponent::reorderMatrixInRowMajor(const double *srcMat, double *destMat, int nRows, int nCols)
+void ModelComponent::reorderMatrixInRowMajor(const double *srcMat, double *destMat, int nRows, int nCols)
 {
   // store the values of the matrix-array in row-major order (*):
   // 2D row-major:  offset = i_row*nCols + i_col
@@ -73,10 +73,9 @@ bool ModelComponent::reorderMatrixInRowMajor(const double *srcMat, double *destM
       // destMat: idx = (i*nCols + j)
     }
   }
-  return true;
 }
 
-bool ModelComponent::reorderMatrixInColMajor(const double *srcMat, double *destMat, int nRows, int nCols)
+void ModelComponent::reorderMatrixInColMajor(const double *srcMat, double *destMat, int nRows, int nCols)
 {
   // store the values of the matrix-array in column-major order (*):
   // 2D column-major:  offset = i_col*nRows + i_row
@@ -87,7 +86,6 @@ bool ModelComponent::reorderMatrixInColMajor(const double *srcMat, double *destM
       // destMat: idx = (i*nRows + j)
     }
   }
-  return true;
 }
 
 // (*) Further details about the offset calculation for the memory layout of 2D-arrays

@@ -1,7 +1,5 @@
 function quat = eul2quat(eul, sequence)
-    if (size(eul,1) ~= 3)
-        error('eul2quat: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
+    WBM.utilities.checkCVecDim(eul, 3, 'eul2quat');
 
     if ~exist('sequence', 'var')
         % use the default axis sequence ...

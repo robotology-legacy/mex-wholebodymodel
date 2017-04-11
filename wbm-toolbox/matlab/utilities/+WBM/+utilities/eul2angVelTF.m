@@ -1,7 +1,5 @@
 function B = eul2angVelTF(eul, sequence)
-    if (size(eul,1) ~= 3)
-        error('eul2angVelTF: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
+    WBM.utilities.checkCVecDim(eul, 3, 'eul2angVelTF');
 
     if ~exist('sequence', 'var')
         % use the default sequence ...
@@ -15,13 +13,13 @@ function B = eul2angVelTF(eul, sequence)
     c_3 = cos(eul(3,1)); % cos(theta_x) or cos(theta_z2)
 
     %% Body angle velocity transformations:
-    %  They relating the time derivative of the Euler angle vector Theta to
-    %  the body angular velocity vector w, s.t.
+    %  The transformation matrices relating the time derivative of the Euler angle vector Theta
+    %  to the body angular velocity vector w = (w_x, w_y, w_z)^T, s.t.
     %
     %       w = B(Theta)*dTheta/dt.
     %
     % Sources:
-    %   [1] Optimal Spacecraft Rotational Maneuvers, John L. Junkins & James D. Turner, Elsevier, 1986, p. 21-24.
+    %   [1] Optimal Spacecraft Rotational Maneuvers, John L. Junkins & James D. Turner, Elsevier, 1986, pp. 21-24.
     %   [2] MATLAB TOOLBOX FOR RIGID BODY KINEMATICS, Hanspeter Schaub & John L. Junkins,
     %       9th AAS/AIAA Astrodynamics Specialist Conference, AAS 99-139, 1999, <http://hanspeterschaub.info/Papers/mtb1.pdf>, p. 12.
     %   [3] GitHub: ShoolCode/ASEN 5010-Spacecraft Attitude Dynamics and Control/AIAA Software (2nd)/Matlab Toolbox,

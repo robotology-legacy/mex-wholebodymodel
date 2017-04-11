@@ -1,7 +1,5 @@
 function rotm = eul2rotm(eul, sequence)
-    if (size(eul,1) ~= 3)
-        error('eul2rotm: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
+    WBM.utilities.checkCVecDim(eul, 3, 'eul2rotm');
 
     if ~exist('sequence', 'var')
         % use the default axis sequence ...

@@ -96,27 +96,7 @@ bool ModelTransformationMatrix::computeFast(int nrhs, const mxArray **prhs)
   qj     = modelState->qj();
   refLnk = mxArrayToString(prhs[1]);
 
-  std::string strCom = "com";
-  int refLnkID = -1; // the ID for ref. link "com" is -1
-
-  if (strCom.compare(refLnk) != 0) { // if refLnk != "com"
-    // try to get the index number from the frame list ...
-    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "transformationMatrix call: Link ID does not exist.");
-    }
-  }
-
-  wbi::Frame frm3d_H;
-  if ( !robotModel->computeH(qj, wf_H_b, refLnkID, frm3d_H) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeH call.");
-  }
-
-  double H_rmo[16]; // transformation matrix in "row major order"
-  frm3d_H.get4x4Matrix(H_rmo);
-  // since the values in the array are stored in row-major order and Matlab
-  // uses the column-major order for multi-dimensional arrays, we have to
-  // make an array-transposition ...
-  reorderMatrixInColMajor(H_rmo, wf_H_lnk, 4, 4);
+  computeTransformationMat();
   return true;
 }
 
@@ -142,15 +122,6 @@ bool ModelTransformationMatrix::processArguments(int nrhs, const mxArray **prhs)
   qj     = mxGetPr(prhs[3]);
   refLnk = mxArrayToString(prhs[4]);
 
-  std::string strCom = "com";
-  int refLnkID = -1; // if ref. link = "com"
-
-  if (strCom.compare(refLnk) != 0) { // if refLnk != "com"
-    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "transformationMatrix call: Link ID does not exist.");
-    }
-  }
-
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
@@ -165,6 +136,22 @@ bool ModelTransformationMatrix::processArguments(int nrhs, const mxArray **prhs)
 
   wf_H_b = wbi::Frame(rot3d, ppos);
 
+  computeTransformationMat();
+  return true;
+}
+
+void ModelTransformationMatrix::computeTransformationMat()
+{
+  std::string strCom = "com";
+  int refLnkID = -1; // the ID for ref. link "com" is -1
+
+  if (strCom.compare(refLnk) != 0) { // if refLnk != "com"
+    // try to get the index number from the frame list ...
+    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "transformationMatrix call: Link ID does not exist.");
+    }
+  }
+
   wbi::Frame frm3d_H;
   if ( !robotModel->computeH(qj, wf_H_b, refLnkID, frm3d_H) ) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeH call.");
@@ -172,6 +159,8 @@ bool ModelTransformationMatrix::processArguments(int nrhs, const mxArray **prhs)
 
   double H_rmo[16]; // transformation matrix in "row major order"
   frm3d_H.get4x4Matrix(H_rmo);
-  reorderMatrixInColMajor(H_rmo, wf_H_lnk, 4, 4); // put the output matrix in "column major order"
-  return true;
+  // since the values in the array are stored in row-major order and
+  // Matlab uses the column-major order for multi-dimensional arrays,
+  // --> put the output matrix in "column major order":
+  reorderMatrixInColMajor(H_rmo, wf_H_lnk, 4, 4);
 }

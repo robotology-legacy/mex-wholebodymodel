@@ -104,6 +104,27 @@ void ComponentManager::initialize(const char *pstrRobotName)
   initComponentList();
 }
 
+void ComponentManager::reinitialize(const mxArray **prhs)
+{
+  if ( !mxIsChar(prhs[1]) ) {
+    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
+  }
+  char *pstrNewRobotName  = mxArrayToString(prhs[1]);
+  char *pstrCurrRobotName = modelState->robotName();
+
+  if (strcmp(pstrCurrRobotName, pstrNewRobotName) != 0) {
+    // the model names are different ...
+    mexPrintf("\nNew robot model: %s\n", pstrNewRobotName);
+    mexPrintf("Deleting previous version of the robot model.\n\n");
+
+    // reset all components and the component list ...
+    cleanup();
+    initialize(pstrNewRobotName);
+
+    mexPrintf("Robot name set as: %s\n", modelState->robotName());
+  }
+}
+
 void ComponentManager::initComponents()
 {
   modelCentroidalMomentum    = ModelCentroidalMomentum::getInstance();
@@ -189,11 +210,8 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray **plhs, int nrhs, c
   mexPrintf("Trying to parse mex-arguments...\n");
 #endif
   char *pstrKeyName = mxArrayToString(prhs[0]);
-  size_t cmplen = sizeof(pcstrInitKey) + 1;
 
-  if ( (strncmp(pstrKeyName, pcstrInitKey, cmplen) != 0) &&
-       (strncmp(pstrKeyName, pcstrInitURDFKey, cmplen) != 0) )
-  {
+  if (strncmp(pstrKeyName, "model-init", 10) != 0) { // everything that starts with "model-init" will be ignored
   #ifdef DEBUG
     mexPrintf("Searching for component '%s'.\n", pstrKeyName);
   #endif
@@ -202,11 +220,11 @@ bool ComponentManager::processFunctionCall(int nlhs, mxArray **plhs, int nrhs, c
       return executeComputation(comp->second, nlhs, plhs, nrhs, prhs);
     }
   }
-  else if ( !strncmp(pstrKeyName, pcstrInitKey, cmplen) ||
-            !strncmp(pstrKeyName, pcstrInitURDFKey, cmplen) )
+  else if ( !strcmp(pstrKeyName, pcstrInitKey) ||
+            !strcmp(pstrKeyName, pcstrInitURDFKey) )
   {
-    // reinitialize the whole body model either with a new robot model
-    // from the yarp-WBI directory, or specified by an URDF file:
+    // reinitialize the whole body model with a new robot model either
+    // from the yarp-WBI directory or specified by an URDF file:
     reinitialize(prhs);
     return true;
   }
@@ -236,25 +254,4 @@ bool ComponentManager::executeComputation(ModelComponent *pActiveComp, int nlhs,
   }
   // else, perform normal computation ...
   return pActiveComp->compute(nrhs, prhs);
-}
-
-void ComponentManager::reinitialize(const mxArray **prhs)
-{
-  if ( !mxIsChar(prhs[1]) ) {
-    mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
-  }
-  char *pstrNewRobotName  = mxArrayToString(prhs[1]);
-  char *pstrCurrRobotName = modelState->robotName();
-
-  if (strcmp(pstrCurrRobotName, pstrNewRobotName) != 0) {
-    // the model names are different ...
-    mexPrintf("\nNew robot model: %s\n", pstrNewRobotName);
-
-    mexPrintf("Deleting previous version of the robot model.\n\n");
-    // reset all components and the component list ...
-    cleanup();
-    initialize(pstrNewRobotName);
-
-    mexPrintf("Robot name set as: %s\n", modelState->robotName());
-  }
 }

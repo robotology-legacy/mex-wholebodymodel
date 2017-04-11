@@ -1,7 +1,5 @@
 function eul = quat2eul(quat, sequence)
-    if (size(quat,1) ~= 4)
-        error('quat2eul: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
+    WBM.utilities.checkCVecDim(quat, 4, 'quat2eul');
 
     if ~exist('sequence', 'var')
         % use the default axis sequence ...
@@ -44,12 +42,9 @@ function eul = quat2eul(quat, sequence)
             t1 = atan2(q_1, q_2);
             t2 = atan2(q_3, q_0);
 
-            eul(1,1) = t2 - t1;                         % theta_z1
-            %        = atan2(r32/r31)
-            eul(2,1) = 2*acos(sqrt(q_0*q_0 + q_3*q_3)); % theta_y
-            %        = acos(r33)
-            eul(3,1) = t2 + t1;                         % theta_z2
-            %        = atan2(r23/-r13)
+            eul(1,1) = t2 - t1;                         % theta_z1 = t2 - t1 = arctan(r32/r31)
+            eul(2,1) = 2*acos(sqrt(q_0*q_0 + q_3*q_3)); % theta_y  = arccos(r33) = 2*arccos(sqrt(q_0^2 + q_3^2))
+            eul(3,1) = t2 + t1;                         % theta_z2 = t2 + t1 = arctan(r23/-r13)
         otherwise
             error('quat2eul: %s', WBM.wbmErrorMsg.UNKNOWN_AXIS_SEQ);
     end

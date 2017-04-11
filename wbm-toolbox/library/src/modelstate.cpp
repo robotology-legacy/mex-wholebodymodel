@@ -45,30 +45,31 @@ double *ModelState::sqj_dot = 0;
 
 wbi::Frame ModelState::wf_H_b = wbi::Frame();
 
-bool isRobotNameAFile(const char *pstrRobotName)
+bool isFileName(const char *pstrRobotName)
 {
   std::string fn = pstrRobotName;
   size_t len = fn.size();
 
   if (len > 4) {
-    // extensions with length of 3 or 4 are only allowed:
-    size_t pos = fn.rfind('.', len-4);
+    // only extensions with a length of 3 or 4 are allowed:
+    fn = fn.substr(len-5, 5);
+    size_t pos = fn.find('.', 0);
     if (pos != std::string::npos) {
       // if '.' was found ...
-      std::string ext = fn.substr(pos+1, len - pos);
+      std::string ext = fn.substr(pos+1, 5 - pos);
       len = ext.size();
       if ( (len > 2) && (len < 5) ) {
         return true;
       }
     }
   }
-  // else, it is not a file name ...
+  // else, it is not a file name ending with "urdf", "mdl", etc.
   return false;
 }
 
 ModelState::ModelState(const char *pstrRobotName)
 {
-  if (isRobotNameAFile(pstrRobotName)) {
+  if (isFileName(pstrRobotName)) {
     robotModelFromURDF(pstrRobotName);
     return;
   }
@@ -152,12 +153,15 @@ void ModelState::deleteInstance()
 bool ModelState::setState(double *qj_t, double *qj_dot_t, double *vb_t)
 {
 #ifdef DEBUG
-  mexPrintf("Trying to update state.\n");
+  mexPrintf("Try to update state.\n");
 #endif
   memcpy(sqj, qj_t, sizeof(double)*nDof);
   memcpy(sqj_dot, qj_dot_t, sizeof(double)*nDof);
   memcpy(svb, vb_t, sizeof(double)*6);
 
+#ifdef DEBUG
+  mexPrintf("State updated.\n");
+#endif
   return true;
 }
 

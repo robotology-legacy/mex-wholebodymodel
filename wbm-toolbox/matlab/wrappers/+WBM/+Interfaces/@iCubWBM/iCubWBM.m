@@ -8,7 +8,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         sim_config@WBM.absSimConfig
         base_tform@double matrix
         tool_tform@double matrix
-        foot_conf@struct
+        feet_conf@struct
         gravity@double    vector
         jlimits@struct
         ndof@uint16       scalar
@@ -22,7 +22,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         msim_config@WBM.absSimConfig
         mbase_tform@double matrix
         mtool_tform@double matrix
-        mfoot_conf@struct
+        mfeet_conf@struct
     end
 
     methods
@@ -81,19 +81,19 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             stFltb = obj.mwbm_icub.getFloatingBaseState();
         end
 
-        function ddq_j = jointAccelerations(obj, q_j, dq_j, tau, stFltb)
+        function ddq_j = jointAccelerations(obj, tau, q_j, dq_j, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            ddq_j = obj.mwmbm_icub.jointAcceleration(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, tau);
+            ddq_j = obj.mwmbm_icub.jointAcceleration(tau, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccelerationsExt(obj, q_j, dq_j, tau, stFltb)
+        function ddq_j = jointAccelerationsFPC(obj, tau, q_j, dq_j, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            ddq_j = obj.mwmbm_icub.jointAccelerationsExt(stFltb.wf_R_b, stFltb.wf_p_b, q_j, ...
-                                                         dq_j, stFltb.v_b, tau, obj.mfoot_conf);
+            ddq_j = obj.mwmbm_icub.jointAccelerationsFPC(obj.mfeet_conf, tau, obj.ZERO_CTC_ACC, stFltb.wf_R_b, ...
+                                                         stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function c_qv = coriolisForces(obj, q_j, dq_j, stFltb)
@@ -142,13 +142,13 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, ddq_j);
         end
 
-        function [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, foot_conf)
-            if exist('foot_conf', 'var')
-                % use the extended functions for the ODE-solver ...
-                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(fhTrqControl, tspan, stvChi_0, ode_opt, foot_conf);
+        function [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, feet_conf)
+            if exist('feet_conf', 'var')
+                % use for the ODE-solver the extended function with the feet pose correction ...
+                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(fhTrqControl, tspan, stvChi_0, ode_opt, feet_conf);
                 return
             end
-            % else, use the normal functions ...
+            % else, use the default function ...
             [t, stmChi] = obj.mwbm_icub.intForwardDynamics(fhTrqControl, tspan, stvChi_0, ode_opt);
         end
 
@@ -348,12 +348,12 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             tform = obj.mtool_tform;
         end
 
-        function set.foot_conf(obj, foot_conf)
-            obj.mfoot_conf = foot_conf;
+        function set.feet_conf(obj, feet_conf)
+            obj.mfeet_conf = feet_conf;
         end
 
-        function foot_conf = get.foot_conf(obj)
-            foot_conf = obj.mfoot_conf;
+        function feet_conf = get.feet_conf(obj)
+            feet_conf = obj.mfeet_conf;
         end
 
         function set.gravity(obj, g_wf)

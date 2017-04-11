@@ -51,8 +51,8 @@ namespace mexWBIComponent
        * elements (since MATLAB is column-major ordered
        * wbi::Rotation is instead row-major)
        */
-      bool reorderMatrixInRowMajor(const double *srcMat, double *destMat, int nRows = 3, int nCols = 3);
-      bool reorderMatrixInColMajor(const double *srcMat, double *destMat, int nRows = 3, int nCols = 3);
+      static void reorderMatrixInRowMajor(const double *srcMat, double *destMat, int nRows = 3, int nCols = 3);
+      static void reorderMatrixInColMajor(const double *srcMat, double *destMat, int nRows = 3, int nCols = 3);
 
       static ModelState *modelState;
       static wbi::iWholeBodyModel *robotModel;

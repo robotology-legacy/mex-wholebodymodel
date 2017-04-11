@@ -49,7 +49,8 @@ namespace mexWBIComponent
 
     private:
       ModelTransformationMatrix();
-      bool processArguments(int nrhs, const mxArray **prhs);
+      static bool processArguments(int nrhs, const mxArray **prhs);
+      static void computeTransformationMat();
 
       static ModelTransformationMatrix *modelTransformationMatrix;
 

@@ -1,7 +1,6 @@
 function axang = rotm2axang(rotm)
-    if ( (size(rotm,1) ~= 3) || (size(rotm,2) ~= 3) )
-        error('rotm2axang: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-    end
+    WBM.utilities.checkMatDim(rotm, 3, 3, 'rotm2axang');
+
     axang   = zeros(4,1);
     epsilon = 1e-12; % min. value to treat a number as zero ...
 

@@ -49,6 +49,7 @@ namespace mexWBIComponent
 
     private:
       ModelGetState();
+      static void getStateValues();
 
       static ModelGetState *modelGetState;
 

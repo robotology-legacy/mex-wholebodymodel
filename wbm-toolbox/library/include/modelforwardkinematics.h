@@ -49,7 +49,8 @@ namespace mexWBIComponent
 
     private:
       ModelForwardKinematics();
-      bool processArguments(int nrhs, const mxArray **prhs);
+      static bool processArguments(int nrhs, const mxArray **prhs);
+      static void computeForwardKin();
 
       static ModelForwardKinematics *modelForwardKinematics;
 

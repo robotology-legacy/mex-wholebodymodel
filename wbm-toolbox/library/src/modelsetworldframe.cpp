@@ -71,15 +71,8 @@ bool ModelSetWorldFrame::compute(int nrhs, const mxArray **prhs)
   ppos = mxGetPr(prhs[2]);
   pg   = mxGetPr(prhs[3]);
 
-  double R_rmo[9];
-  reorderMatrixInRowMajor(pR, R_rmo); // matrix in "row major order"
-
-  wbi::Rotation rot3d(R_rmo);
-  wbi::Frame wf_H_b(rot3d, ppos);
-
-  modelState->setBase2WorldTransformation(wf_H_b);
+  setWorldFrame(pR, ppos);
   modelState->setGravity(pg);
-
   return true;
 }
 
@@ -92,6 +85,12 @@ bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray **prhs)
   pR   = mxGetPr(prhs[1]);
   ppos = mxGetPr(prhs[2]);
 
+  setWorldFrame(pR, ppos);
+  return true;
+}
+
+void ModelSetWorldFrame::setWorldFrame(const double *pR, const double *ppos)
+{
   double R_rmo[9];
   reorderMatrixInRowMajor(pR, R_rmo); // matrix in "row major order"
 
@@ -99,5 +98,4 @@ bool ModelSetWorldFrame::computeFast(int nrhs, const mxArray **prhs)
   wbi::Frame wf_H_b(rot3d, ppos);
 
   modelState->setBase2WorldTransformation(wf_H_b);
-  return true;
 }

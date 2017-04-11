@@ -1,7 +1,6 @@
 function vqT = tform2frame(tform)
-    if ( (size(tform,1) ~= 4) || (size(tform,2) ~= 4) )
-        error('tform2frame: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-    end
+    WBM.utilities.checkMatDim(tform, 4, 4, 'tform2frame');
+
     vqT = zeros(7,1);
     R   = tform(1:3,1:3); % extract the rotation matrix ...
 

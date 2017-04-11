@@ -15,7 +15,8 @@ icub_config = wbm_icub.robot_config;
 %  forward dynamics in state-space form. The state-space form reduces, through variable
 %  substitution, the inhomogeneous second-order ODE to a first-order ODE.
 %  For further details see:
-%    Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008, chapter 3, pp. 40-42, formula (3.8).
+%    [1] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008,
+%        chapter 3, pp. 40-42, formula (3.8).
 chi_init = wbm_icub.stvChiInit;
 
 %% Control torques:
@@ -29,13 +30,13 @@ g_init = wbm_icub.generalizedBiasForces(R_b, p_b, icub_config.init_state_params.
 len = size(g_init,1);
 
 % Function handle (fh) for the torque controller function:
-% Note: This function handle has only a very simple dummy-function as controller
-%       which works in this case. It is advisable for complex scenarios and also
-%       for avoiding integration errors to use a real controller function instead.
+% Note: This function handle has only a very simple dummy-function as controller (zero
+%       torques) that works in this case. For complex scenarios it is advisable to use
+%       a real controller function instead, to avoid integration errors.
 fhTrqControl = @(t)zeroTrqsController(size(g_init(7:len,1)));
 
 %% ODE-Solver:
-%  Setup the function handle of the form f(t,chi) where chi refers to the dynamic state
+%  Setup the function handle of the form f(t,chi), where chi refers to the dynamic state
 %  of the system. It evaluates the right side of the nonlinear first-order ODEs of the
 %  form chi' = f(t,chi) and returns a vector of rates of change (vector of derivatives)
 %  which will be integrated by the solver.

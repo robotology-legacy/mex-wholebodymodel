@@ -49,7 +49,8 @@ namespace mexWBIComponent
 
     private:
       ModelDJdq(void);
-      bool processArguments(int nrhs, const mxArray **prhs);
+      static bool processArguments(int nrhs, const mxArray **prhs);
+      static int getRefLinkID();
 
       static ModelDJdq *modelDJdq;
 

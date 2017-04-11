@@ -21,7 +21,7 @@ and this project does not adheres to [Semantic Versioning](http://semver.org/).
   - wbm_getState:
     - Changed order of the output arguments from [qj, xTb, qjDot, vb] to [vqT_b, q_j, v_b, dq_j], where
       qj = q_j, xTb = vqT_b, qjDot = dq_j and vb = v_b.
-  - wbm_getWorldFrameFromFixedLink -->	wbm_getWorldFrameFromFixLnk
+  - wbm_getWorldFrameFromFixedLink -->  wbm_getWorldFrameFromFixLnk
     - Changed output order:  [world_R_base, world_p_base] --> [wf_p_b, wf_R_b]
 - **_Utility-Function Names:_**
   - quaternionDerivative --> WBM.utilities.dquat
@@ -35,7 +35,7 @@ and this project does not adheres to [Semantic Versioning](http://semver.org/).
   - skew --> WBM.utilities.skewm
   - whatname --> WBM.utilities.getJointAnnotationICub
   - wbm_generalisedBiasForces --> wbm_generalizedBiasForces
-  - wbm_initialise --> wbm_initialise 
+  - wbm_modelInitialise --> wbm_modelInitialize
   
 #### Renamed Key-Names:
 - generalised-forces --> generalized-forces

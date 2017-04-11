@@ -1,7 +1,6 @@
 function quat = rotm2quat(rotm)
-    if ( (size(rotm,1) ~= 3) || (size(rotm,2) ~= 3) )
-        error('rotm2quat: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-    end
+    WBM.utilities.checkMatDim(rotm, 3, 3, 'rotm2quat');
+
     quat    = zeros(4,1);
     epsilon = 1e-12; % min. value to treat a number as zero ...
 

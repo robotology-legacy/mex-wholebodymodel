@@ -48,7 +48,7 @@ namespace mexWBIComponent
 
     private:
       ModelGravityBiasForces();
-      bool processArguments(int nrhs, const mxArray **prhs);
+      static bool processArguments(int nrhs, const mxArray **prhs);
 
       static ModelGravityBiasForces *modelGravityBiasForces;
 

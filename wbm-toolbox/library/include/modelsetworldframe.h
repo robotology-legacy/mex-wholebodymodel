@@ -48,6 +48,7 @@ class ModelSetWorldFrame : public ModelComponent
 
     private:
       ModelSetWorldFrame();
+      static void setWorldFrame(const double *pR, const double *ppos);
 
       static ModelSetWorldFrame *modelSetWorldFrame;
     };

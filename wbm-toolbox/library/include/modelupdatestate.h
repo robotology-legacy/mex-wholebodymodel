@@ -49,7 +49,7 @@ namespace mexWBIComponent
 
     private:
       ModelUpdateState();
-      bool setState(int nrhs, const mxArray **prhs);
+      static bool setState(int nrhs, const mxArray **prhs);
 
       static ModelUpdateState *modelUpdateState;
   };

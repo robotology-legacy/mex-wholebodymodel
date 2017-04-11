@@ -48,8 +48,8 @@ namespace mexWBIComponent
 
     private:
       ModelInverseDynamics();
-      bool processArguments(int nrhs, const mxArray **prhs);
-      bool processFastArguments(int nrhs, const mxArray **prhs);
+      static bool processArguments(int nrhs, const mxArray **prhs);
+      static bool processFastArguments(int nrhs, const mxArray **prhs);
 
       static ModelInverseDynamics *modelInverseDynamics;
 

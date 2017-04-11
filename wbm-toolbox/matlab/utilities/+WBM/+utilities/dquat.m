@@ -1,11 +1,7 @@
 function dq = dquat(quat, omega, varargin)
-    if (size(quat,1) ~= 4)
-        error('dquat: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
-    if (size(omega,1) ~= 3)
-        error('dquat: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
+    WBM.utilities.checkCVecDs(quat, omega, 4, 3, 'dquat');
 
+    % control flags:
     switch nargin
         case 2
             % default values:
@@ -36,20 +32,21 @@ function dq = dquat(quat, omega, varargin)
         % check tolerances:
         if (eps_abs >= 1e-4)
             if (eps_abs > 0.5)
-                error('dquat: Quaternion left SO(3), abs(epsilon) > 0.5!');
+                error('dquat: Quaternion has left SO(3), abs(epsilon) > 0.5!');
             end
             % else ...
             warning('dquat: Quaternion is leaving SO(3), abs(epsilon) >= 1e-4.');
         end
     end
-    % Create the conjugate product matrix "Omega" of the angular velocity omega:
+    %% Conjugate product matrix "Omega" of the angular velocity omega:
     % Further details about the product matrix (operator) Omega can be taken from:
     %   [1] CONTRIBUTIONS TO THE AUTOMATIC CONTROL OF AERIAL VEHICLES, Minh Duc HUA, PhD-Thesis, 2009,
     %       <https://www-sop.inria.fr/act_recherche/formulaire/uploads/phd-425.pdf>, p. 101.
     %   [2] The Vectorial Parameterization of Rotation, Olivier A. Bauchau & Lorenzo Trainelli, Nonlinear Dynamics, 2003,
-    %       <http://soliton.ae.gatech.edu/people/obauchau/publications/Bauchau+Trainelli03.pdf>, p. 16-18, formulas (51) & (73).
+    %       <http://soliton.ae.gatech.edu/people/obauchau/publications/Bauchau+Trainelli03.pdf>, pp. 16-18, formulas (51) & (73).
     %   [3] Quaternion kinematics for the error-state KF, Joan Solà, Universitat Politècnica de Catalunya, 2016,
     %       <http://www.iri.upc.edu/people/jsola/JoanSola/objectes/notes/kinematics.pdf>, p. 19, formulas (97) & (98).
+    %   [4] Optimal Spacecraft Rotational Maneuvers, John L. Junkins & James D. Turner, Elsevier, 1986, pp. 288-289, eq. (8.80).
     Omega_x = zeros(4,4);
     Omega_x(2:4,2:4) = -WBM.utilities.skewm(omega); % (skew-symmetric) cross product matrix
     Omega_x(1,2:4)   = -omega.';

@@ -7,6 +7,7 @@ classdef wbmErrorMsg
         EMPTY_VECTOR      = 'Empty vector(s)!';
         FILE_NOT_EXIST    = 'File does not exist on given path!';
         IDX_OUT_OF_BOUNDS = 'Index value out of bounds!';
+        LIST_NOT_SORTED   = 'List not in ascending order!';
         MAX_JOINT_LIMIT   = 'Maximum joint number exceeded!';
         MAX_NUM_LIMIT     = 'Value exceeds the maximum number!';
         NAME_NOT_EXIST    = 'The name does not exist in the list!'
@@ -19,6 +20,7 @@ classdef wbmErrorMsg
         UNKNOWN_LNK_NAME  = 'Unknown link name!';
         VALUE_IS_INIT     = 'The value is already initialized!';
         VALUE_LTE_ZERO    = 'The value must be greater than zero!';
+        VAL_OUT_OF_BOUNDS = 'Value(s) out of bounds!';
         WRONG_ARG         = 'Wrong number of input arguments!';
         WRONG_ARR_SIZE    = 'Wrong array size!';
         WRONG_DATA_TYPE   = 'Wrong data type!';

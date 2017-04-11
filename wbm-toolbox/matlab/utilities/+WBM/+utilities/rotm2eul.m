@@ -1,7 +1,5 @@
 function eul = rotm2eul(rotm, sequence)
-    if ( (size(rotm,1) ~= 3) || (size(rotm,2) ~= 3) )
-        error('rotm2eul: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-    end
+    WBM.utilities.checkMatDim(rotm, 3, 3, 'rotm2eul');
 
     if ~exist('sequence', 'var')
         % use the default axis sequence ...
@@ -12,7 +10,7 @@ function eul = rotm2eul(rotm, sequence)
     %% Compute the Euler angles theta for the x, y and z-axis from a rotation matrix R, in
     %  dependency of the specified axis rotation sequence for the rotation factorization:
     % For further details see:
-    %   [1] Geometric Tools Engine, Documentation: <http://www.geometrictools.com/Documentation/EulerAngles.pdf>, pp. 9-10, 16-17.
+    %   [1] Geometric Tools Engine, Documentation: <http://www.geometrictools.com/Documentation/EulerAngles.pdf>, pp. 9-10 & pp. 16-17.
     %   [2] Computing Euler angles from a rotation matrix, Gregory G. Slabaugh, <http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf>
     %   [3] Modelling and Control of Robot Manipulators, L. Sciavicco & B. Siciliano, 2nd Edition, Springer, 2008,
     %       pp. 30-33, formulas (2.19), (2.19'), (2.21) and (2.21').
@@ -29,7 +27,7 @@ function eul = rotm2eul(rotm, sequence)
                     eul(3,1) = atan2(rotm(3,2), rotm(3,3)); % theta_x
                 else % case 2: if r31 = -1
                     % theta_x and theta_z are linked --> Gimbal lock:
-                    % There are infinity number of solutions for theta_x - theta_z = atan2(-r23, r22).
+                    % There are infinity number of solutions for theta_x - theta_z = arctan(-r23/r22).
                     % To find a solution, set theta_x = 0 by convention.
                     eul(1,1) = -atan2(-rotm(2,3), rotm(2,2));
                     eul(2,1) = pi/2;
@@ -37,7 +35,7 @@ function eul = rotm2eul(rotm, sequence)
                 end
             else % case 3: if r31 = 1
                 % Gimbal lock: There is not a unique solution for
-                %   theta_x + theta_z = atan2(-r23, r22), by convention, set theta_x = 0.
+                %   theta_x + theta_z = arctan(-r23/r22), by convention, set theta_x = 0.
                 eul(1,1) = atan2(-rotm(2,3), rotm(2,2));
                 eul(2,1) = -pi/2;
                 eul(3,1) = 0;
@@ -48,18 +46,18 @@ function eul = rotm2eul(rotm, sequence)
                 if (rotm(3,3) > -1)
                     % Solution with positive sign, i.e. theta_y is in the range (0, pi):
                     eul(1,1) = atan2(rotm(2,3),  rotm(1,3)); % theta_z1
-                    eul(2,1) = acos(rotm(3,3));              % theta_y (is equivalent to atan2(sqrt(r13^2 + r23^2), r33) )
+                    eul(2,1) = acos(rotm(3,3));              % theta_y (is equivalent to arctan(sqrt(r13^2 + r23^2)/r33))
                     eul(3,1) = atan2(rotm(3,2), -rotm(3,1)); % theta_z2
                 else % if r33 = -1:
                     % Gimbal lock: infinity number of solutions for
-                    %   theta_z2 - theta_z1 = atan2(r21, r22), --> set theta_z2 = 0.
+                    %   theta_z2 - theta_z1 = arctan(r21/r22), --> set theta_z2 = 0.
                     eul(1,1) = -atan2(rotm(2,1), rotm(2,2)); % theta_z1
                     eul(2,1) = pi;                           % theta_y
                     eul(3,1) = 0;                            % theta_z2
                 end
             else % if r33 = 1:
                 % Gimbal lock: infinity number of solutions for
-                %    theta_z2 + theta_z1 = atan2(r21, r22), --> set theta_z2 = 0.
+                %    theta_z2 + theta_z1 = arctan(r21/r22), --> set theta_z2 = 0.
                 eul(1,1) = atan2(rotm(2,1), rotm(2,2)); % theta_z1
                 eul(2,1) = 0;                           % theta_y
                 eul(3,1) = 0;                           % theta_z2
@@ -72,18 +70,18 @@ function eul = rotm2eul(rotm, sequence)
         %             % which produces the same effects as the solution above.
         %             % It limits the values of theta_y in the range of (-pi,0):
         %             eul(1,1) = atan2(-rotm(2,3), -rotm(1,3)); % theta_z1
-        %             eul(2,1) = -acos(rotm(3,3));              % theta_y (is equivalent to atan2(-sqrt(r13^2 + r23^2), r33) )
+        %             eul(2,1) = -acos(rotm(3,3));              % theta_y ( is equivalent to arctan(-sqrt(r13^2 + r23^2)/r33))
         %             eul(3,1) = atan2(-rotm(3,2),  rotm(3,1)); % theta_z2
         %         else % if r33 = -1:
         %             % Gimbal lock: infinity number of solutions for
-        %             %   theta_z2 - theta_z1 = atan2(-r12, -r11), --> set theta_z2 = 0.
+        %             %   theta_z2 - theta_z1 = arctan(-r12/-r11), --> set theta_z2 = 0.
         %             eul(1,1) = -atan2(-rotm(1,2), -rotm(1,1)); % theta_z1  (correct ???)
         %             eul(2,1) = -pi;                            % theta_y
         %             eul(3,1) = 0;                              % theta_z2
         %         end
         %     else % if r33 = 1:
         %         % Gimbal lock: infinity number of solutions for
-        %         %    theta_z2 + theta_z1 = atan2(-r12, -r11), --> set theta_z2 = 0.
+        %         %    theta_z2 + theta_z1 = arctan(-r12/-r11), --> set theta_z2 = 0.
         %         eul(1,1) = atan2(-rotm(1,2), -rotm(1,1)); % theta_z1  (correct ???)
         %         eul(2,1) = 0;                             % theta_y
         %         eul(3,1) = 0;                             % theta_z2

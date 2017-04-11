@@ -1,7 +1,5 @@
 function qnorm = quatnorm(quat)
-    if (size(quat,1) ~= 4)
-        error('quatnorm: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
+    WBM.utilities.checkCVecDim(quat, 4, 'quatnorm');
 
     %% Compute the norm of a quaternion q:
     % Further details can be found in:

@@ -95,7 +95,6 @@ bool ModelDJdq::computeFast(int nrhs, const mxArray **prhs)
   if( !mxIsChar(prhs[1]) ) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidNumInputs", "Malformed state dimensions/components.");
   }
-
   robotModel = modelState->robotModel();
 
   wf_H_b = modelState->getBase2WorldTransformation();
@@ -104,15 +103,7 @@ bool ModelDJdq::computeFast(int nrhs, const mxArray **prhs)
   vb     = modelState->vb();
   refLnk = mxArrayToString(prhs[1]);
 
-  std::string strCom("com");
-  int refLnkID = -1; // if refLnk = "com"
-
-  // try to get the index number ...
-  if (strCom.compare(refLnk) != 0) {
-    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "dJdq call: Link ID does not exist.");
-    }
-  }
+  int refLnkID = getRefLinkID();
 
   if ( !robotModel->computeDJdq(qj, wf_H_b, qj_dot, vb, refLnkID, dJdq) ) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeDJdq call.");
@@ -145,15 +136,6 @@ bool ModelDJdq::processArguments(int nrhs, const mxArray **prhs)
   vb     = mxGetPr(prhs[5]);
   refLnk = mxArrayToString(prhs[6]);
 
-  std::string strCom("com");
-  int refLnkID = -1; // if refLnk = "com"
-
-  if (strCom.compare(refLnk) != 0) {
-    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
-      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "dJdq call: Link ID does not exist.");
-    }
-  }
-
 #ifdef DEBUG
   mexPrintf("qj received.\n");
 
@@ -168,8 +150,24 @@ bool ModelDJdq::processArguments(int nrhs, const mxArray **prhs)
 
   wf_H_b = wbi::Frame(rot3d, ppos);
 
+  int refLnkID = getRefLinkID();
+
   if ( !robotModel->computeDJdq(qj, wf_H_b, qj_dot, vb, refLnkID, dJdq) ) {
     mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "Something failed in the WBI computeDJdq call.");
   }
   return true;
+}
+
+int ModelDJdq::getRefLinkID()
+{
+  std::string strCom("com");
+  int refLnkID = -1; // if refLnk = "com"
+
+  // try to get the index number ...
+  if (strCom.compare(refLnk) != 0) {
+    if ( !robotModel->getFrameList().idToIndex(refLnk, refLnkID) ) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:invalidInputs", "dJdq call: Link ID does not exist.");
+    }
+  }
+  return refLnkID;
 }

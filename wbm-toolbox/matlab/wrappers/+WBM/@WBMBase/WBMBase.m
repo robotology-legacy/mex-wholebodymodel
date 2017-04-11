@@ -424,9 +424,7 @@ classdef WBMBase < handle
         end
 
         function set.wf_R_b(obj, new_rotm)
-            if ( (size(new_rotm,1) ~= 3) || (size(new_rotm,2) ~= 3) )
-                error('WBMBase::set.wf_R_b: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-            end
+            WBM.utilities.checkMatDim(new_rotm, 3, 3, 'WBMBase::set.wf_R_b');
             obj.mwbm_model.wf_R_b = new_rotm;
         end
 
@@ -435,9 +433,7 @@ classdef WBMBase < handle
         end
 
         function set.wf_p_b(obj, new_pos)
-            if (size(new_pos,1) ~= 3)
-                error('WBMBase::set.wf_p_b: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-            end
+            WBM.utilities.checkCVecDim(new_pos, 3, 'WBMBase::set.wf_p_b');
             obj.mwbm_model.wf_p_b = new_pos;
         end
 
@@ -446,9 +442,7 @@ classdef WBMBase < handle
         end
 
         function set.g_wf(obj, new_g)
-            if (size(new_g,1) ~= 3)
-                error('WBMBase::set.g_wf: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-            end
+            WBM.utilities.checkCVecDim(new_g, 3, 'WBMBase::set.g_wf');
             obj.mwbm_model.g_wf = new_g;
         end
 
@@ -477,10 +471,8 @@ classdef WBMBase < handle
             if ~isstruct(frict_coeff)
                 error('WBMBase::set.frict_coeff: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            if ( (size(frict_coeff.v,1) ~= obj.mwbm_model.ndof) || ...
-                 (size(frict_coeff.c,1) ~= obj.mwbm_model.ndof) )
-                error('WBMBase::set.frict_coeff: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-            end
+            n = obj.mwbm_model.ndof;
+            WBM.utilities.checkCVecDs(frict_coeff.v, frict_coeff.c, n, n, 'WBMBase::set.frict_coeff');
 
             % update the friction coefficients ...
             obj.mwbm_model.frict_coeff.v = frict_coeff.v;
@@ -556,15 +548,11 @@ classdef WBMBase < handle
 
             if (robot_model.ndof > 0)
                 if ~isempty(robot_model.frict_coeff.v)
-                    if (size(robot_model.frict_coeff.v,1) ~= robot_model.ndof)
-                        error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-                    end
+                    WBM.utilities.checkCVecDim(robot_model.frict_coeff.v, robot_model.ndof, 'WBMBase::initWBM');
 
                     obj.mwbm_model.frict_coeff.v = robot_model.frict_coeff.v;
                     if ~isempty(obj.mwbm_model.frict_coeff.c)
-                        if (size(robot_model.frict_coeff.c,1) ~= robot_model.ndof)
-                            error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-                        end
+                        WBM.utilities.checkCVecDim(robot_model.frict_coeff.c, robot_model.ndof, 'WBMBase::initWBM');
 
                         obj.mwbm_model.frict_coeff.c = robot_model.frict_coeff.c;
                     else

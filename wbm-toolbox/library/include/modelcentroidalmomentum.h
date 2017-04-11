@@ -49,7 +49,7 @@ namespace mexWBIComponent
 
     private:
       ModelCentroidalMomentum();
-      bool processArguments(int nlhs, const mxArray **prhs);
+      static bool processArguments(int nlhs, const mxArray **prhs);
 
       static ModelCentroidalMomentum *modelCentroidalMomentum;
 
