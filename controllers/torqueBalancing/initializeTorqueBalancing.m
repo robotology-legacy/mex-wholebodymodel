@@ -4,23 +4,29 @@
 % controlled floating base robots using MATLAB. 
 %
 % List of available simulations:
-%
 %  - One or two feet balancing about a reference point;
 %  - One or two feet tracking of a CoM reference trajectory; 
 %  - Highly dynamic Tai Chi (see also https://www.youtube.com/watch?v=9XRI4BeXN78);
 %  
 % List of available robots:
-%
 %  - iCub;
 %  - Walkman;
 %  - Walkman-only legs;
+%
+% List of available tools:
+%  - elasticJoints: assume all joints are driven by Series Elastic Actuators;
+%  - gainTuning: a gain tuning procedure is performed for setting control gains;
+%
+% List of available controllers:
+%  - stackOfTask: a momentum based balancing controller is used;
+%  - jointSpaceController:  a joint space controller is used;
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, March 2017
 %
 
 % ------------Initialization----------------
-clear all 
+clear  
 close all
 clc
 

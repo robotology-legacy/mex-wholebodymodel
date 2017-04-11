@@ -21,9 +21,7 @@ function CONTROLLER = stackOfTaskController(MODEL,GAINS,TRAJECTORY,DYNAMICS,FORK
 % Genova, March 2017
 
 %% ------------Initialization----------------
-import WBM.utilities.skewm;
-
-%% Config parameters
+% config parameters
 pinv_tol            = MODEL.CONFIG.pinv_tol;
 pinv_damp           = MODEL.CONFIG.pinv_damp;
 feet_on_ground      = MODEL.CONFIG.feet_on_ground;

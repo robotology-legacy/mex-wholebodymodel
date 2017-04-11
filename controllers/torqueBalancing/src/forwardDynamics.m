@@ -20,9 +20,6 @@ function dchi = forwardDynamics(t,chi,MODEL,INIT_CONDITIONS)
 % global variables
 global stanceFootForce state prevTimeIndex;
 
-% import utilities from WBM-Class
-import WBM.utilities.dquat;
-
 % update waitbar
 waitbar(t/MODEL.CONFIG.tEnd,MODEL.wait)
 
