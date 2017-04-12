@@ -65,6 +65,15 @@ for kk = 2:dimTime
     CoMTrajectoryError(:,kk)      = visualizeIkinParam.CoMTrajectoryError;
     feetError(:,kk)               = visualizeIkinParam.feetError;
     momentumError(:,kk)           = visualizeIkinParam.momentumError;
+    
+    % detect discrete events and exit the loop
+    if diffState == 0 
+        % stop the integration only in state 3,7,9,13
+        if state == 3 || state == 7 ||state ==9 || state ==13
+            return;
+        end
+    end
+end
 end
 
 %% Joint trajectory and visualization parameters
