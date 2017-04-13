@@ -99,7 +99,7 @@ else
     
     elseif MODEL.CONFIG.feet_on_ground(1) == 0 && MODEL.CONFIG.feet_on_ground(2) == 1 
         % initial conditions for the robot standing on the right foot
-        qjInit = transpose([ 0.0462,-0.5256,-0.0269, ...
+        qjInit = transpose([-0.0462, 0.5256, 0.0269, ...
                             -0.3553, 1.8546, 0.7323, 0.3905,-0.1169, ...
                              0.1874, 1.6258, 0.2462, 0.3053,-0.0948, ...
                              0.2923, 0.8611, 1.2866,-1.7688, 0.4568,-0.0163, ...
@@ -147,8 +147,7 @@ INIT_CONDITIONS.INITDYNAMICS      = robotDynamics(INIT_CONDITIONS.INITSTATE,MODE
 INIT_CONDITIONS.INITFORKINEMATICS = robotForKinematics(INIT_CONDITIONS.INITSTATE,INIT_CONDITIONS.INITDYNAMICS);
 
 % update robot state. This is done in case wbm_wrappers are called using optimized mode
-wbm_updateState(qjInit,INIT_CONDITIONS.INITSTATE.dx_b, ...
-                INIT_CONDITIONS.INITSTATE.w_omega_b,INIT_CONDITIONS.INITSTATE.dqj);
+wbm_updateState(qjInit,INIT_CONDITIONS.INITSTATE.dqj,[INIT_CONDITIONS.INITSTATE.dx_b; INIT_CONDITIONS.INITSTATE.w_omega_b]);
 % set world frame. This is done in case wbm_wrappers are called using optimized mode
 wbm_setWorldFrame(w_R_bInit,x_bInit,[0; 0; -9.81])
 
@@ -156,29 +155,24 @@ wbm_setWorldFrame(w_R_bInit,x_bInit,[0; 0; -9.81])
 % control gains (no gain tuning)
 if strcmp(MODEL.CONFIG.demo_type,'yoga') || strcmp(MODEL.CONFIG.demo_type,'standup') 
     % initial gains
-    INIT_CONDITIONS.GAINS     = reshapeGains(SM.gainsVector,MODEL);
+    MODEL.GAINS     = reshapeGains(SM.gainsVector,MODEL);
 else
     % initial gains (no state machine)
-    INIT_CONDITIONS.GAINS     = gains(MODEL);
+    MODEL.GAINS     = gains(MODEL);
 end
 % joints and CoM references (no ikin) 
 MODEL.REFERENCES.qjRef        = qjInit;
 MODEL.REFERENCES.xCoMRef      = INIT_CONDITIONS.INITFORKINEMATICS.xCoM;
-% the (x,y) components of CoM are setted to be in the center of support 
-% polygon (for both one foot and two feet balancing). This is ignored in
-% case of 'standup' demo
-if ~strcmp(MODEL.CONFIG.demo_type,'standup') 
-    if MODEL.CONFIG.feet_on_ground(2) == 0
-        % left foot balancing 
-        MODEL.REFERENCES.xCoMRef([1,2]) = INIT_CONDITIONS.INITFORKINEMATICS.poseLFoot_qt([1,2]);
-    elseif MODEL.CONFIG.feet_on_ground(1) == 0
-        % right foot balancing
-        MODEL.REFERENCES.xCoMRef([1,2]) = INIT_CONDITIONS.INITFORKINEMATICS.poseRFoot_qt([1,2]);
-    else
-        % two feet balancing
-        MODEL.REFERENCES.xCoMRef([1,2]) = [INIT_CONDITIONS.INITFORKINEMATICS.poseLFoot_qt(1), ...
-                                           0.5*(INIT_CONDITIONS.INITFORKINEMATICS.poseLFoot_qt(2)+INIT_CONDITIONS.INITFORKINEMATICS.poseRFoot_qt(2))];
-    end
-end 
+MODEL.REFERENCES.feetRef      = [INIT_CONDITIONS.INITFORKINEMATICS.poseLFoot_ang;INIT_CONDITIONS.INITFORKINEMATICS.poseRFoot_ang];
+% in case of one foot balancing the (x,y) components of CoM are setted to
+% be in the center of support polygon
+if MODEL.CONFIG.feet_on_ground(2) == 0
+    % left foot balancing 
+    MODEL.REFERENCES.xCoMRef([1,2]) = INIT_CONDITIONS.INITFORKINEMATICS.poseLFoot_qt([1,2]);
+elseif MODEL.CONFIG.feet_on_ground(1) == 0
+    % right foot balancing
+    MODEL.REFERENCES.xCoMRef([1,2]) = INIT_CONDITIONS.INITFORKINEMATICS.poseRFoot_qt([1,2]);
+end
+
 end
 

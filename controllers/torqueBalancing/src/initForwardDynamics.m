@@ -22,8 +22,8 @@ state                    = 1;
 %     xi = theta*eta 
 % where theta are the motor positions and eta is the transmission ratio
 if MODEL.CONFIG.use_SEA
-    xiInit               = INIT_CONDITIONS.qjInit;
-    dxiInit              = INIT_CONDITIONS.dqjInit;
+    xiInit               = INIT_CONDITIONS.INITSTATE.qj;
+    dxiInit              = INIT_CONDITIONS.INITSTATE.dqj;
     chi_motorInit        = [xiInit;dxiInit];
 end
 
@@ -34,12 +34,13 @@ end
 
 %% %%%%%%%%%%%%%%%%%%%%%% GAIN TUNING PROCEDURE %%%%%%%%%%%%%%%%%%%%%%%% %%
 if MODEL.CONFIG.use_gainTuning  
-    % the system is linearized around the initial position
-    MODEL.linearization  = jointSpaceLinearization(MODEL,INIT_CONDITIONS.qjInit);
+    % the system is first linearized around the initial position
+    MODEL.LINEARIZATION  = jointSpaceLinearization(MODEL,INIT_CONDITIONS);
     MODEL.GAINTUNING     = gainsTuning(MODEL);
+    iArrivedHere
 end
 
-%% %%%%%%%% STABILITY TEST: RESPONSE TO STEP REFERENCE %%%%%%%%%%%%%%%%% %%
+%% %%%%%%%%%% STABILITY TEST: RESPONSE TO STEP REFERENCE %%%%%%%%%%%%%%% %%
 if MODEL.CONFIG.stepReference
     % the initial joints configuration is changed by a small delta, but the references
     % are not updated. In this way the robot will move to the reference position
