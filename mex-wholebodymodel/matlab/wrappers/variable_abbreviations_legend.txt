@@ -14,13 +14,13 @@ Legend of abbreviations and acronyms which are used for the variable names:
     b          ...  base
     bf         ...  base frame
     bgn        ...  begin
-    c          ...  cartesian OR contact OR constraint
+    c          ...  Cartesian OR contact OR constraint
     c...       ...  cell array (begin of variable name)
     cX         ...  co-adjoint transformation (matrix)
     cfrict     ...  Coulomb friction
     chn        ...  chain
     chnt       ...  chain tree
-    clink      ...  contact link
+    clink, cl  ...  contact link
     cmo        ...  column major order
     cmp        ...  compare
     cols       ...  columns
@@ -97,6 +97,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     qt, q      ...  quaternion
     quat       ...  quaternion
     r          ...  root (link) OR rotation (orientation)
+    rX         ...  (mixed) rate transformation (matrix)
     rax        ...  rotation axis
     ref        ...  reference
     resv       ...  result vector (boolean)
@@ -107,6 +108,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     rmo        ...  row major order
     rotm       ...  rotation matrix
     rpts       ...  repeats
+    rtype      ...  representation type
     rvec       ...  row vector
     sc         ...  scalar OR scaled
     scn        ...  scene
@@ -143,6 +145,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     wf, WF     ...  world frame
     wf_T_b     ...  transformation FROM the 'base' TO the 'world frame'
     wid        ...  width
+
 
 
 (*) ... Without scale factor S. This is the same as if scale S = 1.

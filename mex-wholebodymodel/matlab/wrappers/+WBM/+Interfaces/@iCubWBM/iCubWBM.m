@@ -88,11 +88,11 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             ddq_j = obj.mwmbm_icub.jointAcceleration(tau, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccelerationsFPC(obj, tau, q_j, dq_j, stFltb)
+        function ddq_j = jointAccelerationsFPC(obj, tau, ac_f, q_j, dq_j, stFltb)
             if ~exist('stFltb', 'var')
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            ddq_j = obj.mwmbm_icub.jointAccelerationsFPC(obj.mfeet_conf, tau, obj.ZERO_CTC_ACC, stFltb.wf_R_b, ...
+            ddq_j = obj.mwmbm_icub.jointAccelerationsFPC(obj.mfeet_conf, tau, ac_f, stFltb.wf_R_b, ...
                                                          stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
@@ -144,11 +144,12 @@ classdef iCubWBM < WBM.Interfaces.IWBM
 
         function [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, feet_conf)
             if exist('feet_conf', 'var')
-                % use for the ODE-solver the extended function with the feet pose correction ...
-                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(fhTrqControl, tspan, stvChi_0, ode_opt, feet_conf);
+                % use the extended function with the feet pose correction ...
+                acf_0 = obj.mwbm_icub.zeroCtcAcc(feet_conf);
+                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(fhTrqControl, tspan, stvChi_0, ode_opt, feet_conf, acf_0);
                 return
             end
-            % else, use the default function ...
+            % else, use the standard function (without pose correction) ...
             [t, stmChi] = obj.mwbm_icub.intForwardDynamics(fhTrqControl, tspan, stvChi_0, ode_opt);
         end
 

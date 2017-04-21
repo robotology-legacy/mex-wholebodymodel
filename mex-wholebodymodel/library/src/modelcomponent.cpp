@@ -36,6 +36,9 @@ ModelComponent::ModelComponent(const unsigned int nArgs, const unsigned int nAlt
 {
   modelState = ModelState::getInstance();
   robotModel = modelState->robotModel();
+
+  // initialize/reset the frame transformation H ...
+  wf_H_b = wbi::Frame::identity();
 }
 
 ModelComponent::~ModelComponent()

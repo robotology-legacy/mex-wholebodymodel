@@ -12,22 +12,22 @@ function dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
     % get the current control torques ...
     [tau,~] = fhTrqControl(t);
 
-    % reconstruct the rotation from the 'base' to the 'world'
-    % of the quaternion part of the transformation vector vqT_b:
-    vqT_b   = obj.stvqT;
-    [~,R_b] = WBM.utilities.frame2posRotm(vqT_b);
+    % reconstruct the rotation from the 'base' to the 'world' of
+    % the quaternion part of the transformation vector vqT_b:
+    vqT_b = obj.stvqT;
+    [~,wf_R_b] = WBM.utilities.frame2posRotm(vqT_b);
 
     % We need to apply the base-to-world rotation to the spatial angular velocity
     % omega_w to obtain the angular velocity in body frame omega_b. This is then
     % used in the quaternion derivative computation:
-    omega_b = R_b * omega_w;
+    omega_b = wf_R_b * omega_w;
     dqt_b   = WBM.utilities.dquat(stp.qt_b, omega_b);
 
-    % velocities:
-    dx = vertcat(stp.dx_b, dqt_b, stp.dq_j);
+    % mixed velocities ...
+    v = vertcat(stp.dx_b, dqt_b, stp.dq_j);
     % joint acceleration dv:
     [dv,~] = jointAccelerations(obj, tau, stp.dq_j); % optimized mode
 
-    dstvChi = vertcat(dx, dv);
+    dstvChi = vertcat(v, dv);
     %kinEnergy = 0.5*nu.'*M*nu;
 end

@@ -104,21 +104,25 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             if opt.rpy
                 % compute the analytical Jacobian with the Euler rotation rate in ZYX (RPY) order:
                 wf_H_lnk = obj.mwbm.forwardKin(obj.mlink_ctrl, q_j);
-                B_inv = WBM.utilities.tform2angRateTF(wf_H_lnk, 'ZYX');
-                if (rcond(B_inv) < eps)
+                Er_inv   = WBM.utilities.tform2angRateTF(wf_H_lnk, 'eul', 'ZYX');
+                if (rcond(Er_inv) < eps)
                     error('MultChainTree::jacob0: %s', WBM.wbmErrorMsg.SINGULAR_MAT);
                 end
+                wf_rX_lnk = eye(6,6);
+                wf_rX_lnk(4:6,4:6) = Er_inv;
 
-                wf_J_lnk = blkdiag(eye(3,3), B_inv) * wf_J_lnk;
+                wf_J_lnk = wf_rX_lnk * wf_J_lnk;
             elseif opt.eul
                 % compute the analytical Jacobian with the Euler rotation rate in ZYZ order:
                 wf_H_lnk = obj.mwbm.forwardKin(obj.mlink_ctrl, q_j);
-                B_inv = WBM.utilities.tform2angRateTF(wf_H_lnk, 'ZYZ');
-                if (rcond(B_inv) < eps)
+                Er_inv   = WBM.utilities.tform2angRateTF(wf_H_lnk, 'eul', 'ZYZ');
+                if (rcond(Er_inv) < eps)
                     error('MultChainTree::jacob0: %s', WBM.wbmErrorMsg.SINGULAR_MAT);
                 end
+                wf_rX_lnk = eye(6,6);
+                wf_rX_lnk(4:6,4:6) = Er_inv;
 
-                wf_J_lnk = blkdiag(eye(3,3), B_inv) * wf_J_lnk;
+                wf_J_lnk = wf_rX_lnk * wf_J_lnk;
             end
 
             if opt.trans

@@ -80,7 +80,7 @@ wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 wbm_icub.plotCoMTrajectory(chi);
 
 % get the visualization-data from the forward dynamics integration for plots and animations:
-vis_data = wbm_icub.getFwdDynVisualizationData(chi, fhTrqControl);
+vis_data = wbm_icub.getFDynVisualizationData(chi, fhTrqControl);
 
 % alternatively, or if you have to plot other parameter values, use e.g.:
 %stp = wbm_icub.getStateParams(chi);

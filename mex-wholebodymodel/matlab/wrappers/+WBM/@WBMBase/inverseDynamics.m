@@ -19,14 +19,14 @@ function tau_j = inverseDynamics(obj, varargin)
         case 7
             % if dv_b, the acceleration (linear & angular acceleration)
             % of the robot base is not given or unknown ...
-            p_b   = varargin{1,2};
-            q_j   = varargin{1,3};
-            dq_j  = varargin{1,4};
-            ddq_j = varargin{1,6};
+            wf_p_b = varargin{1,2};
+            q_j    = varargin{1,3};
+            dq_j   = varargin{1,4};
+            ddq_j  = varargin{1,6};
 
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-            M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, p_b, q_j);
-            c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, p_b, q_j, dq_j, varargin{1,5});
+            M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, wf_p_b, q_j);
+            c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, varargin{1,5});
         case 4 % optimized modes:
             % dq_j  = varargin{1}
             % ddq_j = varargin{2}

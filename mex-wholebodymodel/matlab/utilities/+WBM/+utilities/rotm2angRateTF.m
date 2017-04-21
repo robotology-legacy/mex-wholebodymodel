@@ -1,27 +1,27 @@
-function B_inv = tform2angRateTF(tform, rtype, sequence)
+function B_inv = rotm2angRateTF(rotm, rtype, sequence)
     switch nargin
         case 3
             if ~strcmp(rtype, 'eul')
-                error('tform2angRateTF: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+                error('rotm2angRateTF: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
             end
-            eul   = WBM.utilities.tform2eul(tform, sequence);
+            eul   = WBM.utilities.rotm2eul(rotm, sequence);
             B_inv = WBM.utilities.eul2angRateTF(eul);
         case 2
             switch rtype
                 case 'eul'
                     % use the default ZYX axis sequence ...
-                    eul   = WBM.utilities.tform2eul(tform);
+                    eul   = WBM.utilities.rotm2eul(rotm);
                     B_inv = WBM.utilities.eul2angRateTF(eul);
                 case 'quat'
-                    quat  = WBM.utilities.tform2quat(tform);
+                    quat  = WBM.utilities.rotm2quat(rotm);
                     B_inv = WBM.utilities.quat2angRateTF(quat);
                 case 'axang'
-                    axang = WBM.utilities.tform2axang(tform);
+                    axang = WBM.utilities.rotm2axang(rotm);
                     B_inv = WBM.utilities.axang2angRateTF(axang);
                 otherwise
-                    error('tform2angRateTF: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+                    error('rotm2angRateTF: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
             end
         otherwise
-            error('tform2angRateTF: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('rotm2angRateTF: %s', WBM.wbmErrorMsg.WRONG_ARG);
     end
 end

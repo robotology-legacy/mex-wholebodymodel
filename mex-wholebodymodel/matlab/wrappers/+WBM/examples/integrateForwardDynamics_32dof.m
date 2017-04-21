@@ -48,7 +48,8 @@ feet_conf = wbm_icub.setFeetConfigState(qj_init, feet_on_ground);
 %  of the system. It evaluates the right side of the nonlinear first-order ODEs of the
 %  form chi' = f(t,chi) and returns a vector of rates of change (vector of derivatives)
 %  which will be integrated by the solver.
-fhFwdDyn = @(t, chi)wbm_icub.forwardDynamicsFPC(t, chi, fhTrqControl, feet_conf);
+ac_0 = wbm_icub.zeroCtcAcc(feet_conf);
+fhFwdDyn = @(t, chi)wbm_icub.forwardDynamicsFPC(t, chi, fhTrqControl, feet_conf, ac_0);
 
 % specifying the time interval of the integration ...
 sim_time.start = 0.0;

@@ -8,14 +8,14 @@ function vX = mixveltfm(varargin)
     %   supported orientation transformations for E_r:
     %       - Euler angles (3x3),
     %       - quaternions/Euler parameters (3x4),
-    %       - axis angles (3x3).
+    %       - axis-angle (3x4).
     %
     % Sources:
     %   [1] Multibody Dynamics Notation, S. Traversaro & A. Saccon, Eindhoven University of Technology,
     %       Department of Mechanical Engineering, 2016, <http://repository.tue.nl/849895>, p. 8, eq. (35).
     %   [2] Advanced Robotic Manipulation: Lecture Notes (CS327A), Oussama Khatib, Stanford University, Spring 2005,
     %       <http://www.in.tum.de/fileadmin/user_upload/Lehrstuehle/Lehrstuhl_XXIII/AdvancedRoboticManipulation.pdf>, p. 26 & p. 31, eq. (2.17) & (2.39).
-    %   [1] Robot Dynamics: Lecture Notes (151-0851-00L), M. Hutter & R. Siegwart & T. Stastny, ETH-Zürich, Jan. 2017,
+    %   [3] Robot Dynamics: Lecture Notes (151-0851-00L), M. Hutter & R. Siegwart & T. Stastny, ETH-Zürich, Jan. 2017,
     %       <https://www.ethz.ch/content/dam/ethz/special-interest/mavt/robotics-n-intelligent-systems/rsl-dam/documents/RobotDynamics2016/RD2016script.pdf>,
     %       p. 41, eq. (2.191).
     switch nargin
