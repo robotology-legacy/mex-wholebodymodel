@@ -40,17 +40,11 @@ if MODEL.CONFIG.enable_visualTool
     CoMError             = zeros(9,dimTime);  %#ok<NASGU>
     CoMRef               = zeros(3,dimTime);  %#ok<NASGU>
     HError               = zeros(6,dimTime);  %#ok<NASGU>
-    % create a folder and save stored values inside it
-    outputDir = './media';
-    if (~exist(outputDir, 'dir'))
-        mkdir(outputDir);
-    end
     % save the data in a .mat file
-    save('./media/storedValues','feetError','CoMError','CoMRef','HError','-v7.3');
-    % call the inverse kinematics funtion at tStart, for initializing the
-    % stored values
-    dchiInit             = inverseKinematics(t(1),chiInit,MODEL);
+    save('./media/storedValuesIkin','feetError','CoMError','CoMRef','HError','-v7.3');
 end
+% call the inverse kinematics funtion at tStart
+dchiInit                 = inverseKinematics(t(1),chiInit,MODEL);
 % initialize the joint reference accelerations
 ddqj(:,1)                = dchiInit(14+ndof:end);
 

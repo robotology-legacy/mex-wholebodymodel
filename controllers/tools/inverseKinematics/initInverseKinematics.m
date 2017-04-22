@@ -59,9 +59,9 @@ nuFirstTask            = pinvJc*constraintsDynamics + NullJc*nuSecondTask;
 chi_robotInit          = [INIT_CONDITIONS.chi_robotInit(1:(7+ndof)); nuFirstTask];
 
 % set a waitbar and modify the default options
-MODEL.wait             = waitbar(0, 'Ikin integration in progress...', 'CreateCancelBtn', 'setappdata(gcbf,''canceling'',1); delete(gcbf);');
-set(findall(MODEL.wait ), 'Units', 'Normalized')
-set(MODEL.wait , 'Units', 'Pixels', 'Position', [825 500 300 100])
+MODEL.wait = waitbar(0,'1','Name','Ikin integration in progress...',...
+                     'CreateCancelBtn','setappdata(gcbf,''canceling'',1); delete(gcbf);');
+set(MODEL.wait, 'Units', 'Pixels', 'Position', [800 500 365 100])
 
 %% %%%%%%%%%%%%%%%%% INVERSE KINEMATICS INTEGRATION %%%%%%%%%%%%%%%%%%%% %%
 % state machine is not available for ikin integration, because it is not

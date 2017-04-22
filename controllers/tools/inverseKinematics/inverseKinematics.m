@@ -20,7 +20,8 @@ function dchi = inverseKinematics(t,chi,MODEL)
 % Genova, March 2017
 
 %% ------------Initialization----------------
-waitbar(t/MODEL.CONFIG.tEnd,MODEL.wait)
+% report current time in the waitbar's message field
+waitbar(t/MODEL.CONFIG.tEnd,MODEL.wait,['Current time: ',sprintf('%0.3f',t),' [s]'])
 
 % setup configuration parameters 
 pinv_tol          = MODEL.CONFIG.pinv_tol;
@@ -143,7 +144,7 @@ if MODEL.CONFIG.enable_visualTool
     t_total       =  transpose(MODEL.CONFIG.tStart:MODEL.CONFIG.sim_step:MODEL.CONFIG.tEnd);
     currTimeIndex = sum(t_total <= t);
     % load values from .mat file
-    GRAPHICS = matfile('./media/storedValues.mat','Writable',true);
+    GRAPHICS = matfile('./media/storedValuesIkin.mat','Writable',true);
     GRAPHICS.feetError(:,currTimeIndex)  = errorPoseFeet;
     GRAPHICS.CoMError(:,currTimeIndex)   = [(xCoM              - x_dx_ddx_CoMDes(:,1));...
                                             (JCoM*nu           - x_dx_ddx_CoMDes(:,2)); ...

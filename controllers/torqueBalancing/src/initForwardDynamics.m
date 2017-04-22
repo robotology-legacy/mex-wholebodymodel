@@ -36,18 +36,18 @@ end
 if MODEL.CONFIG.use_gainTuning  
     % the system is first linearized around the initial position
     MODEL.LINEARIZATION  = jointSpaceLinearization(MODEL,INIT_CONDITIONS);
-    MODEL.GAINTUNING     = gainsTuning(MODEL);
-    iArrivedHere
+    [MODEL.GAINS,MODEL.LINEARIZATION.KS,MODEL.LINEARIZATION.KD] = gainsTuning(MODEL.LINEARIZATION,MODEL);
 end
 
 %% %%%%%%%%%% STABILITY TEST: RESPONSE TO STEP REFERENCE %%%%%%%%%%%%%%% %%
 if MODEL.CONFIG.stepReference
     % the initial joints configuration is changed by a small delta, but the references
     % are not updated. In this way the robot will move to the reference position
+    iArrivedHere
     INIT_CONDITIONS      = addStepReference(MODEL,INIT_CONDITIONS);
     % the system is linearized around the initial position (for checking
     % stability and verifying the linearization
-    MODEL.linearization  = jointSpaceLinearization(MODEL,INIT_CONDITIONS.qjInit);
+    MODEL.LINEARIZATION  = jointSpaceLinearization(MODEL,INIT_CONDITIONS);
 end
 
 %% %%%%%%%%%%%%%%%%%%%%% INITIAL SYSTEM STATE %%%%%%%%%%%%%%%%%%%%%%%%%% %%

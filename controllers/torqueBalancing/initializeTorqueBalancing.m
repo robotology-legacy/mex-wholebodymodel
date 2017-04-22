@@ -3,7 +3,7 @@
 %  controlled floating base robots using MATLAB. All the controllers
 %  implemented here are model-based. The robot model is stored in a .urdf
 %  file. The robot dynamics and forward kinematics are obtained using
-%  wbm-toolbox library that is a wrapper of yarpWholeBodyModelV2.h.
+%  wbm-toolbox library that is a wrapper of yarpWholeBodyModelV2 class.
 %
 %  LIST OF AVAILABLE SIMULATIONS:
 %  - One or two feet balancing about a reference point;
@@ -130,9 +130,21 @@ CONFIG.sim_step                              = 0.01;
 % stops and it restarts with new initial conditions, just after the event. 
 CONFIG.eventFunction                         = @(t,chi) eventState(t,chi);
 % integration options. If the numerical integration is slow, try to modify 
-% the options 'RelTol' and/or 'AbsTol'.
-CONFIG.options                               = odeset('RelTol',1e-6,'AbsTol',1e-6, ...
-                                                      'Events',CONFIG.eventFunction,'InitialStep',CONFIG.sim_step);
+% the options 'RelTol' (default: 1e-3) and/or 'AbsTol'  (default: 1e-6).
+CONFIG.options                               = odeset('RelTol',1e-3,'AbsTol',1e-6, ...
+                                                      'Events',CONFIG.eventFunction,'InitialStep',CONFIG.sim_step,'Stats','on');
+% choose the ODE solver. Remember: the funtion to be integrated is in the
+% form: M(y)*dy = f(y). It is a stiff ODE system, and the mass matrix is close 
+% to singular (this makes the system almost a DAE). For this reason, and
+% because the mass matrix is not constant, it is STRONGLY recommended to use
+% one of the two ODE solver specifically designed for stiff ODE/DAE: ode15s
+% and ode23t. make use of other solvers not only slows down the numerical
+% integration, but it can lead to numerical instablity (in particular, do
+% not use a fixed step integrator)
+CONFIG.odeSolver                             = 'ode15s';
+if ~strcmp(CONFIG.odeSolver,'ode15s') && ~strcmp(CONFIG.odeSolver,'ode23t') 
+    warning('ODE solver is not ''ode15s'' or ''ode23t''. This may lead to numerical instability!')
+end
                                                   
 %% %%%%%%%%%%%%%%%%%%%%% SPECIAL TOOLS (DEBUGGING) %%%%%%%%%%%%%%%%%%%%% %%
 % WARNING: these tools must be used for debugging only. Enable them will affect
@@ -199,6 +211,16 @@ if strcmp(CONFIG.demo_type,'yoga') || strcmp(CONFIG.demo_type,'standup')
     % (joint controller requires ikin solver)
     CONFIG.control_type                      = 'stackOfTask';
     warning('for demos that make use of a finite state machine, the following tools/controllers are not available: ikinSolver, gainTuning, jointControl');     
+end
+if CONFIG.enable_visualTool
+    % create a folder and initialize stored values 
+    outputDir = './media';
+    if (~exist(outputDir, 'dir'))
+        mkdir(outputDir);
+        disp('[Visualization]: created the folder ''./media'' for storing data')
+    end
+    % saving the user-defined configuration
+    save('./media/storedValues','CONFIG','-v7.3')
 end
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%% %%

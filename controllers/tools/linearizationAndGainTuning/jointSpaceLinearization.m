@@ -105,9 +105,9 @@ verifyEig     = realEigAState<1e-5;
 % if there are postitive eigenvalues, show a warning message
 if sum(verifyEig)<sum(ones(length(verifyEig),1))
     % the joint space dynamics is not a.s. about the set point 
-    warning('the joint space dynamics is NOT asymptotically stable about the equilibrium point')   
+    warning('[Linerarization]: the joint space dynamics is NOT asymptotically stable about the equilibrium point')   
 else
-    disp('The linearized joint space dynamics is asymptotically stable')
+    disp('[Linearization]: the linearized joint space dynamics is asymptotically stable')
 end
 
 %% Store parameters for gain tuning, stability test and visualization
@@ -118,7 +118,9 @@ LINEARIZATION.ACartesian  = -invMbar*pinvLambda*MatrixFirstTask;
 LINEARIZATION.BCartesian  = JG;
 LINEARIZATION.ANull       = invMbar*NullLambda;
 LINEARIZATION.BNull       = posturalCorr;
-LINEARIZATION.Jj_bar      = (eye(size(Jb,1))-Jb*pinv(Jb,pinv_tol))*Jj;
-LINEARIZATION.NullJj_bar  = eye(ndof)-pinv(LINEARIZATION.Jj_bar,pinv_tol)*LINEARIZATION.Jj_bar;
+% in case of two feet balancing, the following matrix projects the desired
+% impedances and damping matrix into the space of feasible solutions
+Jj_bar                    = (eye(size(Jb,1))-Jb*pinv(Jb,pinv_tol))*Jj;
+LINEARIZATION.NullJj_bar  = eye(ndof)-pinv(Jj_bar,pinv_tol)*Jj_bar;
 
 end
