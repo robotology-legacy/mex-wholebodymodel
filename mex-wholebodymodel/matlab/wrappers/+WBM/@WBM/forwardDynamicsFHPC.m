@@ -6,7 +6,7 @@ function dstvChi = forwardDynamicsFHPC(obj, t, stvChi, fhTrqControl, feet_conf, 
     v_b = vertcat(stp.dx_b, omega_w); % generalized base velocity
 
     % update the state for the optimized mode ...
-    obj.setState(stp.q_j, stp.dq_j, v_b);
+    setState(obj, stp.q_j, stp.dq_j, v_b);
 
     % get the current control torques from the controller ...
     [tau,~] = fhTrqControl(t, M, c_qv, stp, nu, Jc, djcdq, feet_conf);

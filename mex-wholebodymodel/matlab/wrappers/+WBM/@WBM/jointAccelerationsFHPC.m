@@ -25,26 +25,17 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, ta
         otherwise
             error('WBM::jointAccelerationsFHPC: %s', WBM.wbmErrorMsg.WRONG_ARG);
     end
-    feet_idx_list = horzcat(feet_conf.lnk_idx_l, feet_conf.lnk_idx_r);
     hand_idx_list = horzcat(hand_conf.lnk_idx_l, hand_conf.lnk_idx_r);
 
     if (nargin > 8)
         % normal mode:
         wf_R_b_arr = reshape(wf_R_b, 9, 1);
-        % M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, wf_p_b, q_j);
-        % c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
-        % [Jc_f, djcdq_f] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, feet_idx_list);
-
-        [M, c_qv, Jc_f, djcdq_f] = rigidBodyDynCJacobiansCL(obj, feet_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
-        [Jc_h, djcdq_h] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, hand_idx_list); % TEMPORARY: must be changed like above --> check dimensions!
+        [M, c_qv, Jc_f, djcdq_f] = rigidBodyDynCJacobiansCS(obj, feet_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+        [Jc_h, djcdq_h] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, hand_idx_list);
     else
         % optimized mode:
-        % M    = mexWholeBodyModel('mass-matrix');
-        % c_qv = mexWholeBodyModel('generalized-forces');
-        % [Jc_f, djcdq_f] = contactJacobians(obj, feet_idx_list);
-
-        [M, c_qv, Jc_f, djcdq_f] = rigidBodyDynCJacobiansCL(obj, feet_conf);
-        [Jc_h, djcdq_h] = contactJacobians(obj, hand_idx_list); % TEMPORARY: must be changed like above --> check dimensions!
+        [M, c_qv, Jc_f, djcdq_f] = rigidBodyDynCJacobiansCS(obj, feet_conf);
+        [Jc_h, djcdq_h] = contactJacobians(obj, hand_idx_list);
     end
 
     Jcf_t = Jc_f.';

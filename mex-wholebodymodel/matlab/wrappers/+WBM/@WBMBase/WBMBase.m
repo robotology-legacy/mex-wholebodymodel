@@ -27,10 +27,9 @@ classdef WBMBase < handle
                 error('WBMBase::WBMBase: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
 
-            obj.initWBM(robot_model);
+            initWBM(obj, robot_model);
             % set the world frame (WF) to the initial parameters ...
-            obj.setInitWorldFrame(robot_model.wf_R_b, robot_model.wf_p_b, ...
-                                  robot_model.g_wf);
+            setInitWorldFrame(obj, robot_model.wf_R_b, robot_model.wf_p_b, robot_model.g_wf);
         end
 
         % Copy-function:
@@ -116,8 +115,7 @@ classdef WBMBase < handle
                     error('WBMBase::setInitWorldFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             % if nargin = 1, update the world frame with the individual changed values from outside ...
-            obj.setWorldFrame(obj.mwbm_model.wf_R_b, obj.mwbm_model.wf_p_b, ...
-                              obj.mwbm_model.g_wf);
+            setWorldFrame(obj, obj.mwbm_model.wf_R_b, obj.mwbm_model.wf_p_b, obj.mwbm_model.g_wf);
         end
 
         function [wf_p_b, wf_R_b] = getWorldFrameFromFixLnk(obj, urdf_fixed_link, q_j)
@@ -125,10 +123,10 @@ classdef WBMBase < handle
             switch nargin
                 case 3
                     % normal mode: compute the WF for a specific joint configuration (positions)
-                    [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(urdf_fixed_link, q_j);
+                    [wf_p_b, wf_R_b] = computeNewWorld2Base(obj, urdf_fixed_link, q_j);
                 case 2
                     % optimized mode: compute the WF with the current joint configuration
-                    [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(urdf_fixed_link);
+                    [wf_p_b, wf_R_b] = computeNewWorld2Base(obj, urdf_fixed_link);
                 otherwise
                     error('WBMBase::getWorldFrameFromFixLnk: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -138,11 +136,11 @@ classdef WBMBase < handle
             % compute the base world frame (WF) from the default contact (constraint) link:
             if exist('q_j', 'var')
                 % normal mode:
-                [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(obj.mwbm_model.urdf_fixed_link, q_j);
+                [wf_p_b, wf_R_b] = computeNewWorld2Base(obj, obj.mwbm_model.urdf_fixed_link, q_j);
                 return
             end
             % else, optimized mode:
-            [wf_p_b, wf_R_b] = obj.computeNewWorld2Base(obj.mwbm_model.urdf_fixed_link);
+            [wf_p_b, wf_R_b] = computeNewWorld2Base(obj, obj.mwbm_model.urdf_fixed_link);
         end
 
         function setState(~, q_j, dq_j, v_b)
@@ -570,25 +568,25 @@ classdef WBMBase < handle
             % using Unified Robot Description Format (URDF):
             if isempty(robot_model.urdf_robot_name)
                 % optimized mode:
-                obj.initModel(); % use the default (URDF) model ...
+                initModel(obj); % use the default (URDF) model ...
             else
                 % normal mode:
                 [~,model_name, ext] = fileparts(robot_model.urdf_robot_name);
                 if ~isempty(ext)
                     % use directly a specific URDF-file for the robot model ...
-                    obj.initModelURDF(robot_model.urdf_robot_name);
+                    initModelURDF(obj, robot_model.urdf_robot_name);
                 else
                     % set the model name of the robot which is supported by the WB-Toolbox ...
-                    obj.initModel(model_name);
+                    initModel(obj, model_name);
                 end
             end
             % buffer the joint limits of the robot model for fast access ...
-            [obj.mwbm_model.jlim.lwr, obj.mwbm_model.jlim.upr] = obj.getJointLimits();
+            [obj.mwbm_model.jlim.lwr, obj.mwbm_model.jlim.upr] = getJointLimits(obj);
         end
 
         function [nw_p_b, nw_R_b] = computeNewWorld2Base(obj, urdf_link_name, q_j)
             % get the transformation values from the base to the old world ...
-            [ow_vqT_b,~,~,~] = obj.getState();
+            [ow_vqT_b,~,~,~] = getState(obj);
             % get the homogeneous transformation matrix H
             % from the base to the old world ...
             [ow_p_b, ow_R_b] = WBM.utilities.frame2posRotm(ow_vqT_b);

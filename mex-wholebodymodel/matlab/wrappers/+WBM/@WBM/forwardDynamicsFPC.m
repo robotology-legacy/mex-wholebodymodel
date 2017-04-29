@@ -7,7 +7,7 @@ function dstvChi = forwardDynamicsFPC(obj, t, stvChi, fhTrqControl, feet_conf, a
     nu  = vertcat(v_b, stp.dq_j);     % mixed generalized velocity
 
     % update the state for the optimized mode ...
-    obj.setState(stp.q_j, stp.dq_j, v_b);
+    setState(obj, stp.q_j, stp.dq_j, v_b);
 
     M    = mexWholeBodyModel('mass-matrix');
     c_qv = mexWholeBodyModel('generalized-forces');

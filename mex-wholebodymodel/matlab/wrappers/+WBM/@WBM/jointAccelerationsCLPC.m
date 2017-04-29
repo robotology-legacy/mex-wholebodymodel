@@ -11,7 +11,7 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_
             % compute the whole body dynamics and for each contact constraint
             % the Jacobian and the derivative Jacobian ...
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-            [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobiansCL(obj, clink_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+            [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobiansCS(obj, clink_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
             % get the contact forces and the corresponding generalized forces ...
             [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, djcdq, M, c_qv, ...
                                                wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
@@ -22,7 +22,7 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_
             % q_j    = varargin{3}
             % nu     = varargin{4}
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-            [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobiansCL(obj, clink_conf);
+            [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobiansCS(obj, clink_conf);
             [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, djcdq, ...
                                                M, c_qv, wf_R_b_arr, varargin{2:4});
         case {10, 11} % optimized modes:
@@ -43,7 +43,7 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_
             v_b  = varargin{1,2};
             nu   = vertcat(v_b, dq_j);
 
-            [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobiansCL(obj, clink_conf);
+            [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobiansCS(obj, clink_conf);
             [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, djcdq, M, c_qv, nu);
         otherwise
             error('WBM::jointAccelerationsCLPC: %s', WBM.wbmErrorMsg.WRONG_ARG);

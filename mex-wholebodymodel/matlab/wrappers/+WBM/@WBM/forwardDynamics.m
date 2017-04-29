@@ -7,7 +7,7 @@ function dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
     %nu  = vertcat(v_b, stp.dq_j);
 
     % update the state for the optimized mode (precautionary) ...
-    obj.setState(stp.q_j, stp.dq_j, v_b);
+    setState(obj, stp.q_j, stp.dq_j, v_b);
 
     % get the current control torques ...
     [tau,~] = fhTrqControl(t);
