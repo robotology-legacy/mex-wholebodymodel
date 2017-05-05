@@ -70,5 +70,6 @@ set(MODEL.wait, 'Units', 'Pixels', 'Position', [800 500 365 100])
 % state machine.
 REFERENCES             = integrateInverseKinematics(MODEL,chi_robotInit);
 delete(MODEL.wait)
-
+disp('[ikinSolver]: inverse kinematics integration completed')
+  
 end

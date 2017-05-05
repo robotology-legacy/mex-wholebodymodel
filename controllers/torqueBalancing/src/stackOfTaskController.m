@@ -12,10 +12,8 @@ function CONTROLLER = stackOfTaskController(MODEL,GAINS,TRAJECTORY,DYNAMICS,FORK
 %            points in cartesian space;
 %          - STATE contains the current system state;
 %
-%
 % Output:  - CONTROLLER is a structure containing the control torques, 
 %            and other parameters for controlling the robot.
-%
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, March 2017
@@ -38,13 +36,8 @@ momentumGains       = GAINS.momentumGains;
 intMomentumGains    = GAINS.intMomentumGains;
 reg_gains           = GAINS.reg_gains;
 
-%% Robot and elastic joints dynamics
+%% Robot dynamics
 M                   = DYNAMICS.M;
-% Compute motor reflected inertia for control (only in case of stiff
-% control model)
-if MODEL.CONFIG.assume_rigid_joints
-    M(7:end,7:end)  =  M(7:end,7:end)+DYNAMICS.B_xi;
-end
 % decompose mass matrix
 m                   = M(1,1);
 Mb                  = M(1:6,1:6);
@@ -57,13 +50,11 @@ C_nu                = DYNAMICS.C_nu;
 dJc_nu              = DYNAMICS.dJc_nu;
 H                   = DYNAMICS.H;
 Jc                  = DYNAMICS.Jc;
-KS                  = DYNAMICS.KS;
-KD                  = DYNAMICS.KD;
 h                   = g + C_nu;
 f_grav              = [zeros(2,1);
                       -m*gravAcc;
                        zeros(3,1)];
-% The centroidal momentum jacobian is reduced to the joint velocity. This
+% the centroidal momentum jacobian is reduced to the joint velocity. This
 % is then used to compute the approximation of the angular momentum integral
 JH                  = DYNAMICS.JH;
 JG                  = JH(:,7:end) - JH(:,1:6)*(eye(6)/Jc(1:6,1:6))*Jc(1:6,7:end);
@@ -74,10 +65,9 @@ dxCoM               = FORKINEMATICS.dxCoM;
 poseRFoot_ang       = FORKINEMATICS.poseRFoot_ang;
 poseLFoot_ang       = FORKINEMATICS.poseLFoot_ang;
 
-%% Robot state and motor configurations
+%% Robot state
 qj                  = STATE.qj;
 dqj                 = STATE.dqj;
-xi                  = STATE.xi;
 
 %% CoM and joints reference trajectory
 x_dx_ddx_CoMDes     = TRAJECTORY.desired_x_dx_ddx_CoM;
@@ -120,12 +110,12 @@ HDes               = [m.*(dxCoM-x_dx_ddx_CoMDes(:,2)); H(4:end)];
 intHDes            = [m.*(xCoM-x_dx_ddx_CoMDes(:,1)); deltaPhi];
 HDotStar           = HDotDes -momentumGains*HDes -intMomentumGains*intHDes;
 
-%% Control torques equation
+%% Control torques multipliers
 JcMinv             = Jc/M;
 Lambda             = JcMinv*S;
 JcMinvJct          = JcMinv*transpose(Jc);
 pinvLambda         = pinv(Lambda,pinv_tol);
-% multiplier of contact wrenches in u0
+% multiplier of contact wrenches
 JBar               = transpose(Jc(:,7:end)) - transpose(Mbj)/Mb*transpose(Jc(:,1:6));
 % nullspaces
 NullA              = eye(6*numConstraints)-pinvA*A;
@@ -138,20 +128,26 @@ posturalCorr       =  NullLambda_damp*Mbar;
 impedances         =  impedances*pinv(posturalCorr,pinv_tol) + reg_gains.*eye(ndof);
 dampings           =  dampings*pinv(posturalCorr,pinv_tol) + reg_gains.*eye(ndof);
 
-%% Control torques definition (without terms that depend on fc)
-% in case of elastic control model, this is part of the motor reference velocity 
-if MODEL.CONFIG.assume_rigid_joints == 1
-    tauModel       = pinvLambda*(JcMinv*h - dJc_nu) +NullLambda*(h(7:end) -transpose(Mbj)/Mb*h(1:6)...
+%% Control torques (without all terms that depend on fc)
+% in case of elastic control model, this is part of the motor reference
+% velocities. Otherwise tuaModel is directly used in the calculation of
+% control torques
+if MODEL.CONFIG.use_SEA
+    KS             = DYNAMICS.KS;
+    KD             = DYNAMICS.KD;
+    xi             = STATE.xi;
+    tauModel       = pinvLambda*(JcMinv*h - dJc_nu) +KS*(qj-xi) +KD*dqj +NullLambda*(h(7:end) -transpose(Mbj)/Mb*h(1:6)...
                      +Mbar*ddqjRef -impedances*posturalCorr*qjTilde -dampings*posturalCorr*dqjTilde);
 else
-    tauModel       = pinvLambda*(JcMinv*h - dJc_nu) +KS*(qj-xi) +KD*dqj +NullLambda*(h(7:end) -transpose(Mbj)/Mb*h(1:6)...
+    tauModel       = pinvLambda*(JcMinv*h - dJc_nu) +NullLambda*(h(7:end) -transpose(Mbj)/Mb*h(1:6)...
                      +Mbar*ddqjRef -impedances*posturalCorr*qjTilde -dampings*posturalCorr*dqjTilde);
 end
 
-%% Desired contact forces 
+%% Desired contact forces
+% contact forces (no nullspace)
 fcHStar            = pinvA*(HDotStar-f_grav);
 
-% Desired f0 (forces nullspace) without Quadratic Programming
+% Desired f0 (contact forces nullspace) without Quadratic Programming
 f0                 = zeros(6,1);
 
 if  sum(feet_on_ground) == 2    

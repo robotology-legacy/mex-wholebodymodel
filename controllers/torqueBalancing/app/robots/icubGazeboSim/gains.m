@@ -32,9 +32,9 @@ end
 %% Parameters for one foot balancing
 if  sum(MODEL.CONFIG.feet_on_ground) == 1
     % CoM and angular momentum gains
-    gainsPCoM          = diag([30 35 30])/5;
+    gainsPCoM          = diag([30 35 30]);
     gainsDCoM          = 2*sqrt(gainsPCoM);
-    gainsPAngMom       = diag([2.5 5 2.5])/5;
+    gainsPAngMom       = diag([2.5 5 2.5]);
     gainsDAngMom       = 2*sqrt(gainsPAngMom);
     % impedances acting in the null space of the desired contact forces
     impTorso           = [ 10   15   10];
@@ -51,7 +51,7 @@ end
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% Definition of the impedances and dampings vectors
-GAINS.impedances   = [impTorso,impArms,impArms,impLeftLeg,impRightLeg]/5;
+GAINS.impedances   = [impTorso,impArms,impArms,impLeftLeg,impRightLeg];
 GAINS.dampings     = 2*sqrt(GAINS.impedances);
 
 if (size(GAINS.impedances,2) ~= ndof)

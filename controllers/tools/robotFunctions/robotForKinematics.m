@@ -24,9 +24,6 @@ function FORKINEMATICS = robotForKinematics(STATE,DYNAMICS)
 % Genova, March 2017
 
 %% ------------Initialization----------------
-import WBM.utilities.frame2posRotm;
-import WBM.utilities.rotm2eulAngVelTF;
-
 %% State parameters
 w_R_b          = STATE.w_R_b;
 x_b            = STATE.x_b;

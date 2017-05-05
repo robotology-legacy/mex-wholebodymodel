@@ -25,7 +25,7 @@ function DYNAMICS = robotDynamics(STATE,MODEL)
 % Genova, March 2017
 
 %% ------------Initialization----------------
-% Config parameters
+% config parameters
 ndof            = MODEL.ndof;
 numConstraints  = sum(MODEL.CONFIG.feet_on_ground);
 
@@ -40,7 +40,12 @@ w_omega_b       = STATE.w_omega_b;
 %% ROBOT DYNAMICS
 % mass matrix
 M                           = wbm_massMatrix(w_R_b,x_b,qj);
-M(7:end,7:end)              = M(7:end,7:end) + 0.1.*eye(ndof);
+% correct the joint-related part of the mass matrix by adding the motor
+% reflected inertias 
+if MODEL.CONFIG.use_motorReflectedInertia  
+    [B_xi,~,~,~]            = addElasticJoints(MODEL);
+    M(7:end,7:end)          = M(7:end,7:end) + B_xi;
+end
 
 % generalized bias forces, Coriolis and gravity
 h                           = wbm_generalizedBiasForces(w_R_b,x_b,qj,dqj,[dx_b;w_omega_b]);

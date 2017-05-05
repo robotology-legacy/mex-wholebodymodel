@@ -15,17 +15,15 @@ function  desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG)
 % Genova, March 2017
 
 %% ------------Initialization----------------
-% Config parameters
-feet_on_ground             = CONFIG.feet_on_ground;
-
-% Initial parameters
-directionOfOscillation     = [0;0;0];
+% config parameters
+directionOfOscillation     = CONFIG.directionOfOscillation;
+amplitudeOfOscillation     = CONFIG.amplitudeOfOscillation;
+frequencyOfOscillation     = CONFIG.frequencyOfOscillation;
+noOscillationTime          = CONFIG.noOscillationTime;           
+% initial parameters
 referenceParams            = [0.0 0.0];   %referenceParams(1) = amplitude of ascillations in meters
                                           %referenceParams(2) = frequency of ascillations in Hertz
-                                          
-noOscillationTime          = 0;           % If params.demo_movements = 1, the variable noOscillationTime is the time, in seconds,
-                                          % that the robot waits before starting the left-and-right
-
+          
 % it is necessary to initially smooth the reference trajectory to avoid
 % discontinuities with robot initial conditions
 smoothingTime              = 1;
@@ -33,18 +31,13 @@ alpha                      = (t-noOscillationTime)/(smoothingTime);
 
 %% Trajectory definition
 if  strcmp(CONFIG.demo_type,'movements')   
-    if  sum(feet_on_ground) == 2       
-        directionOfOscillation = [0;1;0];
-        referenceParams        = [0.025 0.25];
-    else    
-        directionOfOscillation = [0;1;0];
-        referenceParams        = [0.01 0.2];
-    end
+    % update reference trajectory    
+    referenceParams        = [amplitudeOfOscillation frequencyOfOscillation];
 end
 
 %% Trajectory generation
 % frequency of oscillation
-frequency  = referenceParams(2);
+frequency      = referenceParams(2);
 % amplitude of oscillation
 if t >= noOscillationTime 
     amplitude  = referenceParams(1);
@@ -52,7 +45,7 @@ else
     amplitude  = 0;
 end
  
-% CoM REFERENCES
+%% CoM REFERENCES
 % position
 xCoMDes   =  xCoMInit + (1-exp(-alpha))*amplitude*sin(2*pi*frequency*t)*directionOfOscillation;
 % velocity

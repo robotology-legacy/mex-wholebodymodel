@@ -9,7 +9,6 @@
 %  - One or two feet balancing about a reference point;
 %  - One or two feet tracking of a CoM reference trajectory; 
 %  - Highly dynamic Tai Chi (see also https://www.youtube.com/watch?v=9XRI4BeXN78);
-%  - Stand up motion from a chair;
 %  
 %  LIST OF AVAILABLE ROBOTS:
 %  - iCub;
@@ -19,6 +18,9 @@
 %  LIST OF AVAILABLE TOOLS:
 %  - elasticJoints: assumes all joints are driven by Series Elastic Actuators.
 %                   Motors dynamics is taken into account in both model and control;
+%  - linearization: the joint space is linearized about a set point. This
+%                   utility is used for verifying the closed loop system 
+%                   stability and for gian tuning; 
 %  - gainTuning: a gain tuning procedure is performed for setting control gains.
 %                It is based on a linearization of the joint space dynamics about the
 %                starting joint configuration;
@@ -72,8 +74,8 @@ clc
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%% DEMO SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 % available robot names: 'icubGazeboSim', 'bigman', 'bigman_only_legs'
 CONFIG.robot_name                            = 'icubGazeboSim';  
-% available demos: 'yoga', 'balancing', 'movements', 'standup'
-CONFIG.demo_type                             = 'movements';  
+% available demos: 'yoga', 'balancing', 'movements'
+CONFIG.demo_type                             = 'yoga';  
 % available controllers: 'stackOfTask', 'jointControl'
 CONFIG.control_type                          = 'stackOfTask';  
 
@@ -109,22 +111,22 @@ CONFIG.feet_on_ground                        = [1,1];                      %eith
 % reference for CoM position.
 CONFIG.frequencyOfOscillation                = 0.15;                       %[Hz]
 CONFIG.amplitudeOfOscillation                = 0.015;                      %[m]
-
-% STANDUP DEMO DEDICATED SETUP
-% the robot will go back sitting down on the chair after standing up
-CONFIG.alsoSitDown                           = true;                       %either true or false
+% if params.demo_movements = 1, the variable noOscillationTime is the time, in seconds,
+% that the robot waits before starting the left-and-right
+CONFIG.directionOfOscillation                = [0;1;0];
+CONFIG.noOscillationTime                     = 0;                          %[s]
 
 %% %%%%%%%%%%%%%%%%%%%%%% VISUALIZATION SETUP %%%%%%%%%%%%%%%%%%%%%%%%%% %%
 % activate robot simulator using iDyntree visualizer
-CONFIG.visualize_robot_simulator             = true;                       %either true or false
+CONFIG.visualize_robot_simulator             = false;                      %either true or false
 % enable the visualization tool. The list of avaliable figure will be 
 % displayed after numerical integration
-CONFIG.enable_visualTool                     = true;                       %either true or false
+CONFIG.enable_visualTool                     = false;                      %either true or false
 
 %% %%%%%%%%%%%%%% FORWARD DYNAMICS INTEGRATION SETUP %%%%%%%%%%%%%%%%%%% %%
 % integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 1;
+CONFIG.tEnd                                  = 80;
 CONFIG.sim_step                              = 0.01;
 % event function. Currently, if a discrete event is detected, the integration 
 % stops and it restarts with new initial conditions, just after the event. 
@@ -141,7 +143,7 @@ CONFIG.options                               = odeset('RelTol',1e-3,'AbsTol',1e-
 % and ode23t. make use of other solvers not only slows down the numerical
 % integration, but it can lead to numerical instablity (in particular, do
 % not use a fixed step integrator)
-CONFIG.odeSolver                             = 'ode15s';
+CONFIG.odeSolver                             = 'ode23t';
 if ~strcmp(CONFIG.odeSolver,'ode15s') && ~strcmp(CONFIG.odeSolver,'ode23t') 
     warning('ODE solver is not ''ode15s'' or ''ode23t''. This may lead to numerical instability!')
 end
@@ -161,11 +163,9 @@ CONFIG.use_motorReflectedInertia             = true;                       %eith
 % consider joint limits during the simulation
 CONFIG.use_jointLimits                       = false;                      %either true or false
 % make a video of the iDyntree simulation (offline) 
-CONFIG.makeVideo                             = true;                       %either true or false
+CONFIG.makeVideo                             = false;                      %either true or false
 % record figures data (stored in a .mat file) 
-CONFIG.recordData                            = true;                       %either true or false
-
-% DANGER ZONE
+CONFIG.recordData                            = false;                      %either true or false
 % robot simulator is active during numerical integration. 
 % WARNING: THIS WILL CONSIDERABLY SLOW DOWN NUMERICAL INTEGRATION!
 CONFIG.visualize_robot_simulator_ONLINE      = true;                       %either true or false
@@ -189,20 +189,25 @@ if CONFIG.use_SEA
     % motor reflected inertia can be used only if it is not considered in
     % the model, i.e. if joint elasticity is not taken into account
     CONFIG.use_motorReflectedInertia         = false;    
-    warning('''CONFIG.use_SEA'' option is TRUE, motor reflected inertia correction not available');
+    disp('[Configuration]:''CONFIG.use_SEA'' option is TRUE, motor reflected inertia correction not available');
 end
 if strcmp(CONFIG.control_type,'jointControl')
-    % joint control necessarily requires the use of inverse kinematics
+    % joint control necessarily requires the use of inverse kinematics and
+    % centroidal transformation
+    CONFIG.use_centroidalTransf              = true;                       
     CONFIG.use_ikinSolver                    = true; 
     % for the moment, the algorithm used for addin SEA in the dynamics is
     % specific for 'stackOfTask' controller
     CONFIG.use_SEA                           = false;
     % also gain tuning is specific for 'stackOfTask' controller
     CONFIG.use_gainTuning                    = false; 
-    warning('balancing controller is ''jointControl'': SEA, gainTuning are not available. Ikin solver has been activated by default');    
+    % the same for QPsolver
+    CONFIG.use_QPsolver                      = false; 
+    disp(['[Configuration]: balancing controller is ''jointControl'': SEA, gainTuning, QP solver are not available.' ...
+             'Ikin solver and centroidal transformation has been activated by default']);    
 end
-if strcmp(CONFIG.demo_type,'yoga') || strcmp(CONFIG.demo_type,'standup') 
-    % gain tuning and ikin solver are not available for inverse kinematics.
+if strcmp(CONFIG.demo_type,'yoga')
+    % gain tuning and ikin solver are not available for this demo.
     % The reason is, the state machine is not available for offline
     % integration they use.
     CONFIG.use_ikinSolver                    = false; 
@@ -210,17 +215,23 @@ if strcmp(CONFIG.demo_type,'yoga') || strcmp(CONFIG.demo_type,'standup')
     % hence, the only controller available for these demo is Stack of Task
     % (joint controller requires ikin solver)
     CONFIG.control_type                      = 'stackOfTask';
-    warning('for demos that make use of a finite state machine, the following tools/controllers are not available: ikinSolver, gainTuning, jointControl');     
+    disp(['[Configuration]: for demos that make use of a finite state machine, ' ...
+          'the following tools/controllers are not available: ikinSolver, gainTuning, jointControl']);     
+end
+if strcmp(CONFIG.control_type,'stackOfTask')
+    % centroidal transformation not available for stack of task controller
+    CONFIG.use_centroidalTransf              = false;                       
+    disp('[Configuration]: balancing controller is ''stackOfTask'': centroidal transformation is not available.');
 end
 if CONFIG.enable_visualTool
     % create a folder and initialize stored values 
-    outputDir = './media';
-    if (~exist(outputDir, 'dir'))
-        mkdir(outputDir);
+    CONFIG.outputDir = './media';
+    if (~exist(CONFIG.outputDir, 'dir'))
+        mkdir(CONFIG.outputDir);
         disp('[Visualization]: created the folder ''./media'' for storing data')
     end
     % saving the user-defined configuration
-    save('./media/storedValues','CONFIG','-v7.3')
+    save('./media/storedValuesFwdDyn','CONFIG','-v7.3')
 end
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%% %%

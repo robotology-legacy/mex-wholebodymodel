@@ -1,4 +1,3 @@
-function figureCont = initVisualizer(t_total,chi_total,MODEL)
 %INITVISUALIZER initializes the visualization of forward dynamics
 %               integration results.
 %
@@ -51,4 +50,4 @@ end
 figureCont = MODEL.figureCont;
 set(0,'DefaultFigureWindowStyle','Normal');
 
-end
+

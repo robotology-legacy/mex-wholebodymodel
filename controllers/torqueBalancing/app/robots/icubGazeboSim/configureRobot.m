@@ -6,7 +6,13 @@ function [MODEL,INIT_CONDITIONS] = configureRobot(varargin)
 %
 % Inputs:  - CONFIG: it is the structure containing all user-defined 
 %                    configuration parameters;
+%                       
+%                           ONLY FOR UPDATING THE DATA:
+%
 %          - chi_robotInit: a vector describing the robot state [13+2*ndof x 1]. 
+%          - MODEL_OLD: it is a structure defining the robot model;        
+%          - INIT_CONDITIONS_OLD: it is a structure containing initial conditions
+%                             for forward dynamics integration.
 %
 % Output:  - MODEL: it is a structure defining the robot model;        
 %          - INIT_CONDITIONS: it is a structure containing initial conditions
@@ -19,8 +25,14 @@ function [MODEL,INIT_CONDITIONS] = configureRobot(varargin)
 global state;
 
 CONFIG            = varargin{1};
-if nargin == 2
-    chi_robotInit = varargin{2};
+if nargin == 4
+    chi_robotInit       = varargin{2};
+    MODEL_OLD           = varargin{3};
+    INIT_CONDITIONS_OLD = varargin{4};
+    % save the previous model and initial conditions structure into the new
+    % one (to avoid losing data from ikin, gain tuning, ecc...)
+    MODEL               = MODEL_OLD;
+    INIT_CONDITIONS     = INIT_CONDITIONS_OLD;
 end
     
 %% Include configuration in the model structure
@@ -59,23 +71,7 @@ if strcmp(MODEL.CONFIG.demo_type,'yoga')
     SM     = initStateMachineYoga(MODEL, state, 'init');
     % initial joint positions
     qjInit = SM.qjRef;
-    
-elseif strcmp(MODEL.CONFIG.demo_type,'standup')
-    if state == 1
-        % balancing with both feet and legs                 
-        MODEL.CONFIG.legsInContact   = 1;   
-    elseif state == 3
-        % feet banacing
-        MODEL.CONFIG.legsInContact   = 0; 
-    elseif state == 7
-        % balancing with both feet and legs
-        MODEL.CONFIG.legsInContact   = 1; 
-    end 
-    % initialize state machine references   
-    SM      = initStateMachineStandup(MODEL, state, 'init');
-    % initial joint positions
-    qjInit  = SM.qjRef;
-    
+       
 else
     % initial joints position (NO STATE MACHINE)
     if sum(MODEL.CONFIG.feet_on_ground) == 2
@@ -120,10 +116,6 @@ elseif MODEL.CONFIG.feet_on_ground(1) == 1 && MODEL.CONFIG.feet_on_ground(2) == 
 elseif MODEL.CONFIG.feet_on_ground(1) == 0 && MODEL.CONFIG.feet_on_ground(2) == 1
     % right foot balancing
     MODEL.constraintLinkNames = {'r_sole'};
-    
-elseif MODEL.CONFIG.legsInContact  == 1
-    % two feet and legs balancing
-    MODEL.constraintLinkNames = {'l_sole','r_sole','l_upper_leg_contact','r_upper_leg_contact'};
 end
 
 % fixing the world reference frame w.r.t. the foot on ground position
@@ -153,8 +145,8 @@ wbm_setWorldFrame(w_R_bInit,x_bInit,[0; 0; -9.81])
 
 %% %%%%%%%% INITIAL GAINS AND REFERENCES (NO TUNING, NO IKIN) %%%%%%%%%% %%
 % control gains (no gain tuning)
-if strcmp(MODEL.CONFIG.demo_type,'yoga') || strcmp(MODEL.CONFIG.demo_type,'standup') 
-    % initial gains
+if strcmp(MODEL.CONFIG.demo_type,'yoga')
+    % initial gains (state machine)
     MODEL.GAINS     = reshapeGains(SM.gainsVector,MODEL);
 else
     % initial gains (no state machine)

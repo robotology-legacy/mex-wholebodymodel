@@ -1,4 +1,4 @@
-function [MODEL_updated,INIT_CONDITIONS_updated] = finiteStateMachine(t,MODEL,INIT_CONDITIONS)
+function [MODEL_updated,INIT_CONDITIONS_updated] = finiteStateMachineYoga(t,MODEL,INIT_CONDITIONS)
 %FINITESTATEMACHINE update and configure the robot model and initial
 %                   conditions according to the current state. It also
 %                   defines the conditions for switching to the next state.
@@ -36,7 +36,7 @@ if state == 1
     % update robot model with the number of feet on ground
     MODEL_updated.CONFIG.feet_on_ground = [1,1];
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,'');
+    SM = initStateMachineYoga(MODEL_updated,state,'');
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;
@@ -63,7 +63,7 @@ if state == 2 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef([1,2]) = INIT_CONDITIONS_updated.INITFORKINEMATICS.poseLFoot_qt([1,2]);
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,'');
+    SM = initStateMachineYoga(MODEL_updated,state,'');
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;
@@ -83,7 +83,7 @@ if state == 3 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef([1,2]) = INIT_CONDITIONS_updated.INITFORKINEMATICS.poseLFoot_qt([1,2]);
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,'');
+    SM = initStateMachineYoga(MODEL_updated,state,'');
     MODEL_updated.constraintLinkNames   = SM.constraintLinkNames;
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
@@ -112,7 +112,7 @@ if state == 4 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef([1,2]) = INIT_CONDITIONS_updated.INITFORKINEMATICS.poseLFoot_qt([1,2]);
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,num2str(contYogaMovements));
+    SM = initStateMachineYoga(MODEL_updated,state,num2str(contYogaMovements));
     % conditions for switching to the next movement
     if contYogaMovements < 8
        if (t-t_switch) > SM.t_yoga(contYogaMovements) 
@@ -122,7 +122,7 @@ if state == 4 && changeStateDetector
        end
     end
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,num2str(contYogaMovements));
+    SM = initStateMachineYoga(MODEL_updated,state,num2str(contYogaMovements));
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;
@@ -142,7 +142,7 @@ if state == 5 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef([1,2]) = INIT_CONDITIONS_updated.INITFORKINEMATICS.poseLFoot_qt([1,2]);
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,'');
+    SM = initStateMachineYoga(MODEL_updated,state,'');
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;
@@ -162,7 +162,7 @@ if state == 6 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef([1,2]) = INIT_CONDITIONS_updated.INITFORKINEMATICS.poseLFoot_qt([1,2]);
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,'');
+    SM = initStateMachineYoga(MODEL_updated,state,'');
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;
@@ -182,7 +182,7 @@ if state == 7 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef = INIT_CONDITIONS_updated.INITFORKINEMATICS.xCoM;
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,'');
+    SM = initStateMachineYoga(MODEL_updated,state,'');
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;
@@ -203,7 +203,7 @@ if state == 8 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef([1,2]) = INIT_CONDITIONS_updated.INITFORKINEMATICS.poseRFoot_qt([1,2]);
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,'');
+    SM = initStateMachineYoga(MODEL_updated,state,'');
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;
@@ -223,7 +223,7 @@ if state == 9 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef([1,2]) = INIT_CONDITIONS_updated.INITFORKINEMATICS.poseRFoot_qt([1,2]);
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,'');
+    SM = initStateMachineYoga(MODEL_updated,state,'');
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;
@@ -252,7 +252,7 @@ if state == 10 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef([1,2]) = INIT_CONDITIONS_updated.INITFORKINEMATICS.poseRFoot_qt([1,2]);
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,num2str(contYogaMovements));
+    SM = initStateMachineYoga(MODEL_updated,state,num2str(contYogaMovements));
     % conditions for switching to the next movement
     if contYogaMovements < 8
        if (t-t_switch) > SM.t_yoga(contYogaMovements) 
@@ -262,7 +262,7 @@ if state == 10 && changeStateDetector
        end
     end
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,num2str(contYogaMovements));
+    SM = initStateMachineYoga(MODEL_updated,state,num2str(contYogaMovements));
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;
@@ -282,7 +282,7 @@ if state == 11 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef([1,2]) = INIT_CONDITIONS_updated.INITFORKINEMATICS.poseRFoot_qt([1,2]);
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,'');
+    SM = initStateMachineYoga(MODEL_updated,state,'');
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;
@@ -302,7 +302,7 @@ if state == 12 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef([1,2]) = INIT_CONDITIONS_updated.INITFORKINEMATICS.poseRFoot_qt([1,2]);
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,'');
+    SM = initStateMachineYoga(MODEL_updated,state,'');
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;
@@ -322,7 +322,7 @@ if state == 13 && changeStateDetector
     % update CoM reference w.r.t. stance foot position
     INIT_CONDITIONS_updated.xCoMRef = INIT_CONDITIONS_updated.INITFORKINEMATICS.xCoM;
     % load values for the current state
-    SM = initStateMachine(INIT_CONDITIONS_updated,MODEL_updated,state,'');
+    SM = initStateMachineYoga(MODEL_updated,state,'');
     % update CoM, joint and gains references
     INIT_CONDITIONS_updated.xCoMRef = SM.xCoMRef;
     INIT_CONDITIONS_updated.qjRef   = SM.qjRef;

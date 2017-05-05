@@ -15,6 +15,7 @@ function REFERENCES = integrateInverseKinematics(MODEL,chiInit)
 
 %% ------------Initialization----------------
 % setup integration time and initial conditions
+REFERENCES          = MODEL.REFERENCES;
 ndof                = MODEL.ndof;
 tStep               = MODEL.CONFIG.sim_step;
 t                   = transpose(MODEL.CONFIG.tStart:tStep:MODEL.CONFIG.tEnd);

@@ -23,7 +23,6 @@ function STATE = robotState(chi,MODEL)
 % Genova, March 2017
 
 %% ------------Initialization----------------
-import WBM.utilities.frame2posRotm;
 % CONFIG.demux.baseOrientationType sets the base orientation in stateDemux.m
 % as positions + quaternions (1) or transformation matrix (0)
 MODEL.demux.baseOrientationType = 1;

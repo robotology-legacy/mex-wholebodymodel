@@ -37,21 +37,17 @@ INITFORKINEMATICS      = INIT_CONDITIONS.INITFORKINEMATICS;
 S                      = [zeros(6,ndof);
                           eye(ndof,ndof)];
 
-%% Robot and motors configurations
-xi                     = STATE.xi;
-dxi                    = STATE.dxi;
+%% Robot configuration
 qj                     = STATE.qj;
 dqj                    = STATE.dqj;
 
-%% Robot and elastic joints dynamics
+%% Robot dynamics
 dJc_nu                 = DYNAMICS.dJc_nu;
 M                      = DYNAMICS.M;
 Jc                     = DYNAMICS.Jc;
 h                      = DYNAMICS.h;
 JcMinv                 = Jc/M;
 JcMinvS                = JcMinv*S;
-KS                     = DYNAMICS.KS;
-KD                     = DYNAMICS.KD;
 
 %% Robot forward kinematics
 v_feet                 = FORKINEMATICS.v_feet;
@@ -64,22 +60,28 @@ deltaPoseRFoot         = TR*(poseRFoot_ang-INITFORKINEMATICS.poseRFoot_ang);
 deltaPoseLFoot         = TL*(poseLFoot_ang-INITFORKINEMATICS.poseLFoot_ang);
 
 %% %%%%%%%%%%%%%%%%%%% STACK OF TASK CONTROLLER %%%%%%%%%%%%%%%%%%%%%%%% %%
-CONTROLLER             = stackOfTaskController(MODEL,GAINS,TRAJECTORY,DYNAMICS,FORKINEMATICS,STATE);
-
+% apply centroidal transformation to the control model. 
+if MODEL.CONFIG.use_centroidalTransf  
+    [STATE,DYNAMICS]   = centroidalConversion(DYNAMICS,FORKINEMATICS,STATE);
+end
+% balancing controllers
+if strcmp(MODEL.CONFIG.control_type,'stackOfTask') 
+    CONTROLLER         = stackOfTaskController(MODEL,GAINS,TRAJECTORY,DYNAMICS,FORKINEMATICS,STATE);
+elseif strcmp(MODEL.CONFIG.control_type,'jointControl') 
+    CONTROLLER         = jointSpaceController(MODEL,GAINS,TRAJECTORY,DYNAMICS,STATE);
+end
 % quadratic programming solver for the nullspace of contact forces. It will
 % also apply the unilateral constraints at feet and it ensures the contact
 % forces to be inside the friction cones.
-if  use_QPsolver == 1                 
-    CONTROLLER.fcDes = QPSolver(CONTROLLER,MODEL,FORKINEMATICS);
+if  use_QPsolver                
+    CONTROLLER.fcDes   = QPSolver(CONTROLLER,MODEL,FORKINEMATICS);
 end
 
 %% Application of backstepping algorithm for computing motor torques
-[CONTROLLER.tau_xi,CONTROLLER.dxi_ref] = motorController(DYNAMICS,STATE,GAINS,CONTROLLER);
-
-% if this option is enabled, the controller uses a stiff control model
-% intead of the elastic control model. Be careful: the closed loop system
-% may be unstable!
-if MODEL.CONFIG.assume_rigid_joints == 1
+if MODEL.CONFIG.use_SEA
+    [CONTROLLER.tau_xi,CONTROLLER.dxi_ref] = motorController(DYNAMICS,STATE,GAINS,CONTROLLER);
+else
+    % torque control assuming rigid joints
     CONTROLLER.tau_xi  = CONTROLLER.tauModel + CONTROLLER.Sigma*CONTROLLER.fcDes;
 end
 
@@ -90,16 +92,24 @@ CONTROLLER.tau_xi      = min(MODEL.CONFIG.satTorque, max(-MODEL.CONFIG.satTorque
 % this will avoid numerical errors during the forward dynamics integration
 if feet_on_ground(1) == 1 && feet_on_ground(2) == 0    
     % left foot balancing
-    deltaPoseFeet    = deltaPoseLFoot;    
+    deltaPoseFeet      = deltaPoseLFoot;    
 elseif feet_on_ground(1) == 0 && feet_on_ground(2) == 1    
     % right foot balancing
-    deltaPoseFeet    = deltaPoseRFoot;    
+    deltaPoseFeet      = deltaPoseRFoot;    
 elseif feet_on_ground(1) == 1 && feet_on_ground(2) == 1
     % two feet balancing
-    deltaPoseFeet    = [deltaPoseLFoot;deltaPoseRFoot];
+    deltaPoseFeet      = [deltaPoseLFoot;deltaPoseRFoot];
 end
 
 %% Contact forces computation
-CONTROLLER.fc        = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*(KS*(xi-qj) +KD*(dxi-dqj)) -dJc_nu -KdFeet.*v_feet -KpFeet.*deltaPoseFeet);
-
+if MODEL.CONFIG.use_SEA
+    % contact forces in case motors dynamics is considered
+    xi                 = STATE.xi;
+    dxi                = STATE.dxi;
+    KS                 = DYNAMICS.KS;
+    KD                 = DYNAMICS.KD;
+    CONTROLLER.fc      = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*(KS*(xi-qj) +KD*(dxi-dqj)) -dJc_nu -KdFeet.*v_feet -KpFeet.*deltaPoseFeet);
+else
+    CONTROLLER.fc      = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*controlParam.tau -dJc_nu -KdFeet.*v_feet -KpFeet.*deltaPoseFeet);
+end
 end

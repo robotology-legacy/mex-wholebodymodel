@@ -45,12 +45,12 @@ VISUALIZER.setCamera        = [0.4,0,0.5];
 VISUALIZER.mdlLdr           = iDynTree.ModelLoader();
 model                       = VISUALIZER.mdlLdr.model();
 % load the model from .urdf
-VISUALIZER.mdlLdr.loadReducedModelFromFile('../models/icub/model.urdf',consideredJoints);        
+VISUALIZER.mdlLdr.loadReducedModelFromFile('../../models/icub/model.urdf',consideredJoints);        
 % set lights
 VISUALIZER.lightDir = iDynTree.Direction();     
 VISUALIZER.lightDir.fromMatlab([-0.5 0 -0.5]/sqrt(2)); 
 % open the visualizer
-VISUALIZER.viz  = iDynTree.Visualizer();
+VISUALIZER.viz      = iDynTree.Visualizer();
 VISUALIZER.viz.init();
 VISUALIZER.viz.addModel(model,VISUALIZER.modelName);
 

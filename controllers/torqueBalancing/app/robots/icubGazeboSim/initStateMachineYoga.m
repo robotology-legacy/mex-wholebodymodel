@@ -1,8 +1,8 @@
-function SM = initStateMachine(INIT_CONDITIONS, MODEL, state, prefix)
-%INITSTATEMACHINE configures robot control gains, CoM and joint references and 
+function SM = initStateMachineYoga(MODEL, state, prefix)
+%INITSTATEMACHINEYOGA configures robot control gains, CoM and joint references and 
 %                 tresholds for each state of the finite state machine.
 %
-% Format: SM = INITSTATEMACHINE(INIT_CONDITIONS, state, prefix)
+% Format: SM = INITSTATEMACHINEYOGA(INIT_CONDITIONS, state, prefix)
 %
 % Inputs:  - INIT_CONDITIONS is a structure containing initial conditions
 %            for integration;
@@ -51,7 +51,7 @@ impedances  = [20  30  20,  10  10  10  10  10,  10  10  10  10  10,  30  50   3
                20  30  20,  10  10  10  10  10,  10  10  10  10  10,  30  50   30  60  50  50,  30  50  30  60  50  50]; % state == 13  TRANSITION TO INITIAL POSITION
 
 % select proper gains for the current state
-SM.gainsVector = [gainPCOM(state,:),impedances(state,:)]/10;
+SM.gainsVector = [gainPCOM(state,:),impedances(state,:)];
     
 %% Joint references
 % config parameters
@@ -205,7 +205,7 @@ else
                     0.0, 0.0, 0.00];  %% state == 13  TRANSITION INIT POSITION
        
     % set current CoM reference
-    SM.xCoMRef = INIT_CONDITIONS.xCoMRef + transpose(xCoMRefDelta(state,:));
+    SM.xCoMRef = MODEL.REFERENCES.xCoMRef + transpose(xCoMRefDelta(state,:));
 end
 
 %% Tresholds and smoothing times

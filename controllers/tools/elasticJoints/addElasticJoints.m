@@ -1,5 +1,5 @@
 function [B_xi,KS,KD,damping_xi] = addElasticJoints(MODEL)
-%ADDELASTICJOINTS configure the motor dynamics in case joints elasticity
+%ADDELASTICJOINTS configures the motor dynamics in case joints elasticity
 %                 is considered in the model.
 %
 % Format: [B_xi,KS,KD,damping_xi] = ADDELASTICJOINTS(MODEL)
@@ -21,7 +21,7 @@ robot_name           = MODEL.CONFIG.robot_name;
 % transmission ratio
 eta                  = MODEL.eta;
 
-%% Stiffness, dampinf and motor inertia
+%% Stiffness, damping and motor inertia (expressed w.r.t. the joint side)
 if strcmp(robot_name,'bigman')
     % motor inertia [Kgm^2]
     B_xi       = 5.480e-5./(eta^2).*eye(ndof);
