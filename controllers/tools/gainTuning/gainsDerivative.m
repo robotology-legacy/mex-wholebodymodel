@@ -7,7 +7,7 @@ function [dlambda,dO] = gainsDerivative(lambda,O,MODEL)
 %
 % Inputs:  - lambda: a vector representing the diagonal of matrix Lambda;
 %          - O: orthogonal matrix;
-%          - MODEL: it is a structure defining the robot model.        
+%          - MODEL: is a structure defining the robot model.        
 %
 % Output:  - dlambda: time derivative of lambda;
 %          - dO: time derivative of O.

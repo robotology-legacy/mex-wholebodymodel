@@ -50,8 +50,8 @@ CFoot = [ 0         , 0, -torsionalFrictionCoefficient,               0,        
           0         , 0,                   footSize(2,1),            -1,               0, 0;
           0         , 0,                  -footSize(2,2),             1,               0, 0];
 
-CFoot       =  [ Aineq ;
-                 CFoot ];
+CFoot       =  [Aineq;
+                CFoot];
 
 dConstraints = [zeros(size(Aineq,1), 1); zeros(7,1)];
 dConstraints(3 + size(Aineq,1)) = -fZmin;

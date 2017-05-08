@@ -1,5 +1,5 @@
 function FORKINEMATICS = robotForKinematics(STATE,DYNAMICS)
-%ROBOTFORKINEMATICS uses forward kinematics to define the pose and velocity
+%ROBOTFORKINEMATICS uses forward kinematics to define pose and velocity
 %                   of some points in Cartesian space, e.g. the CoM or
 %                   the contact locations.
 %

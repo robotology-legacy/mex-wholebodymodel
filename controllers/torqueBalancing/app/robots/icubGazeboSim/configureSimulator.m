@@ -3,7 +3,7 @@ function VISUALIZER = configureSimulator()
 %
 % Format: VISUALIZER = CONFIGURESIMULATOR(chi,CONFIG)
 %          
-% Output:  - VISUALIZER a structure containing the initialization parameters 
+% Output:  - VISUALIZER is a structure containing the initialization parameters 
 %            for visualization.  
 %         
 % Author : Gabriele Nava (gabriele.nava@iit.it)

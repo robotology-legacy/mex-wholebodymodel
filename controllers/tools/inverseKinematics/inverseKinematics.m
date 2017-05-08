@@ -12,7 +12,7 @@ function dchi = inverseKinematics(t,chi,MODEL)
 %
 % Inputs:  - t: current time [s]
 %          - chi: robot state vector [13+2*ndof x 1];
-%          - MODEL: it is a structure defining the robot model;        
+%          - MODEL: is a structure defining the robot model;        
 %
 % Output:  - dchi: state derivative [13+2*ndof x 1];
 %         

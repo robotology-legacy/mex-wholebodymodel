@@ -1,6 +1,6 @@
 function  CONTROLLER = jointSpaceController(MODEL,GAINS,TRAJECTORY,DYNAMICS,STATE)
-%JOINTSPACECONTROLLER implements a simple controller in the joint space of
-%                     a floating base robot.
+%JOINTSPACECONTROLLER implements a simple joint space controller for floating 
+%                     base robots. 
 %
 % Format: CONTROLLER = JOINTSPACECONTROLLER(MODEL,GAINS,TRAJECTORY,DYNAMICS,STATE)
 %
@@ -17,7 +17,6 @@ function  CONTROLLER = jointSpaceController(MODEL,GAINS,TRAJECTORY,DYNAMICS,STAT
 % Genova, March 2017
 
 %% ------------Initialization----------------
-% config parameters
 pinv_damp        = MODEL.CONFIG.pinv_damp;
 ndof             = MODEL.CONFIG.ndof;
 feet_on_ground   = MODEL.CONFIG.feet_on_ground;

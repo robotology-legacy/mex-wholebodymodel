@@ -1,6 +1,6 @@
 function DYNAMICS = robotDynamics(STATE,MODEL)
 %ROBOTDYNAMICS defines the robot dynamics given the current state and the
-%              robot model. It is a wrapper for the mex-WBM functions.
+%              robot model. It is a wrapper for mex-WBM functions.
 %
 % Format: DYNAMICS = ROBOTDYNAMICS(STATE,MODEL)
 %

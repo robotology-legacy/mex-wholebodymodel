@@ -14,13 +14,10 @@ function fcDes = QPSolver(CONTROLLER,MODEL,FORKINEMATICS)
 %
 % Output:  - fcDes desired contact forces;
 %
-%
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, March 2017
 
 %% ------------Initialization----------------
-% config parameters
-import WBM.utilities.frame2posRotm;
 regHessianQP         = MODEL.CONFIG.reg_HessianQP;
 feet_on_ground       = MODEL.CONFIG.feet_on_ground;
 
@@ -75,26 +72,24 @@ ConstraintsMatrixQP1Foot  = CL;
 bVectorConstraintsQP1Foot = bVectorConstraints;
 
 if     sum(feet_on_ground) == 1
-    
-    HessianMatrixQP1Foot      =  A'*A;
-    gradientQP1Foot           = -A'*(HDotStar-f_grav);
-    
+    % QP solver in case of 1 foot balancing. It just applies the
+    % constraints to desired contact forces
+    HessianMatrixQP1Foot          =  A'*A;
+    gradientQP1Foot               = -A'*(HDotStar-f_grav);
     [fcDes, ~, exitFlag, ~, ~, ~] = qpOASES(HessianMatrixQP1Foot, gradientQP1Foot, ConstraintsMatrixQP1Foot,...
-                                            [], [], [], bVectorConstraintsQP1Foot);
-    
+                                            [], [], [], bVectorConstraintsQP1Foot);  
 elseif sum(feet_on_ground) == 2
+    % QP solver for 2 feet balancing
+    ConstraintsMatrixQP2Feet   = ConstraintsMatrix2Feet*NullA;
+    bVectorConstraintsQp2Feet  = bVectorConstraints2Feet-ConstraintsMatrix2Feet*fcHStar;
+    HessianMatrixQP2Feet       = SigmaNA'*SigmaNA + eye(size(SigmaNA,2))*regHessianQP;
+    gradientQP2Feet            = SigmaNA'*(tauModel + Sigma*fcHStar);
     
-    ConstraintsMatrixQP2Feet  = ConstraintsMatrix2Feet*NullA;
-    bVectorConstraintsQp2Feet = bVectorConstraints2Feet-ConstraintsMatrix2Feet*fcHStar;
-    HessianMatrixQP2Feet      = SigmaNA'*SigmaNA + eye(size(SigmaNA,2))*regHessianQP;
-    gradientQP2Feet           = SigmaNA'*(tauModel + Sigma*fcHStar);
-    
-    [f0, ~, exitFlag, ~, ~, ~]    = qpOASES(HessianMatrixQP2Feet, gradientQP2Feet, ConstraintsMatrixQP2Feet,...
-                                            [], [], [], bVectorConstraintsQp2Feet);
-    
-    fcDes                     = fcHStar   + NullA*f0;
+    [f0, ~, exitFlag, ~, ~, ~] = qpOASES(HessianMatrixQP2Feet, gradientQP2Feet, ConstraintsMatrixQP2Feet,...
+                                         [], [], [], bVectorConstraintsQp2Feet);   
+    fcDes                      = fcHStar + NullA*f0;
 end
-% detect Qp failures
+% detect eventual Qp failures
 if exitFlag ~= 0   
     warning(['QP failed with: ', num2str(exitFlag)])
 end

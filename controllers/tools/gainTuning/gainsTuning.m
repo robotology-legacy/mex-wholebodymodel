@@ -6,8 +6,8 @@ function [optimalGains,KSopt,KDopt] = gainsTuning(LINEARIZATION,MODEL)
 %
 % Format:  [optimalGains,KSopt,KDopt] = GAINSTUNING(LINEARIZATION,MODEL)
 %
-% Inputs:  - LINEARIZATION: it is a structure containing joint space
-%                           linearized system matrices, lin. state eigenvalues 
+% Inputs:  - LINEARIZATION: is a structure containing joint space linearized 
+%                           system matrices, lin. state eigenvalues 
 %                           and other parameters for gain tuning; 
 %          - MODEL: it is a structure defining the robot model.        
 %

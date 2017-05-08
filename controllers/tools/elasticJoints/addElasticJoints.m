@@ -1,12 +1,12 @@
 function [B_xi,KS,KD,damping_xi] = addElasticJoints(MODEL)
 %ADDELASTICJOINTS configures the motor dynamics in case joints elasticity
-%                 is considered in the model.
+%                 is considered in the model (robot with SEA).
 %
 % Format: [B_xi,KS,KD,damping_xi] = ADDELASTICJOINTS(MODEL)
 %
 % Inputs:  - MODEL is a structure defining the robot model;
 %
-% Output:  - B_xi motor intertia matrix (R^(ndof x ndof))
+% Output:  - B_xi motor intertia matrix projected on joint side (R^(ndof x ndof))
 %          - KS joint stiffness (R^(ndof x ndof))
 %          - KD joint damping (R^(ndof x ndof))
 %          - damping_xi motors velocity control gain (R^(ndof x ndof))
@@ -15,7 +15,6 @@ function [B_xi,KS,KD,damping_xi] = addElasticJoints(MODEL)
 % Genova, March 2017
 
 %% ------------Initialization----------------
-% Configure parameters
 ndof                 = MODEL.ndof;
 robot_name           = MODEL.CONFIG.robot_name;
 % transmission ratio

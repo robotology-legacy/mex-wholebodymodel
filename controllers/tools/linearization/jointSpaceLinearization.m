@@ -9,7 +9,7 @@ function LINEARIZATION  = jointSpaceLinearization(MODEL,INIT_CONDITIONS)
 % Format:  LINEARIZATION  = JOINTSPACELINEARIZATION(MODEL,INIT_CONDITIONS)
 %
 % Inputs:  - MODEL: it is a structure defining the robot model;        
-%          - INIT_CONDITIONS: it is a structure containing initial conditions
+%          - INIT_CONDITIONS: is a structure containing initial conditions
 %                             for forward dynamics integration.
 %
 % Output:  - LINEARIZATION: it is a structure containing joint space

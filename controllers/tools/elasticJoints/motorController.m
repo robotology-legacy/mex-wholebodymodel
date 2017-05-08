@@ -13,18 +13,17 @@ function [tau_xi,dxi_ref] = motorController(DYNAMICS,STATE,GAINS,CONTROLLER)
 % Output:  - tau_xi control torques [ndof x 1] 
 %          - dxi_ref motors reference velocity [ndof x 1] 
 %
-%
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, March 2017
 
 %% ------------Initialization----------------
-% State parameters
+% state parameters
 qj   = STATE.qj;
 dqj  = STATE.dqj;
 dxi  = STATE.dxi;
 xi   = STATE.xi;
 
-% Dynamic parameters
+% dynamic parameters
 KS   = DYNAMICS.KS;
 KD   = DYNAMICS.KD;
 B_xi = DYNAMICS.B_xi;

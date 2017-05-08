@@ -7,7 +7,7 @@ function REFERENCES = integrateInverseKinematics(MODEL,chiInit)
 % Inputs:  - MODEL: it is a structure defining the robot model;        
 %          - chInit: robot state vector [13+2*ndof x 1];
 %
-% Output:  - REFERENCES: it is a structure containing the joints reference 
+% Output:  - REFERENCES: is a structure containing the joints reference 
 %                        trajectory, velocity and acceleration. 
 %         
 % Author : Gabriele Nava (gabriele.nava@iit.it)

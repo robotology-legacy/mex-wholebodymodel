@@ -17,9 +17,9 @@ function yInterp = linearInterpolation(tAfter,tInterp,tBefore,yAfter,yBefore)
 
 %% ------------Initialization----------------
 % define the coefficient m 
-m = (yAfter - yBefore)/(tAfter - tBefore); 
+m       = (yAfter - yBefore)/(tAfter - tBefore); 
 % define the coefficient q
-q = yAfter - m*tAfter;
+q       = yAfter - m*tAfter;
 % compute y = mx + q
 yInterp = m*tInterp + q;
 

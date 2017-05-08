@@ -8,7 +8,7 @@ function REFERENCES = initInverseKinematics(MODEL,INIT_CONDITIONS)
 %          - INIT_CONDITIONS: it is a structure containing initial conditions
 %                             for forward dynamics integration.
 %
-% Output:  - REFERENCES: it is a structure containing the joints reference 
+% Output:  - REFERENCES: is a structure containing the joints reference 
 %                        trajectory, velocity and acceleration. 
 %         
 % Author : Gabriele Nava (gabriele.nava@iit.it)

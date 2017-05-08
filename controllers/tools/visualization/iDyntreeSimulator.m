@@ -4,14 +4,14 @@ function [] = iDyntreeSimulator(t,chi,MODEL)
 % Format: [] = IDYNTREESIMULATOR(t,chi,MODEL)
 %
 % Inputs:  - current time t [s];
-%          - state vector chi [13+4*ndof x 1];
+%          - state vector chi [stateSize X 1];
 %          - MODEL is a structure defining the robot model;
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, March 2017
 
 %% ------------Initialization----------------
-% Setup environment and lights        
+% setup environment     
 env = MODEL.VISUALIZER.viz.enviroment();        
 env.setElementVisibility('root_frame',false);   
 % set lights
@@ -27,7 +27,7 @@ if length(t) == 1
     % this happens for online robot simulator
     [basePos,shape] = iDynTreeModelPositionFromChi(chi,MODEL);
     MODEL.VISUALIZER.viz.modelViz(MODEL.VISUALIZER.modelName).setPositions(basePos,shape);             
-    % Draw visualizer       
+    % draw visualizer       
     MODEL.VISUALIZER.viz.draw();
 else
     counter     = 0; 

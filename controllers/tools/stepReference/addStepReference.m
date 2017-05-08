@@ -9,7 +9,7 @@ function INIT_CONDITIONS  = addStepReference(MODEL,INIT_CONDITIONS_OLD)
 %          - INIT_CONDITIONS_OLD: it is a structure containing initial conditions
 %                                 for forward dynamics integration.
 %
-% Output:  - INIT_CONDITIONS: it is a structure containing initial conditions
+% Output:  - INIT_CONDITIONS: is a structure containing initial conditions
 %                             for forward dynamics integration.
 %         
 % Author : Gabriele Nava (gabriele.nava@iit.it)

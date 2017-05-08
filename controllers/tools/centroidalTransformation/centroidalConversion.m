@@ -1,7 +1,7 @@
 function [STATE,DYNAMICS] = centroidalConversion(DYNAMICS_OLD,FORKINEMATICS,STATE_OLD)
 %CENTROIDALCONVERSION applies the centroidal coordinates tranformation to the
 %                     system, i.e. the floating base dynamics now coincides
-%                     with the momentum dynamics.
+%                     with the centroidal momentum dynamics.
 %
 % Format: [STATE,DYNAMICS] = CENTROIDALCONVERSION(DYNAMICS_OLD,FORKINEMATICS,STATE_OLD)
 %
@@ -17,7 +17,6 @@ function [STATE,DYNAMICS] = centroidalConversion(DYNAMICS_OLD,FORKINEMATICS,STAT
 % Genova, March 2017
 
 %% ------------Initialization----------------
-% initialize output
 DYNAMICS = DYNAMICS_OLD;
 STATE    = STATE_OLD;
 
@@ -54,8 +53,7 @@ inv_dMb  = -Mb\dMb/Mb;
 dX       = [zeros(3),skewm(dr)';
             zeros(3),zeros(3)];  
 dJs      = dX*(Mb\Mbj) + X*inv_dMb*Mbj;
-  
-% T and dT
+% compute transformation (matrices T and dT)
 T        = [X,Js;
             zeros(ndof,6),eye(ndof)];
 dT       = [dX,dJs;

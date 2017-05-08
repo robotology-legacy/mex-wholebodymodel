@@ -1,7 +1,6 @@
 function [trans,shape] = iDynTreeModelPositionFromChi(chi,MODEL) 
-%iDynTreeModelPositionFromChi   Extract a couple (iDynTree.Transform, 
-%                               iDynTree.VectorDynSize) from a chi vector. 
-%
+%iDynTreeModelPositionFromChi  extracts a couple (iDynTree.Transform, 
+%                              iDynTree.VectorDynSize) from a chi vector. 
 internalDofs  = MODEL.ndof;
 pos           = iDynTree.Position(); 
 pos.fromMatlab(chi(1:3));

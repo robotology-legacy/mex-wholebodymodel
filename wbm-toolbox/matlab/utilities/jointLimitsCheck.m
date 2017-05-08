@@ -10,7 +10,6 @@ function [] = jointLimitsCheck(qj,t)
 % Genova, March 2017
 %
 %% ------------Initialization----------------
-% LIMITS CHECK
 [l_min,l_max]  = wbm_jointLimits();
 tol            = 0.01;
 res            = qj < l_min + tol | qj > l_max - tol;

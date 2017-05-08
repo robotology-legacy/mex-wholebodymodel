@@ -1,6 +1,6 @@
 function CONTROLLER = runController(GAINS,TRAJECTORY,DYNAMICS,FORKINEMATICS,INIT_CONDITIONS,STATE,MODEL)
-%RUNCONTROLLER initializes balancing controllers. Currently, default 
-%              controller uses "stack of tasks" approach (see documentation).
+%RUNCONTROLLER initializes balancing controllers, QP solver and centroidal
+%              transformation.
 %
 % Format: CONTROLLER = RUNCONTROLLER(GAINS,TRAJECTORY,DYNAMICS,FORKINEMATICS,INIT_CONDITIONS,STATE,MODEL)
 %
@@ -17,7 +17,6 @@ function CONTROLLER = runController(GAINS,TRAJECTORY,DYNAMICS,FORKINEMATICS,INIT
 % Output:  - CONTROLLER is a structure containing the control torques, contact 
 %            forces (and desired contact forces) and other parameters for
 %            controlling the robot.
-%
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, March 2017
@@ -59,7 +58,7 @@ poseLFoot_ang          = FORKINEMATICS.poseLFoot_ang;
 deltaPoseRFoot         = TR*(poseRFoot_ang-INITFORKINEMATICS.poseRFoot_ang);
 deltaPoseLFoot         = TL*(poseLFoot_ang-INITFORKINEMATICS.poseLFoot_ang);
 
-%% %%%%%%%%%%%%%%%%%%% STACK OF TASK CONTROLLER %%%%%%%%%%%%%%%%%%%%%%%% %%
+%% %%%%%%%%%%%%%%%%%%% BALANCING CONTROLLERS %%%%%%%%%%%%%%%%%%%%%%%% %%
 % apply centroidal transformation to the control model. 
 if MODEL.CONFIG.use_centroidalTransf  
     [STATE,DYNAMICS]   = centroidalConversion(DYNAMICS,FORKINEMATICS,STATE);

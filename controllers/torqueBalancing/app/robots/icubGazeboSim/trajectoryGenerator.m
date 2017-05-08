@@ -1,6 +1,6 @@
 function  desired_x_dx_ddx_CoM = trajectoryGenerator(xCoMInit,t,CONFIG)
 %TRAJECTORYGENERATOR generates a desired CoM trajectory. The default trajectory
-%                    is a sinusoid in the robot lateral direction.
+%                    is a smoothed sinusoid in the robot lateral direction.
 %
 % Format: desired_x_dx_ddx_CoM = TRAJECTORYGENERATOR(xCoMInit,t,CONFIG)
 %

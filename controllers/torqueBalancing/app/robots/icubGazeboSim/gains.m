@@ -1,6 +1,6 @@
 function GAINS = gains(MODEL)
-%GAINS defines initial control gains for controlling floating base robots with 
-%      stack of task approach.
+%GAINS defines initial control gains for controlling floating base robots 
+%      with stack of task approach.
 %
 % Format: GAINS = GAINS(MODEL)
 %

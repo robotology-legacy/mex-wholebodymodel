@@ -4,7 +4,7 @@ function vectorizedOptimalGains = integrateGains(initialConditions,MODEL)
 %
 % Format:  vectorizedOptimalGains = INTEGRATEGAINS(initialConditions,MODEL)
 %
-% Inputs:  - initialConditions: a vector of initial control gains;
+% Inputs:  - initialConditions: it is a vector of initial control gains;
 %          - MODEL: it is a structure defining the robot model.        
 %
 % Output:  - vectorizedOptimalGains: a vector of optimized control gains.

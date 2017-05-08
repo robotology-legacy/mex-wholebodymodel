@@ -29,14 +29,14 @@ MODEL.demux.baseOrientationType = 1;
 
 %% State demux
 [basePose,qj,baseVelocity,dqj] = stateDemux(chi,MODEL);
-% Base position and orientation (in quaternions)
+% base position and orientation (in quaternions)
 x_b                            = basePose(1:3,:);
 qt_b                           = basePose(4:7,:);
-% Normalize quaternions to avoid numerical errors
+% normalize quaternions to avoid numerical errors
 if MODEL.CONFIG.normalize_quaternions
     qt_b                       = qt_b/norm(qt_b);
 end
-% Base velocity; conversion of the base orientation into a rotation matrix;
+% base velocity; conversion of the base orientation into a rotation matrix;
 % state velocity
 dx_b                           = baseVelocity(1:3,:);
 w_omega_b                      = baseVelocity(4:6,:);

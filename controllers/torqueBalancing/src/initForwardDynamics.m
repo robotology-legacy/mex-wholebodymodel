@@ -114,7 +114,7 @@ end
 while exitLoop == 0
     %% Initialization
     % initialize the waitbar
-    MODEL.wait = waitbar(0,'1','Name','Forward dynamics integration in progress...',...
+    MODEL.wait = waitbar(0,'1','Name','Forward dyn. integration in progress...',...
                          'CreateCancelBtn','setappdata(gcbf,''canceling'',1); delete(gcbf);');
     set(MODEL.wait, 'Units', 'Pixels', 'Position', [800 500 365 100])
     % initialize iDyntree simulator for online visualization of the robot
@@ -162,17 +162,11 @@ disp('[Forward dynamics]: integration completed')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% VISUALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 
-% % % % % % % % initialize visualizer
-% % % % % % % MODEL.figureCont = 1;
-% % % % % % % MODEL.figureCont = initVisualizer(t_total,chi_total,MODEL);
-% % % % % % % 
-% % % % % % % %% Remove local paths
-% % % % % % % rmpath(MODEL.CONFIG.tools_root);
-% % % % % % % rmpath(MODEL.CONFIG.robot_root);
-% % % % % % % rmpath(MODEL.CONFIG.plots_root);
-% % % % % % % rmpath(MODEL.CONFIG.src_root);
-% % % % % % % rmpath(MODEL.CONFIG.elastic_root);
-% % % % % % % rmpath(MODEL.CONFIG.state_root);
-% % % % % % % rmpath(MODEL.CONFIG.config_root);
+% %%%% TO DO
+
+%% Remove local paths
+rmpath(genpath(MODEL.CONFIG.tools_root));
+rmpath(MODEL.CONFIG.src_root);
+rmpath(MODEL.CONFIG.config_root);
 
 end

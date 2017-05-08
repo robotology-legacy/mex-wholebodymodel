@@ -24,7 +24,7 @@ function [MODEL,INIT_CONDITIONS] = configureRobot(varargin)
 %% ------------Initialization----------------
 global state;
 
-CONFIG            = varargin{1};
+CONFIG                  = varargin{1};
 if nargin == 4
     chi_robotInit       = varargin{2};
     MODEL_OLD           = varargin{3};
@@ -153,9 +153,9 @@ else
     MODEL.GAINS     = gains(MODEL);
 end
 % joints and CoM references (no ikin) 
-MODEL.REFERENCES.qjRef        = qjInit;
-MODEL.REFERENCES.xCoMRef      = INIT_CONDITIONS.INITFORKINEMATICS.xCoM;
-MODEL.REFERENCES.feetRef      = [INIT_CONDITIONS.INITFORKINEMATICS.poseLFoot_ang;INIT_CONDITIONS.INITFORKINEMATICS.poseRFoot_ang];
+MODEL.REFERENCES.qjRef         = qjInit;
+MODEL.REFERENCES.xCoMRef       = INIT_CONDITIONS.INITFORKINEMATICS.xCoM;
+MODEL.REFERENCES.feetRef       = [INIT_CONDITIONS.INITFORKINEMATICS.poseLFoot_ang;INIT_CONDITIONS.INITFORKINEMATICS.poseRFoot_ang];
 % in case of one foot balancing the (x,y) components of CoM are setted to
 % be in the center of support polygon
 if MODEL.CONFIG.feet_on_ground(2) == 0

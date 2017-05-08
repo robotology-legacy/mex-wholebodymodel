@@ -5,13 +5,12 @@ function dchi = forwardDynamics(t,chi,MODEL,INIT_CONDITIONS)
 % Format: [dchi,GRAPHICS] = FORWARDDYNAMICS(t,chi,MODEL,INIT_CONDITIONS)
 %
 % Inputs:  - current time t [s];
-%          - state vector chi [13+4*ndof x 1];
+%          - state vector chi [stateSize X 1];
 %          - MODEL: it is a structure defining the robot model;        
 %          - INIT_CONDITIONS: it is a structure containing initial conditions
 %                             for forward dynamics integration.
 %
 % Output:  - state vector derivative dchi [13+4*ndof x1];
-%
 %
 % Author : Gabriele Nava (gabriele.nava@iit.it)
 % Genova, March 2017
@@ -25,7 +24,6 @@ if ~MODEL.disableVisForGraphics
     % report current time in the waitbar's message field
     waitbar(t/MODEL.CONFIG.tEnd,MODEL.wait,['Current time: ',sprintf('%0.3f',t),' [s]'])
 end
-
 % if the robot is performing yoga movements, update initial informations
 % according to the current state
 if strcmp(MODEL.CONFIG.demo_type,'yoga')  
@@ -125,10 +123,12 @@ tau_xi          = CONTROLLER.tau_xi;
 % contact forces
 fc              = CONTROLLER.fc;
 
-%% FORWARD DYNAMICS (dchi) COMPUTATION
+%% %%%%%%%%%%%%%%% FORWARD DYNAMICS (dchi) COMPUTATION %%%%%%%%%%%%%%%%% %%
 b_omega_w       = transpose(w_R_b)*w_omega_b;
 dq_b            = dquat(qt_b,b_omega_w);
 nu              = [dx_b;dq_b;dqj];
+% in case motor dynamics is considered in the model, the state is extended
+% to add motor velocity and acceleration
 if MODEL.CONFIG.use_SEA
     dnu         = M\(transpose(Jc)*fc + [zeros(6,1);(KS*(xi-qj)+KD*(dxi-dqj))]-h);
     % robot and floating base state derivative   
