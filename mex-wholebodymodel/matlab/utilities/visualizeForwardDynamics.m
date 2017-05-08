@@ -26,7 +26,7 @@ if nargin == 5
     CONFIG.jets.frames{2}  = 'r_hand_dh_frame';
     CONFIG.jets.frames{3}  = 'l_foot_dh_frame';
     CONFIG.jets.frames{4}  = 'r_foot_dh_frame';
-    [xout,tSpan,comDes,jetsIntensities] = resizeData(xout,tSpan,squeeze(references(:,1,:))',CONFIG,jetsIntensities);
+    [xout,tSpan,comDes,jetsIntensities] = resizeData(xout,tSpan,squeeze(references(:,1,:))',jetsIntensities,CONFIG);
 elseif nargin == 4
     CONFIG.plotThusts                   = false;
     [xout,tSpan,comDes,~]               = resizeData(xout,tSpan,squeeze(references(:,1,:))',CONFIG);    
@@ -53,7 +53,7 @@ else
     [~,qjInit,~,~]   = stateDemux([xout(1,:)';zeros(6+ndof,1)],CONFIG);
 end
 
-[R,p]            = wbm_getWorldFrameFromFixedLink('l_sole',qjInit);
+[p,R]            = wbm_getWorldFrameFromFixLnk('l_sole',qjInit);
 
 wbm_setWorldFrame(R,p,[ 0,0,-9.81]');
 wbm_updateState(qjInit,zeros(CONFIG.ndof,1),zeros(6,1));
