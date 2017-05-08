@@ -16,20 +16,17 @@ function S_j = jselectm(ndof, varargin)
                 idx_list = varargin{1,1};
 
                 if isrow(idx_list)
-                    if issorted(idx_list)
-                        % index list is in ascending order:
-                        len = size(idx_list,2);
-                        WBM.utilities.checkIdxListBounds(idx_list, len, ndof, 'jselectm');
+                    WBM.utilities.checkNumListAscOrder(idx_list, 'jselectm');
 
-                        S_j = zeros(ndof,ndof);
-                        for i = 1:len
-                            idx = idx_list(1,i);
-                            S_j(idx,idx) = 1;
-                        end
-                        return
-                    else
-                        error('jselectm: %s', WBM.wbmErrorMsg.LIST_NOT_SORTED);
+                    len = size(idx_list,2);
+                    WBM.utilities.checkIdxListBounds(idx_list, len, ndof, 'jselectm');
+
+                    S_j = zeros(ndof,ndof);
+                    for i = 1:len
+                        idx = idx_list(1,i);
+                        S_j(idx,idx) = 1;
                     end
+                    return
                 else
                     error('jselectm: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
                 end
@@ -52,37 +49,34 @@ function S_j = jselectm(ndof, varargin)
                 idx_list = varargin{1,2};
 
                 if isrow(idx_list)
-                    if issorted(idx_list)
-                        % index list is in ascending order:
-                        len = size(idx_list,2);
-                        WBM.utilities.checkIdxListBounds(idx_list, len, ndof, 'jselectm');
+                    WBM.utilities.checkNumListAscOrder(idx_list, 'jselectm');
 
-                        switch sel_type
-                            case 'jnts'
-                                % selected actuated joints with deactivated floating base:
-                                S_1 = zeros(6,ndof);
-                                S_2 = zeros(ndof,ndof);
+                    len = size(idx_list,2);
+                    WBM.utilities.checkIdxListBounds(idx_list, len, ndof, 'jselectm');
 
-                                for i = 1:len
-                                    idx = idx_list(1,i);
-                                    S_2(idx,idx) = 1;
-                                end
-                            case 'fltb'
-                                % floating base with selected actuated joints:
-                                S_1 = horzcat(eye(6,6), zeros(6,ndof));
+                    switch sel_type
+                        case 'jnts'
+                            % selected actuated joints with deactivated floating base:
+                            S_1 = zeros(6,ndof);
+                            S_2 = zeros(ndof,ndof);
 
-                                S_22 = zeros(ndof,ndof);
-                                for i = 1:len
-                                    idx = idx_list(1,i);
-                                    S_22(idx,idx) = 1;
-                                end
+                            for i = 1:len
+                                idx = idx_list(1,i);
+                                S_2(idx,idx) = 1;
+                            end
+                        case 'fltb'
+                            % floating base with selected actuated joints:
+                            S_1 = horzcat(eye(6,6), zeros(6,ndof));
 
-                                S_2 = horzcat(zeros(ndof,6), S_22);
-                            otherwise
-                                error('jselectm: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
-                        end
-                    else
-                        error('jselectm: %s', WBM.wbmErrorMsg.LIST_NOT_SORTED);
+                            S_22 = zeros(ndof,ndof);
+                            for i = 1:len
+                                idx = idx_list(1,i);
+                                S_22(idx,idx) = 1;
+                            end
+
+                            S_2 = horzcat(zeros(ndof,6), S_22);
+                        otherwise
+                            error('jselectm: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
                     end
                 else
                     error('jselectm: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);

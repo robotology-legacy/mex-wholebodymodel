@@ -1,4 +1,4 @@
-function clink_conf = setCLinkConfigState(obj, clink_l, clink_r, varargin)
+function clink_conf = setCLinkConfigState(obj, clnk_idx_l, clnk_idx_r, varargin)
     switch nargin
         case 9
             q_j    = varargin{1,1};
@@ -45,8 +45,8 @@ function clink_conf = setCLinkConfigState(obj, clink_l, clink_r, varargin)
     end
 
     %% Setup the configuration structure for the qualitative state of the contact links:
-    clink_conf.lnk_l = clink_l;
-    clink_conf.lnk_r = clink_r;
+    clink_conf.lnk_idx_l = clnk_idx_l;
+    clink_conf.lnk_idx_r = clnk_idx_r;
     % set the correction values (gains) for the links to avoid numerical integration errors:
     clink_conf.ctrl_gains.k_p = k_p; % control gain for the link positions.
     clink_conf.ctrl_gains.k_v = k_v; % control gain for the link velocities (linear & angular).
@@ -62,9 +62,13 @@ function clink_conf = setCLinkConfigState(obj, clink_l, clink_r, varargin)
     else
         % calculate the desired (reference) pose for the contact links in dependency
         % of the current floating base state:
-        % get the forward kinematic transformations of the links ...
         stFltb = getFloatingBaseState(obj);
         wf_R_b_arr = reshape(stFltb.wf_R_b, 9, 1);
+
+        clink_l = obj.mwbm_config.cstr_link_names{1,clnk_idx_l};
+        clink_r = obj.mwbm_config.cstr_link_names{1,clnk_idx_r};
+
+        % get the forward kinematic transformations of the contact links ...
         vqT_ll = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, stFltb.wf_p_b, q_j, clink_l);
         vqT_rl = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, stFltb.wf_p_b, q_j, clink_r);
         % get the positions and transform the orientations into Euler-angles ...

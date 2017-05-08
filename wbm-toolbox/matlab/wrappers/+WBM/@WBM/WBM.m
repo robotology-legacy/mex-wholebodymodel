@@ -11,10 +11,14 @@ classdef WBM < WBM.WBMBase
     end
 
     properties(Constant)
-        DF_STIFFNESS  = 2.5;         % default control gain for the position correction.
+        DF_STIFFNESS  = 2.5; % default control gain for the position correction.
         MAX_NUM_TOOLS = 2;
-        ZERO_CTC_ACC  = zeros(12,1); % zero contact acceleration vector.
-        ZERO_EX_FORCE = zeros(12,1); % zero external force vector.
+        % zero contact acceleration vectors:
+        ZERO_CTC_ACC_12 = zeros(12,1);
+        ZERO_CTC_ACC_6  = zeros(6,1);
+        % zero external force vectors:
+        ZERO_EX_FORCE_12 = zeros(12,1);
+        ZERO_EX_FORCE_6  = zeros(6,1);
     end
 
     properties(Access = protected)
@@ -28,27 +32,28 @@ classdef WBM < WBM.WBMBase
             % call the constructor of the superclass ...
             obj = obj@WBM.WBMBase(robot_model);
 
-            if ~exist('robot_config', 'var')
-                error('WBM::WBM: %s', WBM.wbmErrorMsg.WRONG_ARG);
-            end
-            if ~exist('wf2fixLnk', 'var')
-                obj.mwf2fixLnk = false; % default value ...
-            else
-                obj.mwf2fixLnk = wf2fixLnk;
+            switch nargin
+                case 3
+                    obj.mwf2fixLnk = wf2fixLnk;
+                case 2
+                    % set default value ...
+                    obj.mwf2fixLnk = false;
+                otherwise
+                    error('WBM::WBM: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
 
-            obj.initConfig(robot_config);
+            initConfig(obj, robot_config);
             if obj.mwf2fixLnk
                 if (obj.mwbm_config.nCstrs > 0)
                     % set the world frame (WF) at the initial VQ-Transformation from
                     % the chosen fixed link, i.e. the first entry of the constraint list:
-                    obj.setWorldFrameAtFixLnk(obj.mwbm_config.cstr_link_names{1});
+                    setWorldFrameAtFixLnk(obj, obj.mwbm_config.cstr_link_names{1});
                 else
                     error('WBM::WBM: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
                 end
             end
             % retrieve and update the initial VQ-Transformation of the robot base (world frame) ...
-            obj.updateInitVQTransformation();
+            updateInitVQTransformation(obj);
         end
 
         % Copy-function:
@@ -79,9 +84,9 @@ classdef WBM < WBM.WBMBase
             end
             obj.fixed_link = urdf_fixed_link; % replace the old default fixed link with the new fixed link ...
 
-            obj.setState(q_j, dq_j, v_b); % update the robot state (important for initializations) ...
-            [p_b, R_b] = obj.getWorldFrameFromFixLnk(urdf_fixed_link); % use optimized mode
-            obj.setWorldFrame(R_b, p_b, g_wf);
+            setState(obj, q_j, dq_j, v_b); % update the robot state (important for initializations) ...
+            [p_b, R_b] = getWorldFrameFromFixLnk(obj, urdf_fixed_link); % use optimized mode
+            setWorldFrame(obj, R_b, p_b, g_wf);
         end
 
         function updateWorldFrameFromFixLnk(obj, q_j, dq_j, v_b, g_wf)
@@ -100,9 +105,9 @@ classdef WBM < WBM.WBMBase
                         error('WBM::updateWorldFrameFromFixLnk: %s', WBM.wbmErrorMsg.WRONG_ARG);
                 end
             end
-            obj.setState(q_j, dq_j, v_b); % update state ...
-            [p_b, R_b] = obj.getWorldFrameFromDfltFixLnk(); % optimized mode
-            obj.setWorldFrame(R_b, p_b, g_wf); % update the world frame with the new values ...
+            setState(obj, q_j, dq_j, v_b); % update state ...
+            [p_b, R_b] = getWorldFrameFromDfltFixLnk(obj); % optimized mode
+            setWorldFrame(obj, R_b, p_b, g_wf); % update the world frame with the new values ...
         end
 
         function updateInitVQTransformation(obj)
@@ -121,112 +126,170 @@ classdef WBM < WBM.WBMBase
             [p_b, R_b] = WBM.utilities.frame2posRotm(vqT_b);
             % set the world frame to the base ...
             if ~exist('g_wf', 'var')
-                obj.setWorldFrame(R_b, p_b); % use the default gravity vector ...
+                setWorldFrame(obj, R_b, p_b); % use the default gravity vector ...
             else
-                obj.setWorldFrame(R_b, p_b, g_wf);
+                setWorldFrame(obj, R_b, p_b, g_wf);
             end
             % compute the forward kinematics of the link frame ...
-            vqT_lnk = obj.forwardKinematics(R_b, p_b, q_j, urdf_link_name);
+            vqT_lnk = forwardKinematics(obj, R_b, p_b, q_j, urdf_link_name);
         end
 
-        function [Jc, djcdq] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b)
-            nCstrs = obj.mwbm_config.nCstrs;
+        function [Jc, djcdq] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, idx_list)
             n = obj.mwbm_model.ndof + 6;
 
-            if (nCstrs == 0)
-                Jc = zeros(6,n);
-                djcdq = zeros(6,1);
-                return
-            end
-            % else ...
-            m = 6*nCstrs;
-            Jc = zeros(m,n);
-            djcdq = zeros(m,1);
-
-            % compute for each contact constraint the Jacobian and the derivative Jacobian:
             switch nargin
-                case 6
-                    for i = 1:nCstrs
-                        cstr_link = obj.mwbm_config.cstr_link_names{1,i};
-                        Jc(6*i-5:6*i,1:n)  = mexWholeBodyModel('jacobian', wf_R_b_arr, wf_p_b, q_j, cstr_link); % 6*(i-1)+1 = 6*i-5
-                        djcdq(6*i-5:6*i,1) = mexWholeBodyModel('dJdq', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, cstr_link);
+                case {2, 7}
+                    % use only specific contact constraints from the list ...
+                    if isrow(idx_list)
+                        nCstrs = size(idx_list,2);
+                        if (nCstrs > 1)
+                            WBM.utilities.checkNumListAscOrder(idx_list, 'WBM::contactJacobians');
+                        end
+                    else
+                        error('contactJacobians: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
                     end
-                case 1
-                    for i = 1:nCstrs
-                        cstr_link = obj.mwbm_config.cstr_link_names{1,i};
-                        Jc(6*i-5:6*i,1:n)  = mexWholeBodyModel('jacobian', cstr_link);
-                        djcdq(6*i-5:6*i,1) = mexWholeBodyModel('dJdq', cstr_link);
+                case {1, 6}
+                    nCstrs = obj.mwbm_config.nCstrs;
+                    if (nCstrs == 0)
+                        Jc    = zeros(6,n);
+                        djcdq = obj.ZERO_CTC_ACC_6;
+                        return
                     end
+                    % else, use all contact constraints from the list ...
+                    idx_list = 1:nCstrs;
                 otherwise
                     error('WBM::contactJacobians: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
+            m     = 6*nCstrs;
+            Jc    = zeros(m,n);
+            djcdq = zeros(m,1);
+
+            % compute for each contact constraint the Jacobian and the derivative Jacobian:
+            if (nargin > 2)
+                % normal mode:
+                for i = 1:nCstrs
+                    idx = idx_list(1,i);
+                    cstr_link = obj.mwbm_config.cstr_link_names{1,idx};
+
+                    Jc(6*i-5:6*i,1:n)  = mexWholeBodyModel('jacobian', wf_R_b_arr, wf_p_b, q_j, cstr_link); % 6*(i-1)+1 = 6*i-5
+                    djcdq(6*i-5:6*i,1) = mexWholeBodyModel('dJdq', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, cstr_link);
+                end
+            else
+                % optimized mode:
+                for i = 1:nCstrs
+                    idx = idx_list(1,i);
+                    cstr_link = obj.mwbm_config.cstr_link_names{1,idx};
+
+                    Jc(6*i-5:6*i,1:n)  = mexWholeBodyModel('jacobian', cstr_link);
+                    djcdq(6*i-5:6*i,1) = mexWholeBodyModel('dJdq', cstr_link);
+                end
+            end
         end
 
-        function [ddq_j, fd_prms] = jointAccelerations(obj, tau, varargin)
+        function [f_c, tau_gen] = contactForces(obj, tau, Jc, djcdq, M, c_qv, dq_j)
             switch nargin
-                case 7 % normal mode:
-                    % wf_R_b = varargin{1}
-                    wf_p_b = varargin{1,2};
-                    q_j    = varargin{1,3};
-                    dq_j   = varargin{1,4};
-                    v_b    = varargin{1,5};
-
-                    wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-                    M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, wf_p_b, q_j);
-                    c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
-
-                    % compute for each contact constraint the Jacobian and the derivative Jacobian:
-                    [Jc, djcdq] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
-                case 3 % optimized mode:
-                    dq_j = varargin{1,1};
-
-                    M    = mexWholeBodyModel('mass-matrix');
-                    c_qv = mexWholeBodyModel('generalized-forces');
-
-                    [Jc, djcdq] = contactJacobians(obj);
+                case 7
+                    % generalized forces with friction:
+                    tau_fr  = frictionForces(obj, dq_j);         % friction torques (negated torque values)
+                    tau_gen = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S_j*(tau + (-tau_fr)),
+                                                                 % S_j = [0_(6xn); I_(nxn)] ... joint selection matrix
+                case 6
+                    % general case:
+                    tau_gen = vertcat(zeros(6,1), tau);
                 otherwise
                     error('WBM::jointAccelerations: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             % Calculation of the contact (constraint) force vector:
-            % Further details about the formula see,
+            % For further details about the formula see,
             %   [1] Control Strategies for Robots in Contact, J. Park, PhD-Thesis, Artificial Intelligence Laboratory,
             %       Department of Computer Science, Stanford University, 2006, chapter 5, pp. 106-110, eq. (5.5)-(5.14),
             %       <http://cs.stanford.edu/group/manips/publications/pdfs/Park_2006_thesis.pdf>.
             %   [2] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, pp. 269-270, eq. (6.5) & (6.6).
             Jc_t      = Jc.';
             JcMinv    = Jc / M; % x*M = Jc --> x = Jc*M^(-1)
-            Upsilon_c = JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= inverse "pseudo-kinetic energy matrix"?)
-            tau_fr    = frictionForces(obj, dq_j); % friction torques (negated torque values)
-            tau_gen   = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S_j*(tau + (-tau_fr)), S_j ... joint selection matrix
+            Upsilon_c = JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= "inverse pseudo-kinetic energy matrix"?)
             % contact constraint forces f_c (generated by the environment):
             f_c = Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq); % Upsilon_c*f_c = (...) --> f_c = Upsilon_c^(-1)*(...)
+        end
+
+        [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, djcdq, M, c_qv, varargin) % CLPC ... contact link pose correction
+
+        function [ddq_j, fd_prms] = jointAccelerations(obj, tau, varargin)
+            switch nargin
+                case 7 % normal modes:
+                    % generalized forces with friction:
+                    % wf_R_b = varargin{1}
+                    wf_p_b = varargin{1,2};
+                    q_j    = varargin{1,3};
+                    dq_j   = varargin{1,4};
+                    v_b    = varargin{1,5};
+
+                    % compute the whole body dynamics and for each contact constraint
+                    % the Jacobian and the derivative Jacobian ...
+                    wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
+                    [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                    % get the contact forces and the corresponding generalized forces ...
+                    [f_c, tau_gen] = contactForces(obj, tau, Jc, djcdq, M, c_qv, dq_j);
+                case 6
+                    % general case:
+                    % wf_R_b = varargin{1}
+                    wf_p_b = varargin{1,2};
+                    q_j    = varargin{1,3};
+                    nu     = varargin{1,4};
+
+                    len  = obj.mwbm_model.ndof + 6;
+                    dq_j = nu(7:len,1);
+                    v_b  = nu(1:6,1);
+
+                    wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
+                    [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                    [f_c, tau_gen] = contactForces(obj, tau, Jc, djcdq, M, c_qv);
+                case 3 % optimized modes:
+                    % with friction:
+                    dq_j = varargin{1,1};
+
+                    [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobians(obj);
+                    [f_c, tau_gen] = contactForces(obj, tau, Jc, djcdq, M, c_qv, dq_j);
+                case 2
+                    % general case:
+                    [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobians(obj);
+                    [f_c, tau_gen] = contactForces(obj, tau, Jc, djcdq, M, c_qv);
+                otherwise
+                    error('WBM::jointAccelerations: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
 
             % Joint Acceleration q_ddot (derived from the state-space equation):
             % For further details see:
             %   [1] Efficient Dynamic Simulation of Robotic Mechanisms, K. Lilly, Springer, 1992, p. 82, eq. (5.2).
+            Jc_t  = Jc.';
             ddq_j = M \ (tau_gen + Jc_t*f_c - c_qv); % ddq_j = M^(-1) * (tau - c_qv - Jc.'*(-f_c))
-            %ddq_j = M \ (tau_gen + Jc.'*f_c - c_qv); % cause Jc.'*f_c round-off errors?
 
+            % forward dynamics parameters ...
             fd_prms = struct('tau_gen', tau_gen, 'f_c', f_c);
         end
 
-        [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_c, varargin)   % CLPC ... contact link pose correction
+        [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_c, varargin) % CLPC ... contact link pose correction
 
-        function [ddq_j, fd_prms] = jointAccelerationsFPC(obj, feet_conf, tau, a_c, varargin) % FPC  ... feet pose correction
-            [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, feet_conf, tau, obj.ZERO_EX_FORCE, a_c, varargin{:});
+        function [ddq_j, fd_prms] = jointAccelerationsFPC(obj, feet_conf, tau, ac_f, varargin) % FPC  ... feet pose correction
+            fe_0 = zeroExtForces(obj, feet_conf);
+            [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, feet_conf, tau, fe_0, ac_f, varargin{:});
         end
 
-        function [ddq_j, fd_prms] = jointAccelerationsHPC(obj, hand_conf, tau, f_e, a_c, varargin) % HPC  ... hand pose correction
-            [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, hand_conf, tau, f_e, a_c, varargin{:});
+        function [ddq_j, fd_prms] = jointAccelerationsHPC(obj, hand_conf, tau, fe_h, ac_h, varargin) % HPC  ... hand pose correction
+            [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, hand_conf, tau, fe_h, ac_h, varargin{:});
         end
+
+        [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, tau, fe_h, ac_f, varargin) % FHPC  ... feet & hand pose correction
 
         dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
 
-        dstvChi = forwardDynamicsFPC(obj, t, stvChi, fhTrqControl, feet_conf)
+        dstvChi = forwardDynamicsFPC(obj, t, stvChi, fhTrqControl, feet_conf, ac_f)
 
-        dstvChi = forwardDynamicsHPC(obj, t, stvChi, fhTrqControl, hand_conf)
+        dstvChi = forwardDynamicsHPC(obj, t, stvChi, fhTrqControl, hand_conf, fe_h, ac_h)
 
-        function [t, stmChi] = intForwardDynamics(obj, fhTrqControl, tspan, stvChi_0, ode_opt, feet_conf)
+        dstvChi = forwardDynamicsFHPC(obj, t, stvChi, fhTrqControl, feet_conf, hand_conf, fe_h, ac_f)
+
+        function [t, stmChi] = intForwardDynamics(obj, fhTrqControl, tspan, stvChi_0, ode_opt, feet_conf, ac_f)
             if ~isa(fhTrqControl, 'function_handle')
                 error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE)
             end
@@ -234,31 +297,70 @@ classdef WBM < WBM.WBMBase
                 error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.VALUE_LTE_ZERO);
             end
 
-            if exist('feet_conf', 'var')
-                if ~isstruct(feet_conf)
-                    error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
-                end
-                % use the extended function with the feet pose correction ...
-                fhFwdDyn    = @(t, chi)obj.forwardDynamicsFPC(t, chi, fhTrqControl, feet_conf);
-                [t, stmChi] = ode15s(fhFwdDyn, tspan, stvChi_0, ode_opt); % ODE-Solver
-                return
+            switch nargin
+                case 7
+                    % use the extended function with the feet pose correction:
+                    if ~isstruct(feet_conf)
+                        error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+                    end
+                    fhFwdDyn    = @(t, chi)forwardDynamicsFPC(obj, t, chi, fhTrqControl, feet_conf, ac_f);
+                    [t, stmChi] = ode15s(fhFwdDyn, tspan, stvChi_0, ode_opt); % ODE-Solver
+                case 5
+                    % use the standard function (without pose correction):
+                    fhFwdDyn    = @(t, chi)forwardDynamics(obj, t, chi, fhTrqControl);
+                    [t, stmChi] = ode15s(fhFwdDyn, tspan, stvChi_0, ode_opt); % ODE-Solver
+                otherwise
+                    error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            % else, use the normal function ...
-            fhFwdDyn    = @(t, chi)obj.forwardDynamics(t, chi, fhTrqControl);
-            [t, stmChi] = ode15s(fhFwdDyn, tspan, stvChi_0, ode_opt); % ODE-Solver
         end
 
-        clink_conf = setCLinkConfigState(obj, clink_l, clink_r, varargin)
+        function ac_0 = zeroCtcAcc(obj, clink_conf)
+            nctc = uint8(clink_conf.contact.left) + uint8(clink_conf.contact.right);
+            switch nctc
+                case 1
+                    ac_0 = obj.ZERO_CTC_ACC_6;
+                otherwise % if nctc = 0 or nctc = 2:
+                    % either both contact links have contact with the ground/object, or
+                    % both contact links have no contact to the ground/object ...
+                    ac_0 = obj.ZERO_CTC_ACC_12;
+            end
+        end
+
+        function fe_0 = zeroExtForces(obj, clink_conf)
+            nctc = uint8(clink_conf.contact.left) + uint8(clink_conf.contact.right);
+            switch nctc
+                case 1
+                    fe_0 = obj.ZERO_EX_FORCE_6;
+                otherwise % if nctc = 0 or nctc = 2:
+                    fe_0 = obj.ZERO_EX_FORCE_12;
+            end
+        end
+
+        clink_conf = setCLinkConfigState(obj, clnk_idx_l, clnk_idx_r, varargin)
 
         function feet_conf = setFeetConfigState(obj, varargin)
-            feet_conf = obj.setCLinkConfigState('l_sole', 'r_sole', varargin{:});
+            lfoot_idx = find(strcmp(obj.mwbm_config.cstr_link_names, 'l_sole'));
+            rfoot_idx = find(strcmp(obj.mwbm_config.cstr_link_names, 'r_sole'));
+
+            if ( isempty(lfoot_idx) || isempty(rfoot_idx) )
+                error('WBM::setFeetConfigState: %s', WBM.wbmErrorMsg.LNK_NOT_IN_LIST);
+            end
+
+            feet_conf = setCLinkConfigState(obj, lfoot_idx, rfoot_idx, varargin{:});
         end
 
         function hand_conf = setHandConfigState(obj, varargin)
-            hand_conf = obj.setCLinkConfigState('l_hand', 'r_hand', varargin{:});
+            lhand_idx = find(strcmp(obj.mwbm_config.cstr_link_names, 'l_hand'));
+            rhand_idx = find(strcmp(obj.mwbm_config.cstr_link_names, 'r_hand'));
+
+            if ( isempty(lhand_idx) || isempty(rhand_idx) )
+                error('WBM::setHandConfigState: %s', WBM.wbmErrorMsg.LNK_NOT_IN_LIST);
+            end
+
+            hand_conf = setCLinkConfigState(obj, lhand_idx, rhand_idx, varargin{:});
         end
 
-        vis_data = getFwdDynVisualizationData(obj, stmChi, fhTrqControl, clink_conf)
+        vis_data = getFDynVisualizationData(obj, stmChi, fhTrqControl, varargin)
 
         sim_config = setupSimulation(~, sim_config)
 
@@ -268,13 +370,13 @@ classdef WBM < WBM.WBMBase
             if ~exist('vis_ctrl', 'var')
                 % use the default ctrl-values ...
                 for i = 1:nRpts
-                    obj.visualizeForwardDynamics(pos_out, sim_config, sim_tstep);
+                    visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep);
                 end
                 return
             end
             % else ...
             for i = 1:nRpts
-                obj.visualizeForwardDynamics(pos_out, sim_config, sim_tstep, vis_ctrl);
+                visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl);
             end
         end
 
@@ -404,7 +506,7 @@ classdef WBM < WBM.WBMBase
                 otherwise
                     error('WBM::payloadFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            % transformation: we assume that the orientation of the payload-frame (pl) has the same
+            % Transformation: We assume that the orientation of the payload-frame (pl) has the same
             %                 orientation as the frame of the given link (lnk), e.g. the link of a
             %                 hand, torso, leg, etc.
             %
@@ -628,7 +730,7 @@ classdef WBM < WBM.WBMBase
                     end
 
                     if (nargin == 2)
-                        [~,q_j,~,dq_j] = obj.getState(); % get the current state values ...
+                        [~,q_j,~,dq_j] = getState(obj); % get the current state values ...
                     end
 
                     len = length(chain_names);
@@ -669,7 +771,7 @@ classdef WBM < WBM.WBMBase
                     end
 
                     if (nargin == 2)
-                        [~,q_j,~,dq_j] = obj.getState(); % get the state values ...
+                        [~,q_j,~,dq_j] = getState(obj); % get the state values ...
                     end
                     len = length(joint_names);
 
@@ -679,7 +781,7 @@ classdef WBM < WBM.WBMBase
                         error('WBM::getStateJointNames: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
                     end
                     % get the angles and velocities ...
-                    [jnt_q, jnt_dq] = obj.getJointValues(q_j, dq_j, ridx, len);
+                    [jnt_q, jnt_dq] = getJointValues(obj, q_j, dq_j, ridx, len);
                 otherwise
                     error('WBM::getStateJointNames: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -697,12 +799,12 @@ classdef WBM < WBM.WBMBase
                     end
 
                     if (nargin == 2)
-                        [~,q_j,~,dq_j] = obj.getState(); % get the values ...
+                        [~,q_j,~,dq_j] = getState(obj); % get the values ...
                     end
                     len = length(joint_idx);
 
                     % get the angle and velocity of each joint ...
-                    [jnt_q, jnt_dq] = obj.getJointValues(q_j, dq_j, joint_idx, len);
+                    [jnt_q, jnt_dq] = getJointValues(obj, q_j, dq_j, joint_idx, len);
                 otherwise
                     error('WBM::getStateJointIdx: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
@@ -855,7 +957,7 @@ classdef WBM < WBM.WBMBase
         end
 
         function set.init_state(obj, stInit)
-            if ~obj.checkInitStateDimensions(stInit)
+            if ~checkInitStateDimensions(obj, stInit)
                 error('WBM::set.init_state: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
             end
             obj.mwbm_config.init_state_params = stInit;
@@ -976,7 +1078,7 @@ classdef WBM < WBM.WBMBase
 
                 % check all parameter dimensions in "init_state_params", summed size
                 % is either: 0 (= empty), 'stvLen' or 'stvLen-7' ...
-                if ~obj.checkInitStateDimensions(robot_config.init_state_params)
+                if ~checkInitStateDimensions(obj, robot_config.init_state_params)
                     error('WBM::initConfig: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
                 end
                 % check the number of joints ...
@@ -1016,6 +1118,80 @@ classdef WBM < WBM.WBMBase
             end
 
             lnk_name = lnk_list(idx,1).urdf_link_name;
+        end
+
+        function [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobiansCS(obj, clink_conf, varargin)
+            ctc_l = clink_conf.contact.left;
+            ctc_r = clink_conf.contact.right;
+            % wf_R_b_arr = varargin{1}
+            % wf_p_b     = varargin{2}
+            % q_j        = varargin{3}
+            % dq_j       = varargin{4}
+            % v_b        = varargin{5}
+
+            % check which link is in contact with the ground/object and calculate the
+            % rigid-body dynamics and corresponding the contact Jacobians:
+            if (ctc_l && ctc_r)
+                % both links have contact with the ground/object:
+                n = size(varargin,2);
+                varargin{1,n+1} = horzcat(clink_conf.lnk_idx_l, clink_conf.lnk_idx_r); % idx_list
+            elseif ctc_l
+                % only the left link has contact with the ground/object:
+                n = size(varargin,2);
+                varargin{1,n+1} = clink_conf.lnk_idx_l;
+            elseif ctc_r
+                % only the right link has contact with the ground/object:
+                n = size(varargin,2);
+                varargin{1,n+1} = clink_conf.lnk_idx_r;
+            else
+                % both links have no contact to the ground/object ...
+                n = obj.mwbm_model.ndof + 6;
+                [M, c_qv] = rigidBodyDyn(obj, varargin{:});
+                Jc    = zeros(12,n);
+                djcdq = obj.ZERO_CTC_ACC_12;
+                return
+            end
+
+            [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobians(obj, varargin{:});
+        end
+
+        function [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobians(obj, varargin)
+            switch nargin
+                case 7 % normal modes:
+                    % wf_R_b_arr = varargin{1}
+                    % wf_p_b     = varargin{2}
+                    % q_j        = varargin{3}
+                    % dq_j       = varargin{4}
+                    % v_b        = varargin{5}
+                    % idx_list   = varargin{6}
+                    [M, c_qv]   = rigidBodyDyn(obj, varargin{1,1}, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
+                    [Jc, djcdq] = contactJacobians(obj, varargin{1,1}, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5}, varargin{1,6});
+                case 6
+                    [M, c_qv]   = rigidBodyDyn(obj, varargin{1,1}, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
+                    [Jc, djcdq] = contactJacobians(obj, varargin{1,1}, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
+                case 2 % optimized modes:
+                    % idx_list = varargin{1}
+                    [M, c_qv]   = rigidBodyDyn(obj);
+                    [Jc, djcdq] = contactJacobians(obj, varargin{1,1});
+                case 1
+                    [M, c_qv]   = rigidBodyDyn(obj);
+                    [Jc, djcdq] = contactJacobians(obj);
+                otherwise
+                    error('WBM::rigidBodyDynCJacobians: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+        end
+
+        function [M, c_qv] = rigidBodyDyn(~, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b)
+            switch nargin
+                case 6 % normal mode:
+                    M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, wf_p_b, q_j);
+                    c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                case 1 % optimized mode:
+                    M    = mexWholeBodyModel('mass-matrix');
+                    c_qv = mexWholeBodyModel('generalized-forces');
+                otherwise
+                    error('WBM::rigidBodyDyn: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
         end
 
     end

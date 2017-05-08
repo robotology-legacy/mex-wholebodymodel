@@ -8,10 +8,12 @@ classdef wbmErrorMsg
         FILE_NOT_EXIST    = 'File does not exist on given path!';
         IDX_OUT_OF_BOUNDS = 'Index value out of bounds!';
         LIST_NOT_SORTED   = 'List not in ascending order!';
+        LNK_NOT_IN_LIST   = 'The searched link is not in the list!';
         MAX_JOINT_LIMIT   = 'Maximum joint number exceeded!';
         MAX_NUM_LIMIT     = 'Value exceeds the maximum number!';
-        NAME_NOT_EXIST    = 'The name does not exist in the list!'
+        NAME_NOT_EXIST    = 'The name does not exist in the list!';
         NOT_HOMOG_MAT     = 'Matrix is not homogeneous!';
+        NO_LNK_IN_CTC     = 'At least one link must be in contact with the ground or object!';
         SINGULAR_MAT      = 'Singular matrix!';
         STRING_MISMATCH   = 'String mismatch!';
         UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';

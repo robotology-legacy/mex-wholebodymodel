@@ -19,6 +19,9 @@
  */
 
 // global includes
+#ifdef DEBUG
+#include <matrix.h>
+#endif
 
 // library includes
 #include <iDynTree/ModelIO/URDFDofsImport.h>
@@ -88,7 +91,12 @@ void ModelState::initState()
   #endif
   }
 
-  sg[0] = 0.0f; sg[1] = 0.0f; sg[2] = -9.81f;
+  // initialize/reset the state variables and
+  // the frame transformation (matrix) H:
+  sg[0]  =  0.0f;
+  sg[1]  =  0.0f;
+  sg[2]  = -9.81f;
+  wf_H_b = wbi::Frame::identity();
 }
 
 void ModelState::initRobotModel(const wbi::IDList &jntIDList)
@@ -172,11 +180,33 @@ void ModelState::setGravity(double *pg)
 
 void ModelState::setBase2WorldTransformation(wbi::Frame frm3d_H)
 {
+#ifdef DEBUG
+  double tform[16];
+  frm3d_H.get4x4Matrix(tform);
+
+  for (int i=0; i < 16; i++) {
+    if (mxIsNaN( *(tform + i) )) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:Not_a_Number", "The frame transformation frm3d_H in ModelState has NaN values.");
+    }
+  }
+#endif
+
   wf_H_b = frm3d_H;
 }
 
 wbi::Frame ModelState::getBase2WorldTransformation()
 {
+#ifdef DEBUG
+  double tform[16];
+  wf_H_b.get4x4Matrix(tform);
+
+  for (int i=0; i < 16; i++) {
+    if (mxIsNaN( *(tform + i) )) {
+      mexErrMsgIdAndTxt("MATLAB:mexatexit:Not_a_Number", "The frame transformation wf_H_b in ModelState has NaN values.");
+    }
+  }
+#endif
+
   return wf_H_b;
 }
 

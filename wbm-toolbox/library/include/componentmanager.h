@@ -22,8 +22,8 @@
 #define COMPONENTNMAINTAINER_H
 
 // global includes
-#include <cstring>
 #include <mex.h>
+#include <cstring>
 
 // library includes
 
