@@ -9,7 +9,7 @@ function visualizeForwardDynamics( varargin )
 %   floating base system.
 %
 
-% ------------Initialization----------------
+%% ------------Initialization----------------
 text.color    = [1 1 1];
 text.fontSize = 22;
 xout          = varargin{1};
@@ -553,7 +553,6 @@ if CONFIG.visualiser.makeVideo == 1
     saveFramesForVideo(CONFIG.visualiser.video.filename,CONFIG.figure_main,aviobj,90);
     close(aviobj);
 end
-
 end
 
 
