@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project does not adheres to [Semantic Versioning](http://semver.org/).
 
 ## New release: 
-### [0.2](https://github.com/robotology/mex-wholebodymodel/compare/recovery...master) - 2017-01-25
+### [0.2](https://github.com/robotology/mex-wholebodymodel/compare/v0.2...HEAD) - 2017-01-25
 
 #### Added
 - New version of the mexWholeBodyModel (mex-WBM) subroutine for Matlab. Thanks to [@Ganimed](https://github.com/Ganimed), a 
