@@ -20,6 +20,7 @@ function [optimalGains,KSopt,KDopt] = gainsTuning(LINEARIZATION,MODEL)
 % Genova, March 2017
 
 %% ------------Initialization----------------
+disp('[Gains tuning]: applying gain tuning procedure...')
 ndof                  = MODEL.ndof;
 GAINS                 = MODEL.GAINS;
 optimalGains          = GAINS;

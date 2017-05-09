@@ -109,6 +109,6 @@ if MODEL.CONFIG.use_SEA
     KD                 = DYNAMICS.KD;
     CONTROLLER.fc      = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*(KS*(xi-qj) +KD*(dxi-dqj)) -dJc_nu -KdFeet.*v_feet -KpFeet.*deltaPoseFeet);
 else
-    CONTROLLER.fc      = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*controlParam.tau -dJc_nu -KdFeet.*v_feet -KpFeet.*deltaPoseFeet);
+    CONTROLLER.fc      = (JcMinv*transpose(Jc))\(JcMinv*h -JcMinvS*CONTROLLER.tau_xi -dJc_nu -KdFeet.*v_feet -KpFeet.*deltaPoseFeet);
 end
 end

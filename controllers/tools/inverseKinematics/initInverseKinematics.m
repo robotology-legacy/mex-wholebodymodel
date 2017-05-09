@@ -15,6 +15,7 @@ function REFERENCES = initInverseKinematics(MODEL,INIT_CONDITIONS)
 % Genova, March 2017
 
 %% ------------Initialization----------------
+disp('[ikinSolver]: inverse kinematics integration...')
 % config parameters
 pinv_tol               = MODEL.CONFIG.pinv_tol;
 ndof                   = MODEL.ndof;

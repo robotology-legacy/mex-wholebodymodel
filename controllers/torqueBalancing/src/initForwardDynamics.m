@@ -162,7 +162,19 @@ disp('[Forward dynamics]: integration completed')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%% VISUALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %%
 
-% %%%% TO DO
+%% Robot simulator (offline)
+if MODEL.CONFIG.visualize_robot_simulator == 1
+    disp('[Visualization]: running robot simulator...')
+    MODEL.VISUALIZER = configureSimulator();
+    iDyntreeSimulator(t_total,chi_total,MODEL);
+    disp('[Visualization]: simulator closed')
+end
+
+if CONFIG.enable_visualTool
+    disp('[Visualization]: plotting results...')
+    visualizeResults
+    disp('[Visualization]: done')
+end
 
 %% Remove local paths
 rmpath(genpath(MODEL.CONFIG.tools_root));
