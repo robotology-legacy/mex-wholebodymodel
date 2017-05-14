@@ -16,28 +16,17 @@ An example on how to use mex-wholebodymodel to compute the dynamics quantities o
 a rigid body is available at [examples/rigidBodyDynamics.m](examples/rigidBodyDynamics.m).
 
 ## Controllers
-<<<<<<< HEAD
-In [controllers](/controllers) folder the user can find different whole-body controllers implemented using the mex-wholebodymodel interface. The "official" version is in the directory [controllers/torqueBalancing](/controllers/torqueBalancing), but also other balancing controllers are available. 
-Matlab tools for visualization, inverse kinematics, etc. are available in [controllers/tools](/controllers/tools) folder.
-For more informations about the main balancing controller check the relative [README](/controllers/torqueBalancing).
-=======
 In [controllers](/controllers) folder the user can find different whole-body controllers implemented using the mex-wholebodymodel interface. The "official" version is in the directory 
 [controllers/torqueBalancing](/controllers/torqueBalancing), but also other balancing controllers are available. Matlab tools for visualization, inverse 
 kinematics, etc. are available in [controllers/tools](/controllers/tools) folder. For more informations about the balancing controller check the relative [README](/controllers/torqueBalancing).
->>>>>>> master
 
 ### Simulations
 Please note that the simulations of the inverse dynamics results are performed by using the [iDyntree](https://github.com/robotology/iDyntree) visualizer. In order to be able to use it, enable the 
 options `IDYNTREE_USES_MATLAB` and `IDYNTREE_USES_IRRLICHT` using `ccmake ./` in iDyntree build directory. If the _irrlicht library_ is not installed on your computer, install it by using 
 `sudo apt install libirrlicht-dev`.
 
-<<<<<<< HEAD
 ## Wbm-toolbox
 This folder contains all wrapper and utility functions for Matlab and also the C++ library for the mex-subroutine.
-=======
-## mex-wholebodymodel
-This folder contains all wrappers and utility functions for Matlab and also the C++ library for the mex-subroutine.
->>>>>>> master
 
 ## Tests
 To verify regression in the code, when the user modifies it, some regression tests have been implemented in this repository.
