@@ -58,4 +58,4 @@ endif()
 
 # STARTUP mexWholeBodyModel
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/.startup_mexWholeBodyModel.m.in ${CMAKE_BINARY_DIR}/startup_mexWholeBodyModel.m)
-install(FILES ${CMAKE_BINARY_DIR}/startup_mexWholeBodyModel.m DESTINATION mex)
+install(FILES ${CMAKE_BINARY_DIR}/startup_mexWholeBodyModel.m DESTINATION share/mexWholeBodyModel)

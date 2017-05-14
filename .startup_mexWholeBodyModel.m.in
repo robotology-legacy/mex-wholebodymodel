@@ -36,7 +36,11 @@ if isempty(fileDir)
     end
       
 elseif size(pathSeparatorLocation, 2) > 1
+<<<<<<< HEAD
     answer = input('Multiple userpaths. Do you want mex-wholeBodyModel to reset the userpath for you? Y/N ','s');
+=======
+    answer=input('Multiple userpaths. Do you want mex-wholeBodyModel to reset the userpath for you? Y/N ','s');
+>>>>>>> master
 
     if strcmp(answer,'Y')|| strcmp(answer,'y')
        userpath('reset');
