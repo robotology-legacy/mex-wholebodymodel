@@ -22,6 +22,7 @@ clc
 %% Configure the simulation
 CONFIG.demo_movements                        = 1;                          %either 0 or 1
 CONFIG.feet_on_ground                        = [1,1];                      %either 0 or 1; [left foot,right foot]
+CONFIG.robot_name                            = 'icubGazeboSim';
 
 %% QP solver and gains tuning procedure
 CONFIG.use_QPsolver                          = 1;                          %either 0 or 1
