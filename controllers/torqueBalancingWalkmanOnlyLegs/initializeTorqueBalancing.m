@@ -34,7 +34,7 @@ CONFIG.visualize_joints_dynamics             = 1;                          %eith
 
 %% Integration time [s]
 CONFIG.tStart                                = 0;
-CONFIG.tEnd                                  = 5;
+CONFIG.tEnd                                  = 1;
 CONFIG.sim_step                              = 0.01;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%% ADVANCED SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%% %%
@@ -63,7 +63,7 @@ end
 if CONFIG.demo_movements == 0
     CONFIG.options                   = odeset('RelTol',1e-3,'AbsTol',1e-3);
 else
-    CONFIG.options                   = odeset('RelTol',1e-6,'AbsTol',1e-6);
+    CONFIG.options                   = odeset('RelTol',1e-3,'AbsTol',1e-3);
 end
 
 %% Visualization setup
