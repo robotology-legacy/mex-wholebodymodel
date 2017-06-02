@@ -1,11 +1,16 @@
 function dcm = quat2rotm(quat)
-    if (length(quat) ~= 4)
-        error('quat2rotm: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+    WBM.utilities.checkVecSize(quat, 4, 'quat2rotm');
+
+    if iscolumn(quat)
+        qnorm = quat.'*quat;
+    else
+        % quat is a row-vector ...
+        qnorm = quat*quat.';
     end
 
-    qnorm = norm(quat);
     if (qnorm > 1)
-        quat = quat./qnorm; % normalize
+        % normalize ...
+        quat = quat./sqrt(qnorm); % faster than calling "quat./norm(quat)"
     end
     % scalar (real) part:
     q_0 = quat(1);
