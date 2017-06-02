@@ -16,8 +16,8 @@ function [wbm_icub, ndof] = initRobot_iCub_32dof(wf2fixLnk)
 
     %% Base robot config:
     icub_config = WBM.wbmHumanoidConfig;
-    icub_config.nCstrs          = 2;
-    icub_config.cstr_link_names = {'l_sole', 'r_sole'};
+    icub_config.nCstrs           = 2;
+    icub_config.ccstr_link_names = {'l_sole', 'r_sole'};
 
     % Setup the body of the iCub-Robot with the initial body (joint) positions (in degrees):
     [icub_config.body, joint_names_body] = WBM.RobotModel.iCub_arms_torso_free.setupBody_iCub_atf();

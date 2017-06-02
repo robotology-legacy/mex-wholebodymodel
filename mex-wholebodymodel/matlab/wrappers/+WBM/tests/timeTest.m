@@ -13,7 +13,7 @@ icub_model.g_wf            = [0; 0; -9.81];
 % base robot config:
 icub_config = wbmHumanoidConfig;
 icub_config.nCstrs          = 2;
-icub_config.cstr_link_names = {'r_sole', 'l_gripper'};
+icub_config.ccstr_link_names = {'r_sole', 'l_gripper'};
 
 noi = 1000;
 
@@ -53,14 +53,14 @@ for i = 1:noi
     g_q    = wbm_icub.gravityBiasForces(R, p, q_j);
     g_q    = wbm_icub.gravityBiasForces(R, p, q_j);
 
-    djdq_1 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstr_link_names{1});
-    djdq_2 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.cstr_link_names{2});
+    djdq_1 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.ccstr_link_names{1});
+    djdq_2 = wbm_icub.dJdq(R, p, q_j, dq_j, v_b, icub_config.ccstr_link_names{2});
 
-    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstr_link_names{1});
-    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstr_link_names{2});
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.ccstr_link_names{1});
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.ccstr_link_names{2});
 
-    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstr_link_names{1});
-    J      = wbm_icub.jacobian(R, p, q_j, icub_config.cstr_link_names{2});
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.ccstr_link_names{1});
+    J      = wbm_icub.jacobian(R, p, q_j, icub_config.ccstr_link_names{2});
 end
 totTime = toc();
 
@@ -82,7 +82,7 @@ icub_model.g_wf            = [0; 0; 9.81];
 % base robot config:
 icub_config = wbmHumanoidConfig;
 icub_config.nCstrs          = 2;
-icub_config.cstr_link_names = {'r_sole', 'l_gripper'};
+icub_config.ccstr_link_names = {'r_sole', 'l_gripper'};
 
 noi = 1000;
 
@@ -120,14 +120,14 @@ for i = 1:noi
     g_q    = wbm_icub.gravityBiasForces();
     g_q    = wbm_icub.gravityBiasForces();
 
-    djdq_1 = wbm_icub.dJdq(icub_config.cstr_link_names{1});
-    djdq_2 = wbm_icub.dJdq(icub_config.cstr_link_names{2});
+    djdq_1 = wbm_icub.dJdq(icub_config.ccstr_link_names{1});
+    djdq_2 = wbm_icub.dJdq(icub_config.ccstr_link_names{2});
 
-    J      = wbm_icub.jacobian(icub_config.cstr_link_names{1});
-    J      = wbm_icub.jacobian(icub_config.cstr_link_names{2});
+    J      = wbm_icub.jacobian(icub_config.ccstr_link_names{1});
+    J      = wbm_icub.jacobian(icub_config.ccstr_link_names{2});
 
-    J      = wbm_icub.jacobian(icub_config.cstr_link_names{1});
-    J      = wbm_icub.jacobian(icub_config.cstr_link_names{2});
+    J      = wbm_icub.jacobian(icub_config.ccstr_link_names{1});
+    J      = wbm_icub.jacobian(icub_config.ccstr_link_names{2});
 end
 totTime = toc();
 

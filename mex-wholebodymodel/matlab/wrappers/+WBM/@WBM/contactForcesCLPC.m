@@ -73,8 +73,8 @@ function error_clp = clnkPoseError(obj, clink_conf, varargin)
     % error between the reference (desired) and the new link transformations:
     if (ctc_l && ctc_r)
         % both links are in contact with the ground/object:
-        clink_l = obj.mwbm_config.cstr_link_names{1,clink_conf.lnk_idx_l};
-        clink_r = obj.mwbm_config.cstr_link_names{1,clink_conf.lnk_idx_r};
+        clink_l = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_l};
+        clink_r = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_r};
 
         % set the desired poses (VE-Transformations*) of the contact links as reference ...
         fk_ref_pose.veT_llnk = clink_conf.des_pose.veT_llnk;
@@ -104,7 +104,7 @@ function error_clp = clnkPoseError(obj, clink_conf, varargin)
         error_clp = vertcat(delta_ll, delta_rl);
     elseif ctc_l
         % only the left link is in contact with the ground/object:
-        clink_l = obj.mwbm_config.cstr_link_names{1,clink_conf.lnk_idx_l};
+        clink_l = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_l};
 
         % set the desired pose transformation as reference and compute
         % compute the new pose transformation:
@@ -121,7 +121,7 @@ function error_clp = clnkPoseError(obj, clink_conf, varargin)
         error_clp = vX_ll*(fk_new_pose.veT_llnk - fk_ref_pose.veT_llnk);
     elseif ctc_r
         % only the right link is in contact with the ground/object:
-        clink_r = obj.mwbm_config.cstr_link_names{1,clink_conf.lnk_idx_r};
+        clink_r = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_r};
 
         % set the desired pose transformation as reference and compute
         % the new pose transformation:

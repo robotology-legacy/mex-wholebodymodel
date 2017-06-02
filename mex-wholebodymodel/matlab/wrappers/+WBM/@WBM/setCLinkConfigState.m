@@ -65,8 +65,8 @@ function clink_conf = setCLinkConfigState(obj, clnk_idx_l, clnk_idx_r, varargin)
         stFltb = getFloatingBaseState(obj);
         wf_R_b_arr = reshape(stFltb.wf_R_b, 9, 1);
 
-        clink_l = obj.mwbm_config.cstr_link_names{1,clnk_idx_l};
-        clink_r = obj.mwbm_config.cstr_link_names{1,clnk_idx_r};
+        clink_l = obj.mwbm_config.ccstr_link_names{1,clnk_idx_l};
+        clink_r = obj.mwbm_config.ccstr_link_names{1,clnk_idx_r};
 
         % get the forward kinematic transformations of the contact links ...
         vqT_ll = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, stFltb.wf_p_b, q_j, clink_l);

@@ -47,7 +47,7 @@ classdef WBM < WBM.WBMBase
                 if (obj.mwbm_config.nCstrs > 0)
                     % set the world frame (WF) at the initial VQ-Transformation from
                     % the chosen fixed link, i.e. the first entry of the constraint list:
-                    setWorldFrameAtFixLnk(obj, obj.mwbm_config.cstr_link_names{1});
+                    setWorldFrameAtFixLnk(obj, obj.mwbm_config.ccstr_link_names{1});
                 else
                     error('WBM::WBM: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
                 end
@@ -155,7 +155,7 @@ classdef WBM < WBM.WBMBase
                         djcdq = obj.ZERO_CTC_ACC_6;
                         return
                     end
-                    % else, use all contact constraints from the list ...
+                    % else, use all contact constraints from the constraints list ...
                     idx_list = 1:nCstrs;
                 otherwise
                     error('WBM::contactJacobians: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -169,7 +169,7 @@ classdef WBM < WBM.WBMBase
                 % normal mode:
                 for i = 1:nCstrs
                     idx = idx_list(1,i);
-                    cstr_link = obj.mwbm_config.cstr_link_names{1,idx};
+                    cstr_link = obj.mwbm_config.ccstr_link_names{1,idx};
 
                     Jc(6*i-5:6*i,1:n)  = mexWholeBodyModel('jacobian', wf_R_b_arr, wf_p_b, q_j, cstr_link); % 6*(i-1)+1 = 6*i-5
                     djcdq(6*i-5:6*i,1) = mexWholeBodyModel('dJdq', wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, cstr_link);
@@ -178,7 +178,7 @@ classdef WBM < WBM.WBMBase
                 % optimized mode:
                 for i = 1:nCstrs
                     idx = idx_list(1,i);
-                    cstr_link = obj.mwbm_config.cstr_link_names{1,idx};
+                    cstr_link = obj.mwbm_config.ccstr_link_names{1,idx};
 
                     Jc(6*i-5:6*i,1:n)  = mexWholeBodyModel('jacobian', cstr_link);
                     djcdq(6*i-5:6*i,1) = mexWholeBodyModel('dJdq', cstr_link);
@@ -339,8 +339,8 @@ classdef WBM < WBM.WBMBase
         clink_conf = setCLinkConfigState(obj, clnk_idx_l, clnk_idx_r, varargin)
 
         function feet_conf = setFeetConfigState(obj, varargin)
-            lfoot_idx = find(strcmp(obj.mwbm_config.cstr_link_names, 'l_sole'));
-            rfoot_idx = find(strcmp(obj.mwbm_config.cstr_link_names, 'r_sole'));
+            lfoot_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'l_sole'));
+            rfoot_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'r_sole'));
 
             if ( isempty(lfoot_idx) || isempty(rfoot_idx) )
                 error('WBM::setFeetConfigState: %s', WBM.wbmErrorMsg.LNK_NOT_IN_LIST);
@@ -350,8 +350,8 @@ classdef WBM < WBM.WBMBase
         end
 
         function hand_conf = setHandConfigState(obj, varargin)
-            lhand_idx = find(strcmp(obj.mwbm_config.cstr_link_names, 'l_hand'));
-            rhand_idx = find(strcmp(obj.mwbm_config.cstr_link_names, 'r_hand'));
+            lhand_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'l_hand'));
+            rhand_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'r_hand'));
 
             if ( isempty(lhand_idx) || isempty(rhand_idx) )
                 error('WBM::setHandConfigState: %s', WBM.wbmErrorMsg.LNK_NOT_IN_LIST);
@@ -975,7 +975,7 @@ classdef WBM < WBM.WBMBase
             nCstrs = obj.mwbm_config.nCstrs;
             stInit = obj.mwbm_config.init_state_params;
 
-            clnk_names     = vertcat(num2cell(1:nCstrs), obj.mwbm_config.cstr_link_names);
+            clnk_names     = vertcat(num2cell(1:nCstrs), obj.mwbm_config.ccstr_link_names);
             strLnkNamesLst = sprintf('  %d  %s\n', clnk_names{1:2,1:nCstrs});
 
             cinit_st = cell(6,1);
@@ -1046,13 +1046,13 @@ classdef WBM < WBM.WBMBase
             % further error checks ...
             nCstrs = robot_config.nCstrs; % by default 0, when value is not given ...
             if (nCstrs > 0)
-                if (nCstrs ~= size(robot_config.cstr_link_names,2))
+                if (nCstrs ~= size(robot_config.ccstr_link_names,2))
                     % the list is not a row vector or the sizes are different ...
                     error('WBM::initConfig: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
                 end
             else
                 % the length is not given, try to get it ...
-                nCstrs = size(robot_config.cstr_link_names,2);
+                nCstrs = size(robot_config.ccstr_link_names,2);
             end
 
             if isempty(robot_config.init_state_params)
@@ -1061,7 +1061,7 @@ classdef WBM < WBM.WBMBase
 
             obj.mwbm_config = WBM.wbmBaseRobotConfig;
             obj.mwbm_config.nCstrs          = nCstrs;
-            obj.mwbm_config.cstr_link_names = robot_config.cstr_link_names;
+            obj.mwbm_config.ccstr_link_names = robot_config.ccstr_link_names;
 
             if ~isempty(robot_config.body)
                 obj.mwbm_config.body = robot_config.body;
@@ -1158,6 +1158,7 @@ classdef WBM < WBM.WBMBase
         function [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobians(obj, varargin)
             switch nargin
                 case 7 % normal modes:
+                    % use only specific contacts:
                     % wf_R_b_arr = varargin{1}
                     % wf_p_b     = varargin{2}
                     % q_j        = varargin{3}
@@ -1167,13 +1168,16 @@ classdef WBM < WBM.WBMBase
                     [M, c_qv]   = rigidBodyDyn(obj, varargin{1,1}, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
                     [Jc, djcdq] = contactJacobians(obj, varargin{1,1}, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5}, varargin{1,6});
                 case 6
+                    % use all contacts:
                     [M, c_qv]   = rigidBodyDyn(obj, varargin{1,1}, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
                     [Jc, djcdq] = contactJacobians(obj, varargin{1,1}, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
                 case 2 % optimized modes:
+                    % specific contacts:
                     % idx_list = varargin{1}
                     [M, c_qv]   = rigidBodyDyn(obj);
                     [Jc, djcdq] = contactJacobians(obj, varargin{1,1});
                 case 1
+                    % all contacts:
                     [M, c_qv]   = rigidBodyDyn(obj);
                     [Jc, djcdq] = contactJacobians(obj);
                 otherwise

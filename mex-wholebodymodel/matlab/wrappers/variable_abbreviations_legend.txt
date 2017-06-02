@@ -17,6 +17,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     c          ...  Cartesian OR contact OR constraint
     c...       ...  cell array (begin of variable name)
     cX         ...  co-adjoint transformation (matrix)
+    ccstr      ...  contact constraint
     cfrict     ...  Coulomb friction
     chn        ...  chain
     chnt       ...  chain tree
