@@ -27,6 +27,7 @@ function a_cX_b = coadjoint(varargin)
             a_cX_b(4:6,1:3) = R_t*S_p;
             a_cX_b(4:6,4:6) = R_t;
         case 1
+            % special case:
             if iscolumn(varargin{1,1})
                 % a_R_b is an identity matrix and
                 % a_p_b is not zero:

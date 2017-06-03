@@ -10,7 +10,7 @@ function dcm = quat2rotm(quat)
 
     if (qnorm > 1)
         % normalize ...
-        quat = quat./sqrt(qnorm); % faster than calling "quat./norm(quat)"
+        quat = quat./sqrt(qnorm); % comp. faster than "quat./norm(quat)"
     end
     % scalar (real) part:
     q_0 = quat(1);
