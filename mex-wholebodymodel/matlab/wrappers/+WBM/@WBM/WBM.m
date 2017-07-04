@@ -507,8 +507,9 @@ classdef WBM < WBM.WBMBase
                     error('WBM::payloadFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             % Transformation: We assume that the orientation of the payload-frame (pl) has the same
-            %                 orientation as the frame of the given link (lnk), e.g. the link of a
-            %                 hand, torso, leg, etc.
+            %                 orientation as the frame of the given link (lnk), i.e. the link of an
+            %                 end-effector (hand, finger, etc.) or an arbitrary link (torso, leg, etc.)
+            %                 where the payload is mounted on that body part.
             %
             % get the homog. transformation of the payload-frame (relative to the link-frame):
             lnk_H_pl = eye(4,4);
@@ -517,19 +518,14 @@ classdef WBM < WBM.WBMBase
             wf_H_pl = wf_H_lnk * lnk_H_pl; % payload transformation matrix
         end
 
-        % Note: The payload forces cannot be calculated, since the mex-subroutine of the whole body model for
-        %       YARP-based robots does not support this at the moment. Moreover, an added payload to a link
-        %       would affect the complete dynamics (inertia, Coriolis, gravity term, etc.) of the robot.
-        %       To include this case in the subroutine either the complete dynamics must be reimplemented,
-        %       or new dynamic-functions must be added that treating also the payload-term.
-        %
-        %       To overcome this problem the calculation with additional payloads on specific links can
-        %       be approximated by adding the payload directly to the mass of the desired link in the
-        %       corresponding URDF-file.
-        %
-        % function tau_pl = payloadForces(obj, wf_R_b, wf_p_b, q_j, dq_j, v_b)
+        function f_pl = payloadForce(~, M_pl, v_pl, a_pl, wc_tot)
+            % spatial cross operator of the mixed payload velocity in R^6 ...
+            SCPv = WBM.utilities.mixvelSCP(v_pl);
 
-        % end
+            % apply the Newton-Euler equation to calculate the payload force
+            % in dependency of total contact wrench wc of the payload object:
+            f_pl = M_pl * a_pl +  SCPv * M_pl * v_pl + wc_tot;
+        end
 
         function setToolLinks(obj, ee_link_names, frames_tt)
             % verify the input types ...

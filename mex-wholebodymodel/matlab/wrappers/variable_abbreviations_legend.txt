@@ -23,6 +23,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     chnt       ...  chain tree
     clink, cl  ...  contact link
     clp        ...  contact link pose
+    cm         ...  center of mass
     cmo        ...  column major order
     cmp        ...  compare
     cols       ...  columns
@@ -53,6 +54,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     fwnd       ...  figure window
     g          ...  gravity acceleration (vector)
     h...       ...  "handle" to an object (begin of variable name), e.g. hFig = handle to the figure object
+    ..._h      ...  "hat" (end of variable name), 'h' declares that this variable is an unit vector of length 1, e.g. "f1_h", "fcp_h", etc.
     h_c        ...  centroidal momentum (vector)
     hf         ...  half
     hgt        ...  height
@@ -102,6 +104,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     r          ...  root (link) OR rotation (orientation)
     rX         ...  (mixed) rate transformation (matrix)
     rax        ...  rotation axis
+    rb         ...  rigid body
     ref        ...  reference
     resv       ...  result vector (boolean)
     rev        ...  revolute

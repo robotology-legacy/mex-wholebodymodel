@@ -6,19 +6,21 @@ function B_c = wbasis(ctc_type)
     %       <http://www-robotics.cs.umass.edu/uploads/Main/PlattThesis.pdf>, p. 9, tbl. 2.1.
     %   [3] Handbook of Robotics, B. Siciliano & O. Khatib & Editors, 2nd Edition, Springer, 2016, p. 938, eq. (37.10), (37.11) & (37.12).
     switch ctc_type
-        case 'pt_ctc'
-            % frictionless point contact:
-            B_c = zeros(6,1);
-            B_c(3,1) = 1;
-        case 'hard_ctc'
+        case 'pcwf'
             % point contact with friction:
             B_c = zeros(6,3);
             B_c(1:3,1:3) = eye(3,3);
-        case 'soft_ctc'
+        case 'sfc'
             % soft-finger contact (with friction):
             B_c = zeros(6,4);
             B_c(1:3,1:3) = eye(3,3);
             B_c(6,4)     = 1;
+        case 'fpc'
+            % frictionless point contact:
+            % (rarely used, i.e. if the friction is
+            % negligibly low or unknown)
+            B_c = zeros(6,1);
+            B_c(3,1) = 1;
         otherwise
             error('wbasis: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
     end

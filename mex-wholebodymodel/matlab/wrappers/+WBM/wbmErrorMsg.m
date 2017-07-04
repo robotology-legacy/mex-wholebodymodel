@@ -25,6 +25,7 @@ classdef wbmErrorMsg
         VAL_OUT_OF_BOUNDS = 'Value(s) out of bounds!';
         WRONG_ARG         = 'Wrong number of input arguments!';
         WRONG_ARR_SIZE    = 'Wrong array size!';
+        WRONG_CTC_MODEL   = 'Wrong contact model!';
         WRONG_DATA_TYPE   = 'Wrong data type!';
         WRONG_MAT_DIM     = 'Wrong matrix dimension!';
         WRONG_VEC_DIM     = 'Wrong vector dimension!';

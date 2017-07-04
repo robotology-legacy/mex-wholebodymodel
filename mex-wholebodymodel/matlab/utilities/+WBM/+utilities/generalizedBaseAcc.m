@@ -17,7 +17,7 @@ function dv_b = generalizedBaseAcc(M, c_qv, ddq_j, ndof)
     %   [1] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008,
     %       chapter 9.3-9.5, pp. 180-184, eq. (9.13) & (9.24).
     %   [2] Informatics in Control, Automation and Robotics, J. A. Cetto & J. Ferrier & J. Filipe,
-    %       Lecture Notes in Electrical Engineering, volume 89, Springer, 2011, p. 14, eq. (36) & (37).
+    %       Lecture Notes in Electrical Engineering, Volume 89, Springer, 2011, p. 14, eq. (36) & (37).
     %   [3] Dynamics of Tree-Type Robotic Systems, S. V. Shah & S. K. Saha & J. K. Dutt,
     %       Intelligent Systems, Control and Automation: Science and Engineering, Volume 62, Springer, 2012,
     %       p. 119, eq. (7.1) & (7.2).
