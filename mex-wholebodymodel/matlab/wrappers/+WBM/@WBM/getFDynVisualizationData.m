@@ -121,7 +121,8 @@ function fd_prms = getFDynParams(obj, t, stvChi, fhTrqControl)
     [tau, ctrl_prms] = fhTrqControl(t);
     % get the the visualization data from the joint-acceleration computation:
     [~,fd_prms] = jointAccelerations(obj, tau, stp.dq_j); % optimized mode
-    % add the controller data to the data-structure:
+
+    % add the controller data to the data-structure ...
     fd_prms.ctrl_prms = ctrl_prms;
 end
 
@@ -141,11 +142,10 @@ function fd_prms = getFDynParamsCLPC(obj, t, stvChi, fhTrqControl, clink_conf, f
 
     % get the torque forces and the visualization data from the controller:
     [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp, nu, Jc, djcdq, clink_conf);
-
     % get the visualization data from the acceleration calculation (optimized mode):
     [~,fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_c, Jc, djcdq, M, c_qv, stp.dq_j, nu);
 
-    % add the controller data to the visualization data:
+    % add the controller data to the visualization data ...
     fd_prms.ctrl_prms = ctrl_prms;
 end
 

@@ -13,12 +13,10 @@ classdef WBM < WBM.WBMBase
     properties(Constant)
         DF_STIFFNESS  = 2.5; % default control gain for the position correction.
         MAX_NUM_TOOLS = 2;
-        % zero contact acceleration vectors:
-        ZERO_CTC_ACC_12 = zeros(12,1);
-        ZERO_CTC_ACC_6  = zeros(6,1);
-        % zero external force vectors:
-        ZERO_EX_FORCE_12 = zeros(12,1);
-        ZERO_EX_FORCE_6  = zeros(6,1);
+        % zero-vectors for contact accelerations/velocities
+        % and for external force vectors:
+        ZERO_CVEC_12 = zeros(12,1);
+        ZERO_CVEC_6  = zeros(6,1);
     end
 
     properties(Access = protected)
@@ -139,8 +137,8 @@ classdef WBM < WBM.WBMBase
 
             switch nargin
                 case {2, 7}
-                    % use only specific contact constraints from the list ...
-                    if isrow(idx_list)
+                    % use only specific contact constraints from the list:
+                    if isrow(idx_list) % (including scalar)
                         nCstrs = size(idx_list,2);
                         if (nCstrs > 1)
                             WBM.utilities.checkNumListAscOrder(idx_list, 'WBM::contactJacobians');
@@ -149,13 +147,14 @@ classdef WBM < WBM.WBMBase
                         error('contactJacobians: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
                     end
                 case {1, 6}
+                    % use all contact constraints:
                     nCstrs = obj.mwbm_config.nCstrs;
                     if (nCstrs == 0)
+                        % contact constraint list is empty ...
                         Jc    = zeros(6,n);
-                        djcdq = obj.ZERO_CTC_ACC_6;
+                        djcdq = obj.ZERO_CVEC_6;
                         return
                     end
-                    % else, use all contact constraints from the constraints list ...
                     idx_list = 1:nCstrs;
                 otherwise
                     error('WBM::contactJacobians: %s', WBM.wbmErrorMsg.WRONG_ARG);
@@ -264,22 +263,40 @@ classdef WBM < WBM.WBMBase
             Jc_t  = Jc.';
             ddq_j = M \ (tau_gen + Jc_t*f_c - c_qv); % ddq_j = M^(-1) * (tau - c_qv - Jc.'*(-f_c))
 
-            % forward dynamics parameters ...
-            fd_prms = struct('tau_gen', tau_gen, 'f_c', f_c);
+            if (nargout == 2)
+                % set the forward dynamics parameters ...
+                fd_prms = struct('tau_gen', tau_gen, 'f_c', f_c);
+            end
         end
 
         [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_c, varargin) % CLPC ... contact link pose correction
 
         function [ddq_j, fd_prms] = jointAccelerationsFPC(obj, feet_conf, tau, ac_f, varargin) % FPC  ... feet pose correction
             fe_0 = zeroExtForces(obj, feet_conf);
-            [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, feet_conf, tau, fe_0, ac_f, varargin{:});
+            if (nargout == 2)
+                [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, feet_conf, tau, fe_0, ac_f, varargin{:});
+                return
+            end
+            % else ...
+            ddq_j = jointAccelerationsCLPC(obj, feet_conf, tau, fe_0, ac_f, varargin{:});
         end
 
         function [ddq_j, fd_prms] = jointAccelerationsHPC(obj, hand_conf, tau, fe_h, ac_h, varargin) % HPC  ... hand pose correction
-            [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, hand_conf, tau, fe_h, ac_h, varargin{:});
+            if (nargout == 2)
+                [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, hand_conf, tau, fe_h, ac_h, varargin{:});
+                return
+            end
+            % else ...
+            ddq_j = jointAccelerationsCLPC(obj, hand_conf, tau, fe_h, ac_h, varargin{:});
         end
 
         [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, tau, fe_h, ac_f, varargin) % FHPC  ... feet & hand pose correction
+
+        [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, fhTotCWrench, f_cp, tau, varargin) % FHPCPL ... feet & hand pose correction with payload
+
+        [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, varargin)
+
+        [vc_h, v_prms] = handVelocities(obj, hand_conf, varargin)
 
         dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
 
@@ -288,6 +305,8 @@ classdef WBM < WBM.WBMBase
         dstvChi = forwardDynamicsHPC(obj, t, stvChi, fhTrqControl, hand_conf, fe_h, ac_h)
 
         dstvChi = forwardDynamicsFHPC(obj, t, stvChi, fhTrqControl, feet_conf, hand_conf, fe_h, ac_f)
+
+        dstvChi = forwardDynamicsFHPCPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, f_cp, ac_f)
 
         function [t, stmChi] = intForwardDynamics(obj, fhTrqControl, tspan, stvChi_0, ode_opt, feet_conf, ac_f)
             if ~isa(fhTrqControl, 'function_handle')
@@ -318,11 +337,11 @@ classdef WBM < WBM.WBMBase
             nctc = uint8(clink_conf.contact.left) + uint8(clink_conf.contact.right);
             switch nctc
                 case 1
-                    ac_0 = obj.ZERO_CTC_ACC_6;
+                    ac_0 = obj.ZERO_CVEC_6;
                 otherwise % if nctc = 0 or nctc = 2:
                     % either both contact links have contact with the ground/object, or
                     % both contact links have no contact to the ground/object ...
-                    ac_0 = obj.ZERO_CTC_ACC_12;
+                    ac_0 = obj.ZERO_CVEC_12;
             end
         end
 
@@ -330,9 +349,9 @@ classdef WBM < WBM.WBMBase
             nctc = uint8(clink_conf.contact.left) + uint8(clink_conf.contact.right);
             switch nctc
                 case 1
-                    fe_0 = obj.ZERO_EX_FORCE_6;
+                    fe_0 = obj.ZERO_CVEC_6;
                 otherwise % if nctc = 0 or nctc = 2:
-                    fe_0 = obj.ZERO_EX_FORCE_12;
+                    fe_0 = obj.ZERO_CVEC_12;
             end
         end
 
@@ -423,26 +442,24 @@ classdef WBM < WBM.WBMBase
             zlabel('$z_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
         end
 
-        function setPayloadLinks(obj, link_names, pl_data)
-            % verify the input types ...
-            if ( ~iscell(link_names) || ~ismatrix(pl_data) )
+        function setPayloadLinks(obj, pl_data)
+            % verify the input data ...
+            if isempty(pl_data)
+                error('WBM::setPayloadLinks: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
+            end
+            if ( ~iscell(pl_data) && ~isstruct(pl_data{1,1}) )
                 error('WBM::setPayloadLinks: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            % check dimensions ...
-            [m, n] = size(pl_data);
-            if (n ~= 4)
-                error('WBM::setPayloadLinks: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-            end
-            if (size(link_names,2) ~= m) % the list must be a row-vector ...
-                error('WBM::setPayloadLinks: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
-            end
+            n = size(pl_data,2);
 
-            obj.mwbm_config.nPlds = m; % number of payloads ...
-            obj.mwbm_config.payload_links(1:m,1) = WBM.wbmPayloadLink;
-            for i = 1:m
-                obj.mwbm_config.payload_links(i,1).urdf_link_name = link_names{1,i};
-                obj.mwbm_config.payload_links(i,1).pt_mass        = pl_data(i,1);
-                obj.mwbm_config.payload_links(i,1).lnk_p_pl       = pl_data(i,2:4).';
+            obj.mwbm_config.nPlds = n; % number of payloads ...
+            obj.mwbm_config.payload_links(1,1:n) = WBM.wbmPayloadLink;
+            for i = 1:n
+                pl_lnk = pl_data{1,i};
+                obj.mwbm_config.payload_links(1,i).urdf_link_name = pl_lnk.name;
+                obj.mwbm_config.payload_links(1,i).lnk_p_cm       = pl_lnk.lnk_p_cm;
+                obj.mwbm_config.payload_links(1,i).m_rb           = pl_lnk.m_rb;
+                obj.mwbm_config.payload_links(1,i).I_cm           = pl_lnk.I_cm;
             end
         end
 
@@ -460,19 +477,21 @@ classdef WBM < WBM.WBMBase
 
             pl_links   = obj.mwbm_config.payload_links;
             clnk_names = cell(nPlds,1);
-            mass       = zeros(nPlds,1);
             cpos       = clnk_names;
+            mass       = zeros(nPlds,1);
+            inertia    = clnk_names;
 
             for i = 1:nPlds
-                clnk_names{i,1} = pl_links(i,1).urdf_link_name;
-                mass(i,1)       = pl_links(i,1).pt_mass;
-                cpos{i,1}       = pl_links(i,1).lnk_p_pl;
+                clnk_names{i,1} = pl_links(1,i).urdf_link_name;
+                cpos{i,1}       = pl_links(1,i).lnk_p_cm;
+                mass(i,1)       = pl_links(1,i).m_rb;
+                inertia{i,1}    = pl_links(1,i).I_cm;
             end
-            cplds  = horzcat(clnk_names, num2cell(mass), cpos);
-            pl_tbl = cell2table(cplds, 'VariableNames', {'link_name', 'mass', 'pos'});
+            cplds  = horzcat(clnk_names, cpos, num2cell(mass), inertia);
+            pl_tbl = cell2table(cplds, 'VariableNames', {'link_name', 'pos', 'mass', 'inertia'});
         end
 
-        function wf_H_pl = payloadFrame(obj, varargin)
+        function wf_H_cm = payloadFrame(obj, varargin)
             if (obj.mwbm_config.nPlds == 0)
                 error('WBM::payloadFrame: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
             end
@@ -482,49 +501,93 @@ classdef WBM < WBM.WBMBase
             switch nargin
                 case 5 % normal modes:
                     pl_idx       = varargin{1,4};
-                    pl_link_name = getLinkName(obj, obj.mwbm_config.payload_links, pl_idx);
-                    lnk_p_pl     = obj.mwbm_config.payload_links(pl_idx,1).lnk_p_pl;
+                    pl_link_name = obj.mwbm_config.payload_links(1,pl_idx).urdf_link_name;
+                    lnk_p_cm     = obj.mwbm_config.payload_links(1,pl_idx).lnk_p_cm;
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
                     wf_H_lnk = mexWholeBodyModel('transformation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, pl_link_name);
                 case 4
                     % use the values of the default payload-link ...
-                    lnk_p_pl = obj.mwbm_config.payload_links(1,1).lnk_p_pl;
+                    lnk_p_cm = obj.mwbm_config.payload_links(1,1).lnk_p_cm;
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
                     wf_H_lnk = mexWholeBodyModel('transformation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, ...
                                                  obj.mwbm_config.payload_links(1,1).urdf_link_name);
                 case 2 % optimized modes:
                     pl_idx       = varargin{1,1};
-                    pl_link_name = getLinkName(obj, obj.mwbm_config.payload_links, pl_idx);
-                    lnk_p_pl     = obj.mwbm_config.payload_links(pl_idx,1).lnk_p_pl;
+                    pl_link_name = obj.mwbm_config.payload_links(1,pl_idx).urdf_link_name;
+                    lnk_p_cm     = obj.mwbm_config.payload_links(1,pl_idx).lnk_p_cm;
 
                     wf_H_lnk = mexWholeBodyModel('transformation-matrix', pl_link_name);
                 case 1
-                    lnk_p_pl = obj.mwbm_config.payload_links(1,1).lnk_p_pl;
+                    lnk_p_cm = obj.mwbm_config.payload_links(1,1).lnk_p_cm;
                     wf_H_lnk = mexWholeBodyModel('transformation-matrix', obj.mwbm_config.payload_links(1,1).urdf_link_name);
                 otherwise
                     error('WBM::payloadFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            % Transformation: We assume that the orientation of the payload-frame (pl) has the same
-            %                 orientation as the frame of the given link (lnk), i.e. the link of an
+            % Transformation: We assume that the orientation of the payload-frame {pl} has the same
+            %                 orientation as the frame {lnk} of a given link, i.e. the link of an
             %                 end-effector (hand, finger, etc.) or an arbitrary link (torso, leg, etc.)
             %                 where the payload is mounted on that body part.
             %
-            % get the homog. transformation of the payload-frame (relative to the link-frame):
-            lnk_H_pl = eye(4,4);
-            lnk_H_pl(1:3,4) = lnk_p_pl; % position of the CoM of the payload
+            % get the homog. transformation of the payload-frame centered at the CoM (relative to the link-frame):
+            lnk_H_cm = eye(4,4);
+            lnk_H_cm(1:3,4) = lnk_p_cm; % position from the payload's CoM to the frame {lnk}.
 
-            wf_H_pl = wf_H_lnk * lnk_H_pl; % payload transformation matrix
+            wf_H_cm = wf_H_lnk * lnk_H_cm; % payload transformation matrix
         end
 
         function f_pl = payloadForce(~, M_pl, v_pl, a_pl, wc_tot)
             % spatial cross operator of the mixed payload velocity in R^6 ...
-            SCPv = WBM.utilities.mixvelSCP(v_pl);
+            SCPv = WBM.utilities.mixvelcp(v_pl);
 
-            % apply the Newton-Euler equation to calculate the payload force
-            % in dependency of total contact wrench wc of the payload object:
-            f_pl = M_pl * a_pl +  SCPv * M_pl * v_pl + wc_tot;
+            % apply the Newton-Euler equation to calculate the payload force in
+            % dependency of the total contact wrench wc of the payload object:
+            f_pl = M_pl * a_pl + SCPv * M_pl * v_pl + wc_tot;
+        end
+
+        [f_pl, pl_prms] = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp, v_pl, a_pl)
+
+        function [M_pl, frms] = generalizedInertiaPL(obj, pl_idx, varargin)
+            pl_link_name = obj.mwbm_config.payload_links(1,pl_idx).urdf_link_name;
+            lnk_p_cm     = obj.mwbm_config.payload_links(1,pl_idx).lnk_p_cm;
+            m_rb         = obj.mwbm_config.payload_links(1,pl_idx).m_rb;
+            I_cm         = obj.mwbm_config.payload_links(1,pl_idx).I_cm;
+
+            switch nargin
+                case 5
+                    % normal mode:
+                    % wf_R_b = varargin{1}
+                    % wf_p_b = varargin{2}
+                    % q_j    = varargin{3}
+                    wf_H_lnk = transformationMatrix(obj, varargin{1,1}, varargin{1,2}, ...
+                                                    varargin{1,3}, pl_link_name);
+                case 2
+                     % optimized mode:
+                    wf_H_lnk = transformationMatrix(obj, pl_link_name);
+                otherwise
+                    error('WBM::generalizedInertiaPL: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            end
+            % Apply a simplified position/orientation estimation for the payload's CoM with
+            %
+            %       wf_R_cm = wf_R_lnk * lnk_R_c * c_R_cm   and
+            %       wf_p_cm = wf_p_c + (wf_R_c * c_p_cm),
+            %
+            % where wf_R_c = wf_R_lnk * lnk_R_c, lnk_R_c = c_R_cm = I_3 (identity matrix),
+            % wf_p_c = wf_p_lnk and c_p_cm = lnk_p_cm.
+            % I.e. the contact frame {c_i} and the frame {pl}, centered at CoM of the payload,
+            % have the same orientation as the link frame {lnk_i} and the contact point pc_i
+            % is at the origin o_i of {lnk_i}.
+            lnk_H_cm = eye(4,4);
+            lnk_H_cm(1:3,4) = lnk_p_cm; % position from the payload's CoM to {lnk_i}.
+            wf_H_cm = wf_H_lnk * lnk_H_cm; % payload transformation matrix
+            [wf_p_cm, wf_R_cm] = WBM.utilities.tform2posRotm(wf_H_cm);
+
+            M_pl = WBM.utilities.generalizedInertia(m_rb, I_cm, wf_R_cm, wf_p_cm);
+
+            if (nargout == 2)
+                frms = struct('wf_H_lnk', wf_H_lnk, 'wf_H_cm', wf_H_cm);
+            end
         end
 
         function setToolLinks(obj, ee_link_names, frames_tt)
@@ -602,7 +665,7 @@ classdef WBM < WBM.WBMBase
             switch nargin
                 case 5 % normal modes:
                     t_idx        = varargin{1,4};
-                    ee_link_name = getLinkName(obj, obj.mwbm_config.tool_links, t_idx);
+                    ee_link_name = obj.mwbm_config.tool_links(t_idx,1).urdf_link_name;
                     ee_vqT_tt    = obj.mwbm_config.tool_links(t_idx,1).ee_vqT_tt;
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
@@ -616,7 +679,7 @@ classdef WBM < WBM.WBMBase
                                                 obj.mwbm_config.tool_links(1,1).urdf_link_name);
                 case 2 % optimized modes:
                     t_idx        = varargin{1,1};
-                    ee_link_name = getLinkName(obj, obj.mwbm_config.tool_links, t_idx);
+                    ee_link_name = obj.mwbm_config.tool_links(t_idx,1).urdf_link_name;
                     ee_vqT_tt    = obj.mwbm_config.tool_links(t_idx,1).ee_vqT_tt;
 
                     wf_H_ee = mexWholeBodyModel('transformation-matrix', ee_link_name);
@@ -627,7 +690,7 @@ classdef WBM < WBM.WBMBase
                 otherwise
                     error('WBM::toolFrame: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
-            % transformation: we assume the general case, that the orientation of the tool-frame (tt)
+            % Transformation: We assume the general case, that the orientation of the tool-frame (tt)
             %                 does not have the same orientation as the frame of the end-effector (ee),
             %                 i.e. the frame of a hand (or of a finger).
             %
@@ -990,30 +1053,34 @@ classdef WBM < WBM.WBMBase
                 pl_lnks  = obj.mwbm_config.payload_links;
 
                 clnk_names = cell(nPlds,1);
-                cmass      = clnk_names;
                 cpos       = clnk_names;
+                cmass      = clnk_names;
+                cinertia   = clnk_names;
                 % put the data in cell-arrays ...
                 for i = 1:nPlds
-                    clnk_names{i,1} = pl_lnks(i,1).urdf_link_name;
-                    cmass{i,1}      = num2str(pl_lnks(i,1).pt_mass, prec);
-                    cpos{i,1}       = mat2str(pl_lnks(i,1).lnk_p_pl, prec);
+                    clnk_names{i,1} = pl_lnks(1,i).urdf_link_name;
+                    cpos{i,1}       = mat2str(pl_lnks(1,i).lnk_p_cm, prec);
+                    cmass{i,1}      = num2str(pl_lnks(1,i).m_rb, prec);
+                    cinertia{i,1}   = mat2str(pl_lnks(1,i).I_cm, prec);
                 end
                 % get the string lengths and the max. string lengths ...
                 slen1 = cellfun('length', clnk_names);
-                slen2 = cellfun('length', cmass);
+                slen2 = cellfun('length', cpos);
+                slen3 = cellfun('length', cmass);
                 msl1  = max(slen1);
                 msl2  = max(slen2);
+                msl3  = max(slen3);
                 % compute the number of spaces ...
-                nspc = msl1 - 9 + 5; % length('link_name') = 9
+                nspc = msl1 - 9 + 6; % length('link_name') = 9
 
                 % create the formatted table in string form ...
-                strPldTbl = sprintf('  idx   link_name%smass%spos\\n', blanks(nspc), blanks(msl2-1));
+                strPldTbl = sprintf('  idx   link_name%spos%smass%sinertia\\n', blanks(nspc), blanks(msl2), blanks(msl3-1));
                 for i = 1:nPlds
-                    nspc_1 = msl1 - slen1(i,1) + 5;
+                    nspc_1 = msl1 - slen1(i,1) + 6;
                     nspc_2 = msl2 - slen2(i,1) + 3;
-                    str = sprintf('   %d    %s%s%s%s%s\\n', ...
-                                  i, clnk_names{i,1}, blanks(nspc_1), cmass{i,1}, ...
-                                  blanks(nspc_2), cpos{i,1});
+                    nspc_3 = msl3 - slen3(i,1) + 3;
+                    str = sprintf('   %d    %s%s%s%s%s%s%s\\n', i, clnk_names{i,1}, blanks(nspc_1), cpos{i,1}, blanks(nspc_2), ...
+                                                                   cmass{i,1}, blanks(nspc_3), cinertia{i,1});
                     strPldTbl = strcat(strPldTbl, str);
                 end
                 strPldTbl = sprintf(strPldTbl);
@@ -1107,16 +1174,7 @@ classdef WBM < WBM.WBMBase
             result = true;
         end
 
-        function lnk_name = getLinkName(~, lnk_list, idx)
-            % check range ...
-            if ( (idx > size(lnk_list,1)) || (idx < 1) )
-                error('WBM::getLinkName: %s', WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
-            end
-
-            lnk_name = lnk_list(idx,1).urdf_link_name;
-        end
-
-        function [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobiansCS(obj, clink_conf, varargin)
+        function [M, c_qv, Jc, djcdq] = rigidBodyDynCJacobiansCS(obj, clink_conf, varargin) % in dependency of the contact state (CS)
             ctc_l = clink_conf.contact.left;
             ctc_r = clink_conf.contact.right;
             % wf_R_b_arr = varargin{1}
@@ -1144,7 +1202,7 @@ classdef WBM < WBM.WBMBase
                 n = obj.mwbm_model.ndof + 6;
                 [M, c_qv] = rigidBodyDyn(obj, varargin{:});
                 Jc    = zeros(12,n);
-                djcdq = obj.ZERO_CTC_ACC_12;
+                djcdq = obj.ZERO_CVEC_12;
                 return
             end
 

@@ -1,5 +1,5 @@
-function [I_cm, m_rb] = inertiaMassGObj(obj_type, rho, varargin)
-    %% Returns the inertia tensor and the corresponding mass of a geometrical object with
+function [m_rb, I_cm] = massInertiaGObj(obj_type, rho, varargin)
+    %% Returns the mass and the corresponding inertia tensor of a geometrical object with
     %  the origin of the coordinate system at the object body's center of mass (CoM):
     %
     %  Sources:
@@ -42,12 +42,12 @@ function [I_cm, m_rb] = inertiaMassGObj(obj_type, rho, varargin)
                     % inertia tensor at CoM:
                     I_cm = (m_rb/6*s2) * eye(3,3);
                 otherwise
-                    error('inertiaMassGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                    error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
         case 'scyl'
             % solid cylinder:
             if (nargin ~= 4)
-                error('inertiaMassGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             r = varargin{1,1}; % radius
             h = varargin{1,2}; % height
@@ -64,14 +64,14 @@ function [I_cm, m_rb] = inertiaMassGObj(obj_type, rho, varargin)
         case 'cylt'
             % cylindrical tube:
             if (nargin ~= 5)
-                error('inertiaMassGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             r_o = varargin{1,1}; % outer radius
             h   = varargin{1,2}; % height
             t_m = varargin{1,3}; % thickness of the material
 
             if (t_m <= 0)
-                error('inertiaMassGObj: %s', WBM.wbmErrorMsg.VALUE_LTE_ZERO);
+                error('massInertiaGObj: %s', WBM.wbmErrorMsg.VALUE_LTE_ZERO);
             end
             r_i = r_o - t_m; % inner radius
 
@@ -89,7 +89,7 @@ function [I_cm, m_rb] = inertiaMassGObj(obj_type, rho, varargin)
         case 'ssph'
             % solid sphere:
             if (nargin ~= 3)
-                error('inertiaMassGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             r = varargin{1,1}; % radius
 
@@ -102,13 +102,13 @@ function [I_cm, m_rb] = inertiaMassGObj(obj_type, rho, varargin)
         case 'sphs'
             % sphere shell:
             if (nargin ~= 4)
-                error('inertiaMassGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
             end
             r_o = varargin{1,1}; % outer radius
             t_m = varargin{1,2}; % thickness of the material
 
             if (t_m <= 0)
-                error('inertiaMassGObj: %s', WBM.wbmErrorMsg.VALUE_LTE_ZERO);
+                error('massInertiaGObj: %s', WBM.wbmErrorMsg.VALUE_LTE_ZERO);
             end
             r_i = r_o - t_m; % inner radius
 
@@ -125,10 +125,10 @@ function [I_cm, m_rb] = inertiaMassGObj(obj_type, rho, varargin)
             % inertia tensor at CoM:
             I_cm = (2/5*m_rb*( (ro5 - ri5) / (ro3 - ri3) )) * eye(3,3);
         otherwise
-            error('inertiaMassGObj: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+            error('massInertiaGObj: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
     end
 end
-%% END of inertiaMassGObj.
+%% END of massInertiaGObj.
 
 
 %% INERTIA TENSOR:

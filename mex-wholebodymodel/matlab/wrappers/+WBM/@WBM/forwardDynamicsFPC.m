@@ -14,7 +14,7 @@ function dstvChi = forwardDynamicsFPC(obj, t, stvChi, fhTrqControl, feet_conf, a
     [Jc, djcdq] = contactJacobians(obj);
 
     % get the current control torques from the controller ...
-    [tau,~] = fhTrqControl(t, M, c_qv, stp, nu, Jc, djcdq, feet_conf);
+    tau = fhTrqControl(t, M, c_qv, stp, nu, Jc, djcdq, feet_conf);
 
     % get the rotation matrix from the VQ-transformation (from 'base' to 'world frame') ...
     vqT_b = obj.stvqT;
@@ -26,10 +26,10 @@ function dstvChi = forwardDynamicsFPC(obj, t, stvChi, fhTrqControl, feet_conf, a
     omega_b = wf_R_b * omega_w;
     dqt_b   = WBM.utilities.dquat(stp.qt_b, omega_b);
 
-    % mixed velocities ...
+    % new mixed generalized velocity ...
     v = vertcat(stp.dx_b, dqt_b, stp.dq_j);
     % joint acceleration dv (optimized mode):
-    [dv,~] = jointAccelerationsFPC(obj, feet_conf, tau, ac_f, Jc, djcdq, M, c_qv, stp.dq_j, nu);
+    dv = jointAccelerationsFPC(obj, feet_conf, tau, ac_f, Jc, djcdq, M, c_qv, stp.dq_j, nu);
 
     dstvChi = vertcat(v, dv);
 end

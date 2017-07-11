@@ -28,13 +28,13 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
     Jc = zeros(m,n);
     djcdq = zeros(m,1);
     for i = 1:nCstrs
-        cstr_link = robot_config.cstr_link_names{1,i};
-        Jc(6*i-5:6*i,1:n)  = wbm_jacobian(cstr_link);
-        djcdq(6*i-5:6*i,1) = wbm_dJdq(cstr_link);
+        ccstr_link = robot_config.ccstr_link_names{1,i};
+        Jc(6*i-5:6*i,1:n)  = wbm_jacobian(ccstr_link);
+        djcdq(6*i-5:6*i,1) = wbm_dJdq(ccstr_link);
     end
 
     % get the current control torques ...
-    [tau,~] = fhTrqControl(t);
+    tau = fhTrqControl(t);
 
     % Computation of the contact (constraint) force vector:
     % For further details about the formula see,
@@ -57,7 +57,7 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
     omega_b = wf_R_b * omega_w;
     dqt_b   = WBM.utilities.dquat(stp.qt_b, omega_b);
 
-    % mixed velocities ...
+    % new mixed generalized velocity ...
     v = vertcat(stp.dx_b, dqt_b, stp.dq_j);
     % Joint Acceleration q_ddot (derived from the state-space equation):
     % For further details see:

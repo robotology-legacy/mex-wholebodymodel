@@ -22,6 +22,7 @@ classdef wbmErrorMsg
         UNKNOWN_LNK_NAME  = 'Unknown link name!';
         VALUE_IS_INIT     = 'The value is already initialized!';
         VALUE_LTE_ZERO    = 'The value must be greater than zero!';
+        VALUE_LT_ZERO     = 'The value must be positive!';
         VAL_OUT_OF_BOUNDS = 'Value(s) out of bounds!';
         WRONG_ARG         = 'Wrong number of input arguments!';
         WRONG_ARR_SIZE    = 'Wrong array size!';

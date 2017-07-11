@@ -8,15 +8,14 @@ function [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, 
             % wf_p_b     = varargin{2}
             % q_j        = varargin{3}
             dq_j = varargin{1,4};
-            v_b  = varargin{1,5};
-            nu   = vertcat(v_b, dq_j); % mixed generalized velocity
+            nu   = varargin{1,5}; % mixed generalized velocity
 
             tau_fr  = frictionForces(obj, dq_j);         % friction torques (negated torque values)
             tau_gen = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S_j*(tau + (-tau_fr)),
                                                          % S_j = [0_(6xn); I_(nxn)] ... joint selection matrix
             error_clp = clnkPoseError(obj, clink_conf, varargin{1:3});
         case 13
-            % general case:
+            % without friction:
             nu = varargin{1,4};
 
             tau_gen   = vertcat(zeros(6,1), tau);
@@ -30,7 +29,7 @@ function [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, 
             tau_gen   = vertcat(zeros(6,1), tau + tau_fr);
             error_clp = clnkPoseError(obj, clink_conf);
         case 10
-            % general case:
+            % without friction:
             nu = varargin{1,1};
 
             tau_gen   = vertcat(zeros(6,1), tau);
@@ -40,7 +39,7 @@ function [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, 
     end
     if ( isscalar(error_clp) && ~error_clp )
         % both contact links have no contact to the ground/object ...
-        f_c = obj.ZERO_EX_FORCE_12;
+        f_c = obj.ZERO_CVEC_12;
         return
     end
     k_p = clink_conf.ctrl_gains.k_p; % control gain for correcting the link positions (position feedback).

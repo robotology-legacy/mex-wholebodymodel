@@ -13,36 +13,36 @@ function G_c = ctcmap(varargin)
     switch nargin
         case 3
             % general case:
-            wf_R_c = varargin{1,1};
-            r_c    = varargin{1,2};
+            a_R_c = varargin{1,1};
+            a_p_c = varargin{1,2};
             % ctc_type = varargin{3}
 
-            WBM.utilities.checkMatDim(wf_R_c, 3, 3, 'ctcmap');
-            WBM.utilities.checkCVecDim(r_c, 3, 'ctcmap');
+            WBM.utilities.checkMatDim(a_R_c, 3, 3, 'ctcmap');
+            WBM.utilities.checkCVecDim(a_p_c, 3, 'ctcmap');
 
-            wf_cX_c = WBM.utilities.coadjoint(wf_R_c, r_c);
-            B_c     = WBM.utilities.wbasis(varargin{1,3});
-            G_c     = wf_cX_c * B_c;
+            a_cX_c = WBM.utilities.coadjoint(a_R_c, a_p_c);
+            B_c    = WBM.utilities.wbasis(varargin{1,3});
+            G_c    = a_cX_c * B_c;
         case 2
             % special case:
-            % The rotation matrix wf_R_c (from WF to contact frame {C})
-            % is an identity matrix and r_c is not zero.
-            r_c      = varargin{1,1};
+            % The rotation matrix a_R_c (from contact frame {C} to frame {A})
+            % is an identity matrix and a_p_c is not zero.
+            a_p_c    = varargin{1,1};
             ctc_type = varargin{1,2};
 
-            WBM.utilities.checkCVecDim(r_c, 3, 'ctcmap');
+            WBM.utilities.checkCVecDim(a_p_c, 3, 'ctcmap');
 
             switch ctc_type
                 case 'pcwf'
                     % point contact with friction:
                     G_c = zeros(6,3);
                     G_c(1:3,1:3) = eye(3,3);
-                    G_c(4:6,1:3) = WBM.utilities.skewm(r_c);
+                    G_c(4:6,1:3) = WBM.utilities.skewm(a_p_c);
                 case 'sfc'
                     % soft-finger contact (with friction):
                     G_c = zeros(6,4);
                     G_c(1:3,1:3) = eye(3,3);
-                    G_c(4:6,1:3) = WBM.utilities.skewm(r_c);
+                    G_c(4:6,1:3) = WBM.utilities.skewm(a_p_c);
                     G_c(6,4)     = 1;
                 case 'fpc'
                     % frictionless point contact:
@@ -50,8 +50,8 @@ function G_c = ctcmap(varargin)
                     % negligibly low or unknown)
                     G_c = zeros(6,1);
                     G_c(3,1) =  1;
-                    G_c(4,1) =  r_c(2,1);
-                    G_c(5,1) = -r_c(1,1);
+                    G_c(4,1) =  a_p_c(2,1);
+                    G_c(5,1) = -a_p_c(1,1);
                 otherwise
                     error('ctcmap: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
             end

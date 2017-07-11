@@ -1,4 +1,4 @@
-function M_rb = generalizedInertia(I_cm, m_rb, varargin)
+function M_rb = generalizedInertia(m_rb, I_cm, varargin)
     %% Generalized inertia tensor of a rigid body:
     %  {C} is an orientation frame of the body's center of mass (CoM) and
     %  {A} is a generic frame defined according to
@@ -29,8 +29,7 @@ function M_rb = generalizedInertia(I_cm, m_rb, varargin)
             I_a = a_R_cm * I_cm * cm_R_a - m_rb * Sp2; %  a_R_cm = cm_R_a^T,
                                                        % -S(a_p_cm) = S(a_p_cm)^T, S ... skewm
         case 3 % special cases:
-            % with respect to a frame {C}, which has the same orientation as
-            % frame {A}, centered at a_p_cm:
+            % with respect to a frame {C} centered at a_p_cm:
             % (if a_R_cm is an identity matrix and a_p_cm is not zero)
             a_p_cm = varargin{1,1};
 

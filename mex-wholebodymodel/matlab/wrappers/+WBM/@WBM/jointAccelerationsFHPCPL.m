@@ -1,4 +1,4 @@
-function [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, tau, fe_h, varargin)
+function [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, fhTotCWrench, f_cp, tau, varargin)
     switch nargin
         case 12 % normal modes:
             % ac_f   = varargin{1}
@@ -21,35 +21,42 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, ta
 
             ac_f = zeroCtcAcc(obj, feet_conf);
             [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, ac_f, varargin{1:6});
-        case 8 % optimized modes:
+        case 9 % optimized modes:
             % ac_f = varargin{1}
+            % v_b  = varargin{3}
             dq_j = varargin{1,2};
+            nu   = varargin{1,4};
+
+            [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, varargin{1:4});
+        case 8
+            % v_b  = varargin{2}
+            dq_j = varargin{1,1};
             nu   = varargin{1,3};
 
-            [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, varargin{1:3});
-        case 7
-            dq_j = varargin{1,1};
-            nu   = varargin{1,2};
-
             ac_f = zeroCtcAcc(obj, feet_conf);
-            [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, ac_f, varargin{1:2});
+            [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, ac_f, varargin{1:3});
         otherwise
-            error('WBM::jointAccelerationsFHPC: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('WBM::jointAccelerationsFHPCPL: %s', WBM.wbmErrorMsg.WRONG_ARG);
     end
+    % get the mixed velocity and acceleration of the payload(s) ...
+    v_pl = a_prms.Jc_h * dq_j;
+    a_pl = ac_h;
+    % calculate the payload force(s):
+    f_pl = payloadForces(obj, hand_conf, fhTotCWrench, f_cp, v_pl, a_pl);
+
     % compute the contact force(s) of the hand(s) -- (optimized mode):
-    [fc_h,~] = contactForcesCLPC(obj, hand_conf, tau, fe_h, ac_h, a_prms.Jc_h, ...
+    [fc_h,~] = contactForcesCLPC(obj, hand_conf, tau, f_pl, ac_h, a_prms.Jc_h, ...
                                  a_prms.djcdq_h, a_prms.M, a_prms.c_qv, dq_j, nu);
     % calculate the total joint acceleration vector ddq_j in
     % dependency of the contact forces of the feet and hands:
-    J_c  = vertcat(Jc_f, Jc_h);
-    f_c  = vertcat(fc_f, fc_h);
+    J_c  = vertcat(a_prms.Jc_f, a_prms.Jc_h);
+    f_c  = vertcat(a_prms.fc_f, fc_h);
     Jc_t = J_c.';
-    ddq_j = M \ (tau_gen + Jc_t*f_c - c_qv);
+    ddq_j = M \ (a_prms.tau_gen + Jc_t*f_c - c_qv);
 
     if (nargout == 2)
         % data structure of the calculated forward dynamics parameters ...
-        f_e = vertcat(fe_0, fe_h);
         a_c = vertcat(ac_f, ac_h);
-        fd_prms = struct('tau_gen', tau_gen, 'f_c', f_c, 'f_e', f_e, 'a_c', a_c);
+        fd_prms = struct('tau_gen', tau_gen, 'f_c', f_c, 'f_pl', f_pl, 'a_c', a_c);
     end
 end
