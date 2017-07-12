@@ -1,6 +1,6 @@
 % namespaces:
 import WBM.*
-import WBM.utilities.*
+import WBM.utilities.tfms.*
 import WBM.RobotModel.iCub_arms_torso_free.*
 
 
@@ -18,14 +18,14 @@ icub_config      = wbm_icub.robot_config;
 %  For further details see:
 %    [1] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008,
 %        chapter 3, pp. 40-42, formula (3.8).
-chi_init = wbm_icub.stvChiInit;
+chi_init = wbm_icub.init_stvChi;
 
 %% Control torques:
 %  Setup the time-dependent function "fhTrqControl" which describes a forcing function
 %  on the ODEs to control the dynamics of the equation-system. It refers to the control
 %  torques of each time-step t and is needed to calculate the constraint (contact) forces
 %  which influences the outcome of each equation, the generalized acceleration dv (q_ddot).
-[p_b, R_b] = frame2posRotm(wbm_icub.vqTInit);
+[p_b, R_b] = frame2posRotm(wbm_icub.init_vqT_base);
 qj_init = icub_config.init_state_params.q_j;
 g_init  = wbm_icub.generalizedBiasForces(R_b, p_b, qj_init, zeros(icub_model.ndof,1), zeros(6,1));
 len = size(g_init,1);
@@ -77,7 +77,7 @@ sim_config = initSimConfig_iCub_atf(icub_model.urdf_robot_name);             % s
 sim_config = wbm_icub.setupSimulation(sim_config);
 x_out = wbm_icub.getPositionsData(chi);
 % show and repeat the simulation 10 times ...
-nRpts = 1;
+nRpts = 2;
 wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:

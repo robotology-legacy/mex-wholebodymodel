@@ -9,7 +9,7 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, 
             dq_j = varargin{1,5};
             nu   = varargin{1,7};
 
-            % get the mixed acceleration of the hand(s) at the contact link(s) ...
+            % get the mixed acceleration of the hands at the contact links ...
             [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, varargin{1:7});
         case 11
             % wf_R_b = varargin{1}
@@ -41,10 +41,10 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, 
     % get the mixed velocity and acceleration of the payload(s) ...
     v_pl = a_prms.Jc_h * dq_j;
     a_pl = ac_h;
-    % calculate the payload force(s):
-    f_pl = payloadForces(obj, hand_conf, fhTotCWrench, f_cp, v_pl, a_pl);
+    % calculate the payload forces of the hands:
+    f_pl = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp, v_pl, a_pl);
 
-    % compute the contact force(s) of the hand(s) -- (optimized mode):
+    % compute the contact forces of the hands -- (optimized mode):
     [fc_h,~] = contactForcesCLPC(obj, hand_conf, tau, f_pl, ac_h, a_prms.Jc_h, ...
                                  a_prms.djcdq_h, a_prms.M, a_prms.c_qv, dq_j, nu);
     % calculate the total joint acceleration vector ddq_j in

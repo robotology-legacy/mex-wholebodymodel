@@ -19,35 +19,39 @@ classdef (Abstract) IMultChainTree < handle
     end
 
     methods(Abstract)
-        ddq_j = accel(obj, q_j, dq_j, tau)
+        ddq_j = accel(bot, q_j, dq_j, tau)
 
-        c_qv = corolis(obj, q_j, dq_j)
+        c_qv = coriolis(bot, q_j, dq_j)
 
-        tau_fr = friction(obj, dq_j)
+        tau_fr = friction(bot, dq_j)
 
-        g_q = gravload(obj, q_j)
+        g_q = gravload(bot, q_j)
 
-        tau_j = invdyn(obj, q_j, dq_j, ddq_j)
+        tau_j = rne(bot, q_j, dq_j, ddq_j)
 
-        [t, stmChi] = fdyn(obj, tspan, fhCtrlTrqs, stvChi_0, ode_opt)
+        [t, stmChi] = fdyn(bot, tspan, fhCtrlTrqs, stvChi_0, ode_opt)
 
-        wf_H_lnk = fkine(obj, q_j)
+        wf_H_lnk = fkine(bot, q_j)
 
-        wf_H_lnk = A(obj, jnt_idx, q_j)
+        wf_H_lnk = A(bot, jnt_idx, q_j)
 
-        wf_H_ee = T0_n(obj, q_j) % computes the forward kinematics of the current end-effector.
+        wf_H_ee = T0_n(bot, q_j) % computes the forward kinematics of the current end-effector.
 
-        djdq_lnk = jacob_dot(obj, q_j, dq_j)
+        djdq_lnk = jacob_dot(bot, q_j, dq_j)
 
-        wf_J_lnk = jacob0(obj, q_j, varargin)
+        wf_J_lnk = jacob0(bot, q_j, varargin)
 
-        wf_J_ee = jacobn(obj, q_j) % Jacobian of the current ee-frame.
+        wf_J_ee = jacobn(bot, q_j) % Jacobian of the current ee-frame.
 
-        M = inertia(obj, q_j)
+        M = inertia(bot, q_j)
 
-        resv = islimit(obj, q_j)
+        payload(bot, pl_data);
 
-        plot3d(obj, x_out, sim_tstep, vis_ctrl)
+        f_pl = pay(bot, fhTotCWrench, f_cp, tau, q_j, dq_j);
+
+        resv = islimit(bot, q_j)
+
+        plot3d(bot, x_out, sim_tstep, vis_ctrl)
 
     end
 end

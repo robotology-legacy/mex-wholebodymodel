@@ -12,7 +12,7 @@ icub_model.wf_R_b          = eye(3,3);
 icub_model.g_wf            = [0; 0; -9.81];
 % base robot config:
 icub_config = wbmHumanoidConfig;
-icub_config.nCstrs          = 2;
+icub_config.nCstrs           = 2;
 icub_config.ccstr_link_names = {'r_sole', 'l_gripper'};
 
 noi = 1000;
@@ -81,7 +81,7 @@ icub_model.wf_R_b          = eye(3,3);
 icub_model.g_wf            = [0; 0; 9.81];
 % base robot config:
 icub_config = wbmHumanoidConfig;
-icub_config.nCstrs          = 2;
+icub_config.nCstrs           = 2;
 icub_config.ccstr_link_names = {'r_sole', 'l_gripper'};
 
 noi = 1000;

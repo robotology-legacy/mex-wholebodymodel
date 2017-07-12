@@ -5,7 +5,7 @@ function clink_conf = setCLinkConfigState(obj, clnk_idx_l, clnk_idx_r, varargin)
             veT_ll = varargin{1,2};
             veT_rl = varargin{1,3};
 
-            WBM.utilities.checkCVecDs(veT_ll, veT_rl, 6, 6, 'WBM::setCLinkConfigState');
+            WBM.utilities.chkfun.checkCVecDs(veT_ll, veT_rl, 6, 6, 'WBM::setCLinkConfigState');
 
             % get the link orientations ...
             eul_ll = veT_ll(4:6,1);
@@ -72,8 +72,8 @@ function clink_conf = setCLinkConfigState(obj, clnk_idx_l, clnk_idx_r, varargin)
         vqT_ll = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, stFltb.wf_p_b, q_j, clink_l);
         vqT_rl = mexWholeBodyModel('forward-kinematics', wf_R_b_arr, stFltb.wf_p_b, q_j, clink_r);
         % get the positions and transform the orientations into Euler-angles ...
-        [p_ll, eul_ll] = WBM.utilities.frame2posEul(vqT_ll);
-        [p_rl, eul_rl] = WBM.utilities.frame2posEul(vqT_rl);
+        [p_ll, eul_ll] = WBM.utilities.tfms.frame2posEul(vqT_ll);
+        [p_rl, eul_rl] = WBM.utilities.tfms.frame2posEul(vqT_rl);
 
         % desired pose (using vector Euler-angle transformations (veT)):
         clink_conf.des_pose.veT_llnk = vertcat(p_ll, eul_ll);
@@ -81,6 +81,6 @@ function clink_conf = setCLinkConfigState(obj, clnk_idx_l, clnk_idx_r, varargin)
     end
 
     % set the angular velocity transformations for the contact links:
-    clink_conf.des_pose.avT_llnk = WBM.utilities.eul2angVelTF(eul_ll);
-    clink_conf.des_pose.avT_rlnk = WBM.utilities.eul2angVelTF(eul_rl);
+    clink_conf.des_pose.avT_llnk = WBM.utilities.tfms.eul2angVelTF(eul_ll);
+    clink_conf.des_pose.avT_rlnk = WBM.utilities.tfms.eul2angVelTF(eul_rl);
 end

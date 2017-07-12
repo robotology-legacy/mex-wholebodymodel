@@ -82,17 +82,17 @@ function error_clp = clnkPoseError(obj, clink_conf, varargin)
         % get the new VQ-Transformations (link frames) for the contact links ...
         fk_new_pose = clnkPoseTransformations(clink_l, clink_r, varargin{:});
         % convert the link frames in VE-Transformations (veT) ...
-        [p_ll, eul_ll] = WBM.utilities.frame2posEul(fk_new_pose.vqT_llnk);
-        [p_rl, eul_rl] = WBM.utilities.frame2posEul(fk_new_pose.vqT_rlnk);
+        [p_ll, eul_ll] = WBM.utilities.tfms.frame2posEul(fk_new_pose.vqT_llnk);
+        [p_rl, eul_rl] = WBM.utilities.tfms.frame2posEul(fk_new_pose.vqT_rlnk);
         fk_new_pose.veT_llnk = vertcat(p_ll, eul_ll); % current motions
         fk_new_pose.veT_rlnk = vertcat(p_rl, eul_rl);
 
         % compute the Euler angle velocity transformations ...
-        Er_ll = WBM.utilities.eul2angVelTF(eul_ll);
-        Er_rl = WBM.utilities.eul2angVelTF(eul_rl);
+        Er_ll = WBM.utilities.tfms.eul2angVelTF(eul_ll);
+        Er_rl = WBM.utilities.tfms.eul2angVelTF(eul_rl);
         % create for each link the mixed velocity transformation matrix ...
-        vX_ll = WBM.utilities.mixveltfm(Er_ll);
-        vX_rl = WBM.utilities.mixveltfm(Er_rl);
+        vX_ll = WBM.utilities.tfms.mixveltfm(Er_ll);
+        vX_rl = WBM.utilities.tfms.mixveltfm(Er_rl);
 
         % get the error (distances) between the contact link poses (CLP):
         % delta  =   vX * (current transf. T   -   desired transf. T*)
@@ -110,12 +110,12 @@ function error_clp = clnkPoseError(obj, clink_conf, varargin)
         fk_ref_pose.veT_llnk = clink_conf.des_pose.veT_llnk;
         fk_new_pose = clnkPoseTransformationLeft(clink_l, varargin{:});
         % convert to VE-transformation ...
-        [p_ll, eul_ll] = WBM.utilities.frame2posEul(fk_new_pose.vqT_llnk);
+        [p_ll, eul_ll] = WBM.utilities.tfms.frame2posEul(fk_new_pose.vqT_llnk);
         fk_new_pose.veT_llnk = vertcat(p_ll, eul_ll); % current motion
 
         % create the mixed velocity transformation ...
-        Er_ll = WBM.utilities.eul2angVelTF(eul_ll);
-        vX_ll = WBM.utilities.mixveltfm(Er_ll);
+        Er_ll = WBM.utilities.tfms.eul2angVelTF(eul_ll);
+        vX_ll = WBM.utilities.tfms.mixveltfm(Er_ll);
         % compute the error (distance) ...
         error_clp = vX_ll*(fk_new_pose.veT_llnk - fk_ref_pose.veT_llnk);
     elseif ctc_r
@@ -127,12 +127,12 @@ function error_clp = clnkPoseError(obj, clink_conf, varargin)
         fk_ref_pose.veT_rlnk = clink_conf.des_pose.veT_rlnk;
         fk_new_pose = clnkPoseTransformationRight(clink_r, varargin{:});
 
-        [p_rl, eul_rl] = WBM.utilities.frame2posEul(fk_new_pose.vqT_rlnk);
+        [p_rl, eul_rl] = WBM.utilities.tfms.frame2posEul(fk_new_pose.vqT_rlnk);
         fk_new_pose.veT_rlnk = vertcat(p_rl, eul_rl);
 
         % create the mixed velocity transformation ...
-        Er_rl = WBM.utilities.eul2angVelTF(eul_rl);
-        vX_rl = WBM.utilities.mixveltfm(Er_rl);
+        Er_rl = WBM.utilities.tfms.eul2angVelTF(eul_rl);
+        vX_rl = WBM.utilities.tfms.mixveltfm(Er_rl);
         % compute the error (distance) ...
         error_clp = vX_rl*(fk_new_pose.veT_rlnk - fk_ref_pose.veT_rlnk);
     else

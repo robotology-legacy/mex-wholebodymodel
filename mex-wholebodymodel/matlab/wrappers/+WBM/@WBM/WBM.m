@@ -1,13 +1,13 @@
 classdef WBM < WBM.WBMBase
     properties(Dependent)
-        stvChiInit@double vector
-        stvLen@uint16     scalar
-        vqTInit@double    vector
-        stvqT@double      vector
+        stvLen@uint16        scalar
+        vqT_base@double      vector
+        init_vqT_base@double vector
+        init_stvChi@double   vector
+        init_state@WBM.wbmStateParams
         robot_body@WBM.wbmBody
         robot_config@WBM.wbmBaseRobotConfig
         robot_params@WBM.wbmBaseRobotParams
-        init_state@WBM.wbmStateParams
     end
 
     properties(Constant)
@@ -109,7 +109,7 @@ classdef WBM < WBM.WBMBase
         end
 
         function updateInitVQTransformation(obj)
-            vqT_init = obj.stvqT; % get the vector-quaternion transf. of the current state ...
+            vqT_init = obj.vqT_base; % get the vector-quaternion transf. of the current state ...
             obj.mwbm_config.init_state_params.x_b  = vqT_init(1:3,1); % translation/position
             obj.mwbm_config.init_state_params.qt_b = vqT_init(4:7,1); % orientation (quaternion)
         end
@@ -121,7 +121,7 @@ classdef WBM < WBM.WBMBase
             end
 
             % get the VQ-Transformation form the base state ...
-            [p_b, R_b] = WBM.utilities.frame2posRotm(vqT_b);
+            [p_b, R_b] = WBM.utilities.tfms.frame2posRotm(vqT_b);
             % set the world frame to the base ...
             if ~exist('g_wf', 'var')
                 setWorldFrame(obj, R_b, p_b); % use the default gravity vector ...
@@ -141,7 +141,7 @@ classdef WBM < WBM.WBMBase
                     if isrow(idx_list) % (including scalar)
                         nCstrs = size(idx_list,2);
                         if (nCstrs > 1)
-                            WBM.utilities.checkNumListAscOrder(idx_list, 'WBM::contactJacobians');
+                            WBM.utilities.chkfun.checkNumListAscOrder(idx_list, 'WBM::contactJacobians');
                         end
                     else
                         error('contactJacobians: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
@@ -539,7 +539,7 @@ classdef WBM < WBM.WBMBase
 
         function f_pl = payloadForce(~, M_pl, v_pl, a_pl, wc_tot)
             % spatial cross operator of the mixed payload velocity in R^6 ...
-            SCPv = WBM.utilities.mixvelcp(v_pl);
+            SCPv = WBM.utilities.tfms.mixvelcp(v_pl);
 
             % apply the Newton-Euler equation to calculate the payload force in
             % dependency of the total contact wrench wc of the payload object:
@@ -581,9 +581,9 @@ classdef WBM < WBM.WBMBase
             lnk_H_cm = eye(4,4);
             lnk_H_cm(1:3,4) = lnk_p_cm; % position from the payload's CoM to {lnk_i}.
             wf_H_cm = wf_H_lnk * lnk_H_cm; % payload transformation matrix
-            [wf_p_cm, wf_R_cm] = WBM.utilities.tform2posRotm(wf_H_cm);
+            [wf_p_cm, wf_R_cm] = WBM.utilities.tfms.tform2posRotm(wf_H_cm);
 
-            M_pl = WBM.utilities.generalizedInertia(m_rb, I_cm, wf_R_cm, wf_p_cm);
+            M_pl = WBM.utilities.rb.generalizedInertia(m_rb, I_cm, wf_R_cm, wf_p_cm);
 
             if (nargout == 2)
                 frms = struct('wf_H_lnk', wf_H_lnk, 'wf_H_cm', wf_H_cm);
@@ -695,7 +695,7 @@ classdef WBM < WBM.WBMBase
             %                 i.e. the frame of a hand (or of a finger).
             %
             % get the homog. transformation of the tool-frame (relative to the ee-frame):
-            ee_H_tt = WBM.utilities.frame2tform(ee_vqT_tt);
+            ee_H_tt = WBM.utilities.tfms.frame2tform(ee_vqT_tt);
             wf_H_tt = wf_H_ee * ee_H_tt; % tool transformation matrix
         end
 
@@ -765,13 +765,13 @@ classdef WBM < WBM.WBMBase
             %       Springer, 2010, p. 150, eq. (3.112).
             %   [3] Introduction to Robotics: Mechanics and Control, John J. Craig, 3rd Edition, Pearson/Prentice Hall, 2005,
             %       p. 158, eq. (5.103).
-            [~, wf_R_ee]    = WBM.utilities.tform2posRotm(wf_H_ee);   % orientation of the end-effector (ee).
-            [p_tt, ee_R_tt] = WBM.utilities.frame2posRotm(ee_vqT_tt); % position & orientation of the tool-tip (tt).
+            [~, wf_R_ee]    = WBM.utilities.tfms.tform2posRotm(wf_H_ee);   % orientation of the end-effector (ee).
+            [p_tt, ee_R_tt] = WBM.utilities.tfms.frame2posRotm(ee_vqT_tt); % position & orientation of the tool-tip (tt).
 
             % calculate the position from the tool-tip (tt) to the world-frame (wf) ...
             wf_p_tt = wf_R_ee * (ee_R_tt * p_tt); % = wf_R_ee * ee_p_tt
             % get the velocity transformation matrix ...
-            tt_X_wf = WBM.utilities.adjoint(wf_p_tt);
+            tt_X_wf = WBM.utilities.tfms.adjoint(wf_p_tt);
 
             % compute wf_J_tt by performing velocity addition ...
             wf_J_tt = tt_X_wf * wf_J_ee; % = tt[wf]_X_ee[wf] * ee[wf]_J_ee
@@ -875,7 +875,7 @@ classdef WBM < WBM.WBMBase
             stParams = WBM.wbmStateParams;
 
             if iscolumn(stChi)
-                WBM.utilities.checkCVecDim(stChi, len, 'WBM::getStateParams');
+                WBM.utilities.chkfun.checkCVecDim(stChi, len, 'WBM::getStateParams');
                 % get the base/joint positions and the base orientation ...
                 stParams.x_b  = stChi(1:3,1);
                 stParams.qt_b = stChi(4:7,1);
@@ -909,7 +909,7 @@ classdef WBM < WBM.WBMBase
             cutp = obj.mwbm_model.ndof + 7; % 3 + 4 + ndof
 
             if iscolumn(stChi)
-                WBM.utilities.checkCVecDim(stChi, len, 'WBM::getPositions');
+                WBM.utilities.chkfun.checkCVecDim(stChi, len, 'WBM::getPositions');
                 % extract the base VQS-Transformation (without S)
                 % and the joint positions ...
                 vqT_b = stChi(1:7,1); % [x_b; qt_b]
@@ -942,7 +942,7 @@ classdef WBM < WBM.WBMBase
             ndof  = obj.mwbm_model.ndof;
 
             if iscolumn(stChi)
-                WBM.utilities.checkCVecDim(stChi, len, 'WBM::getMixedVelocities');
+                WBM.utilities.chkfun.checkCVecDim(stChi, len, 'WBM::getMixedVelocities');
                 % extract the velocities ...
                 v_b  = stChi(ndof+8:ndof+13,1); % [dx_b; omega_b]
                 dq_j = stChi(ndof+14:len,1);
@@ -965,7 +965,7 @@ classdef WBM < WBM.WBMBase
             ndof  = obj.mwbm_model.ndof;
 
             if iscolumn(stChi)
-                WBM.utilities.checkCVecDim(stChi, len, 'WBM::getBaseVelocities');
+                WBM.utilities.chkfun.checkCVecDim(stChi, len, 'WBM::getBaseVelocities');
 
                 v_b = stChi(ndof+8:ndof+13,1); % [dx_b; omega_b]
                 return
@@ -981,23 +981,34 @@ classdef WBM < WBM.WBMBase
             error('WBM::getBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
         end
 
-        function stvChi = get.stvChiInit(obj)
+        function stvLen = get.stvLen(obj)
+            stvLen = obj.mwbm_config.stvLen;
+        end
+
+        function vqT_b = get.vqT_base(obj)
+            [vqT_b,~,~,~] = getState(obj);
+        end
+
+        function vqT_b = get.init_vqT_base(obj)
+            stInit = obj.mwbm_config.init_state_params;
+            vqT_b  = vertcat(stInit.x_b, stInit.qt_b);
+        end
+
+        function stvChi = get.init_stvChi(obj)
             stInit = obj.mwbm_config.init_state_params;
             stvChi = vertcat(stInit.x_b, stInit.qt_b, stInit.q_j, ...
                              stInit.dx_b, stInit.omega_b, stInit.dq_j);
         end
 
-        function stvLen = get.stvLen(obj)
-            stvLen = obj.mwbm_config.stvLen;
+        function set.init_state(obj, stInit)
+            if ~checkInitStateDimensions(obj, stInit)
+                error('WBM::set.init_state: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
+            end
+            obj.mwbm_config.init_state_params = stInit;
         end
 
-        function vqT_b = get.vqTInit(obj)
+        function stInit = get.init_state(obj)
             stInit = obj.mwbm_config.init_state_params;
-            vqT_b  = vertcat(stInit.x_b, stInit.qt_b);
-        end
-
-        function vqT_b = get.stvqT(obj)
-            [vqT_b,~,~,~] = getState(obj);
         end
 
         function robot_body = get.robot_body(obj)
@@ -1013,17 +1024,6 @@ classdef WBM < WBM.WBMBase
             robot_params.model     = obj.mwbm_model;
             robot_params.config    = obj.mwbm_config;
             robot_params.wf2fixLnk = obj.mwf2fixLnk;
-        end
-
-        function set.init_state(obj, stInit)
-            if ~checkInitStateDimensions(obj, stInit)
-                error('WBM::set.init_state: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
-            end
-            obj.mwbm_config.init_state_params = stInit;
-        end
-
-        function stInit = get.init_state(obj)
-            stInit = obj.mwbm_config.init_state_params;
         end
 
         function dispConfig(obj, prec)

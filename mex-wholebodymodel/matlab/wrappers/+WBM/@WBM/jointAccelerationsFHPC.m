@@ -9,7 +9,7 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, ta
             dq_j = varargin{1,5};
             nu   = varargin{1,7};
 
-            % get the mixed acceleration of the hand(s) at the contact link(s) ...
+            % get the mixed acceleration of the hands at the contact links ...
             [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, varargin{1:7});
         case 11
             % wf_R_b = varargin{1}
@@ -36,7 +36,7 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, ta
         otherwise
             error('WBM::jointAccelerationsFHPC: %s', WBM.wbmErrorMsg.WRONG_ARG);
     end
-    % compute the contact force(s) of the hand(s) -- (optimized mode):
+    % compute the contact forces of the hands -- (optimized mode):
     [fc_h,~] = contactForcesCLPC(obj, hand_conf, tau, fe_h, ac_h, a_prms.Jc_h, ...
                                  a_prms.djcdq_h, a_prms.M, a_prms.c_qv, dq_j, nu);
     % calculate the total joint acceleration vector ddq_j in

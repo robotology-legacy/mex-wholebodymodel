@@ -210,7 +210,7 @@ classdef WBMBase < handle
         end
 
         function dv_b = generalizedBaseAcc(obj, M, c_qv, ddq_j)
-            dv_b = WBM.utilities.generalizedBaseAcc(M, c_qv, ddq_j, obj.mwbm_model.ndof);
+            dv_b = WBM.utilities.mbd.generalizedBaseAcc(M, c_qv, ddq_j, obj.mwbm_model.ndof);
         end
 
         tau_j = inverseDynamics(obj, varargin)
@@ -422,7 +422,7 @@ classdef WBMBase < handle
         end
 
         function set.wf_R_b(obj, new_rotm)
-            WBM.utilities.checkMatDim(new_rotm, 3, 3, 'WBMBase::set.wf_R_b');
+            WBM.utilities.chkfun.checkMatDim(new_rotm, 3, 3, 'WBMBase::set.wf_R_b');
             obj.mwbm_model.wf_R_b = new_rotm;
         end
 
@@ -431,7 +431,7 @@ classdef WBMBase < handle
         end
 
         function set.wf_p_b(obj, new_pos)
-            WBM.utilities.checkCVecDim(new_pos, 3, 'WBMBase::set.wf_p_b');
+            WBM.utilities.chkfun.checkCVecDim(new_pos, 3, 'WBMBase::set.wf_p_b');
             obj.mwbm_model.wf_p_b = new_pos;
         end
 
@@ -440,7 +440,7 @@ classdef WBMBase < handle
         end
 
         function set.g_wf(obj, new_g)
-            WBM.utilities.checkCVecDim(new_g, 3, 'WBMBase::set.g_wf');
+            WBM.utilities.chkfun.checkCVecDim(new_g, 3, 'WBMBase::set.g_wf');
             obj.mwbm_model.g_wf = new_g;
         end
 
@@ -470,7 +470,7 @@ classdef WBMBase < handle
                 error('WBMBase::set.frict_coeff: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             n = obj.mwbm_model.ndof;
-            WBM.utilities.checkCVecDs(frict_coeff.v, frict_coeff.c, n, n, 'WBMBase::set.frict_coeff');
+            WBM.utilities.chkfun.checkCVecDs(frict_coeff.v, frict_coeff.c, n, n, 'WBMBase::set.frict_coeff');
 
             % update the friction coefficients ...
             obj.mwbm_model.frict_coeff.v = frict_coeff.v;
@@ -503,7 +503,8 @@ classdef WBMBase < handle
                 strURDFname = sprintf(' URDF robot model:  %s', strName);
             end
 
-            if ~any(obj.mwbm_model.frict_coeff.v,1) % if frict_coeff.v = 0:
+            if ~any(obj.mwbm_model.frict_coeff.v,1)
+                % if frict_coeff.v = 0:
                 strFrictions = '  frictionless';
             else
                 strFrictions = sprintf(['  viscous frictions:  %s\n' ...
@@ -546,11 +547,11 @@ classdef WBMBase < handle
 
             if (robot_model.ndof > 0)
                 if ~isempty(robot_model.frict_coeff.v)
-                    WBM.utilities.checkCVecDim(robot_model.frict_coeff.v, robot_model.ndof, 'WBMBase::initWBM');
+                    WBM.utilities.chkfun.checkCVecDim(robot_model.frict_coeff.v, robot_model.ndof, 'WBMBase::initWBM');
 
                     obj.mwbm_model.frict_coeff.v = robot_model.frict_coeff.v;
                     if ~isempty(obj.mwbm_model.frict_coeff.c)
-                        WBM.utilities.checkCVecDim(robot_model.frict_coeff.c, robot_model.ndof, 'WBMBase::initWBM');
+                        WBM.utilities.chkfun.checkCVecDim(robot_model.frict_coeff.c, robot_model.ndof, 'WBMBase::initWBM');
 
                         obj.mwbm_model.frict_coeff.c = robot_model.frict_coeff.c;
                     else
@@ -589,8 +590,8 @@ classdef WBMBase < handle
             [ow_vqT_b,~,~,~] = getState(obj);
             % get the homogeneous transformation matrix H
             % from the base to the old world ...
-            [ow_p_b, ow_R_b] = WBM.utilities.frame2posRotm(ow_vqT_b);
-            ow_H_b = WBM.utilities.posRotm2tform(ow_p_b, ow_R_b);
+            [ow_p_b, ow_R_b] = WBM.utilities.tfms.frame2posRotm(ow_vqT_b);
+            ow_H_b = WBM.utilities.tfms.posRotm2tform(ow_p_b, ow_R_b);
 
             % get the transformation values from the reference link (contact link)
             % to the old world:
@@ -602,11 +603,11 @@ classdef WBMBase < handle
 
             % compute the homogeneous transformation matrix H from the base to
             % the new world:
-            ow_H_rlnk = WBM.utilities.frame2tform(ow_vqT_rlnk);
+            ow_H_rlnk = WBM.utilities.tfms.frame2tform(ow_vqT_rlnk);
             nw_H_b    = ow_H_rlnk \ ow_H_b;
 
             % extract the translation and the rotation values ...
-            [nw_p_b, nw_R_b] = WBM.utilities.tform2posRotm(nw_H_b);
+            [nw_p_b, nw_R_b] = WBM.utilities.tfms.tform2posRotm(nw_H_b);
         end
 
     end

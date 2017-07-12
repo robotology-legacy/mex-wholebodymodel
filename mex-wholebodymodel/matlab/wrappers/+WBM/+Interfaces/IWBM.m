@@ -9,6 +9,7 @@ classdef (Abstract) IWBM < handle
         base_tform@double matrix
         tool_tform@double matrix
         feet_conf@struct
+        hand_conf@struct
         gravity@double    vector
         jlimits@struct
         ndof@uint16       scalar
@@ -65,9 +66,9 @@ classdef (Abstract) IWBM < handle
 
         wf_J_tt = jacobianTool(obj, t_idx, q_j, stFltb) % Jacobian matrix in tool-frame
 
-        payload(obj, pt_mass, pos, link_names)
+        payload(obj, pl_data)
 
-        % tau_pl = payloadForces(obj, q_j, dq_j, stFltb)
+        f_pl = payloadForces(obj, fhTotCWrench, f_cp, tau, q_j, dq_j, stFltb)
 
         resv = islimit(obj, q_j)
 

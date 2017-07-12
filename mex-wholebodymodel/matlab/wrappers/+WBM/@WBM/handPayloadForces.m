@@ -28,8 +28,8 @@ function [f_pl, pl_prms] = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp,
 
         % get the positions & orientations from the contact frame {c_i}
         % (at contact point pc_i) to the world frame {wf}:
-        [wf_R_cl, wf_p_cl] = WBM.utilities.tform2posRotm(wf_H_ee{1,1});
-        [wf_R_cr, wf_p_cr] = WBM.utilities.tform2posRotm(wf_H_ee{1,2});
+        [wf_R_cl, wf_p_cl] = WBM.utilities.tfms.tform2posRotm(wf_H_ee{1,1});
+        [wf_R_cr, wf_p_cr] = WBM.utilities.tfms.tform2posRotm(wf_H_ee{1,2});
 
         wc_tot_l = fhTotCWrench(fcp_l, wf_R_cl, wf_p_cl);
         wc_tot_r = fhTotCWrench(fcp_r, wf_R_cr, wf_p_cr);
@@ -51,7 +51,7 @@ function [f_pl, pl_prms] = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp,
         wf_H_eel = frms.wf_H_lnk;
 
         % positions & orientations of the left contact point ...
-        [wf_R_cl, wf_p_cl] = WBM.utilities.tform2posRotm(wf_H_eel);
+        [wf_R_cl, wf_p_cl] = WBM.utilities.tfms.tform2posRotm(wf_H_eel);
         % calculate the total contact wrench of the left hand ...
         wc_tot_l = fhTotCWrench(f_cp, wf_R_cl, wf_p_cl);
         % get the payload force of the left hand:
@@ -67,7 +67,7 @@ function [f_pl, pl_prms] = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp,
         wf_H_eer = frms.wf_H_lnk;
 
         % positions & orientations of the right contact point ...
-        [wf_R_cr, wf_p_cr] = WBM.utilities.tform2posRotm(wf_H_eer);
+        [wf_R_cr, wf_p_cr] = WBM.utilities.tfms.tform2posRotm(wf_H_eer);
         % calculate the total contact wrench of the right hand ...
         wc_tot_r = fhTotCWrench(f_cp, wf_R_cr, wf_p_cr);
         % get the payload force of the right hand:

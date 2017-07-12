@@ -110,7 +110,7 @@ end
 
 function fd_prms = getFDynParams(obj, t, stvChi, fhTrqControl)
     % get the current state parameters ...
-    stp = WBM.utilities.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
+    stp = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
     v_b = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
 
     % update the state for the optimized mode ...
@@ -128,7 +128,7 @@ end
 
 function fd_prms = getFDynParamsCLPC(obj, t, stvChi, fhTrqControl, clink_conf, f_e, a_c)
     % get the state parameters ...
-    stp = WBM.utilities.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
+    stp = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
     v_b = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
     nu  = vertcat(v_b, stp.dq_j);         % mixed generalized velocity
 
