@@ -47,6 +47,6 @@ function rX = mixratetfm(varargin)
         case 0
             rX = eye(6,6); % default
         otherwise
-            error('mixratetfm: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('mixratetfm: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

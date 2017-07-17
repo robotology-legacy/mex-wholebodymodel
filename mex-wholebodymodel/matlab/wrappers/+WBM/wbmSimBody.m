@@ -36,7 +36,7 @@ classdef wbmSimBody < handle
     methods
         function obj = wbmSimBody(joint_lnk_names, joint_pair_idx, draw_prop)
             if ( (nargin < 2) || (nargin > 3) )
-                error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
             if ( ~iscell(joint_lnk_names) || ~ismatrix(joint_pair_idx) )
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);

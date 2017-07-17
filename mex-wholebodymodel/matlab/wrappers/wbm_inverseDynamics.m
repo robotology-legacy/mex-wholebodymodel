@@ -22,11 +22,11 @@ function tau_j = wbm_inverseDynamics(varargin)
     % Author: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
     switch nargin
         case 2
-            tau_j = mexWholeBodyModel('inverse-dynamics', varargin{1}, varargin{2});
+            tau_j = mexWholeBodyModel('inverse-dynamics', varargin{1,1}, varargin{1,2});
         case 7
-            tau_j = mexWholeBodyModel('inverse-dynamics', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3}, ...
-                                                          varargin{4}, varargin{5}, varargin{6}, varargin{7});
+            tau_j = mexWholeBodyModel('inverse-dynamics', reshape(varargin{1,1}, 9, 1), varargin{1,2}, varargin{1,3}, ...
+                                                          varargin{1,4}, varargin{1,5}, varargin{1,6}, varargin{1,7});
         otherwise
-            error('wbm_inverseDynamics: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_inverseDynamics');
     end
 end

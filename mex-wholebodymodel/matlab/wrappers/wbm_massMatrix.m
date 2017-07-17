@@ -19,8 +19,8 @@ function M = wbm_massMatrix(varargin)
         case 0
             M = mexWholeBodyModel('mass-matrix');
         case 3
-            M = mexWholeBodyModel('mass-matrix', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3});
+            M = mexWholeBodyModel('mass-matrix', reshape(varargin{1,1}, 9, 1), varargin{1,2}, varargin{1,3});
         otherwise
-            error('wbm_massMatrix: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_massMatrix');
     end
 end

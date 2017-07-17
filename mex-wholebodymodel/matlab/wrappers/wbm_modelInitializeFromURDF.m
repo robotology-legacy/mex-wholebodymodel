@@ -14,8 +14,8 @@ function wbm_modelInitializeFromURDF(varargin)
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
     switch nargin
         case 1
-            mexWholeBodyModel('model-initialize-urdf', varargin{1});
+            mexWholeBodyModel('model-initialize-urdf', varargin{1,1});
         otherwise
-            error('wbm_modelInitializeFromURDF: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_modelInitializeFromURDF');
     end
 end

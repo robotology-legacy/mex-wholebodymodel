@@ -24,8 +24,9 @@ function h_c = wbm_centroidalMomentum(varargin)
         case 0
             h_c = mexWholeBodyModel('centroidal-momentum');
         case 5
-            h_c = mexWholeBodyModel('centroidal-momentum', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3}, varargin{4}, varargin{5});
+            h_c = mexWholeBodyModel('centroidal-momentum', reshape(varargin{1,1}, 9, 1), varargin{1,2}, varargin{1,3}, ...
+                                                           varargin{1,4}, varargin{1,5});
         otherwise
-            error('wbm_centroidalMomentum: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_centroidalMomentum');
     end
 end

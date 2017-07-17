@@ -22,6 +22,6 @@ function B_inv = rotm2angRateTF(rotm, rtype, sequence)
                     error('rotm2angRateTF: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
             end
         otherwise
-            error('rotm2angRateTF: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('rotm2angRateTF: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

@@ -56,6 +56,6 @@ function a_X_b = adjoint(varargin)
             %          a_p_b is a 0-vector.
             a_X_b = eye(6,6);
         otherwise
-            error('adjoint: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('adjoint: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

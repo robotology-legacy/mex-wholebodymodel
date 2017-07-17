@@ -3,7 +3,7 @@ function [m_rb, I_cm] = massInertiaGObj(obj_type, rho, varargin)
     %  the origin of the coordinate system at the object body's center of mass (CoM):
     %
     %  Sources:
-    %   [1]  A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, p. 163.
+    %   [1] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, p. 163.
     %   [2] Introduction to Robotics: Mechanics and Control, John J. Craig, 3rd Edition, Pearson/Prentice Hall, 2005,
     %       pp. 169-171, eq. (6.28).
     %   [3] Eric Weisstein's World of Physics: Moment of Inertia--Cylinder, Eric W. Weisstein, scienceworld.wolfram.com, 1996-2007,
@@ -42,12 +42,12 @@ function [m_rb, I_cm] = massInertiaGObj(obj_type, rho, varargin)
                     % inertia tensor at CoM:
                     I_cm = (m_rb/6*s2) * eye(3,3);
                 otherwise
-                    error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                    error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
         case 'scyl'
             % solid cylinder:
             if (nargin ~= 4)
-                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
             r = varargin{1,1}; % radius
             h = varargin{1,2}; % height
@@ -64,7 +64,7 @@ function [m_rb, I_cm] = massInertiaGObj(obj_type, rho, varargin)
         case 'cylt'
             % cylindrical tube:
             if (nargin ~= 5)
-                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
             r_o = varargin{1,1}; % outer radius
             h   = varargin{1,2}; % height
@@ -89,7 +89,7 @@ function [m_rb, I_cm] = massInertiaGObj(obj_type, rho, varargin)
         case 'ssph'
             % solid sphere:
             if (nargin ~= 3)
-                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
             r = varargin{1,1}; % radius
 
@@ -102,7 +102,7 @@ function [m_rb, I_cm] = massInertiaGObj(obj_type, rho, varargin)
         case 'sphs'
             % sphere shell:
             if (nargin ~= 4)
-                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
             r_o = varargin{1,1}; % outer radius
             t_m = varargin{1,2}; % thickness of the material

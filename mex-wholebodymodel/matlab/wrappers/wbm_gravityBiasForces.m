@@ -21,8 +21,8 @@ function g_q = wbm_gravityBiasForces(varargin)
         case 0
             g_q = mexWholeBodyModel('gravity-forces');
         case 3
-            g_q = mexWholeBodyModel('gravity-forces', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3});
+            g_q = mexWholeBodyModel('gravity-forces', reshape(varargin{1,1}, 9, 1), varargin{1,2}, varargin{1,3});
         otherwise
-            error('wbm_gravityBiasForces: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_gravityBiasForces');
     end
 end

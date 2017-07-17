@@ -38,18 +38,16 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
 
     % Computation of the contact (constraint) force vector:
     % For further details about the formula see,
-    %   [1] Control Strategies for Robots in Contact, J. Park, PhD-Thesis, Artificial Intelligence Laboratory,
-    %       Department of Computer Science, Stanford University, 2006, chapter 5, pp. 106-110, eq. (5.5)-(5.14),
-    %       <http://cs.stanford.edu/group/manips/publications/pdfs/Park_2006_thesis.pdf>.
+    %   [1] Control Strategies for Robots in Contact, J. Park, PhD-Thesis, Artificial Intelligence Laboratory, Stanford University, 2006,
+    %       <http://cs.stanford.edu/group/manips/publications/pdfs/Park_2006_thesis.pdf>, Chapter 5, pp. 106-110, eq. (5.5)-(5.14).
     %   [2] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, pp. 269-270, eq. (6.5) & (6.6).
-    Jc_t      =  Jc.';
-    JcMinv    =  Jc / M;
-    Upsilon_c =  JcMinv * Jc_t; % inverse mass matrix in contact space Upsilon_c = (Jc * M^(-1) * Jc^T) ... (= "inverse pseudo-kinetic energy matrix"?)
-    tau_fr    =  wbm_frictionForces(stp.dq_j, frict_c, frict_v); % friction torques (negated values)
-    tau_gen   =  vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S_j*(tau + (-tau_fr)),
-                                                    % S_j = [0_(6xn); I_(nxn)] ... joint selection matrix
+    tau_fr  = wbm_frictionForces(stp.dq_j, frict_c, frict_v); % friction torques (negated values)
+    tau_gen = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S_j*(tau + (-tau_fr)),
+                                                 % S_j = [0_(6xn); I_(nxn)] ... joint selection matrix.
+    [Mx_c, JcMinv, Jc_t] = WBM.utilities.tfms.cartmass(Jc, M); % mass matrix in contact space Mx_c = Lambda = (Jc * M^(-1) * Jc^T)^(-1),
+                                                               % Lambda ... pseudo-kinetic energy matrix.
     % calculate the contact forces ...
-    f_c = Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq);
+    f_c = Mx_c * (JcMinv*(c_qv - tau_gen) - djcdq); % this variant
 
     % We need to apply the base-to-world rotation to the spatial angular velocity
     % omega_w to obtain the angular velocity in body frame omega_b. This is then

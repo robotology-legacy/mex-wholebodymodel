@@ -22,6 +22,6 @@ function B_inv = tform2angRateTF(tform, rtype, sequence)
                     error('tform2angRateTF: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
             end
         otherwise
-            error('tform2angRateTF: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('tform2angRateTF: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

@@ -9,7 +9,7 @@ classdef wbmBody
     methods
         function obj = wbmBody(chain_names, chain_idx, joint_names, joint_idx)
             if (nargin ~= 4)
-                error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
 
             %% Chains:

@@ -22,6 +22,6 @@ function B = tform2angVelTF(tform, rtype, sequence)
                     error('tform2angVelTF: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
             end
         otherwise
-            error('tform2angVelTF: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('tform2angVelTF: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

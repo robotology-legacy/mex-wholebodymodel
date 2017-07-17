@@ -33,18 +33,22 @@ function [vc_h, v_prms] = handVelocities(obj, hand_conf, varargin)
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
             [Jc_h, djcdq_h] = contactJacobians(obj, wf_R_b_arr, varargin{1,2}, varargin{1,3}, ...
                                                dq_j, varargin{1,5}, hand_idx_list);
+        case 4 % optimized modes:
+            Jc_h = varargin{1,1};
+            dq_j = varargin{1,2};
         case 3
-            % optimized mode:
             dq_j = varargin{1,1};
-
             [Jc_h, djcdq_h] = contactJacobians(obj, hand_idx_list);
         otherwise
-            error('WBM::handVelocities: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('WBM::handVelocities: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
     % calculate the mixed velocity of the hand(s) at the contact link(s):
     vc_h = Jc_h * dq_j;
 
     if (nargout == 2)
+        if (nargin == 4)
+            error('WBM::handVelocities: %s', WBM.wbmErrorMsg.WRONG_NARGOUT);
+        end
         % data structure of the calculated velocity parameters ...
         v_prms = struct('Jc_h', Jc_h, 'djcdq_h', djcdq_h);
     end

@@ -21,8 +21,8 @@ function wbm_setWorldFrame(varargin)
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
     switch nargin
         case 3
-            mexWholeBodyModel('set-world-frame', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3});
+            mexWholeBodyModel('set-world-frame', reshape(varargin{1,1}, 9, 1), varargin{1,2}, varargin{1,3});
         otherwise
-            error('wbm_setWorldFrame: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_setWorldFrame');
     end
 end

@@ -25,12 +25,12 @@ function [M, c_qv, h_c] = wbm_wholeBodyDynamics(varargin)
             c_qv = mexWholeBodyModel('generalized-forces');
             h_c  = mexWholeBodyModel('centroidal-momentum');
         case 5
-            wf_R_b_arr = reshape(varargin{1}, 9, 1);
-            M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, varargin{2}, varargin{3});
-            c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr,varargin{2}, varargin{3}, varargin{4}, varargin{5});
-            h_c  = mexWholeBodyModel('centroidal-momentum', wf_R_b_arr, varargin{2}, varargin{3}, varargin{4}, varargin{5});
+            wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
+            M    = mexWholeBodyModel('mass-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3});
+            c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr,varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
+            h_c  = mexWholeBodyModel('centroidal-momentum', wf_R_b_arr, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
         otherwise
-            error('wbm_wholeBodyDynamics: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_wholeBodyDynamics');
     end
 
 end

@@ -49,7 +49,7 @@ function tau_j = inverseDynamics(obj, varargin)
             M    = mexWholeBodyModel('mass-matrix');
             c_qv = mexWholeBodyModel('generalized-forces');
     otherwise
-        error('WBMBase::inverseDynamics: %s', WBM.wbmErrorMsg.WRONG_ARG);
+        error('WBMBase::inverseDynamics: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 
     tau_fr = frictionForces(obj, dq_j);

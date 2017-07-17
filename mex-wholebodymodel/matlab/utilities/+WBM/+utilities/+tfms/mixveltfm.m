@@ -10,7 +10,7 @@ function vX = mixveltfm(varargin)
     %       - quaternions/Euler parameters (3x4),
     %       - axis-angle (3x4).
     %
-    % Sources:
+    %  Sources:
     %   [1] Multibody Dynamics Notation, S. Traversaro & A. Saccon, Eindhoven University of Technology,
     %       Department of Mechanical Engineering, 2016, <http://repository.tue.nl/849895>, p. 8, eq. (35).
     %   [2] Advanced Robotic Manipulation: Lecture Notes (CS327A), Oussama Khatib, Stanford University, Spring 2005,
@@ -50,6 +50,6 @@ function vX = mixveltfm(varargin)
         case 0
             vX = eye(6,6); % default
         otherwise
-            error('mixveltfm: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('mixveltfm: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

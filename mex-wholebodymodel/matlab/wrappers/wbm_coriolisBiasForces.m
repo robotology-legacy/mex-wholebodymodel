@@ -23,8 +23,9 @@ function c_qv = wbm_coriolisBiasForces(varargin)
         case 0
             c_qv = mexWholeBodyModel('coriolis-forces');
         case 5
-            c_qv = mexWholeBodyModel('coriolis-forces', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3}, varargin{4}, varargin{5});
+            c_qv = mexWholeBodyModel('coriolis-forces', reshape(varargin{1,1}, 9, 1), varargin{1,2}, varargin{1,3}, ...
+                                                        varargin{1,4}, varargin{1,5});
         otherwise
-            error('wbm_coriolisBiasForces: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_coriolisBiasForces');
     end
 end

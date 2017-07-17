@@ -21,11 +21,11 @@ function [wf_p_b, wf_R_b] = wbm_getWorldFrameFromFixLnk(varargin)
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
     switch nargin
         case 1
-            [wf_p_b, wf_R_b] = computeNewWorld2Base(varargin{1});
+            [wf_p_b, wf_R_b] = computeNewWorld2Base(varargin{1,1});
         case 2
-            [wf_p_b, wf_R_b] = computeNewWorld2Base(varargin{1}, varargin{2});
+            [wf_p_b, wf_R_b] = computeNewWorld2Base(varargin{1,1}, varargin{1,2});
         otherwise
-            error('wbm_getWorldFrameFromFixLnk: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_getWorldFrameFromFixLnk');
     end
 end
 
@@ -34,8 +34,8 @@ function [nw_p_b, nw_R_b] = computeNewWorld2Base(urdf_fixed_link, q_j)
     [ow_vqT_b,~,~,~] = wbm_getState(); % vector-quaternion transformation (from base to old world)
 
     % get the homogeneous transformation matrix H (from base to old world):
-    [ow_p_b, ow_R_b] = WBM.utilities.frame2posRotm(ow_vqT_b);
-    ow_H_b = WBM.utilities.posRotm2tform(ow_p_b, ow_R_b);
+    [ow_p_b, ow_R_b] = WBM.utilities.tfms.frame2posRotm(ow_vqT_b);
+    ow_H_b = WBM.utilities.tfms.posRotm2tform(ow_p_b, ow_R_b);
 
     % get the VQ-Transformation to the old world of the reference (contact) link:
     if (nargin == 1)
@@ -45,9 +45,9 @@ function [nw_p_b, nw_R_b] = computeNewWorld2Base(urdf_fixed_link, q_j)
     end
 
     % compute the new homogeneous transformation matrix H (from base to new world):
-    ow_H_rlnk = WBM.utilities.frame2tform(ow_vqT_rlnk);
+    ow_H_rlnk = WBM.utilities.tfms.frame2tform(ow_vqT_rlnk);
     nw_H_b = ow_H_rlnk \ ow_H_b;
 
     % get the new position and rotation (from base to new world):
-    [nw_p_b, nw_R_b] = WBM.utilities.tform2posRotm(nw_H_b);
+    [nw_p_b, nw_R_b] = WBM.utilities.tfms.tform2posRotm(nw_H_b);
 end

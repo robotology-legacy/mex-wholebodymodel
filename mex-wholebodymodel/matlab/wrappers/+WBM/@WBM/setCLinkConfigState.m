@@ -34,7 +34,7 @@ function clink_conf = setCLinkConfigState(obj, clnk_idx_l, clnk_idx_r, varargin)
             k_p = obj.DF_STIFFNESS; % use the default stiffness value ...
             k_v = 2*sqrt(k_p); % (3)
         otherwise
-            error('WBM::setCLinkConfigState: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('WBM::setCLinkConfigState: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
     % some error checks ...
     if ( ~islogical(contact) || ~isrow(contact) )

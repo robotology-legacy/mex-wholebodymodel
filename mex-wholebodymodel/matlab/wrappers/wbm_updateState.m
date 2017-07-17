@@ -16,8 +16,8 @@ function wbm_updateState(varargin)
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
     switch nargin
         case 3
-            mexWholeBodyModel('update-state', varargin{1}, varargin{2}, varargin{3});
+            mexWholeBodyModel('update-state', varargin{1,1}, varargin{1,2}, varargin{1,3});
         otherwise
-            error('wbm_updateState: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_updateState');
     end
 end

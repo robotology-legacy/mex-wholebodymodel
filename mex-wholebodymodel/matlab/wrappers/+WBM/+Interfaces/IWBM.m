@@ -44,7 +44,7 @@ classdef (Abstract) IWBM < handle
 
         tau_j = inverseHybridDyn(obj, q_j, dq_j, ddq_j, stFltb)
 
-        [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, feet_conf)
+        [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, varargin)
 
         visualizeForwardDyn(obj, stmChi, sim_tstep, vis_ctrl)
 

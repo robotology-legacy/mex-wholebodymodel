@@ -19,7 +19,7 @@ function cX_v = comixvelcp(varargin)
             v = v_m(1:3,1);
             w = v_m(4:6,1);
         otherwise
-            error('comixvelcp: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('comixvelcp: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
     % skew-symmetric matrices of the velocities ...
     Sv = WBM.utilities.tfms.skewm(v);

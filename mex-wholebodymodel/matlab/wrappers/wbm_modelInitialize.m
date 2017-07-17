@@ -18,8 +18,8 @@ function wbm_modelInitialize(varargin)
         case 0
             mexWholeBodyModel('model-initialize');
         case 1
-            mexWholeBodyModel('model-initialize', varargin{1});
+            mexWholeBodyModel('model-initialize', varargin{1,1});
         otherwise
-            error('wbm_modelInitialize: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_modelInitialize');
     end
 end

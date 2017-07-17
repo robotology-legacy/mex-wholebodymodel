@@ -45,7 +45,7 @@ function M_rb = generalizedInertia(m_rb, I_cm, varargin)
             M_rb(4:6,4:6) = I_cm;
             return
         otherwise
-            error('generalizedInertia: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('generalizedInertia: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
     % create the generalized inertia matrix ...
     h = m_rb * Sp;

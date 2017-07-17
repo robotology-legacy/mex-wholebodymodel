@@ -21,30 +21,45 @@ function [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, vara
         return
     end
 
+    feet_data = true;
     switch nargin
         case 11
-            % normal mode:
-            ac_f   = varargin{1,1};
-            wf_R_b = varargin{1,2};
-            wf_p_b = varargin{1,3};
-            q_j    = varargin{1,4};
-            dq_j   = varargin{1,5};
-            v_b    = varargin{1,6};
-            nu     = varargin{1,7}; % mixed generalized velocity
+            if iscolumn(varargin{1,4})
+                % normal mode:
+                ac_f   = varargin{1,1};
+                wf_R_b = varargin{1,2};
+                wf_p_b = varargin{1,3};
+                q_j    = varargin{1,4};
+                dq_j   = varargin{1,5};
+                v_b    = varargin{1,6};
+                nu     = varargin{1,7}; % mixed generalized velocity
 
-            wf_R_b_arr = reshape(wf_R_b, 9, 1);
-            [M, c_qv, Jc_f, djcdq_f] = rigidBodyDynCJacobiansCS(obj, feet_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
-            [Jc_h, djcdq_h] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, hand_idx_list);
+                wf_R_b_arr = reshape(wf_R_b, 9, 1);
+                [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, feet_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                [Jc_h, djcdq_h] = contactJacobians(obj, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, hand_idx_list);
+            else
+                % optimized mode:
+                ac_f    = varargin{1,1};
+                Jc_f    = varargin{1,2};
+                djcdq_f = varargin{1,3};
+                M       = varargin{1,4};
+                c_qv    = varargin{1,5};
+                dq_j    = varargin{1,6};
+                nu      = varargin{1,7};
+
+                [Jc_h, djcdq_h] = contactJacobians(obj, hand_idx_list);
+                feet_data = false;
+            end
         case 7
             % optimized mode:
             ac_f = varargin{1,1};
             dq_j = varargin{1,2};
             nu   = varargin{1,3};
 
-            [M, c_qv, Jc_f, djcdq_f] = rigidBodyDynCJacobiansCS(obj, feet_conf);
+            [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, feet_conf);
             [Jc_h, djcdq_h] = contactJacobians(obj, hand_idx_list);
         otherwise
-            error('WBM::handAccelerations: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('WBM::handAccelerations: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
     Jcf_t = Jc_f.';
     % compute the feet contact forces with the corresponding generalized forces ...
@@ -57,8 +72,14 @@ function [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, vara
     ac_h = Jc_h*ddqj_f + djcdq_h;
 
     if (nargout == 2)
-        % data structure of the calculated acceleration parameters ...
-        a_prms = struct('M', M, 'c_qv', c_qv, 'Jc_f', Jc_f, 'Jc_h', Jc_h, 'djcdq_f', djcdq_f, ...
-                        'djcdq_h', djcdq_h, 'fc_f', fc_f, 'tau_gen', tau_gen);
+        % data structure of the calculated acceleration parameters:
+        if feet_data
+            % with feet data Jc_f, djcdq_f, M and c_qv ...
+            a_prms = struct('M', M, 'c_qv', c_qv, 'Jc_f', Jc_f, 'Jc_h', Jc_h, 'djcdq_f', djcdq_f, ...
+                            'djcdq_h', djcdq_h, 'fc_f', fc_f, 'tau_gen', tau_gen);
+            return
+        end
+        % else, without Jc_f, djcdq_f, M and c_qv (existing outside) ...
+        a_prms = struct('Jc_h', Jc_h, 'djcdq_h', djcdq_h, 'fc_f', fc_f, 'tau_gen', tau_gen);
     end
 end

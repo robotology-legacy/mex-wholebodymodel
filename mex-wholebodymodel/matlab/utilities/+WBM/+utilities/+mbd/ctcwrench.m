@@ -5,7 +5,7 @@ function [w_c, wc_prms] = ctcwrench(f_cp, varargin)
     %% Contact wrench:
     %  Sources:
     %   [1]  GraspIt!: A Versatile Simulator for Robotic Grasping, Andrew T. Miller, PhD, Columbia University, 2001, pp. 44-50, eq. (4.1)-(4.5) & (4.10).
-    %   [2]  Planning Optimal Grasps, C. Ferrari & J. Canny, Proceedings 1992 IEEE International Conference on Robotics and Automation (ICRA), 1992,
+    %   [2]  Planning Optimal Grasps, C. Ferrari & J. Canny, IEEE International Conference on Robotics and Automation (ICRA), 1992,
     %        <https://people.eecs.berkeley.edu/~jfc/papers/92/FCicra92.pdf>, pp. 2291-2293.
     %   [3]  From Robot to Human Grasping Simulation: 19 (Cognitive Systems Monographs), B. León & A. Morales & J. Sancho-Bru, Volume 19, Springer, 2014,
     %        pp. 16-21, eq. (2.6).
@@ -100,7 +100,7 @@ function [w_c, wc_prms] = ctcwrench(f_cp, varargin)
             end
             return
         otherwise
-            error('ctcwrench: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('ctcwrench: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
     % Based on the frictional contact models, calculate the contact wrench w_c and
     % the corresponding friction cone FC of the contact point a_p_c:
@@ -213,6 +213,6 @@ function f_e = computePrimForcesPCone(varargin)
                 f_e(1:3,j) = mu_s*cos(a_p)*ft_h + f3_h;
             end
         otherwise
-            error('computePrimForcesPCone: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('computePrimForcesPCone: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

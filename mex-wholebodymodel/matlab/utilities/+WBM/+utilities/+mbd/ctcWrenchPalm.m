@@ -16,6 +16,6 @@ function wc_tot = ctcWrenchPalm(f_cp, a_R_c, a_p_c, varargin)
             % frictionless contact model:
             wc_tot = WBM.utilities.mbd.ctcwrench(f_cp, a_R_c, a_p_c);
         otherwise
-            error('ctcWrenchPalm: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('ctcWrenchPalm: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

@@ -22,6 +22,6 @@ function B = rotm2angVelTF(rotm, rtype, sequence)
                     error('rotm2angVelTF: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
             end
         otherwise
-            error('rotm2angVelTF: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('rotm2angVelTF: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

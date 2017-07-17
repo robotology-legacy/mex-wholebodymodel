@@ -18,10 +18,11 @@ function wf_H_lnk = wbm_transformationMatrix(varargin)
     % Author: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
     switch nargin
         case 1
-            wf_H_lnk = mexWholeBodyModel('transformation-matrix', varargin{1});
+            wf_H_lnk = mexWholeBodyModel('transformation-matrix', varargin{1,1});
         case 4
-            wf_H_lnk = mexWholeBodyModel('transformation-matrix', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3}, varargin{4});
+            wf_H_lnk = mexWholeBodyModel('transformation-matrix', reshape(varargin{1,1}, 9, 1), varargin{1,2}, ...
+                                                                  varargin{1,3}, varargin{1,4});
         otherwise
-            error('wbm_transformationMatrix: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_transformationMatrix');
     end
 end

@@ -22,10 +22,10 @@ function vqT_lnk = wbm_forwardKinematics(varargin)
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
     switch nargin
         case 1
-            vqT_lnk = mexWholeBodyModel('forward-kinematics', varargin{1});
+            vqT_lnk = mexWholeBodyModel('forward-kinematics', varargin{1,1});
         case 4
-            vqT_lnk = mexWholeBodyModel('forward-kinematics', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3}, varargin{4});
+            vqT_lnk = mexWholeBodyModel('forward-kinematics', reshape(varargin{1,1}, 9, 1), varargin{1,2}, varargin{1,3}, varargin{1,4});
         otherwise
-            error('wbm_forwardKinematics: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_forwardKinematics');
     end
 end

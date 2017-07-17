@@ -50,6 +50,18 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             delete(bot);
         end
 
+        function [q_j, dq_j, wf_H_b, v_b] = getstate(bot)
+            switch nargout
+                case 2
+                    [~,q_j,~,dq_j] = bot.mwbm.getState();
+                case 4
+                    [vqT_b, q_j, v_b, dq_j] = bot.mwbm.getState();
+                    wf_H_b = WBM.utilities.tfms.frame2tform(vqT_b);
+                otherwise
+                    error('MultChainTree::getstate: %s', WBM.wbmErrorMsg.WRONG_NARGOUT);
+            end
+        end
+
         function ddq_j = accel(bot, q_j, dq_j, tau)
             ddq_j = bot.mwbm.jointAccelerations(tau, q_j, dq_j);
         end
@@ -70,16 +82,16 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             tau_j = bot.mwbm.inverseHybridDyn(q_j, dq_j, ddq_j);
         end
 
-        function [t, stmChi] = fdyn(bot, tspan, fhCtrlTrqs, stvChi_0, ode_opt)
-            [t, stmChi] = bot.mwbm.forwardDyn(fhCtrlTrqs, tspan, stvChi_0, ode_opt);
+        function [t, stmChi] = fdyn(bot, tspan, stvChi_0, fhCtrlTrqs, ode_opt, varargin)
+            [t, stmChi] = bot.mwbm.forwardDyn(tspan, stvChi_0, fhCtrlTrqs, ode_opt, varargin{:});
         end
 
         function wf_H_lnk = fkine(bot, q_j)
             wf_H_lnk = bot.mwbm.forwardKin(bot.mlink_ctrl, q_j);
         end
 
-        function wf_H_lnk = A(bot, jnt_idx, q_j)
-            wf_H_lnk = bot.mwbm.linkFrame(jnt_idx, q_j);
+        function wf_H_lnk = A(bot, lnk_name, q_j)
+            wf_H_lnk = bot.mwbm.linkFrame(lnk_name, q_j);
         end
 
         function wf_H_ee = T0_n(bot, q_j) % computes the forward kinematics of the current end-effector.
@@ -97,7 +109,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             opt.eul   = false;
             opt.trans = false;
             opt.rot   = false;
-            opt = tb_optparse(opt, varargin); % (function from the Robotics Toolbox of Peter Corke.)
+            opt = tb_optparse(opt, varargin); % function from the RTB of Peter Corke.
 
             wf_J_lnk = bot.mwbm.jacobian(bot.mlink_ctrl, q_j);
 
@@ -134,12 +146,36 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             end
         end
 
-        function wf_J_ee = jacobn(bot, q_j) % Jacobian of the current ee-frame.
+        function wf_J_ee = jacobn(bot, q_j, varargin) % Jacobian of the current ee-frame.
+            % options:
+            opt.trans = false;
+            opt.rot   = false;
+            opt = tb_optparse(opt, varargin);
+
+            % Jacobian of the end-effector controlled by the system:
             wf_J_ee = bot.mwbm.jacobian(bot.mlink_ee, q_j);
+
+            if opt.trans
+                % translational sub-matrix:
+                wf_J_ee = wf_J_ee(1:3,1:6);
+            elseif opt.rot
+                % rotational sub-matrix:
+                wf_J_ee = wf_J_ee(4:6,1:6);
+            end
         end
 
         function M = inertia(bot, q_j)
             M = bot.mwbm.massMatrix(q_j);
+        end
+
+        function Mx = cinertia(bot, q_j)
+            M = bot.mwbm.massMatrix(q_j);
+            wf_J_lnk = bot.mwbm.jacobian(bot.mlink_ctrl, q_j);
+
+            % calculate the Cartesian mass matrix (pseudo-kinetic energy matrix)
+            %   Mx = (J * M^(-1) * J^T)^(-1)
+            % in operational space:
+            [Mx,~,~] = WBM.utilities.tfms.cartmass(wf_J_lnk, M);
         end
 
         function payload(bot, pl_data)

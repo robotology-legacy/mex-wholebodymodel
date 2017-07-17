@@ -19,10 +19,10 @@ function wf_J_lnk = wbm_jacobian(varargin)
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
     switch nargin
         case 1
-            wf_J_lnk = mexWholeBodyModel('jacobian', varargin{1});
+            wf_J_lnk = mexWholeBodyModel('jacobian', varargin{1,1});
         case 4
-            wf_J_lnk = mexWholeBodyModel('jacobian', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3}, varargin{4});
+            wf_J_lnk = mexWholeBodyModel('jacobian', reshape(varargin{1,1}, 9, 1), varargin{1,2}, varargin{1,3}, varargin{1,4});
         otherwise
-            error('wbm_jacobian: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_jacobian');
     end
 end

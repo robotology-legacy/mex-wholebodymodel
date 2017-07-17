@@ -21,7 +21,7 @@ function dq = dquat(quat, omega, varargin)
             k      = varargin{1,1};
             chktol = varargin{1,2};
         otherwise
-            error('dquat: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('dquat: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 
     qnorm = quat.'*quat;

@@ -53,6 +53,6 @@ function b_X_a = iadjoint(varargin)
                 error('iadjoint: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
         otherwise
-            error('iadjoint: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('iadjoint: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

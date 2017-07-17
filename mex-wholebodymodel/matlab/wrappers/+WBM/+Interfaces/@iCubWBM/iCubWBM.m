@@ -116,11 +116,11 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             c_qv = obj.mwbm_icub.generalizedBiasForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function tau_gen = generalizedForces(obj, q_j, dq_j, f_c, Jc_t, stFltb)
+        function tau_gen = generalizedForces(obj, q_j, dq_j, J_e, f_e, stFltb)
             if (nargin == 5)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            tau_gen = obj.mwbm_icub.generalizedForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, f_c, Jc_t);
+            tau_gen = obj.mwbm_icub.generalizedForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, J_e, f_e);
         end
 
         function g_q = gravityForces(obj, q_j, stFltb)
@@ -134,26 +134,55 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             if (nargin == 5)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, ddq_j, dv_b);
+            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, ...
+                                                  stFltb.v_b, ddq_j, dv_b);
         end
 
         function tau_j = inverseHybridDyn(obj, q_j, dq_j, ddq_j, stFltb)
             if (nargin == 4)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, ddq_j);
+            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, ...
+                                                  stFltb.v_b, ddq_j);
         end
 
-        function [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt)
-            if ~isempty(obj.mfeet_conf)
-                % use the extended function with the feet pose correction ...
-                acf_0 = obj.mwbm_icub.zeroCtcAcc(obj.mfeet_conf);
-                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(fhTrqControl, tspan, stvChi_0, ode_opt, ...
-                                                               obj.mfeet_conf, acf_0);
-                return
+        function [t, stmChi] = forwardDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, varargin)
+            f_cfg = ~isempty(obj.mfeet_conf);
+            h_cfg = ~isempty(obj.mhand_conf);
+
+            if (f_cfg && h_cfg)
+                switch nargin
+                    case 8
+                        % forward dynamics with feet and hand pose correction and payload:
+                        % fhTotCWrench = varargin{1}
+                        % f_cp         = varargin{2}
+                        % ac_f         = varargin{3}
+                        [t, stmChi] = obj.mwbm_icub.intForwardDynamicsFHPCPL(tspan, stvChi_0, fhTrqControl, ode_opt, varargin{1,1}, ...
+                                                                             obj.mfeet_conf, obj.mhand_conf, varargin{1,2}, varargin{1,3});
+                    case 7
+                        % forward dynamics with feet and hand pose correction:
+                        % fe_h = varargin{1}
+                        % ac_f = varargin{2}
+                        [t, stmChi] = obj.mwbm_icub.intForwardDynamicsFHPC(tspan, stvChi_0, fhTrqControl, ode_opt, obj.mfeet_conf, ...
+                                                                           obj.mhand_conf, varargin{1,2}, varargin{1,3});
+                    otherwise
+                        error('iCubWBM::forwardDyn: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+                end
+            elseif h_cfg
+                % only with hand pose correction:
+                % fe_h = varargin{1}
+                % ac_f = varargin{2}
+                [t, stmChi] = obj.mwbm_icub.intForwardDynamicsHPC(tspan, stvChi_0, fhTrqControl, ode_opt, ...
+                                                                  obj.mhand_conf, varargin{1,1}, varargin{1,2});
+            elseif f_cfg
+                % only with feet pose correction:
+                % ac_f = varargin{1}
+                [t, stmChi] = obj.mwbm_icub.intForwardDynamicsFPC(tspan, stvChi_0, fhTrqControl, ode_opt, ...
+                                                                  obj.mfeet_conf, varargin{1,1});
+            else
+                % simple forward dynamics without any pose corrections:
+                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt);
             end
-            % else, use the standard function without any pose correction ...
-            [t, stmChi] = obj.mwbm_icub.intForwardDynamics(fhTrqControl, tspan, stvChi_0, ode_opt);
         end
 
         function visualizeForwardDyn(obj, stmChi, sim_tstep, vis_ctrl)

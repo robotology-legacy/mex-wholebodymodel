@@ -8,7 +8,7 @@ function G_c = ctcmap(varargin)
     %   [4] Learning and Generalizing Control-Based Grasping and Manipulation Skills, Robert J. Platt, PhD, University of Massachusetts Amherst, 2006,
     %       <http://www-robotics.cs.umass.edu/uploads/Main/PlattThesis.pdf>, p. 11, eq. 2.11.
     %   [5] Passivity-Based Whole-Body Balancing for Torque-Controlled Humanoid Eobots in Multi-Contact Scenarios, B. Henze & M. A. Roa & C. Ott,
-    %       Vol 35, Issue 12, 2016, The International Journal of Robotics Research (IJRR), <http://journals.sagepub.com/doi/abs/10.1177/0278364916653815?journalCode=ijra>,
+    %       International Journal of Robotics Research (IJRR), 2016, Volume 35, Issue 12, <http://journals.sagepub.com/doi/abs/10.1177/0278364916653815?journalCode=ijra>,
     %       p. 1525, eq. (3).
     switch nargin
         case 3
@@ -53,9 +53,9 @@ function G_c = ctcmap(varargin)
                     G_c(4,1) =  a_p_c(2,1);
                     G_c(5,1) = -a_p_c(1,1);
                 otherwise
-                    error('ctcmap: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+                    error('ctcmap: %s', WBM.wbmErrorMsg.UNKNOWN_CTC_MODEL);
             end
         otherwise
-            error('ctcmap: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('ctcmap: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

@@ -26,8 +26,9 @@ function c_qv = wbm_generalizedBiasForces(varargin)
         case 0
             c_qv = mexWholeBodyModel('generalized-forces');
         case 5
-            c_qv = mexWholeBodyModel('generalized-forces', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3}, varargin{4}, varargin{5});
+            c_qv = mexWholeBodyModel('generalized-forces', reshape(varargin{1,1}, 9, 1), varargin{1,2}, varargin{1,3}, ...
+                                                           varargin{1,4}, varargin{1,5});
         otherwise
-            error('wbm_generalizedBiasForces: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_generalizedBiasForces');
     end
 end

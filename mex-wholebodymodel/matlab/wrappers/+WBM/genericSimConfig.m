@@ -34,7 +34,7 @@ classdef genericSimConfig < WBM.absSimConfig
     methods
         function obj = genericSimConfig(main_title, robot_sim_body, env_settings)
             if ( (nargin < 2) || (nargin > 3) )
-                error('genericSimConfig::genericSimConfig: %s', WBM.wbmErrorMsg.WRONG_ARG);
+                error('genericSimConfig::genericSimConfig: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
 
             obj.main_title = main_title;

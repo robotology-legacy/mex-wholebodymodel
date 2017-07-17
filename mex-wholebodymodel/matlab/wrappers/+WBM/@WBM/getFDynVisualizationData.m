@@ -78,7 +78,7 @@ function vis_data = getFDynVisualizationData(obj, stmChi, fhTrqControl, varargin
                 vis_data = setVisData(vis_data, i, ndof, vlen, fd_prms, nflds_base, nflds_ctrl, fnames_ctrl);
             end
         otherwise
-            error('WBM::getFDynVisualizationData: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('WBM::getFDynVisualizationData: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end
 %% END of getFDynVisualizationData.

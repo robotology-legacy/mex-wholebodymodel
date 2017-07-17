@@ -24,10 +24,11 @@ function djdq_lnk = wbm_dJdq(varargin)
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
     switch nargin
         case 1
-            djdq_lnk = mexWholeBodyModel('dJdq', varargin{1});
+            djdq_lnk = mexWholeBodyModel('dJdq', varargin{1,1});
         case 6
-            djdq_lnk = mexWholeBodyModel('dJdq', reshape(varargin{1}, 9, 1), varargin{2}, varargin{3}, varargin{4}, varargin{5}, varargin{6});
+            djdq_lnk = mexWholeBodyModel('dJdq', reshape(varargin{1,1}, 9, 1), varargin{1,2}, varargin{1,3}, ...
+                                                 varargin{1,4}, varargin{1,5}, varargin{1,6});
         otherwise
-            error('wbm_dJdq: %s\n', wbm_errorMsg());
+            wbm_narginError('wbm_dJdq');
     end
 end

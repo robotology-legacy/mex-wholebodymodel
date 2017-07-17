@@ -19,6 +19,8 @@ classdef (Abstract) IMultChainTree < handle
     end
 
     methods(Abstract)
+        [q_j, dq_j, wf_H_b, v_b] = getstate(bot);
+
         ddq_j = accel(bot, q_j, dq_j, tau)
 
         c_qv = coriolis(bot, q_j, dq_j)
@@ -29,11 +31,11 @@ classdef (Abstract) IMultChainTree < handle
 
         tau_j = rne(bot, q_j, dq_j, ddq_j)
 
-        [t, stmChi] = fdyn(bot, tspan, fhCtrlTrqs, stvChi_0, ode_opt)
+        [t, stmChi] = fdyn(bot, tspan, stvChi_0, fhCtrlTrqs, ode_opt, varargin)
 
         wf_H_lnk = fkine(bot, q_j)
 
-        wf_H_lnk = A(bot, jnt_idx, q_j)
+        wf_H_lnk = A(bot, lnk_name, q_j)
 
         wf_H_ee = T0_n(bot, q_j) % computes the forward kinematics of the current end-effector.
 
@@ -41,9 +43,11 @@ classdef (Abstract) IMultChainTree < handle
 
         wf_J_lnk = jacob0(bot, q_j, varargin)
 
-        wf_J_ee = jacobn(bot, q_j) % Jacobian of the current ee-frame.
+        wf_J_ee = jacobn(bot, q_j, varargin) % Jacobian of the current ee-frame.
 
         M = inertia(bot, q_j)
+
+        Mx = cinertia(bot, q_j)
 
         payload(bot, pl_data);
 

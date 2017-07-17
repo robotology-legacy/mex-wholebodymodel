@@ -85,7 +85,7 @@ function S_j = jselectm(ndof, varargin)
                 error('jselectm: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
         otherwise
-            error('jselectm: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('jselectm: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
     % concatenate both selection matrices ...
     S_j = vertcat(S_1, S_2);

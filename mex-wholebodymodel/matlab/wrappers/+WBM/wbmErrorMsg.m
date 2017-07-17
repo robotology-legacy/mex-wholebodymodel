@@ -17,6 +17,7 @@ classdef wbmErrorMsg
         SINGULAR_MAT      = 'Singular matrix!';
         STRING_MISMATCH   = 'String mismatch!';
         UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';
+        UNKNOWN_CTC_MODEL = 'Unknown contact model!';
         UNKNOWN_EXC       = 'Unknown exception!';
         UNKNOWN_JNT_TYPE  = 'Unknown joint type!';
         UNKNOWN_LNK_NAME  = 'Unknown link name!';
@@ -24,11 +25,11 @@ classdef wbmErrorMsg
         VALUE_LTE_ZERO    = 'The value must be greater than zero!';
         VALUE_LT_ZERO     = 'The value must be positive!';
         VAL_OUT_OF_BOUNDS = 'Value(s) out of bounds!';
-        WRONG_ARG         = 'Wrong number of input arguments!';
         WRONG_ARR_SIZE    = 'Wrong array size!';
-        WRONG_CTC_MODEL   = 'Wrong contact model!';
         WRONG_DATA_TYPE   = 'Wrong data type!';
         WRONG_MAT_DIM     = 'Wrong matrix dimension!';
+        WRONG_NARGIN      = 'Incorrect number of input arguments!';
+        WRONG_NARGOUT     = 'Incorrect number of output arguments!';
         WRONG_VEC_DIM     = 'Wrong vector dimension!';
         WRONG_VEC_SIZE    = 'Wrong vector size!';
     end

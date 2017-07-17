@@ -17,7 +17,7 @@ icub_config = wbm_icub.robot_config;
 %  substitution, the inhomogeneous second-order ODE to a first-order ODE.
 %  For further details see:
 %    [1] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008,
-%        chapter 3, pp. 40-42, formula (3.8).
+%        Chapter 3, pp. 40-42, formula (3.8).
 chi_init = wbm_icub.init_stvChi;
 
 %% Control torques:
@@ -58,7 +58,7 @@ ode_options = odeset('RelTol', 1e-2, 'AbsTol', 1e-4);         % setup the error 
 % or, optional:
 %[t, chi] = fastIntForwardDynamics(fhTrqControl, tspan, chi_init, wbm_icub.robot_model, ...
 %                                  wbm_icub.robot_config, ode_options);
-%[t, chi] = wbm_icub.intForwardDynamics(fhTrqControl, tspan, chi_init, ode_options);
+%[t, chi] = wbm_icub.intForwardDynamics(tspan, chi_init, fhTrqControl, ode_options);
 
 save('testTrajectory.mat', 't', 'chi', 'chi_init', 'fhTrqControl', 'icub_model', 'icub_config');
 disp('Numerical integration finished.');

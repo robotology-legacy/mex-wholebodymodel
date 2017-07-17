@@ -42,6 +42,6 @@ function a_cX_b = coadjoint(varargin)
                 error('coadjoint: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
         otherwise
-            error('coadjoint: %s', WBM.wbmErrorMsg.WRONG_ARG);
+            error('coadjoint: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

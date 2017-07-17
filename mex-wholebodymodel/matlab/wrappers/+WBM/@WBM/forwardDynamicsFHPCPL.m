@@ -9,8 +9,10 @@ function dstvChi = forwardDynamicsFHPCPL(obj, t, stvChi, fhTrqControl, fhTotCWre
     % update the state for the optimized mode ...
     setState(obj, stp.q_j, stp.dq_j, v_b);
 
+    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, feet_conf); % optimized mode
+
     % get the current control torques from the controller ...
-    tau = fhTrqControl(t, M, c_qv, stp, nu, Jc, djcdq, feet_conf);
+    tau = fhTrqControl(t, M, c_qv, stp, nu, Jc_f, djcdq_f, feet_conf);
 
     % get the rotation matrix from the VQ-transformation (from 'base' to 'world frame') ...
     vqT_b = obj.vqT_base;
@@ -26,7 +28,7 @@ function dstvChi = forwardDynamicsFHPCPL(obj, t, stvChi, fhTrqControl, fhTotCWre
     v = vertcat(stp.dx_b, dqt_b, stp.dq_j);
 
     % joint acceleration dv (optimized mode):
-    dv = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, fhTotCWrench, f_cp, tau, ac_f, dq_j, v_b, nu);
-
+    dv = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, fhTotCWrench, f_cp, tau, ac_f, ...
+                                  Jc_f, djcdq_f, M, c_qv, stp.dq_j, nu);
     dstvChi = vertcat(v, dv);
 end

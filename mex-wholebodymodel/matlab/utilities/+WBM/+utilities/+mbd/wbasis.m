@@ -22,6 +22,6 @@ function B_c = wbasis(ctc_type)
             B_c = zeros(6,1);
             B_c(3,1) = 1;
         otherwise
-            error('wbasis: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+            error('wbasis: %s', WBM.wbmErrorMsg.UNKNOWN_CTC_MODEL);
     end
 end
