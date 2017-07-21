@@ -151,7 +151,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             c_qv = obj.mwbm_icub.generalizedBiasForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function tau_gen = generalizedForces(obj, q_j, dq_j, Je_t, f_e, stFltb)
+        function tau_gen = generalizedForces(obj, Je_t, f_e, q_j, dq_j, stFltb)
             if (nargin == 5)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end

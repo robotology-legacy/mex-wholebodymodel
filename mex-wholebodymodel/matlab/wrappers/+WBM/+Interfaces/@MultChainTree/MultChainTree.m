@@ -154,7 +154,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function wf_J_lnk = jacob0(bot, q_j, varargin)
-            % opt:
+            % options:
             opt.rpy   = false;
             opt.eul   = false;
             opt.trans = false;
@@ -198,7 +198,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function wf_J_ee = jacobn(bot, q_j, varargin) % Jacobian of the ee-frames.
-            % opt:
+            % options:
             opt.trans = false;
             opt.rot   = false;
             opt = tb_optparse(opt, varargin);
