@@ -277,9 +277,9 @@ classdef WBM < WBM.WBMBase
             ddq_j = jointAccelerationsCLPC(obj, hand_conf, tau, fe_h, ac_h, varargin{:});
         end
 
-        [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, tau, fe_h, ac_f, varargin) % FHPC  ... feet & hand pose correction
+        [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, tau, fe_h, varargin) % FHPC  ... feet & hand pose correction
 
-        [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, fhTotCWrench, f_cp, tau, varargin) % FHPCPL ... feet & hand pose correction with payload
+        [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % FHPCPL ... feet & hand pose correction with payload
 
         [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, varargin)
 

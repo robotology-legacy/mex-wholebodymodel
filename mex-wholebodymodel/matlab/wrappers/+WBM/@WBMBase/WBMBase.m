@@ -331,20 +331,19 @@ classdef WBMBase < handle
             % v_b    = varargin{5}
             switch nargin
                 case 8 % normal mode:
-                    J_e = varargin{1,6};
-                    f_e = varargin{1,7};
+                    Je_t = varargin{1,6};
+                    f_e  = varargin{1,7};
 
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
                     c_qv = mexWholeBodyModel('generalized-forces', wf_R_b_arr, varargin{1,2}, varargin{1,3}, varargin{1,4}, varargin{1,5});
                 case 3 % optimized mode:
-                    J_e = varargin{1,1};
-                    f_e = varargin{1,2};
+                    Je_t = varargin{1,1};
+                    f_e  = varargin{1,2};
 
                     c_qv = mexWholeBodyModel('generalized-forces');
                 otherwise
                     error('WBMBase::generalizedForces: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
-            Je_t = J_e.';
             tau_gen = c_qv - Je_t*f_e;
         end
 

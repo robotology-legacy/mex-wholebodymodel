@@ -29,7 +29,15 @@ classdef (Abstract) IWBM < handle
 
         ddq_j = jointAccelerations(obj, tau, q_j, dq_j, stFltb)
 
-        ddq_j = jointAccelerationsFPC(obj, tau, q_j, dq_j, stFltb)
+        ddq_j = jointAccelerationsFPC(obj, tau, q_j, dq_j, stFltb) % FPC ... feet pose correction
+
+        ddq_j = jointAccelerationsFHPC(obj, tau, fe_h, q_j, dq_j, stFltb) % FHPC  ... feet & hand pose correction
+
+        ddq_j = jointAccelerationsFHPCPL(obj, tau, fhTotCWrench, f_cp, q_j, dq_j, stFltb) % FHPCPL  ... feet & hand pose correction with payload
+
+        ac_h = handAccelerations(obj, tau, q_j, dq_j, stFltb)
+
+        vc_h = handVelocities(obj, q_j, dq_j, stFltb)
 
         c_qv = coriolisForces(obj, q_j, dq_j, stFltb)
 
@@ -37,7 +45,7 @@ classdef (Abstract) IWBM < handle
 
         c_qv = generalizedBiasForces(obj, q_j, dq_j, stFltb)
 
-        tau_gen = generalizedForces(obj, q_j, dq_j, f_c, Jc_t, stFltb)
+        tau_gen = generalizedForces(obj, Je_t, f_e, q_j, dq_j, stFltb)
 
         g_q = gravityForces(obj, q_j, stFltb)
 

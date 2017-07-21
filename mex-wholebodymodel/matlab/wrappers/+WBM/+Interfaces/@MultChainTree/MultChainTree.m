@@ -28,40 +28,51 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
     end
 
     methods
-        function bot = MultChainTree(robot_wbm, ctrl_link, varargin) %comment)
+        function bot = MultChainTree(robot_wbm, ctrl_lnk_name, varargin)
+            % some error checks ...
+            if ( (nargin < 2) || (nargin > 3) )
+                error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+            end
             if ~isa(robot_wbm, 'WBM.Interfaces.IWBM')
                 error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            if isempty(ctrl_link)
-                error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.EMPTY_STRING);
-            end
             % initialization:
-            switch nargin
-                case 2
-                    bot.mwbm_info.comment = '';
-                case 3
-                    ee_links = varargin{1,1};
-                    if ( ~iscellstr(ee_links) || ~ischar(ee_links) )
-                        error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
-                    end
-                    bot.mlnk_names_ee = ee_links;
-                case 4
-                    ee_links = varargin{1,1};
-                    comment  = varargin{1,2};
-                    if ( ~iscellstr(ee_links) || ~ischar(ee_links) || ~ischar(comment) )
-                        error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
-                    end
-                    bot.mlnk_names_ee = ee_links;
-                    bot.mwbm_info.comment = comment;
-                otherwise
-                    error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
-            end
             bot.mwbm = robot_wbm;
-            bot.mlnk_name_ctrl = ctrl_link;
+            % set the initial link to be controlled by the system ...
+            bot.ctrl_link = ctrl_lnk_name;
 
-            % get some informations about the WBM of the robot ...
-            bot.mwbm_info.robot_name  = robot_wbm.robot_name;
-            bot.mwbm_info.robot_manuf = robot_wbm.robot_manuf;
+            % options:
+            if (nargin == 3)
+                opt = varargin{1,1};
+                if isstruct(opt)
+                    if isempty(opt)
+                        error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
+                    end
+                    % set some annotation informations about the robot:
+                    bot.mwbm_info.robot_name  = opt.name;
+                    bot.mwbm_info.robot_manuf = opt.manufacturer;
+                    bot.mwbm_info.comment     = opt.comment;
+
+                    % set the end-effector links (hands) to be controlled by the system:
+                    if ~isempty(opt.ee_links)
+                        bot.ee_links = opt.ee_links;
+                    end
+                    % plot options:
+                    if ~isempty(opt.plotopt3d)
+                        bot.mwbm.sim_config = opt.plotopt3d;
+                    end
+                else
+                    error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+                end
+            end
+
+            % try to get some informations about the robot directly from the WBM ...
+            if isempty(bot.mwbm_info.robot_name)
+                bot.mwbm_info.robot_name = robot_wbm.robot_name;
+            end
+            if isempty(bot.mwbm_info.robot_manuf)
+                bot.mwbm_info.robot_manuf = robot_wbm.robot_manuf;
+            end
         end
 
         function delete(bot)
@@ -143,7 +154,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function wf_J_lnk = jacob0(bot, q_j, varargin)
-            % options:
+            % opt:
             opt.rpy   = false;
             opt.eul   = false;
             opt.trans = false;
@@ -187,7 +198,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function wf_J_ee = jacobn(bot, q_j, varargin) % Jacobian of the ee-frames.
-            % options:
+            % opt:
             opt.trans = false;
             opt.rot   = false;
             opt = tb_optparse(opt, varargin);

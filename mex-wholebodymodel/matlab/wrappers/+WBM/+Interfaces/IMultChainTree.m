@@ -30,7 +30,7 @@ classdef (Abstract) IMultChainTree < handle
 
         g_q = gravload(bot, q_j)
 
-        [g_q, wf_J_rlnk] = gravjac(bot, q_j)
+        [g_q, wf_J_b] = gravjac(bot, q_j)
 
         tau_j = rne(bot, q_j, dq_j, ddq_j)
 

@@ -32,7 +32,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         % Constructor:
         function obj = iCubWBM(robot_model, robot_config, wf2fixLnk)
             switch nargin
-                % init the mex-WholeBodyModel for the iCub-Robot:
+                % initialize the mex-WholeBodyModel for the iCub-Robot:
                 case 3
                     obj.mwbm_icub = WBM.WBM(robot_model, robot_config, wf2fixLnk);
                 case 2
@@ -91,12 +91,46 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             ddq_j = obj.mwbm_icub.jointAcceleration(tau, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccelerationsFPC(obj, tau, ac_f, q_j, dq_j, stFltb)
+        function ddq_j = jointAccelerationsFPC(obj, tau, q_j, dq_j, stFltb) % FPC ... feet pose correction
             if (nargin == 5)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            ddq_j = obj.mwbm_icub.jointAccelerationsFPC(obj.mfeet_conf, tau, ac_f, stFltb.wf_R_b, ...
-                                                         stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            ac_0  = obj.mwbm_icub.zeroCtcAcc(obj.mfeet_conf);
+            ddq_j = obj.mwbm_icub.jointAccelerationsFPC(obj.mfeet_conf, tau, ac_0, stFltb.wf_R_b, ...
+                                                        stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+        end
+
+        function ddq_j = jointAccelerationsFHPC(obj, tau, fe_h, q_j, dq_j, stFltb) % FHPC  ... feet & hand pose correction
+            if (nargin == 5)
+                stFltb = obj.mwbm_icub.getFloatingBaseState();
+            end
+            ddq_j = obj.mwbm_icub.jointAccelerationsFHPC(obj.mfeet_conf, obj.mhand_conf, tau, fe_h, ...
+                                                         stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+        end
+
+        function ddq_j = jointAccelerationsFHPCPL(obj, tau, fhTotCWrench, f_cp, q_j, dq_j, stFltb) % FHPCPL  ... feet & hand pose correction with payload
+            if (nargin == 6)
+                stFltb = obj.mwbm_icub.getFloatingBaseState();
+            end
+            ddq_j = obj.mwbm_icub.jointAccelerationsFHPCPL(obj.mfeet_conf, obj.mhand_conf, tau, fhTotCWrench, f_cp, ...
+                                                           stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+        end
+
+        function ac_h = handAccelerations(obj, tau, q_j, dq_j, stFltb)
+            if (nargin == 4)
+                stFltb = obj.mwbm_icub.getFloatingBaseState();
+            end
+            nu   = vertcat(stFltb.v_b, dq_j); % mixed generalized velocity
+            ac_0 = obj.mwbm_icub.zeroCtcAcc(obj.mfeet_conf);
+            ac_h = obj.mwbm_icub.handAccelerations(obj.mfeet_conf, obj.mhand_conf, tau, ac_0, stFltb.wf_R_b, ...
+                                                   stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, nu);
+        end
+
+        function vc_h = handVelocities(obj, q_j, dq_j, stFltb)
+            if (nargin == 3)
+                stFltb = obj.mwbm_icub.getFloatingBaseState();
+            end
+            vc_h = obj.mwbm_icub.handVelocities(obj.mhand_conf, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function c_qv = coriolisForces(obj, q_j, dq_j, stFltb)
@@ -117,11 +151,11 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             c_qv = obj.mwbm_icub.generalizedBiasForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function tau_gen = generalizedForces(obj, q_j, dq_j, J_e, f_e, stFltb)
+        function tau_gen = generalizedForces(obj, q_j, dq_j, Je_t, f_e, stFltb)
             if (nargin == 5)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            tau_gen = obj.mwbm_icub.generalizedForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, J_e, f_e);
+            tau_gen = obj.mwbm_icub.generalizedForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, Je_t, f_e);
         end
 
         function g_q = gravityForces(obj, q_j, stFltb)
@@ -252,7 +286,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             if (nargin == 2)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            % compute the jacobian of the tool-tip:
+            % compute the Jacobian of the tool-tip:
             % use the default tool (1st element of the tool list)
             wf_J_tt = obj.mwbm_icub.jacobianTool(stFltb.wf_R_b, stFltb.wf_p_b, q_j, 1);
         end

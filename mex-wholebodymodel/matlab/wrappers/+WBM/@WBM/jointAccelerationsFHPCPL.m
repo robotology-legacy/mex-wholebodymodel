@@ -1,4 +1,4 @@
-function [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, fhTotCWrench, f_cp, tau, varargin)
+function [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin)
     switch nargin
         case 13
             % get the mixed acceleration of the hands at the contact links ...

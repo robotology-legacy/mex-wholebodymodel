@@ -32,7 +32,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     cs         ...  contact state
     cstr       ...  constraint
     ctc        ...  contact
-    ctrl       ...  control
+    ctrl, ctr  ...  control
     cvec       ...  column vector
     d...       ...  derivative (dot) of a variable (begin of variable name), like dv of v (= v_dot), etc.
     df, dflt   ...  default
