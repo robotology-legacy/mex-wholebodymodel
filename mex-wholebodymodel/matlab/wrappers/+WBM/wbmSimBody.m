@@ -38,7 +38,7 @@ classdef wbmSimBody < handle
             if ( (nargin < 2) || (nargin > 3) )
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
-            if ( ~iscell(joint_lnk_names) || ~ismatrix(joint_pair_idx) )
+            if ( ~iscellstr(joint_lnk_names) || ~ismatrix(joint_pair_idx) )
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             if ~iscolumn(joint_lnk_names)

@@ -1,6 +1,6 @@
 function h_c = wbm_centroidalMomentum(varargin)
     % WBM_CENTROIDALMOMENTUM computes the centroidal momentum h_c of a robot system.
-    % It is a function of the state variables q_j, dq_j and the floating base velocity v_b.
+    % It is a function of the state variables q_j, dq_j and the generalized base velocity v_b.
     %
     % The centroidal momentum of a humanoid robot is the sum of all link moments projected
     % to the Center of Mass (CoM) of the robot.
@@ -13,7 +13,7 @@ function h_c = wbm_centroidalMomentum(varargin)
     %           wf_p_b -- (3 x 1) position vector from base to world frame
     %           q_j    -- (nDoF x 1) joint angle vector in radian
     %           dq_j   -- (nDoF x 1) joint angle velocity vector (rad/s)
-    %           v_b    -- (6 x 1) floating base velocity vector
+    %           v_b    -- (6 x 1) generalized base velocity vector
     %
     %   OUTPUT ARGUMENTS:
     %       h_c -- (6 x 1) centroidal moment vector.

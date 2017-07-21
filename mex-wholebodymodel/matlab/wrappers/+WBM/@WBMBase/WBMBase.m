@@ -2,10 +2,10 @@ classdef WBMBase < handle
     properties(Dependent)
         % public properties for fast get/set methods:
         fixed_link@char
-        wf_R_b@double matrix
-        wf_p_b@double vector
-        g_wf@double   vector
-        ndof@uint16   scalar
+        init_wf_R_b@double matrix
+        init_wf_p_b@double vector
+        g_wf@double        vector
+        ndof@uint16        scalar
         frict_coeff@struct
         joint_limits@struct
         robot_model@WBM.wbmBaseRobotModel
@@ -29,7 +29,7 @@ classdef WBMBase < handle
 
             initWBM(obj, robot_model);
             % set the world frame (WF) to the initial parameters ...
-            setInitWorldFrame(obj, robot_model.wf_R_b, robot_model.wf_p_b, robot_model.g_wf);
+            setInitWorldFrame(obj, robot_model.wf_R_b_init, robot_model.wf_p_b_init, robot_model.g_wf);
         end
 
         % Copy-function:
@@ -87,45 +87,49 @@ classdef WBMBase < handle
             if (nargin < 3)
                 error('WBMBase::setWorldFrame: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
-
-            if ~exist('g_wf', 'var')
+            if (nargin == 3)
                 % use the default gravity vector ...
                 g_wf = obj.mwbm_model.g_wf;
             end
+
             wf_R_b_arr = reshape(wf_R_b, 9, 1); % reshape the matrix into a 1-column array ...
             mexWholeBodyModel('set-world-frame', wf_R_b_arr, wf_p_b, g_wf);
         end
 
         function setInitWorldFrame(obj, wf_R_b, wf_p_b, g_wf)
-            % setup the world frame with the initial parameters, or update it with the new values:
+            % setup the world frame with the initial parameters or update it with the new parameters:
             switch nargin
                 case 4
                     % replace all old initial parameters with the new values ...
-                    obj.mwbm_model.wf_R_b = wf_R_b;
-                    obj.mwbm_model.wf_p_b = wf_p_b;
-                    obj.mwbm_model.g_wf   = g_wf;
+                    obj.mwbm_model.wf_R_b_init = wf_R_b;
+                    obj.mwbm_model.wf_p_b_init = wf_p_b;
+                    obj.mwbm_model.g_wf        = g_wf;
                 case 3
                     % replace only the orientation and the translation ...
-                    obj.mwbm_model.wf_R_b = wf_R_b;
-                    obj.mwbm_model.wf_p_b = wf_p_b;
+                    obj.mwbm_model.wf_R_b_init = wf_R_b;
+                    obj.mwbm_model.wf_p_b_init = wf_p_b;
 
-                    obj.setWorldFrame(obj.mwbm_model.wf_R_b, obj.mwbm_model.wf_p_b);
+                    obj.setWorldFrame(obj.mwbm_model.wf_R_b_init, obj.mwbm_model.wf_p_b_init);
                     return
                 case 2
                     error('WBMBase::setInitWorldFrame: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
-            % if nargin = 1, update the world frame with the individual changed values from outside ...
-            setWorldFrame(obj, obj.mwbm_model.wf_R_b, obj.mwbm_model.wf_p_b, obj.mwbm_model.g_wf);
+            % if nargin = 1:
+            % update the world frame with the new initial parameters that are individually changed from outside.
+
+            % set the world frame with the (new) initial parameters:
+            setWorldFrame(obj, obj.mwbm_model.wf_R_b_init, obj.mwbm_model.wf_p_b_init, obj.mwbm_model.g_wf);
         end
 
         function [wf_p_b, wf_R_b] = getWorldFrameFromFixLnk(obj, urdf_fixed_link, q_j)
-            % compute the base world frame (WF) from a given contact (constraint) link:
+            % compute the position and orientation of the floating base w.r.t. a world frame (WF)
+            % that is fixed to a specified link frame (reference frame):
             switch nargin
                 case 3
-                    % normal mode: compute the WF for a specific joint configuration (positions)
+                    % normal mode: compute the base frame for a specific joint configuration (joint positions)
                     [wf_p_b, wf_R_b] = computeNewWorld2Base(obj, urdf_fixed_link, q_j);
                 case 2
-                    % optimized mode: compute the WF with the current joint configuration
+                    % optimized mode: compute the base frame with the current joint configuration
                     [wf_p_b, wf_R_b] = computeNewWorld2Base(obj, urdf_fixed_link);
                 otherwise
                     error('WBMBase::getWorldFrameFromFixLnk: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
@@ -133,8 +137,9 @@ classdef WBMBase < handle
         end
 
         function [wf_p_b, wf_R_b] = getWorldFrameFromDfltFixLnk(obj, q_j)
-            % compute the base world frame (WF) from the default contact (constraint) link:
-            if exist('q_j', 'var')
+            % compute the position and orientation of the floating base w.r.t. a world frame (WF)
+            % that is fixed to the default reference link frame:
+            if (nargin == 2)
                 % normal mode:
                 [wf_p_b, wf_R_b] = computeNewWorld2Base(obj, obj.mwbm_model.urdf_fixed_link, q_j);
                 return
@@ -171,7 +176,7 @@ classdef WBMBase < handle
                 case 5 % normal modes:
                     urdf_link_name = varargin{1,4};
                 case 4
-                    % use the default link frame ...
+                    % use the default link frame (reference frame) ...
                     urdf_link_name = obj.mwbm_model.urdf_fixed_link;
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
@@ -201,12 +206,13 @@ classdef WBMBase < handle
             end
         end
 
-        function [jlim_lower, jlim_upper] = getJointLimits(~)
-            [jlim_lower, jlim_upper] = mexWholeBodyModel('joint-limits');
+        function [jlmts_lwr, jlmts_upr] = getJointLimits(~)
+            % get the lower (min.) and upper (max.) joint limits ...
+            [jlmts_lwr, jlmts_upr] = mexWholeBodyModel('joint-limits');
         end
 
         function resv = isJointLimit(obj, q_j)
-            resv = ~((q_j > obj.mwbm_model.jlim.lwr) & (q_j < obj.mwbm_model.jlim.upr));
+            resv = ~((q_j > obj.mwbm_model.jlmts.lwr) & (q_j < obj.mwbm_model.jlmts.upr));
         end
 
         function dv_b = generalizedBaseAcc(obj, M, c_qv, ddq_j)
@@ -223,7 +229,7 @@ classdef WBMBase < handle
                 case 5 % normal modes:
                     urdf_link_name = varargin{1,4};
                 case 4
-                    % use the default link frame ...
+                    % use the default link frame (reference frame) ...
                     urdf_link_name = obj.mwbm_model.urdf_fixed_link;
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
@@ -249,7 +255,8 @@ classdef WBMBase < handle
                 case 7 % normal modes:
                     urdf_link_name = varargin{1,6};
                 case 6
-                    urdf_link_name = obj.mwbm_model.urdf_fixed_link; % default link name ...
+                    % default link name (reference link) ...
+                    urdf_link_name = obj.mwbm_model.urdf_fixed_link;
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
                     djdq_lnk = mexWholeBodyModel('dJdq', varargin{1,1});
@@ -286,7 +293,8 @@ classdef WBMBase < handle
                 case 5 % normal modes:
                     urdf_link_name = varargin{1,4};
                 case 4
-                    urdf_link_name = obj.mwbm_model.urdf_fixed_link; % default link name ...
+                    % default link name (reference link) ...
+                    urdf_link_name = obj.mwbm_model.urdf_fixed_link;
                 case 2 % optimized modes:
                     % urdf_link_name = varargin{1}
                     vqT_lnk = mexWholeBodyModel('forward-kinematics', varargin{1,1});
@@ -369,7 +377,7 @@ classdef WBMBase < handle
         end
 
         function tau_fr = frictionForces(obj, dq_j)
-            if ~exist('dq_j', 'var')
+            if (nargin == 1)
                 [~,~,~,dq_j] = getState(obj);
             end
             epsilon = 1e-12; % min. value to treat a number as zero ...
@@ -410,39 +418,39 @@ classdef WBMBase < handle
             end
         end
 
-        function set.fixed_link(obj, lnk_name)
-            if isempty(lnk_name)
+        function set.fixed_link(obj, rlnk_name)
+            if isempty(rlnk_name)
                 error('WBMBase::set.fixed_link: %s', WBM.wbmErrorMsg.EMPTY_STRING);
             end
-            % update the default link name ...
-            obj.mwbm_model.urdf_fixed_link = lnk_name;
+            % update the fixed link (= new default reference link) ...
+            obj.mwbm_model.urdf_fixed_link = rlnk_name;
         end
 
-        function lnk_name = get.fixed_link(obj)
-            lnk_name = obj.mwbm_model.urdf_fixed_link;
+        function rlnk_name = get.fixed_link(obj)
+            rlnk_name = obj.mwbm_model.urdf_fixed_link;
         end
 
-        function set.wf_R_b(obj, new_rotm)
-            WBM.utilities.chkfun.checkMatDim(new_rotm, 3, 3, 'WBMBase::set.wf_R_b');
-            obj.mwbm_model.wf_R_b = new_rotm;
+        function set.init_wf_R_b(obj, wf_R_b)
+            WBM.utilities.chkfun.checkMatDim(wf_R_b, 3, 3, 'WBMBase::set.wf_R_b_init');
+            obj.mwbm_model.wf_R_b_init = wf_R_b;
         end
 
-        function wf_R_b = get.wf_R_b(obj)
-            wf_R_b = obj.mwbm_model.wf_R_b;
+        function wf_R_b = get.init_wf_R_b(obj)
+            wf_R_b = obj.mwbm_model.wf_R_b_init;
         end
 
-        function set.wf_p_b(obj, new_pos)
-            WBM.utilities.chkfun.checkCVecDim(new_pos, 3, 'WBMBase::set.wf_p_b');
-            obj.mwbm_model.wf_p_b = new_pos;
+        function set.init_wf_p_b(obj, wf_p_b)
+            WBM.utilities.chkfun.checkCVecDim(wf_p_b, 3, 'WBMBase::set.wf_p_b_init');
+            obj.mwbm_model.wf_p_b_init = wf_p_b;
         end
 
-        function wf_p_b = get.wf_p_b(obj)
-            wf_p_b = obj.mwbm_model.wf_p_b;
+        function wf_p_b = get.init_wf_p_b(obj)
+            wf_p_b = obj.mwbm_model.wf_p_b_init;
         end
 
-        function set.g_wf(obj, new_g)
+        function set.g_wf(obj, g_wf)
             WBM.utilities.chkfun.checkCVecDim(new_g, 3, 'WBMBase::set.g_wf');
-            obj.mwbm_model.g_wf = new_g;
+            obj.mwbm_model.g_wf = g_wf;
         end
 
         function g_wf = get.g_wf(obj)
@@ -482,8 +490,8 @@ classdef WBMBase < handle
             frict_coeff = obj.mwbm_model.frict_coeff;
         end
 
-        function jlim = get.joint_limits(obj)
-            jlim = obj.mwbm_model.jlim;
+        function jlmts = get.joint_limits(obj)
+            jlmts = obj.mwbm_model.jlmts;
         end
 
         function robot_model = get.robot_model(obj)
@@ -524,8 +532,8 @@ classdef WBMBase < handle
                                  ' joint friction coefficients:\n%s\n'], ...
                                 obj.mwbm_model.ndof, strURDFname, ...
                                 obj.mwbm_model.urdf_fixed_link, ...
-                                mat2str(obj.mwbm_model.wf_R_b, prec), ...
-                                mat2str(obj.mwbm_model.wf_p_b, prec), ...
+                                mat2str(obj.mwbm_model.wf_R_b_init, prec), ...
+                                mat2str(obj.mwbm_model.wf_p_b_init, prec), ...
                                 mat2str(obj.mwbm_model.g_wf, prec), strFrictions);
             fprintf('%s\n', strParams);
         end
@@ -583,31 +591,28 @@ classdef WBMBase < handle
                 end
             end
             % buffer the joint limits of the robot model for fast access ...
-            [obj.mwbm_model.jlim.lwr, obj.mwbm_model.jlim.upr] = getJointLimits(obj);
+            [obj.mwbm_model.jlmts.lwr, obj.mwbm_model.jlmts.upr] = getJointLimits(obj);
         end
 
         function [nw_p_b, nw_R_b] = computeNewWorld2Base(obj, urdf_link_name, q_j)
-            % get the transformation values from the base to the old world ...
-            [ow_vqT_b,~,~,~] = getState(obj);
-            % get the homogeneous transformation matrix H
-            % from the base to the old world ...
+            [ow_vqT_b,~,~,~] = getState(obj); % VQ-transformation (from base to old world) ...
+
+            % get the homogeneous transformation matrix H (from base to old world):
             [ow_p_b, ow_R_b] = WBM.utilities.tfms.frame2posRotm(ow_vqT_b);
             ow_H_b = WBM.utilities.tfms.posRotm2tform(ow_p_b, ow_R_b);
 
-            % get the transformation values from the reference link (contact link)
-            % to the old world:
+            % get the VQ-transformation (from reference link to old world):
             if (nargin == 2)
                 ow_vqT_rlnk = forwardKinematics(obj, urdf_link_name);
             else
                 ow_vqT_rlnk = forwardKinematics(obj, ow_R_b, ow_p_b, q_j, urdf_link_name);
             end
 
-            % compute the homogeneous transformation matrix H from the base to
-            % the new world:
+            % compute the new homogeneous transformation matrix H (from base to new world):
             ow_H_rlnk = WBM.utilities.tfms.frame2tform(ow_vqT_rlnk);
-            nw_H_b    = ow_H_rlnk \ ow_H_b;
+            nw_H_b    = ow_H_rlnk \ ow_H_b; % = ow_H_rlnk^(-1) * ow_H_b
 
-            % extract the translation and the rotation values ...
+            % extract the translation and rotation values (from base to new world) ...
             [nw_p_b, nw_R_b] = WBM.utilities.tfms.tform2posRotm(nw_H_b);
         end
 

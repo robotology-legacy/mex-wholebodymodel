@@ -42,10 +42,10 @@ function visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
     fkin.hJnt_dp = zeros(1,nJnts);
     % joint pair (link) translations (xyz-positions):
     fkin.jnt_pair_pos = zeros(nLnks,6);
-    % forward kin. VQ-Transformation (in VQS-form):
+    % forward kin. VQ-transformation (in VQS-form):
     fkin.vqT = zeros(nSteps,7,nJnts);
 
-    % calculate the forward kinematics (VQ-Transformations) of each joint in the
+    % calculate the forward kinematics (VQ-transformations) of each joint in the
     % joint name list of the robot:
     fkin.vqT(1:nSteps,1:7,1) = vqT_b; % use the base data instead the forward kin. of the 'root_link' ...
     for i = 1:nSteps % for each time step ...

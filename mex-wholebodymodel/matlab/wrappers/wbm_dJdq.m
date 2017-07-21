@@ -13,7 +13,7 @@ function djdq_lnk = wbm_dJdq(varargin)
     %                   wf_p_b -- (3 x 1) position vector from base to world frame
     %                      q_j -- (nDoF x 1) joint angle vector in radian
     %                     dq_j -- (nDoF x 1) joint angle velocity vector (rad/s)
-    %                      v_b -- (6 x 1) floating base velocity vector
+    %                      v_b -- (6 x 1) generalized base velocity vector
     %           urdf_link_name -- string matching URDF name of the link (frame)
     %
     %   OUTPUT ARGUMENTS:

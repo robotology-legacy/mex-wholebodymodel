@@ -104,7 +104,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyxdTB0bDk8U="
 							},
-							"name": "wf_R_b",
+							"name": "init_wf_R_b",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -122,7 +122,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyxdTB0bDk8U="
 							},
-							"name": "wf_p_b",
+							"name": "init_wf_p_b",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -1775,7 +1775,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFPyzoL5EdSDv4="
 									},
-									"name": "jlim_lower",
+									"name": "jlmts_lwr",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -1791,7 +1791,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFPyzoL5EdSDv4="
 									},
-									"name": "jlim_upper",
+									"name": "jlmts_upr",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -4607,7 +4607,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFRAN8L7WER05o="
 									},
-									"name": "lnk_name",
+									"name": "rlnk_name",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -4639,7 +4639,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFRpn5tyR9pzO0="
 									},
-									"name": "lnk_name",
+									"name": "rlnk_name",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -4676,7 +4676,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyxdTB0bDk8U="
 							},
-							"name": "set.wf_R_b",
+							"name": "set.init_wf_R_b",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -4703,7 +4703,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFRY7ndOHI3/7U="
 									},
-									"name": "new_rotm",
+									"name": "wf_R_b",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -4724,7 +4724,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyxdTB0bDk8U="
 							},
-							"name": "get.wf_R_b",
+							"name": "get.init_wf_R_b",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -4772,7 +4772,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyxdTB0bDk8U="
 							},
-							"name": "set.wf_p_b",
+							"name": "set.init_wf_p_b",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -4799,7 +4799,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFRY7nksHJYR3Y="
 									},
-									"name": "new_pos",
+									"name": "wf_p_b",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -4820,7 +4820,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyxdTB0bDk8U="
 							},
-							"name": "get.wf_p_b",
+							"name": "get.init_wf_p_b",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -4895,7 +4895,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFRY7noAHJ5tJY="
 									},
-									"name": "g",
+									"name": "g_wf",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -5167,7 +5167,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFVMG5ZeqBwlXw="
 									},
-									"name": "jl",
+									"name": "jlmts",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -6089,7 +6089,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+wf_R_b: matrix",
+											"text": "+init_wf_R_b: matrix",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -6118,7 +6118,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+wf_p_b: vector",
+											"text": "+init_wf_p_b: vector",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -7072,7 +7072,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+getJointLimits(out jlim_lower: vector, out jlim_upper: vector)",
+											"text": "+getJointLimits(out jlmts_lwr: vector, out jlmts_upr: vector)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -8029,7 +8029,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+set.fixed_link(obj, lnk_name: string)",
+											"text": "+set.fixed_link(obj, rlnk_name: string)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -8058,7 +8058,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+get.fixed_link(out lnk_name: string, obj)",
+											"text": "+get.fixed_link(out rlnk_name: string, obj)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -8087,7 +8087,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+set.wf_R_b(obj, new_rotm: matrix)",
+											"text": "+set.init_wf_R_b(obj, wf_R_b: matrix)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -8116,7 +8116,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+get.wf_R_b(out wf_R_b: matrix, obj)",
+											"text": "+get.init_wf_R_b(out wf_R_b: matrix, obj)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -8145,7 +8145,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+set.wf_p_b(obj, new_pos: vector)",
+											"text": "+set.init_wf_p_b(obj, wf_p_b: vector)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -8174,7 +8174,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+get.wf_p_b(out wf_p_b: vector, obj)",
+											"text": "+get.init_wf_p_b(out wf_p_b: vector, obj)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -8203,7 +8203,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+set.g_wf(obj, g: vector)",
+											"text": "+set.g_wf(obj, g_wf: vector)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -8377,7 +8377,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+get.joint_limits(out jl: struct, obj)",
+											"text": "+get.joint_limits(out jlmts: struct, obj)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -12294,7 +12294,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+updateToolFrame(obj, t_idx: integer, new_frm_tt: vector)",
+											"text": "+updateToolFrame(obj, ee_vqT_tt: vector, t_idx: integer)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -12990,7 +12990,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+get.stvLen(out stvLen: integer, obj)",
+											"text": "+get.stvLen(out len: integer, obj)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -13106,7 +13106,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+set.init_state(obj, stInit: wbmStateParams)",
+											"text": "+set.init_state(obj, stp_init: wbmStateParams)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -13135,7 +13135,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+get.init_state(out stInit: wbmStateParams, obj)",
+											"text": "+get.init_state(out stp_init: wbmStateParams, obj)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -13338,7 +13338,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "-checkInitStateDimensions(out result: logical, obj, stInit: wbmStateParams)",
+											"text": "-checkInitStateDimensions(out result: logical, obj, stp_init: wbmStateParams)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -14038,7 +14038,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+wf_R_b: matrix",
+											"text": "+wf_R_b_init: matrix",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -14067,7 +14067,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+wf_p_b: vector",
+											"text": "+wf_p_b_init: vector",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -14183,7 +14183,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+jlim.lwr: vector",
+											"text": "+jlmts.lwr: vector",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -14212,7 +14212,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+jlim.upr: vector",
+											"text": "+jlmts.upr: vector",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -47010,11 +47010,11 @@
 									"_parent": {
 										"$ref": "AAAAAAFVyUpDaH95RIo="
 									},
-									"name": "t_idx",
+									"name": "ee_vqT_tt",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "integer",
+									"type": "vector",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -47026,11 +47026,11 @@
 									"_parent": {
 										"$ref": "AAAAAAFVyUpDaH95RIo="
 									},
-									"name": "new_frm_tt",
+									"name": "t_idx",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "vector",
+									"type": "integer",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -48924,7 +48924,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFReanB1R+Dsmk="
 									},
-									"name": "stvLen",
+									"name": "len",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -49132,7 +49132,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFUXipWHI9eYpw="
 									},
-									"name": "stInit",
+									"name": "stp_init",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -49166,7 +49166,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFUXipawY+jR24="
 									},
-									"name": "stInit",
+									"name": "stp_init",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -49625,7 +49625,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFUXhuqy/5C+qs="
 									},
-									"name": "stInit",
+									"name": "stp_init",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -50565,7 +50565,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPy+jwbw/0fN4="
 							},
-							"name": "wf_R_b",
+							"name": "wf_R_b_init",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -50583,7 +50583,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPy+jwbw/0fN4="
 							},
-							"name": "wf_p_b",
+							"name": "wf_p_b_init",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -50655,7 +50655,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPy+jwbw/0fN4="
 							},
-							"name": "jlim.lwr",
+							"name": "jlmts.lwr",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -50673,7 +50673,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPy+jwbw/0fN4="
 							},
-							"name": "jlim.upr",
+							"name": "jlmts.upr",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,

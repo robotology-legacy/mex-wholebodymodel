@@ -1,6 +1,6 @@
 function M = wbm_massMatrix(varargin)
-    % WBM_MASSMATRIX computes the mass matrix of the floating base robot w.r.t. the given joint
-    % configuration q_j.
+    % WBM_MASSMATRIX computes the generalized mass matrix of the floating base robot w.r.t. the
+    % given joint configuration q_j.
     %
     %   INPUT ARGUMENTS:
     %       Optimized mode:  no arguments
@@ -11,7 +11,7 @@ function M = wbm_massMatrix(varargin)
     %           q_j    -- (nDoF x 1) joint angle vector in radian
     %
     %   OUTPUT ARGUMENTS:
-    %       M -- ((nDoF+6) x (nDoF+6)) floating base mass matrix.
+    %       M -- ((nDoF+6) x (nDoF+6)) generalized mass matrix.
     %
     % Author: Naveen Kuppuswamy (naveen.kuppuswamy@iit.it); Genova, Dec 2014
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017

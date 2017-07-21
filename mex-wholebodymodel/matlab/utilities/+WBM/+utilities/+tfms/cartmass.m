@@ -27,11 +27,7 @@ function [Mx, aJcMinv, aJc_t] = cartmass(a_J_c, M)
     aJc_t   = a_J_c.';
     aJcMinv = a_J_c / M; % x*M = a_J_c --> x = a_J_c * M^(-1)
     Upsilon = aJcMinv * aJc_t; % inverse mass matrix Upsilon = Lambda^(-1) = a_J_c * M^(-1) * a_J_c^T
-                               % in operational space (= "inverse pseudo-kinetic energy matrix").
-    Mx = Upsilon \ eye(n,n); % Cartesian mass matrix Mx = Lambda = (a_J_c * M^(-1) * a_J_c^T)^(-1),
-                             % Lambda ... pseudo-kinetic energy matrix in operational space.
-                             % (more numerical accurate/stable than Mx = eye(n,n) / Upsilon)
-    % Mx2 = eye(n,n) / Upsilon; % Cartesian mass matrix Mx = Lambda = (a_J_c * M^(-1) * a_J_c^T)^(-1),
-    %                          % Lambda ... pseudo-kinetic energy matrix in operational space.
-    % df = Mx - Mx2;
+                               % in operational space {C} (Lambda^(-1) ... inverse pseudo-kinetic energy matrix).
+    Mx = Upsilon \ eye(n,n); % Cartesian mass matrix Mx = Lambda = (a_J_c * M^(-1) * a_J_c^T)^(-1)
+                             % in operational space {C} (Lambda ... pseudo-kinetic energy matrix).
 end

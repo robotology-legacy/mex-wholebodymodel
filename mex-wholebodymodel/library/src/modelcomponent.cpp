@@ -94,11 +94,11 @@ void ModelComponent::reorderMatrixInColMajor(const double *srcMat, double *destM
 // (*) Further details about the offset calculation for the memory layout of 2D-arrays
 //     are available under:
 //      [1] Memory layout of multi-dimensional arrays, Eli Bendersky, September 2015,
-//            url: http://eli.thegreenplace.net/2015/memory-layout-of-multi-dimensional-arrays
+//            URL: http://eli.thegreenplace.net/2015/memory-layout-of-multi-dimensional-arrays
 //      [2] Row Major and Column Major Address calculations, October 2012,
-//            url: http://www.cbseguy.com/row-column-major-address-calculations-cbse
+//            URL: http://www.cbseguy.com/row-column-major-address-calculations-cbse
 //      [3] An exhaustive evaluation of row-major, column-major and Morton layouts for large two-dimensional arrays,
 //          Thiyagalingam & Beckmann & Kelly, Imperial College, 2003, p. 2,
-//            url: https://www.doc.ic.ac.uk/~phjk/Publications/ExhaustiveMortonUKPEW2003.pdf
+//            URL: https://www.doc.ic.ac.uk/~phjk/Publications/ExhaustiveMortonUKPEW2003.pdf
 //      [4] The Art of Assembly Language Programming, Randall Hyde, 2003, pp. 468-475,
-//            url: http://www.plantation-productions.com/Webster/www.artofasm.com/Linux/HTML/Arraysa2.html
+//            URL: http://www.plantation-productions.com/Webster/www.artofasm.com/Linux/HTML/Arraysa2.html

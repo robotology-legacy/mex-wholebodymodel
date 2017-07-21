@@ -42,15 +42,18 @@ classdef WBM < WBM.WBMBase
 
             initConfig(obj, robot_config);
             if obj.mwf2fixLnk
-                if (obj.mwbm_config.nCstrs > 0)
-                    % set the world frame (WF) at the initial VQ-Transformation from
-                    % the chosen fixed link, i.e. the first entry of the constraint list:
-                    setWorldFrameAtFixLnk(obj, obj.mwbm_config.ccstr_link_names{1});
+                if ~isempty(obj.mwbm_model.urdf_fixed_link)
+                    % use the previous set fixed link of the robot model ...
+                    updateWorldFrameFromFixLnk(obj);
+                elseif (obj.mwbm_config.nCstrs > 0)
+                    % set the world frame (WF) at the initial VQ-transformation of the chosen
+                    % fixed link. In this case the first entry of the contact constraint list:
+                    setWorldFrameAtFixLnk(obj, obj.mwbm_config.ccstr_link_names{1,1});
                 else
                     error('WBM::WBM: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
                 end
             end
-            % retrieve and update the initial VQ-Transformation of the robot base (world frame) ...
+            % retrieve and update the initial VQ-transformation of the robot base (world frame) ...
             updateInitVQTransformation(obj);
         end
 
@@ -80,11 +83,11 @@ classdef WBM < WBM.WBMBase
                         error('WBM::setWorldFrameAtFixLnk: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
                 end
             end
-            obj.fixed_link = urdf_fixed_link; % replace the old default fixed link with the new fixed link ...
+            obj.fixed_link = urdf_fixed_link; % replace the old fixed link with the new one ...
 
             setState(obj, q_j, dq_j, v_b); % update the robot state (important for initializations) ...
-            [p_b, R_b] = getWorldFrameFromFixLnk(obj, urdf_fixed_link); % use optimized mode
-            setWorldFrame(obj, R_b, p_b, g_wf);
+            [wf_p_b, wf_R_b] = getWorldFrameFromFixLnk(obj, urdf_fixed_link); % use optimized mode
+            setWorldFrame(obj, wf_R_b, wf_p_b, g_wf);
         end
 
         function updateWorldFrameFromFixLnk(obj, q_j, dq_j, v_b, g_wf)
@@ -104,8 +107,8 @@ classdef WBM < WBM.WBMBase
                 end
             end
             setState(obj, q_j, dq_j, v_b); % update state ...
-            [p_b, R_b] = getWorldFrameFromDfltFixLnk(obj); % optimized mode
-            setWorldFrame(obj, R_b, p_b, g_wf); % update the world frame with the new values ...
+            [wf_p_b, wf_R_b] = getWorldFrameFromDfltFixLnk(obj); % optimized mode
+            setWorldFrame(obj, wf_R_b, wf_p_b, g_wf); % update the world frame with the new values ...
         end
 
         function updateInitVQTransformation(obj)
@@ -116,20 +119,19 @@ classdef WBM < WBM.WBMBase
 
         function vqT_lnk = fkinVQTransformation(obj, urdf_link_name, q_j, vqT_b, g_wf)
             % computes the forward kinematic vector-quaternion transf. of a specified link frame:
-            if (nargin < 4)
-                error('WBM::fkinVQTransformation: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+            % set the world frame at the given base-to-world transformation (base frame) ...
+            switch nargin
+                case 5
+                    [wf_p_b, wf_R_b] = WBM.utilities.tfms.frame2posRotm(vqT_b); % pos. & orientation from the base frame ...
+                    setWorldFrame(obj, wf_R_b, wf_p_b, g_wf);
+                case 4
+                    [wf_p_b, wf_R_b] = WBM.utilities.tfms.frame2posRotm(vqT_b);
+                    setWorldFrame(obj, wf_R_b, wf_p_b); % use the default gravity vector ...
+                otherwise
+                    error('WBM::fkinVQTransformation: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
-
-            % get the VQ-Transformation form the base state ...
-            [p_b, R_b] = WBM.utilities.tfms.frame2posRotm(vqT_b);
-            % set the world frame to the base ...
-            if ~exist('g_wf', 'var')
-                setWorldFrame(obj, R_b, p_b); % use the default gravity vector ...
-            else
-                setWorldFrame(obj, R_b, p_b, g_wf);
-            end
-            % compute the forward kinematics of the link frame ...
-            vqT_lnk = forwardKinematics(obj, R_b, p_b, q_j, urdf_link_name);
+            % compute the forward kinematics of the given link frame ...
+            vqT_lnk = forwardKinematics(obj, wf_R_b, wf_p_b, q_j, urdf_link_name);
         end
 
         [Jc, djcdq] = contactJacobians(obj, varargin)
@@ -152,10 +154,13 @@ classdef WBM < WBM.WBMBase
             %   [1] Control Strategies for Robots in Contact, J. Park, PhD-Thesis, Artificial Intelligence Laboratory, Stanford University, 2006,
             %       <http://cs.stanford.edu/group/manips/publications/pdfs/Park_2006_thesis.pdf>, Chapter 5, pp. 106-110, eq. (5.5)-(5.14).
             %   [2] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, pp. 269-270, eq. (6.5) & (6.6).
-            [Mx_c, JcMinv,~] = WBM.utilities.tfms.cartmass(Jc, M); % mass matrix in contact space Mx_c = Lambda = (Jc * M^(-1) * Jc^T)^(-1),
-                                                                   % Lambda ... pseudo-kinetic energy matrix.
+            Jc_t      = Jc.';
+            JcMinv    = Jc / M; % x*M = Jc --> x = Jc * M^(-1)
+            Upsilon_c = JcMinv * Jc_t; % inverse mass matrix Upsilon_c = Lambda^(-1) = Jc * M^(-1) * Jc^T
+                                       % in contact space {c} (Lambda^(-1) ... inverse pseudo-kinetic energy matrix).
             % contact constraint forces f_c (generated by the environment):
-            f_c = Mx_c * (JcMinv*(c_qv - tau_gen) - djcdq);
+            f_c = Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq);
+            % (this calculation method is numerically more accurate and robust than the calculation variant with the cartmass-function.)
         end
 
         [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, djcdq, M, c_qv, varargin) % CLPC ... contact link pose correction
@@ -192,7 +197,7 @@ classdef WBM < WBM.WBMBase
                 return
             end
 
-            [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCC(obj, varargin{:}); % TO CHECK!!!!!
+            [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCC(obj, varargin{:});
         end
 
         function [ddq_j, fd_prms] = jointAccelerations(obj, tau, varargin)
@@ -551,7 +556,7 @@ classdef WBM < WBM.WBMBase
 
         function setToolLinks(obj, ee_link_names, frames_tt)
             % verify the input types ...
-            if ( ~iscell(ee_link_names) || ~ismatrix(frames_tt) )
+            if ( ~iscellstr(ee_link_names) || ~ismatrix(frames_tt) )
                 error('WBM::setToolLinks: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             % check dimensions ...
@@ -570,7 +575,7 @@ classdef WBM < WBM.WBMBase
             obj.mwbm_config.tool_links(1:n,1) = WBM.wbmToolLink;
             for i = 1:n
                 obj.mwbm_config.tool_links(i,1).urdf_link_name = ee_link_names{1,i};
-                obj.mwbm_config.tool_links(i,1).ee_vqT_tt      = frames_tt(1:7,i);
+                obj.mwbm_config.tool_links(i,1).ee_vqT_tt      = frames_tt(1:7,i); % from {tt} to {ee}
             end
         end
 
@@ -599,18 +604,18 @@ classdef WBM < WBM.WBMBase
             tool_tbl = cell2table(ctools, 'VariableNames', {'link_name', 'frame_tt'});
         end
 
-        function updateToolFrame(obj, t_idx, new_frm_tt)
+        function updateToolFrame(obj, ee_vqT_tt, t_idx)
             if (obj.mwbm_config.nTools == 0)
                 error('WBM::updateToolFrame: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
             end
             if (t_idx > obj.MAX_NUM_TOOLS)
                 error('WBM::updateToolFrame: %s', WBM.wbmErrorMsg.MAX_NUM_LIMIT);
             end
-            if (size(new_frm_tt,1) ~= 7)
+            if (size(ee_vqT_tt,1) ~= 7)
                 error('WBM::updateToolFrame: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
-            % update the tool-frame (VQ-Transformation) of the selected tool with the new frame ...
-            obj.mwbm_config.tool_links(t_idx,1).ee_vqT_tt = new_frm_tt;
+            % update the tool-frame (VQ-transformation) of the selected tool with the new frame ...
+            obj.mwbm_config.tool_links(t_idx,1).ee_vqT_tt = ee_vqT_tt;
         end
 
         function wf_H_tt = toolFrame(obj, varargin)
@@ -940,8 +945,8 @@ classdef WBM < WBM.WBMBase
             error('WBM::getBaseVelocities: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
         end
 
-        function stvLen = get.stvLen(obj)
-            stvLen = obj.mwbm_config.stvLen;
+        function len = get.stvLen(obj)
+            len = obj.mwbm_config.stvLen;
         end
 
         function vqT_b = get.vqT_base(obj)
@@ -949,25 +954,25 @@ classdef WBM < WBM.WBMBase
         end
 
         function vqT_b = get.init_vqT_base(obj)
-            stInit = obj.mwbm_config.init_state_params;
-            vqT_b  = vertcat(stInit.x_b, stInit.qt_b);
+            stp_init = obj.mwbm_config.init_state_params;
+            vqT_b    = vertcat(stp_init.x_b, stp_init.qt_b);
         end
 
         function stvChi = get.init_stvChi(obj)
-            stInit = obj.mwbm_config.init_state_params;
-            stvChi = vertcat(stInit.x_b, stInit.qt_b, stInit.q_j, ...
-                             stInit.dx_b, stInit.omega_b, stInit.dq_j);
+            stp_init = obj.mwbm_config.init_state_params;
+            stvChi   = vertcat(stp_init.x_b, stp_init.qt_b, stp_init.q_j, ...
+                               stp_init.dx_b, stp_init.omega_b, stp_init.dq_j);
         end
 
-        function set.init_state(obj, stInit)
-            if ~checkInitStateDimensions(obj, stInit)
+        function set.init_state(obj, stp_init)
+            if ~checkInitStateDimensions(obj, stp_init)
                 error('WBM::set.init_state: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
             end
-            obj.mwbm_config.init_state_params = stInit;
+            obj.mwbm_config.init_state_params = stp_init;
         end
 
-        function stInit = get.init_state(obj)
-            stInit = obj.mwbm_config.init_state_params;
+        function stp_init = get.init_state(obj)
+            stp_init = obj.mwbm_config.init_state_params;
         end
 
         function robot_body = get.robot_body(obj)
@@ -989,27 +994,27 @@ classdef WBM < WBM.WBMBase
             if ~exist('prec', 'var')
                 prec = 2;
             end
-            nPlds  = obj.mwbm_config.nPlds;
-            nCstrs = obj.mwbm_config.nCstrs;
-            stInit = obj.mwbm_config.init_state_params;
+            nPlds    = obj.mwbm_config.nPlds;
+            nCstrs   = obj.mwbm_config.nCstrs;
+            stp_init = obj.mwbm_config.init_state_params;
 
-            clnk_names     = vertcat(num2cell(1:nCstrs), obj.mwbm_config.ccstr_link_names);
-            strLnkNamesLst = sprintf('  %d  %s\n', clnk_names{1:2,1:nCstrs});
+            clnk_names    = vertcat(num2cell(1:nCstrs), obj.mwbm_config.ccstr_link_names);
+            strLnkNameLst = sprintf('  %d  %s\n', clnk_names{1:2,1:nCstrs});
 
-            cinit_st = cell(6,1);
-            cinit_st{1,1} = sprintf('  q_j:      %s', mat2str(stInit.q_j, prec));
-            cinit_st{2,1} = sprintf('  dq_j:     %s', mat2str(stInit.dq_j, prec));
-            cinit_st{3,1} = sprintf('  x_b:      %s', mat2str(stInit.x_b, prec));
-            cinit_st{4,1} = sprintf('  qt_b:     %s', mat2str(stInit.qt_b, prec));
-            cinit_st{5,1} = sprintf('  dx_b:     %s', mat2str(stInit.dx_b, prec));
-            cinit_st{6,1} = sprintf('  omega_b:  %s', mat2str(stInit.omega_b, prec));
-            strInitState  = sprintf('%s\n%s\n%s\n%s\n%s\n%s', cinit_st{1,1}, cinit_st{2,1}, ...
-                                    cinit_st{3,1}, cinit_st{4,1}, cinit_st{5,1}, cinit_st{6,1});
+            cinit_stp = cell(6,1);
+            cinit_stp{1,1} = sprintf('  q_j:      %s', mat2str(stp_init.q_j, prec));
+            cinit_stp{2,1} = sprintf('  dq_j:     %s', mat2str(stp_init.dq_j, prec));
+            cinit_stp{3,1} = sprintf('  x_b:      %s', mat2str(stp_init.x_b, prec));
+            cinit_stp{4,1} = sprintf('  qt_b:     %s', mat2str(stp_init.qt_b, prec));
+            cinit_stp{5,1} = sprintf('  dx_b:     %s', mat2str(stp_init.dx_b, prec));
+            cinit_stp{6,1} = sprintf('  omega_b:  %s', mat2str(stp_init.omega_b, prec));
+            strInitState   = sprintf('%s\n%s\n%s\n%s\n%s\n%s', cinit_stp{1,1}, cinit_stp{2,1}, ...
+                                     cinit_stp{3,1}, cinit_stp{4,1}, cinit_stp{5,1}, cinit_stp{6,1});
 
             strPldTbl = sprintf('  none\n');
             if (nPlds > 0)
                 % print the payload data in table form:
-                pl_lnks  = obj.mwbm_config.payload_links;
+                pl_lnks = obj.mwbm_config.payload_links;
 
                 clnk_names = cell(nPlds,1);
                 cpos       = clnk_names;
@@ -1051,7 +1056,7 @@ classdef WBM < WBM.WBMBase
                                  ' initial state:\n%s\n\n' ...
                                  ' #payloads: %d\n' ...
                                  ' link payloads:\n%s'], ...
-                                obj.mwbm_config.nCstrs, strLnkNamesLst, ...
+                                obj.mwbm_config.nCstrs, strLnkNameLst, ...
                                 strInitState, nPlds, strPldTbl);
             fprintf('%s\n', strConfig);
         end
@@ -1082,7 +1087,7 @@ classdef WBM < WBM.WBMBase
             end
 
             obj.mwbm_config = WBM.wbmBaseRobotConfig;
-            obj.mwbm_config.nCstrs          = nCstrs;
+            obj.mwbm_config.nCstrs           = nCstrs;
             obj.mwbm_config.ccstr_link_names = robot_config.ccstr_link_names;
 
             if ~isempty(robot_config.body)
@@ -1120,9 +1125,9 @@ classdef WBM < WBM.WBMBase
             jnt_dq(1:len,1) = dq_j(joint_idx,1); % velocity
         end
 
-        function result = checkInitStateDimensions(obj, stInit)
-            len = size(stInit.x_b,1) + size(stInit.qt_b,1) + size(stInit.q_j,1) + ...
-                  size(stInit.dx_b,1) + size(stInit.omega_b,1) + size(stInit.dq_j,1);
+        function result = checkInitStateDimensions(obj, stp_init)
+            len = size(stp_init.x_b,1) + size(stp_init.qt_b,1) + size(stp_init.q_j,1) + ...
+                  size(stp_init.dx_b,1) + size(stp_init.omega_b,1) + size(stp_init.dq_j,1);
 
             if (len ~= obj.mwbm_config.stvLen) % allowed length: 'stvLen' or 'stvLen-7'
                 if (len ~= (obj.mwbm_config.stvLen - 7)) % length without x_b & qt_b (they will be updated afterwards)

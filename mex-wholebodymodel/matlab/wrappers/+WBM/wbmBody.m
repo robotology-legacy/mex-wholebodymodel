@@ -14,7 +14,7 @@ classdef wbmBody
 
             %% Chains:
             % verify the input types ...
-            if ( ~iscell(chain_names) || ~ismatrix(chain_idx) )
+            if ( ~iscellstr(chain_names) || ~ismatrix(chain_idx) )
                 error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             % check the dimensions ...
@@ -32,7 +32,7 @@ classdef wbmBody
 
             %% Joints:
             % check input types ...
-            if ( ~iscell(joint_names) || ~isvector(joint_idx) )
+            if ( ~iscellstr(joint_names) || ~isvector(joint_idx) )
                 error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             % check dimensions ...

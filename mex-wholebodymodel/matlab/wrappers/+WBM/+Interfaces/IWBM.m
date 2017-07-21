@@ -6,6 +6,7 @@ classdef (Abstract) IWBM < handle
         robot_manuf@char
         robot_params@WBM.wbmBaseRobotParams
         sim_config@WBM.absSimConfig
+        base_link@char
         base_tform@double matrix
         tool_tform@double matrix
         feet_conf@struct

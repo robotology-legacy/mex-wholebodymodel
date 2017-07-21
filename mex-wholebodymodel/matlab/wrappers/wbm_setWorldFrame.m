@@ -1,11 +1,11 @@
 function wbm_setWorldFrame(varargin)
-    % WBM_SETWORLDFRAME sets the world frame (WF), which is fixed at a specified (contact) link frame,
-    % to a given transformation (position & orientation).
+    % WBM_SETWORLDFRAME sets the world frame (WF) at a given position and orientation (transformation)
+    % form a specified fixed link frame (reference frame). The specified fixed link (reference link)
+    % can also be a contact constraint link.
     %
-    % With the help of the WF-transformation, the transformation vqT_b from the base to the WF can be
-    % computed afterwards w.r.t. a given joint configuration q_j. The base-transformation, or
-    % base VQ-Transformation vqT_b supports the optimized computations of all kinematic/dynamic
-    % functions of the component classes.
+    % The set base-to-world transformation wf_H_b supports, w.r.t. a given joint configuration q_j,
+    % the optimized computations of all kinematic and dynamic functions of the component classes in C++.
+    % It supports also the computation of the base VQ-transformation vqT_b of the current model's state.
     %
     %   INPUT ARGUMENTS:
     %       Optimized mode:  none (does not exist)

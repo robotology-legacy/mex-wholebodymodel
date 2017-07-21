@@ -121,7 +121,7 @@ void ModelGetState::getStateValues()
   mexPrintf(sR.c_str());
 #endif
 
-  // get the values for the VQ-Transformation ...
+  // get the values for the VQ-transformation ...
   memcpy(vqT_b, wf_H_b.p, sizeof(double)*3);
   memcpy((vqT_b + 3), quat_b, sizeof(double)*4);
 

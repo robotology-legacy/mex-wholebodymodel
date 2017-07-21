@@ -1,6 +1,6 @@
 function wbm_updateState(varargin)
     % WBM_UPDATESTATE updates the state of the robot model, i.e. the joint angles and velocities,
-    % and the floating base velocity.
+    % and the generalized base velocity of the floating base.
     %
     %   INPUT ARGUMENTS:
     %       Optimized mode:  none (does not exist)
@@ -8,7 +8,7 @@ function wbm_updateState(varargin)
     %       Normal mode:
     %           q_j    -- (nDoF x 1) joint angle vector in radian
     %           dq_j   -- (nDoF x 1) joint angle velocity vector (rad/s)
-    %           v_b    -- (6 x 1) floating base velocity vector
+    %           v_b    -- (6 x 1) generalized base velocity vector
     %
     %   OUTPUT ARGUMENTS:  none
     %

@@ -6,8 +6,9 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         wbm_info@struct % general information about whole body model of the robot.
         wbm_params@WBM.wbmBaseRobotParams
         plotopt3d@WBM.absSimConfig
+        base_link@char        % floating base link (fixed reference link) of the robot.
         ctrl_link@char        % current kinematic link of the robot that is controlled by the system.
-        ee_link@char          % kinematic link of the current end-effector that is controlled by the system.
+        ee_links              % kinematic links of the end-effectors (hands) that are controlled by the system.
         gravity@double vector % gravity vector (direction of the gravity)
         base@double    matrix % base transform of the robot (pose of the robot)
         tool@double    matrix % tool transform (from the end-effector to the tool-tip)
@@ -22,28 +23,45 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         mwbm_info = struct( 'robot_name',  '', ...
                             'robot_manuf', '', ...
                             'comment',     '' );
-        mlink_ctrl@char
-        mlink_ee@char
+        mlnk_name_ctrl@char
+        mlnk_names_ee
     end
 
     methods
-        function bot = MultChainTree(robot_wbm, ctrl_link, comment)
+        function bot = MultChainTree(robot_wbm, ctrl_link, varargin) %comment)
             if ~isa(robot_wbm, 'WBM.Interfaces.IWBM')
                 error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             if isempty(ctrl_link)
                 error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.EMPTY_STRING);
             end
-
+            % initialization:
+            switch nargin
+                case 2
+                    bot.mwbm_info.comment = '';
+                case 3
+                    ee_links = varargin{1,1};
+                    if ( ~iscellstr(ee_links) || ~ischar(ee_links) )
+                        error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+                    end
+                    bot.mlnk_names_ee = ee_links;
+                case 4
+                    ee_links = varargin{1,1};
+                    comment  = varargin{1,2};
+                    if ( ~iscellstr(ee_links) || ~ischar(ee_links) || ~ischar(comment) )
+                        error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+                    end
+                    bot.mlnk_names_ee = ee_links;
+                    bot.mwbm_info.comment = comment;
+                otherwise
+                    error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+            end
             bot.mwbm = robot_wbm;
-            bot.mlink_ctrl = ctrl_link;
+            bot.mlnk_name_ctrl = ctrl_link;
 
             % get some informations about the WBM of the robot ...
             bot.mwbm_info.robot_name  = robot_wbm.robot_name;
             bot.mwbm_info.robot_manuf = robot_wbm.robot_manuf;
-            if exist('comment', 'var')
-                bot.mwbm_info.comment = comment;
-            end
         end
 
         function delete(bot)
@@ -78,6 +96,16 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             g_q = bot.mwbm.gravityForces(q_j);
         end
 
+        function [g_q, wf_J_b] = gravjac(bot, q_j)
+            stFltb   = bot.mwbm.getFloatingBaseState();
+            base_lnk = bot.mwbm.base_link; % reference link (fixed link)
+
+            % gravity bias forces g(q):
+            g_q = bot.mwbm.gravityForces(q_j, stFltb);
+            % Jacobian of the base frame (reference frame):
+            wf_J_b = bot.mwbm.jacobian(base_lnk, q_j, stFltb);
+        end
+
         function tau_j = rne(bot, q_j, dq_j, ddq_j)
             tau_j = bot.mwbm.inverseHybridDyn(q_j, dq_j, ddq_j);
         end
@@ -87,20 +115,31 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function wf_H_lnk = fkine(bot, q_j)
-            wf_H_lnk = bot.mwbm.forwardKin(bot.mlink_ctrl, q_j);
+            wf_H_lnk = bot.mwbm.forwardKin(bot.mlnk_name_ctrl, q_j);
         end
 
         function wf_H_lnk = A(bot, lnk_name, q_j)
             wf_H_lnk = bot.mwbm.linkFrame(lnk_name, q_j);
         end
 
-        function wf_H_ee = T0_n(bot, q_j) % computes the forward kinematics of the current end-effector.
-            vqT_ee = bot.mwbm.forwardKin(bot.mlink_ee, q_j);
+        function wf_H_ee = T0_n(bot, q_j) % computes the forward kinematics of the end-effectors (hands).
+            if iscell(bot.mlnk_names_ee)
+                % both hands ...
+                stFltb = bot.mwbm.getFloatingBaseState();
+                wf_H_ee = cell(1,2);
+                for i = 1:2
+                    vqT_ee = bot.mwbm.forwardKin(bot.mlnk_names_ee{1,i}, q_j, stFltb);
+                    wf_H_ee{1,i} = WBM.utilities.tfms.frame2tform(vqT_ee);
+                end
+                return
+            end
+            % else, only one hand is in use ...
+            vqT_ee  = bot.mwbm.forwardKin(bot.mlnk_names_ee, q_j);
             wf_H_ee = WBM.utilities.tfms.frame2tform(vqT_ee);
         end
 
         function djdq_lnk = jacob_dot(bot, q_j, dq_j)
-            djdq_lnk = bot.mwbm.jacobianDot(bot.mlink_ctrl, q_j, dq_j);
+            djdq_lnk = bot.mwbm.jacobianDot(bot.mlnk_name_ctrl, q_j, dq_j);
         end
 
         function wf_J_lnk = jacob0(bot, q_j, varargin)
@@ -111,11 +150,12 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             opt.rot   = false;
             opt = tb_optparse(opt, varargin); % function from the RTB of Peter Corke.
 
-            wf_J_lnk = bot.mwbm.jacobian(bot.mlink_ctrl, q_j);
+            stFltb   = bot.mwbm.getFloatingBaseState();
+            wf_J_lnk = bot.mwbm.jacobian(bot.mlnk_name_ctrl, q_j, stFltb);
 
             if opt.rpy
                 % compute the analytical Jacobian with the Euler rotation rate in ZYX (RPY) order:
-                wf_H_lnk = bot.mwbm.forwardKin(bot.mlink_ctrl, q_j);
+                wf_H_lnk = bot.mwbm.forwardKin(bot.mlnk_name_ctrl, q_j, stFltb);
                 Er_inv   = WBM.utilities.tfms.tform2angRateTF(wf_H_lnk, 'eul', 'ZYX');
                 if (rcond(Er_inv) < eps)
                     error('MultChainTree::jacob0: %s', WBM.wbmErrorMsg.SINGULAR_MAT);
@@ -126,7 +166,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
                 wf_J_lnk = wf_rX_lnk * wf_J_lnk;
             elseif opt.eul
                 % compute the analytical Jacobian with the Euler rotation rate in ZYZ order:
-                wf_H_lnk = bot.mwbm.forwardKin(bot.mlink_ctrl, q_j);
+                wf_H_lnk = bot.mwbm.forwardKin(bot.mlnk_name_ctrl, q_j, stFltb);
                 Er_inv   = WBM.utilities.tfms.tform2angRateTF(wf_H_lnk, 'eul', 'ZYZ');
                 if (rcond(Er_inv) < eps)
                     error('MultChainTree::jacob0: %s', WBM.wbmErrorMsg.SINGULAR_MAT);
@@ -139,28 +179,45 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
 
             if opt.trans
                 % return the translational sub-matrix of the Jacobian:
-                wf_J_lnk = wf_J_lnk(1:3,1:6);
+                wf_J_lnk = wf_J_lnk(1:3,:);
             elseif opt.rot
                 % return the rotational sub-matrix of the Jacobian:
-                wf_J_lnk = wf_J_lnk(4:6,1:6);
+                wf_J_lnk = wf_J_lnk(4:6,:);
             end
         end
 
-        function wf_J_ee = jacobn(bot, q_j, varargin) % Jacobian of the current ee-frame.
+        function wf_J_ee = jacobn(bot, q_j, varargin) % Jacobian of the ee-frames.
             % options:
             opt.trans = false;
             opt.rot   = false;
             opt = tb_optparse(opt, varargin);
 
-            % Jacobian of the end-effector controlled by the system:
-            wf_J_ee = bot.mwbm.jacobian(bot.mlink_ee, q_j);
+            % Jacobians of the end-effectors (hands) controlled by the system:
+            if iscell(bot.mlnk_names_ee)
+                % both hands ...
+                stFltb  = bot.mwbm.getFloatingBaseState();
+                wf_J_ee = cell(1,2);
+                for i = 1:2
+                    wf_J_ee{1,i} = bot.mwbm.jacobian(bot.mlnk_names_ee{1,i}, q_j, stFltb);
+                end
 
+                if opt.trans
+                    % translational sub-matrices:
+                    wf_J_ee{1,1} = wf_J_ee{1,1}(1:3,:);
+                    wf_J_ee{1,2} = wf_J_ee{1,2}(1:3,:);
+                elseif opt.rot
+                    % rotational sub-matrices:
+                    wf_J_ee{1,1} = wf_J_ee{1,1}(4:6,:);
+                    wf_J_ee{1,2} = wf_J_ee{1,2}(4:6,:);
+                end
+                return
+            end
+            % else, only one hand is in use ...
+            wf_J_ee = bot.mwbm.jacobian(bot.mlink_ee, q_j);
             if opt.trans
-                % translational sub-matrix:
-                wf_J_ee = wf_J_ee(1:3,1:6);
+                wf_J_ee = wf_J_ee(1:3,:);
             elseif opt.rot
-                % rotational sub-matrix:
-                wf_J_ee = wf_J_ee(4:6,1:6);
+                wf_J_ee = wf_J_ee(4:6,:);
             end
         end
 
@@ -169,12 +226,12 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function Mx = cinertia(bot, q_j)
-            M = bot.mwbm.massMatrix(q_j);
-            wf_J_lnk = bot.mwbm.jacobian(bot.mlink_ctrl, q_j);
+            stFltb = bot.mwbm.getFloatingBaseState();
 
+            M        = bot.mwbm.massMatrix(q_j, stFltb);
+            wf_J_lnk = bot.mwbm.jacobian(bot.mlnk_name_ctrl, q_j, stFltb);
             % calculate the Cartesian mass matrix (pseudo-kinetic energy matrix)
-            %   Mx = (J * M^(-1) * J^T)^(-1)
-            % in operational space:
+            % Mx = (J * M^(-1) * J^T)^(-1) in operational space:
             [Mx,~,~] = WBM.utilities.tfms.cartmass(wf_J_lnk, M);
         end
 
@@ -234,26 +291,42 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             sim_config = bot.mwbm.sim_config;
         end
 
+        function set.base_link(bot, rlnk_name)
+            bot.mwbm.base_link = rlnk_name;
+        end
+
+        function rlnk_name = get.base_link(bot)
+            rlnk_name = bot.mwbm.base_link;
+        end
+
         function set.ctrl_link(bot, lnk_name)
             if isempty(lnk_name)
                 error('MultChainTree::set.ctrl_link: %s', WBM.wbmErrorMsg.EMPTY_STRING);
             end
-            bot.mlink_ctrl = lnk_name;
+            bot.mlnk_name_ctrl = lnk_name;
         end
 
         function lnk_name = get.ctrl_link(bot)
-            lnk_name = bot.mlink_ctrl;
+            lnk_name = bot.mlnk_name_ctrl;
         end
 
-        function set.ee_link(bot, lnk_name)
-            if isempty(lnk_name)
-                error('MultChainTree::set.ee_link: %s', WBM.wbmErrorMsg.EMPTY_STRING);
+        function set.ee_links(bot, lnk_names)
+            if ( iscellstr(lnk_names) && isrow(lnk_names) )
+                if (size(lnk_names,2) ~= 2)
+                    error('MultChainTree::set.ee_links: %s', WBM.wbmErrorMsg.WRONG_ARR_SIZE);
+                end
+                % both ee-links (hands) will be used ...
+                bot.mlnk_names_ee = lnk_names;
+            elseif ischar(lnk_names)
+                % only one ee-link (hand) will be used ...
+                bot.mlnk_names_ee = lnk_names;
+            else
+                error('MultChainTree::set.ee_links: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            bot.mlink_ee = lnk_name;
         end
 
-        function lnk_name = get.ee_link(bot)
-            lnk_name = bot.mlink_ee;
+        function lnk_names = get.ee_links(bot)
+            lnk_names = bot.mlnk_names_ee;
         end
 
         function set.gravity(bot, g_wf)
@@ -264,25 +337,25 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             g_wf = bot.mwbm.g_wf;
         end
 
-        function set.base(bot, tform)
-            bot.mwbm.base_tform = tform;
+        function set.base(bot, wf_H_b)
+            bot.mwbm.base_tform = wf_H_b;
         end
 
-        function tform = get.base(bot)
-            tform = bot.mwbm.base_tform;
+        function wf_H_b = get.base(bot)
+            wf_H_b = bot.mwbm.base_tform;
         end
 
-        function set.tool(bot, tform)
-            bot.mwbm.tool_tform = tform;
+        function set.tool(bot, ee_H_tt)
+            bot.mwbm.tool_tform = ee_H_tt;
         end
 
-        function tform = get.tool(bot)
-            tform = bot.mwbm.tool_tform;
+        function ee_H_tt = get.tool(bot)
+            ee_H_tt = bot.mwbm.tool_tform;
         end
 
         function jlmts = get.qlim(bot)
-            jlim  = bot.mwbm.jlimits;
-            jlmts = horzcat(jlim.lwr, jlim.upr);
+            jl    = bot.mwbm.jlimits;
+            jlmts = horzcat(jl.lwr, jl.upr);
         end
 
         function ndof = get.n(bot)

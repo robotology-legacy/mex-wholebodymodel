@@ -7,8 +7,9 @@ classdef (Abstract) IMultChainTree < handle
         wbm_info@struct % general information about whole body model of the robot.
         wbm_params@WBM.wbmBaseRobotParams % base model and configuration parameters of the robot
         plotopt3d@WBM.absSimConfig
+        base_link@char        % floating base link (fixed reference link) of the robot.
         ctrl_link@char        % current kinematic link of the robot that is controlled by the system.
-        ee_link@char          % kinematic link of the current end-effector that is controlled by the system.
+        ee_links              % kinematic links of the end-effectors (hands) that are controlled by the system.
         gravity@double vector % gravity vector (direction of the gravity)
         base@double    matrix % base transform of the robot (pose of the robot)
         tool@double    matrix % tool transform (from the end-effector to the tool-tip)
@@ -29,6 +30,8 @@ classdef (Abstract) IMultChainTree < handle
 
         g_q = gravload(bot, q_j)
 
+        [g_q, wf_J_rlnk] = gravjac(bot, q_j)
+
         tau_j = rne(bot, q_j, dq_j, ddq_j)
 
         [t, stmChi] = fdyn(bot, tspan, stvChi_0, fhCtrlTrqs, ode_opt, varargin)
@@ -37,13 +40,13 @@ classdef (Abstract) IMultChainTree < handle
 
         wf_H_lnk = A(bot, lnk_name, q_j)
 
-        wf_H_ee = T0_n(bot, q_j) % computes the forward kinematics of the current end-effector.
+        wf_H_ee = T0_n(bot, q_j) % computes the forward kinematics of the end-effectors (hands).
 
         djdq_lnk = jacob_dot(bot, q_j, dq_j)
 
         wf_J_lnk = jacob0(bot, q_j, varargin)
 
-        wf_J_ee = jacobn(bot, q_j, varargin) % Jacobian of the current ee-frame.
+        wf_J_ee = jacobn(bot, q_j, varargin) % Jacobians of the ee-frames.
 
         M = inertia(bot, q_j)
 

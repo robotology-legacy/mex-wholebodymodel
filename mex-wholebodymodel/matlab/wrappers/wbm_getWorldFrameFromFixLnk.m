@@ -1,9 +1,14 @@
 function [wf_p_b, wf_R_b] = wbm_getWorldFrameFromFixLnk(varargin)
     % WBM_GETWORLDFRAMEFROMFIXLNK returns the position and the orientation of the floating base w.r.t.
-    % a world frame (WF) that is intentionally set and fixed at a specified (contact) link frame.
+    % a world frame (WF) that is intentionally set and fixed at a specified link frame. The specified
+    % fixed link (reference link) can also be a contact constraint link.
     %
     % The returned floating base position and orientation is obtained from the forward kinematics
-    % w.r.t. the specified fixed link frame.
+    % w.r.t. the specified fixed link frame (reference frame).
+    %
+    % Note: The default fixed link (floating base link) of each YARP-based robot can be different and
+    % the selection of the floating base link depends also from the situation. For example the default
+    % fixed link of the iCub-Humanoid-Robot is "l_sole".
     %
     %   INPUT ARGUMENTS:
     %       Optimized mode:
@@ -37,7 +42,7 @@ function [nw_p_b, nw_R_b] = computeNewWorld2Base(urdf_fixed_link, q_j)
     [ow_p_b, ow_R_b] = WBM.utilities.tfms.frame2posRotm(ow_vqT_b);
     ow_H_b = WBM.utilities.tfms.posRotm2tform(ow_p_b, ow_R_b);
 
-    % get the VQ-Transformation to the old world of the reference (contact) link:
+    % get the VQ-transformation (from reference link to old world):
     if (nargin == 1)
         ow_vqT_rlnk = wbm_forwardKinematics(urdf_fixed_link);
     else
@@ -46,7 +51,7 @@ function [nw_p_b, nw_R_b] = computeNewWorld2Base(urdf_fixed_link, q_j)
 
     % compute the new homogeneous transformation matrix H (from base to new world):
     ow_H_rlnk = WBM.utilities.tfms.frame2tform(ow_vqT_rlnk);
-    nw_H_b = ow_H_rlnk \ ow_H_b;
+    nw_H_b = ow_H_rlnk \ ow_H_b; % = ow_H_rlnk^(-1) * ow_H_b
 
     % get the new position and rotation (from base to new world):
     [nw_p_b, nw_R_b] = WBM.utilities.tfms.tform2posRotm(nw_H_b);

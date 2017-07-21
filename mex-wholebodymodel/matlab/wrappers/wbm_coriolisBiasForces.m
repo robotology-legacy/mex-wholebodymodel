@@ -3,7 +3,7 @@ function c_qv = wbm_coriolisBiasForces(varargin)
     % dynamics of rigid-body systems.
     %
     % This function is derived from the generalized bias force function and has the same
-    % dependencies (q_j, dq_j, v_b) as the generalized bias force function.
+    % dependencies (q_j, dq_j, v_b) as the parent-function.
     %
     %   INPUT ARGUMENTS:
     %       Optimized mode:  no arguments
@@ -13,7 +13,7 @@ function c_qv = wbm_coriolisBiasForces(varargin)
     %           wf_p_b -- (3 x 1) position vector from base to world frame
     %           q_j    -- (nDoF x 1) joint angle vector in radian
     %           dq_j   -- (nDoF x 1) joint angle velocity vector (rad/s)
-    %           v_b    -- (6 x 1) floating base velocity vector
+    %           v_b    -- (6 x 1) generalized base velocity vector
     %
     %   OUTPUT ARGUMENTS:
     %       c_qv -- ((nDoF+6) x 1) bias Coriolis and centrifugal force vector.
