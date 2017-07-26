@@ -27,9 +27,9 @@ classdef (Abstract) IWBM < handle
 
         stFltb = getBaseState(obj)
 
-        feet_conf = getFeetConfig(obj, varargin)
+        feet_conf = feetConfig(obj, varargin)
 
-        hand_conf = getHandConfig(obj, varargin)
+        hand_conf = handConfig(obj, varargin)
 
         ddq_j = jointAcc(obj, tau, q_j, dq_j, stFltb)
 

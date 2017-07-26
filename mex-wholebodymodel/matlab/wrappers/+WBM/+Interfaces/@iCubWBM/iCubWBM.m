@@ -84,11 +84,11 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             stFltb = obj.mwbm_icub.getFloatingBaseState();
         end
 
-        function feet_conf = getFeetConfig(obj, varargin)
+        function feet_conf = feetConfig(obj, varargin)
             feet_conf = obj.mwbm_icub.feetConfigState(varargin{:});
         end
 
-        function hand_conf = getHandConfig(obj, varargin)
+        function hand_conf = handConfig(obj, varargin)
             hand_conf = obj.mwbm_icub.handConfigState(varargin{:});
         end
 
@@ -108,7 +108,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                                                         stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAcceFHPC(obj, tau, fe_h, q_j, dq_j, stFltb) % FHPC ... feet & hand pose correction
+        function ddq_j = jointAccFHPC(obj, tau, fe_h, q_j, dq_j, stFltb) % FHPC ... feet & hand pose correction
             if (nargin == 5)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
