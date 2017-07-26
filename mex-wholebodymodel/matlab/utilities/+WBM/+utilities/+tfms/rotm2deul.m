@@ -1,5 +1,5 @@
 function de = rotm2deul(rotm, omega, sequence)
-    if ~exist('sequence', 'var')
+    if (nargin ~= 3)
         % use the default sequence ...
         sequence = 'ZYX';
     end

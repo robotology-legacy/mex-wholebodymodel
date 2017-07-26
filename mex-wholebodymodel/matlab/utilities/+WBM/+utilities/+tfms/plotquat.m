@@ -1,5 +1,5 @@
 function plotquat(vqT, twait)
-    if ~exist('twait', 'var')
+    if (nargin ~= 2)
         % use the default time duration of waiting (in seconds) ...
         twait = 0.0005;
     end

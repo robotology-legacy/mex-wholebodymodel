@@ -1,7 +1,7 @@
 function B = eul2angVelTF(eul, sequence)
     WBM.utilities.chkfun.checkCVecDim(eul, 3, 'eul2angVelTF');
 
-    if ~exist('sequence', 'var')
+    if (nargin ~= 2)
         % use the default sequence ...
         sequence = 'ZYX';
     end

@@ -73,15 +73,15 @@ sim_config = initSimConfig_iCub();           % shows the simulation with a light
 %sim_config = initSimConfig_iCub('DarkScn'); % optional, shows the simulation with a dark scene.
 sim_config = wbm_icub.setupSimulation(sim_config);
 x_out = wbm_icub.getPositionsData(chi);
-% show and repeat the simulation 10 times ...
-nRpts = 3;
+% show and repeat the simulation 2 times ...
+nRpts = 2;
 wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:
 wbm_icub.plotCoMTrajectory(chi);
 
-% get the visualization-data from the forward dynamics integration for plots and animations:
-vis_data = wbm_icub.getFDynVisualizationData(chi, fhTrqControl);
+% get the visualization data of the forward dynamics integration for plots and animations:
+vis_data = wbm_icub.getFDynVisData(chi, fhTrqControl);
 
 % alternatively, or if you have to plot other parameter values, use e.g.:
 %stp = wbm_icub.getStateParams(chi);

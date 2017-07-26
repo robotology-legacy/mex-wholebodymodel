@@ -3,7 +3,7 @@ function [jnt_names, ndof] = getJointNamesFromURDF(urdf_file_name, jnt_type)
         error('getJointNamesFromURDF: %s', WBM.wbmErrorMsg.EMPTY_STRING);
     end
 
-    if ~exist('jnt_type', 'var')
+    if (nargin ~= 2)
         % set 'revolute' as default type ...
         jnt_type = 'revolute';
     elseif ~find(strcmp(jnt_type, {'revolute', 'prismatic', 'fixed'}), 1)

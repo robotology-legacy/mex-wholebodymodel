@@ -86,6 +86,6 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, ta
         fe_0 = zeroExtForces(obj, feet_conf);
         f_e = vertcat(fe_0, fe_h);
         a_c = vertcat(ac_f, ac_h);
-        fd_prms = struct('tau_gen', a_prms.tau_gen, 'f_c', f_c, 'f_e', f_e, 'a_c', a_c);
+        fd_prms = struct('tau_gen', a_prms.tau_gen, 'f_c', f_c, 'a_c', a_c, 'f_e', f_e);
     end
 end

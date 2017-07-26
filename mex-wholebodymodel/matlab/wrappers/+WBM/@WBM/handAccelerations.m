@@ -21,7 +21,7 @@ function [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, vara
         return
     end
 
-    feet_data = true;
+    f_data = true;
     switch nargin
         case 11
             if iscolumn(varargin{1,4})
@@ -48,7 +48,7 @@ function [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, vara
                 nu      = varargin{1,7};
 
                 [Jc_h, djcdq_h] = contactJacobians(obj, hand_idx_list);
-                feet_data = false;
+                f_data = false;
             end
         case 7
             % optimized mode:
@@ -73,7 +73,7 @@ function [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, vara
 
     if (nargout == 2)
         % data structure of the calculated acceleration parameters:
-        if feet_data
+        if f_data
             % with feet data Jc_f, djcdq_f, M and c_qv ...
             a_prms = struct('M', M, 'c_qv', c_qv, 'Jc_f', Jc_f, 'Jc_h', Jc_h, 'djcdq_f', djcdq_f, ...
                             'djcdq_h', djcdq_h, 'fc_f', fc_f, 'tau_gen', tau_gen);

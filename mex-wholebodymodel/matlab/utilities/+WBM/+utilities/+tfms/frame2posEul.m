@@ -1,5 +1,5 @@
 function [pos, eul] = frame2posEul(vqT, sequence)
-     if ~exist('sequence', 'var')
+    if (nargin ~= 2)
         % use the default sequence ...
         sequence = 'ZYX';
     end

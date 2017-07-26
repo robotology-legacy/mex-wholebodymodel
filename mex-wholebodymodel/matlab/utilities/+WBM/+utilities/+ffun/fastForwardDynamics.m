@@ -59,7 +59,7 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
     b_omega_wf = b_R_wf * wf_omega_b;
     dqt_b      = WBM.utilities.tfms.dquat(stp.qt_b, b_omega_wf);
 
-    % new mixed generalized velocity ...
+    % new mixed generalized velocity vector ...
     nu = vertcat(stp.dx_b, dqt_b, stp.dq_j);
     % Joint Acceleration nu_dot = q_ddot (derived from the state-space equation):
     % For further details see:

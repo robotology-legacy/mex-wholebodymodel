@@ -1,7 +1,7 @@
-function de = tform2deul(tform, omega)
+function de = tform2deul(tform, omega, sequence)
     WBM.utilities.chkfun.checkMatDim(tform, 4, 4, 'tform2deul');
 
-    if ~exist('sequence', 'var')
+    if (nargin ~= 3)
         % use the default axis sequence ...
         sequence = 'ZYX';
     end

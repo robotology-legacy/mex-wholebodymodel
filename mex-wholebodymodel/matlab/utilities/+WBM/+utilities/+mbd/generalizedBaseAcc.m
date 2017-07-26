@@ -23,7 +23,7 @@ function dv_b = generalizedBaseAcc(M, c_qv, ddq_j, ndof)
     %       p. 119, eq. (7.1) & (7.2).
     %
     % Author: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
-    if exist('ndof', 'var')
+    if (nargin == 4)
         n = ndof + 6;
     else
         n = size(M,2);

@@ -1,7 +1,7 @@
 function eul = quat2eul(quat, sequence)
     WBM.utilities.chkfun.checkCVecDim(quat, 4, 'quat2eul');
 
-    if ~exist('sequence', 'var')
+    if (nargin ~= 2)
         % use the default axis sequence ...
         sequence = 'ZYX';
     end

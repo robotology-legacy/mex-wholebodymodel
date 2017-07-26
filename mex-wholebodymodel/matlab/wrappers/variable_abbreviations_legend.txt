@@ -7,6 +7,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     R          ...  rotation (matrix)
     T, TF      ...  transformation (vector/matrix)
     X          ...  adjoint transformation (matrix)
+    acc        ...  acceleration(s)
     adj        ...  adjacency (matrix)
     arT        ...  angle rate transformation (matrix)
     arr        ...  array
@@ -19,17 +20,22 @@ Legend of abbreviations and acronyms which are used for the variable names:
     c...       ...  cell array (begin of variable name)
     cX         ...  co-adjoint transformation (matrix)
     ccstr      ...  contact constraint
+    cent       ...  centroidal
+    centf      ...  centrifugal OR centrifugal force(s)
     cfrict     ...  Coulomb friction
     chn        ...  chain
     chnt       ...  chain tree
     clink, cl  ...  contact link
+    clnk       ...  contact link
     clp        ...  contact link pose
     cm         ...  center of mass
     cmo        ...  column major order
     cmp        ...  compare
+    cntfgl     ...  centrifugal
     cols       ...  columns
     config     ...  configuration
-    cs         ...  contact state
+    cor        ...  Coriolis
+    cstate, cs ...  contact state
     cstr       ...  constraint
     ctc        ...  contact
     ctrl, ctr  ...  control
@@ -53,8 +59,10 @@ Legend of abbreviations and acronyms which are used for the variable names:
     fltb       ...  floating base
     frict      ...  friction
     frm        ...  frame
+    fwd        ...  forward
     fwnd       ...  figure window
     g          ...  gravity acceleration (vector)
+    gen        ...  generalized
     h...       ...  "handle" to an object (begin of variable name), e.g. hFig = handle to the figure object
     ..._h      ...  "hat" (end of variable name), 'h' declares that this variable is an unit vector of length 1, e.g. "f1_h", "fcp_h", etc.
     h_c        ...  centroidal momentum (vector)
@@ -76,6 +84,8 @@ Legend of abbreviations and acronyms which are used for the variable names:
     lwr        ...  lower
     m...       ...  "member" (begin of variable name), 'm' declares that this variable is a private member variable, e.g. "mwbm", "mstv", etc.
     ...m       ...  "matrix" (end of variable name), like "skewm", "adjointm", etc.
+    mat        ...  matrix
+    mom        ...  moment/momentum
     mult       ...  multiplier(s)
     ndof       ...  number degrees of freedom
     nflds      ...  number of fields
@@ -93,8 +103,9 @@ Legend of abbreviations and acronyms which are used for the variable names:
     param, prm ...  parameter
     params     ...  parameters
     pcstr...   ...  pointer to a constant null-terminated string (begin of variable name, C++)
-    pl         ...  payload
+    pl, pld    ...  payload
     plds       ...  payloads
+    pload      ...  payload
     pos        ...  position(s)
     pris       ...  prismatic
     prms       ...  parameters

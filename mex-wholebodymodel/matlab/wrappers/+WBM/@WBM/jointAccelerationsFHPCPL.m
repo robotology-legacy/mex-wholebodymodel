@@ -92,6 +92,6 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, 
     if (nargout == 2)
         % data structure of the calculated forward dynamics parameters ...
         a_c = vertcat(ac_f, ac_h);
-        fd_prms = struct('tau_gen', a_prms.tau_gen, 'f_c', f_c, 'f_pl', f_pl, 'a_c', a_c);
+        fd_prms = struct('tau_gen', a_prms.tau_gen, 'f_c', f_c, 'a_c', a_c, 'f_pl', f_pl);
     end
 end

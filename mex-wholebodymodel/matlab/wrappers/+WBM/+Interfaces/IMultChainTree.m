@@ -20,7 +20,9 @@ classdef (Abstract) IMultChainTree < handle
     end
 
     methods(Abstract)
-        [q_j, dq_j, wf_H_b, v_b] = getstate(bot);
+        [q_j, dq_j, wf_H_b, v_b] = getstate(bot)
+
+        setcontact(bot, ctc_mode, varargin) % for closed-loop & non-closed loop contacts
 
         ddq_j = accel(bot, q_j, dq_j, tau)
 
@@ -52,9 +54,9 @@ classdef (Abstract) IMultChainTree < handle
 
         Mx = cinertia(bot, q_j)
 
-        payload(bot, pl_data);
+        payload(bot, pl_data)
 
-        f_pl = pay(bot, fhTotCWrench, f_cp, tau, q_j, dq_j);
+        f_pl = pay(bot, fhTotCWrench, f_cp, tau, q_j, dq_j)
 
         resv = islimit(bot, q_j)
 

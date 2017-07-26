@@ -1,7 +1,7 @@
 function eul = rotm2eul(rotm, sequence)
     WBM.utilities.chkfun.checkMatDim(rotm, 3, 3, 'rotm2eul');
 
-    if ~exist('sequence', 'var')
+    if (nargin ~= 2)
         % use the default axis sequence ...
         sequence = 'ZYX';
     end

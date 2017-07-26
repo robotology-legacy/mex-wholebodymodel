@@ -41,7 +41,7 @@ fhTrqControl = @(t, M, c_qv, stp, nu, Jc, djcdq, feet_conf)zeroTrqsController(si
 %       function with feet pose correction (FPC). It defines the current feet pose and
 %       on which foot the legged robot is currently in contact with the ground.
 feet_on_ground = [true, true]; % [l_foot, r_foot]
-feet_conf = wbm_icub.setFeetConfigState(qj_init, feet_on_ground);
+feet_conf = wbm_icub.feetConfigState(feet_on_ground, qj_init);
 
 %% ODE-Solver:
 %  Setup the function handle of the form f(t,chi), where chi refers to the dynamic state
@@ -76,9 +76,13 @@ sim_config = initSimConfig_iCub_32dof(icub_model.urdf_robot_name);           % s
 %sim_config = initSimConfig_iCub_atf(icub_model.urdf_robot_name, 'DarkScn'); % optional, shows the simulation with a dark scene.
 sim_config = wbm_icub.setupSimulation(sim_config);
 x_out = wbm_icub.getPositionsData(chi);
-% show and repeat the simulation 10 times ...
+% show and repeat the simulation 2 times ...
 nRpts = 2;
 wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:
 wbm_icub.plotCoMTrajectory(chi);
+
+% get the visualization data of the forward dynamics integration for plots and animations:
+fe_0 = wbm_icub.zeroExtForces(feet_conf);
+vis_data = wbm_icub.getFDynVisData(chi, fhTrqControl, feet_conf, fe_0, ac_0);

@@ -1,7 +1,7 @@
 function rotm = eul2rotm(eul, sequence)
     WBM.utilities.chkfun.checkCVecDim(eul, 3, 'eul2rotm');
 
-    if ~exist('sequence', 'var')
+    if (nargin ~= 2)
         % use the default axis sequence ...
         sequence = 'ZYX';
     end

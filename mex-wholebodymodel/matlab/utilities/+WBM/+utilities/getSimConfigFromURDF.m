@@ -3,7 +3,7 @@ function [jnt_lnk_names, nLnks, jnt_pair_idx, nJntPairs, shp_size_sf, foot_jnt_i
         error('getSimConfigFromURDF: %s', WBM.wbmErrorMsg.EMPTY_STRING);
     end
 
-    if ~exist('sf', 'var')
+    if (nargin ~= 3)
         % use the default scale factor for the shape sizes ...
         sf = 0.03;
     end

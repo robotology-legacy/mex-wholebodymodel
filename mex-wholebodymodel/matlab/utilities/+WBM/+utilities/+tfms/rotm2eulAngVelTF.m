@@ -1,5 +1,5 @@
 function [eul, B] = rotm2eulAngVelTF(rotm, sequence)
-    if ~exist('sequence', 'var')
+    if (nargin ~= 2)
         % use the default sequence ...
         sequence = 'ZYX';
     end

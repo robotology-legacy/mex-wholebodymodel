@@ -3,7 +3,7 @@ function result = isNormalized(v, epsilon)
         error('isNormalized: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
 
-    if ~exist('epsilon', 'var')
+    if (nargin ~= 2)
         epsilon = 1e-12; % min. value to treat a number as zero ...
     end
 

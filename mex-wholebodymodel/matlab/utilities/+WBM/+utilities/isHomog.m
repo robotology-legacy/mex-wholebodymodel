@@ -1,7 +1,7 @@
 function result = isHomog(tform, epsilon)
     WBM.utilities.chkfun.checkMatDim(tform, 4, 4, 'isHomog');
 
-    if ~exist('epsilon', 'var')
+    if (nargin ~= 2)
         epsilon = 1e-12; % min. value to treat a number as zero ...
     end
 

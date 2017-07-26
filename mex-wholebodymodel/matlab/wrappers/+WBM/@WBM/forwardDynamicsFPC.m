@@ -14,21 +14,10 @@ function dstvChi = forwardDynamicsFPC(obj, t, stvChi, fhTrqControl, feet_conf, a
     % get the current control torques from the controller ...
     tau = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_f, djcdq_f, feet_conf);
 
-    % get the rotation matrix from the VQ-transformation (from 'base' to 'world frame') ...
-    vqT_b = obj.vqT_base;
-    [~,wf_R_b] = WBM.utilities.tfms.frame2posRotm(vqT_b);
-
-    % We need to apply the world-to-base rotation b_R_wf to the spatial angular
-    % velocity wf_omega_b to obtain the angular velocity b_omega_wf in the base
-    % body frame. This is then used in the quaternion derivative computation:
-    b_R_wf = wf_R_b.';
-    b_omega_wf = b_R_wf * wf_omega_b;
-    dqt_b      = WBM.utilities.tfms.dquat(stp.qt_b, b_omega_wf);
-
-    % new mixed generalized velocity ...
-    nu = vertcat(stp.dx_b, dqt_b, stp.dq_j);
+    % new mixed generalized velocity vector ...
+    nu  = fdynNewMixedVelocities(obj, stp.qt_b, stp.dx_b, wf_omega_b, stp.dq_j);
     % joint acceleration dnu = ddq_j (optimized mode):
-    dnu = jointAccelerationsFPC(obj, feet_conf, tau, ac_f, Jc_f, ...
-                                djcdq_f, M, c_qv, stp.dq_j, nu_s);
+    dnu = jointAccelerationsFPC(obj, feet_conf, tau, ac_f, Jc_f, djcdq_f, ...
+                                M, c_qv, stp.dq_j, nu_s);
     dstvChi = vertcat(nu, dnu);
 end

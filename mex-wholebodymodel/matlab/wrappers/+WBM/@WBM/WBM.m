@@ -166,8 +166,8 @@ classdef WBM < WBM.WBMBase
         [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, djcdq, M, c_qv, varargin) % CLPC ... contact link pose correction
 
         function [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clink_conf, varargin) % in dependency of the contact state (CS)
-            ctc_l = clink_conf.contact.left;
-            ctc_r = clink_conf.contact.right;
+            ctc_l = clink_conf.contact.left;  % CS-left
+            ctc_r = clink_conf.contact.right; % CS-right
             % wf_R_b_arr = varargin{1}
             % wf_p_b     = varargin{2}
             % q_j        = varargin{3}
@@ -268,7 +268,7 @@ classdef WBM < WBM.WBMBase
             ddq_j = jointAccelerationsCLPC(obj, feet_conf, tau, fe_0, ac_f, varargin{:});
         end
 
-        function [ddq_j, fd_prms] = jointAccelerationsHPC(obj, hand_conf, tau, fe_h, ac_h, varargin) % HPC  ... hand pose correction
+        function [ddq_j, fd_prms] = jointAccelerationsHPC(obj, hand_conf, tau, fe_h, ac_h, varargin) % HPC ... hand pose correction
             if (nargout == 2)
                 [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, hand_conf, tau, fe_h, ac_h, varargin{:});
                 return
@@ -277,7 +277,7 @@ classdef WBM < WBM.WBMBase
             ddq_j = jointAccelerationsCLPC(obj, hand_conf, tau, fe_h, ac_h, varargin{:});
         end
 
-        [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, tau, fe_h, varargin) % FHPC  ... feet & hand pose correction
+        [ddq_j, fd_prms] = jointAccelerationsFHPC(obj, feet_conf, hand_conf, tau, fe_h, varargin) % FHPC ... feet & hand pose correction
 
         [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % FHPCPL ... feet & hand pose correction with payload
 
@@ -319,31 +319,33 @@ classdef WBM < WBM.WBMBase
             end
         end
 
-        clink_conf = setCLinkConfigState(obj, clnk_idx_l, clnk_idx_r, varargin)
+        clink_conf = ctcLinksConfigState(obj, varargin)
 
-        function feet_conf = setFeetConfigState(obj, varargin)
+        function feet_conf = feetConfigState(obj, cstate, varargin)
             lfoot_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'l_sole'));
             rfoot_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'r_sole'));
 
             if ( isempty(lfoot_idx) || isempty(rfoot_idx) )
-                error('WBM::setFeetConfigState: %s', WBM.wbmErrorMsg.LNK_NOT_IN_LIST);
+                error('WBM::feetConfigState: %s', WBM.wbmErrorMsg.LNK_NOT_IN_LIST);
             end
+            feet_idx = horzcat(lfoot_idx, rfoot_idx);
 
-            feet_conf = setCLinkConfigState(obj, lfoot_idx, rfoot_idx, varargin{:});
+            feet_conf = ctcLinksConfigState(obj, cstate, feet_idx, varargin{:});
         end
 
-        function hand_conf = setHandConfigState(obj, varargin)
+        function hand_conf = handConfigState(obj, cstate, varargin)
             lhand_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'l_hand'));
             rhand_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'r_hand'));
 
             if ( isempty(lhand_idx) || isempty(rhand_idx) )
-                error('WBM::setHandConfigState: %s', WBM.wbmErrorMsg.LNK_NOT_IN_LIST);
+                error('WBM::handConfigState: %s', WBM.wbmErrorMsg.LNK_NOT_IN_LIST);
             end
+            hand_idx = horzcat(lhand_idx, rhand_idx);
 
-            hand_conf = setCLinkConfigState(obj, lhand_idx, rhand_idx, varargin{:});
+            hand_conf = ctcLinksConfigState(obj, cstate, hand_idx, varargin{:});
         end
 
-        vis_data = getFDynVisualizationData(obj, stmChi, fhTrqControl, varargin)
+        vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
 
         sim_config = setupSimulation(~, sim_config)
 
@@ -753,7 +755,8 @@ classdef WBM < WBM.WBMBase
                     end
 
                     if (nargin == 2)
-                        [~,q_j,~,dq_j] = getState(obj); % get the current state values ...
+                        % get the current state values ...
+                        [~,q_j,~,dq_j] = mexWholeBodyModel('get-state');
                     end
 
                     len = length(chain_names);
@@ -794,7 +797,8 @@ classdef WBM < WBM.WBMBase
                     end
 
                     if (nargin == 2)
-                        [~,q_j,~,dq_j] = getState(obj); % get the state values ...
+                        % get the state values ...
+                        [~,q_j,~,dq_j] = mexWholeBodyModel('get-state');
                     end
                     len = length(joint_names);
 
@@ -822,7 +826,8 @@ classdef WBM < WBM.WBMBase
                     end
 
                     if (nargin == 2)
-                        [~,q_j,~,dq_j] = getState(obj); % get the values ...
+                        % get the values ...
+                        [~,q_j,~,dq_j] = mexWholeBodyModel('get-state');
                     end
                     len = length(joint_idx);
 
@@ -949,8 +954,8 @@ classdef WBM < WBM.WBMBase
             len = obj.mwbm_config.stvLen;
         end
 
-        function vqT_b = get.vqT_base(obj)
-            [vqT_b,~,~,~] = getState(obj);
+        function vqT_b = get.vqT_base(~)
+            [vqT_b,~,~,~] = mexWholeBodyModel('get-state');
         end
 
         function vqT_b = get.init_vqT_base(obj)
@@ -1179,6 +1184,22 @@ classdef WBM < WBM.WBMBase
                 otherwise
                     error('WBM::wholeBodyDyn: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
+        end
+
+        function nu = fdynNewMixedVelocities(~, qt_b, dx_b, wf_omega_b, dq_j)
+            % get the rotation matrix of the current VQ-transformation (base-to-world):
+            [vqT_b,~,~,~] = mexWholeBodyModel('get-state');
+            [~,wf_R_b] = WBM.utilities.tfms.frame2posRotm(vqT_b);
+
+            % We need to apply the world-to-base rotation b_R_wf to the spatial angular
+            % velocity wf_omega_b to obtain the angular velocity b_omega_wf in the base
+            % body frame. This is then used in the quaternion derivative computation:
+            b_R_wf = wf_R_b.';
+            b_omega_wf = b_R_wf * wf_omega_b;
+            dqt_b      = WBM.utilities.tfms.dquat(qt_b, b_omega_wf);
+
+            % new mixed generalized velocity vector ...
+            nu = vertcat(dx_b, dqt_b, dq_j);
         end
 
     end

@@ -11373,6 +11373,35 @@
 										},
 										{
 											"_type": "UMLOperationView",
+											"_id": "AAAAAAFdeMiRcnNb/aQ=",
+											"_parent": {
+												"$ref": "AAAAAAFPyz7/UkeY3as="
+											},
+											"model": {
+												"$ref": "AAAAAAFdeMiRRHNYtno="
+											},
+											"visible": true,
+											"enabled": true,
+											"lineColor": "#000000",
+											"fillColor": "#ffff91",
+											"fontColor": "#000000",
+											"font": "Arial;13;0",
+											"showShadow": true,
+											"containerChangeable": false,
+											"containerExtending": false,
+											"left": 871,
+											"top": 2858,
+											"width": 1478,
+											"height": 13,
+											"autoResize": false,
+											"underline": false,
+											"text": "+ctcLinksConfigState(out clink_conf: struct, obj)",
+											"horizontalAlignment": 0,
+											"verticalAlignment": 5,
+											"wordWrap": false
+										},
+										{
+											"_type": "UMLOperationView",
 											"_id": "AAAAAAFbOMLZKniCrbA=",
 											"_parent": {
 												"$ref": "AAAAAAFPyz7/UkeY3as="
@@ -11390,12 +11419,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 2858,
+											"top": 2873,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setCLinkConfigState(out clink_conf: struct, obj, clink_l: string, clink_r: string, q_j: vector, contact: logical[2])",
+											"text": "+ctcLinksConfigState(out clink_conf: struct, obj, cstate: logical[2], clnk_idx: integer[1..2], q_j: vector)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11419,12 +11448,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 2873,
+											"top": 2888,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setCLinkConfigState(out clink_conf: struct, obj, clink_l: string, clink_r: string, q_j: vector, contact: logical[2], k_p: double)",
+											"text": "+ctcLinksConfigState(out clink_conf: struct, obj, cstate: logical[2], clnk_idx: integer[1..2], q_j: vector, k_p: double)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11448,12 +11477,41 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 2888,
+											"top": 2903,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setCLinkConfigState(out clink_conf: struct, obj, clink_l: string, clink_r: string, q_j: vector, contact: logical[2], k_p: double, k_v: double)",
+											"text": "+ctcLinksConfigState(out clink_conf: struct, obj, cstate: logical[2], clnk_idx: integer[1..2], q_j: vector, k_p: double, k_v: double)",
+											"horizontalAlignment": 0,
+											"verticalAlignment": 5,
+											"wordWrap": false
+										},
+										{
+											"_type": "UMLOperationView",
+											"_id": "AAAAAAFdeMiNpHLyS6U=",
+											"_parent": {
+												"$ref": "AAAAAAFPyz7/UkeY3as="
+											},
+											"model": {
+												"$ref": "AAAAAAFdeMiNb3LvNn8="
+											},
+											"visible": true,
+											"enabled": true,
+											"lineColor": "#000000",
+											"fillColor": "#ffff91",
+											"fontColor": "#000000",
+											"font": "Arial;13;0",
+											"showShadow": true,
+											"containerChangeable": false,
+											"containerExtending": false,
+											"left": 871,
+											"top": 2918,
+											"width": 1478,
+											"height": 13,
+											"autoResize": false,
+											"underline": false,
+											"text": "+ctcLinksConfigState(out clink_conf: struct, obj, cstate: logical[2], clnk_idx: integer[2], veT_lnk: matrix, k_p: double, k_v: double)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11477,12 +11535,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 2903,
+											"top": 2933,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setCLinkConfigState(out clink_conf: struct, obj, clink_l: string, clink_r: string, q_j: vector, veT_ll: vector, veT_rl: vector, contact: logical[2], k_p: double, k_v: double)",
+											"text": "+ctcLinksConfigState(out clink_conf: struct, obj, cstate: logical[2], clnk_idx: integer, veT_lnk: vector, k_p: double, k_v: double)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11506,12 +11564,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 2918,
+											"top": 2948,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setFeetConfigState(out feet_conf: struct, obj, q_j: vector, contact: logical[2])",
+											"text": "+feetConfigState(out feet_conf: struct, obj, cstate: logical[2], q_j: vector)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11535,12 +11593,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 2933,
+											"top": 2963,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setFeetConfigState(out feet_conf: struct, obj, q_j: vector, contact: logical[2], k_p: double)",
+											"text": "+feetConfigState(out feet_conf: struct, obj, cstate: logical[2], q_j: vector, k_p: double)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11564,12 +11622,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 2948,
+											"top": 2978,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setFeetConfigState(out feet_conf: struct, obj, q_j: vector, contact: logical[2], k_p: double, k_v: double)",
+											"text": "+feetConfigState(out feet_conf: struct, obj, cstate: logical[2], q_j: vector, k_p: double, k_v: double)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11593,12 +11651,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 2963,
+											"top": 2993,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setFeetConfigState(out feet_conf: struct, obj, q_j: vector, veT_ll: vector, veT_rl: vector, contact: logical[2], k_p: double, k_v: double)",
+											"text": "+feetConfigState(out feet_conf: struct, obj, cstate: logical[2], veT_lnk: matrix, k_p: double, k_v: double)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11622,12 +11680,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 2978,
+											"top": 3008,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setHandConfigState(out hand_conf: struct, obj, q_j: vector, contact: logical[2])",
+											"text": "+handConfigState(out hand_conf: struct, obj, cstate: logical[2], q_j: vector)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11651,12 +11709,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 2993,
+											"top": 3023,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setHandConfigState(out hand_conf: struct, obj, q_j: vector, contact: logical[2], k_p: double)",
+											"text": "+handConfigState(out hand_conf: struct, obj, cstate: logical[2], q_j: vector, k_p: double)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11680,12 +11738,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3008,
+											"top": 3038,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setHandConfigState(out hand_conf: struct, obj, q_j: vector, contact: logical[2], k_p: double, k_v: double)",
+											"text": "+handConfigState(out hand_conf: struct, obj, cstate: logical[2], q_j: vector, k_p: double, k_v: double)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11709,12 +11767,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3023,
+											"top": 3053,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+setHandConfigState(out hand_conf: struct, obj, q_j: vector, veT_ll: vector, veT_rl: vector, contact: logical[2], k_p: double, k_v: double)",
+											"text": "+handConfigState(out hand_conf: struct, obj, cstate: logical[2], veT_lnk: matrix, q_j: vector, k_p: double, k_v: double)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11738,12 +11796,99 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3038,
+											"top": 3068,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+getFDynVisualizationData(out vis_data: struct, obj, stmChi: matrix, fhTrqControl: function_handle, clink_conf: struct)",
+											"text": "+getFDynVisualizationData(out vis_data: struct, obj, stmChi: matrix, fhTrqControl: function_handle)",
+											"horizontalAlignment": 0,
+											"verticalAlignment": 5,
+											"wordWrap": false
+										},
+										{
+											"_type": "UMLOperationView",
+											"_id": "AAAAAAFdgETL9PSchiI=",
+											"_parent": {
+												"$ref": "AAAAAAFPyz7/UkeY3as="
+											},
+											"model": {
+												"$ref": "AAAAAAFdgETLyvSZNPo="
+											},
+											"visible": true,
+											"enabled": true,
+											"lineColor": "#000000",
+											"fillColor": "#ffff91",
+											"fontColor": "#000000",
+											"font": "Arial;13;0",
+											"showShadow": true,
+											"containerChangeable": false,
+											"containerExtending": false,
+											"left": 871,
+											"top": 3083,
+											"width": 1478,
+											"height": 13,
+											"autoResize": false,
+											"underline": false,
+											"text": "+getFDynVisualizationData(out vis_data: struct, obj, stmChi: matrix, fhTrqControl: function_handle, clink_conf: struct, f_e: vector, a_c: vector)",
+											"horizontalAlignment": 0,
+											"verticalAlignment": 5,
+											"wordWrap": false
+										},
+										{
+											"_type": "UMLOperationView",
+											"_id": "AAAAAAFdgETPwPUFLPo=",
+											"_parent": {
+												"$ref": "AAAAAAFPyz7/UkeY3as="
+											},
+											"model": {
+												"$ref": "AAAAAAFdgETPkvUCr3U="
+											},
+											"visible": true,
+											"enabled": true,
+											"lineColor": "#000000",
+											"fillColor": "#ffff91",
+											"fontColor": "#000000",
+											"font": "Arial;13;0",
+											"showShadow": true,
+											"containerChangeable": false,
+											"containerExtending": false,
+											"left": 871,
+											"top": 3098,
+											"width": 1478,
+											"height": 13,
+											"autoResize": false,
+											"underline": false,
+											"text": "+getFDynVisualizationData(out vis_data: struct, obj, stmChi: matrix, fhTrqControl: function_handle, feet_conf: struct, hand_conf: struct, fe_h: vector, ac_f: vector)",
+											"horizontalAlignment": 0,
+											"verticalAlignment": 5,
+											"wordWrap": false
+										},
+										{
+											"_type": "UMLOperationView",
+											"_id": "AAAAAAFdgETHZ/Qzm60=",
+											"_parent": {
+												"$ref": "AAAAAAFPyz7/UkeY3as="
+											},
+											"model": {
+												"$ref": "AAAAAAFdgETHOfQwFlY="
+											},
+											"visible": true,
+											"enabled": true,
+											"lineColor": "#000000",
+											"fillColor": "#ffff91",
+											"fontColor": "#000000",
+											"font": "Arial;13;0",
+											"showShadow": true,
+											"containerChangeable": false,
+											"containerExtending": false,
+											"left": 871,
+											"top": 3113,
+											"width": 1478,
+											"height": 13,
+											"autoResize": false,
+											"underline": false,
+											"text": "+getFDynVisualizationData(out vis_data: struct, obj, stmChi: matrix, fhTrqControl: function_handle, fhTotCWrench: function_handle, feet_conf: struct, hand_conf: struct, f_cp: vector, ac_f: vector)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -11767,7 +11912,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3053,
+											"top": 3128,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -11796,7 +11941,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3068,
+											"top": 3143,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -11825,7 +11970,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3083,
+											"top": 3158,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -11854,7 +11999,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3098,
+											"top": 3173,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -11883,7 +12028,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3113,
+											"top": 3188,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -11912,7 +12057,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3128,
+											"top": 3203,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -11941,7 +12086,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3143,
+											"top": 3218,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -11970,7 +12115,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3158,
+											"top": 3233,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -11999,7 +12144,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3173,
+											"top": 3248,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12028,7 +12173,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3188,
+											"top": 3263,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12057,7 +12202,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3203,
+											"top": 3278,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12086,7 +12231,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3218,
+											"top": 3293,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12115,7 +12260,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3233,
+											"top": 3308,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12144,7 +12289,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3248,
+											"top": 3323,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12173,7 +12318,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3263,
+											"top": 3338,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12202,7 +12347,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3278,
+											"top": 3353,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12231,7 +12376,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3293,
+											"top": 3368,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12260,7 +12405,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3308,
+											"top": 3383,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12289,7 +12434,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3323,
+											"top": 3398,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12318,7 +12463,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3338,
+											"top": 3413,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12347,7 +12492,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3353,
+											"top": 3428,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12376,7 +12521,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3368,
+											"top": 3443,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12405,7 +12550,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3383,
+											"top": 3458,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12434,7 +12579,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3398,
+											"top": 3473,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12463,7 +12608,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3413,
+											"top": 3488,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12492,7 +12637,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3428,
+											"top": 3503,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12521,7 +12666,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3443,
+											"top": 3518,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12550,7 +12695,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3458,
+											"top": 3533,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12579,7 +12724,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3473,
+											"top": 3548,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12608,7 +12753,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3488,
+											"top": 3563,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12637,7 +12782,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3503,
+											"top": 3578,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12666,7 +12811,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3518,
+											"top": 3593,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12695,7 +12840,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3533,
+											"top": 3608,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12724,7 +12869,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3548,
+											"top": 3623,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12753,7 +12898,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3563,
+											"top": 3638,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12782,7 +12927,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3578,
+											"top": 3653,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12811,7 +12956,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3593,
+											"top": 3668,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12840,7 +12985,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3608,
+											"top": 3683,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12869,7 +13014,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3623,
+											"top": 3698,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12898,7 +13043,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3638,
+											"top": 3713,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12927,7 +13072,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3653,
+											"top": 3728,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12956,7 +13101,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3668,
+											"top": 3743,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -12985,7 +13130,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3683,
+											"top": 3758,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13014,12 +13159,12 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3698,
+											"top": 3773,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+get.vqT_base(out vqT_b: vector, obj)",
+											"text": "+get.vqT_base(out vqT_b: vector)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -13043,7 +13188,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3713,
+											"top": 3788,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13072,7 +13217,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3728,
+											"top": 3803,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13101,7 +13246,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3743,
+											"top": 3818,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13130,7 +13275,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3758,
+											"top": 3833,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13159,7 +13304,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3773,
+											"top": 3848,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13188,7 +13333,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3788,
+											"top": 3863,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13217,7 +13362,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3803,
+											"top": 3878,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13246,7 +13391,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3818,
+											"top": 3893,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13275,7 +13420,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3833,
+											"top": 3908,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13304,7 +13449,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3848,
+											"top": 3923,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13333,7 +13478,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3863,
+											"top": 3938,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13362,7 +13507,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3878,
+											"top": 3953,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13391,7 +13536,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3893,
+											"top": 3968,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13420,7 +13565,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3908,
+											"top": 3983,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13449,7 +13594,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3923,
+											"top": 3998,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13478,7 +13623,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3938,
+											"top": 4013,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
@@ -13507,12 +13652,41 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 871,
-											"top": 3953,
+											"top": 4028,
 											"width": 1478,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
 											"text": "-wholeBodyDyn(out M: matrix, out c_qv: vector, wf_R_b_arr: vector, wf_p_b: vector, q_j: vector, dq_j: vector, v_b: vector)",
+											"horizontalAlignment": 0,
+											"verticalAlignment": 5,
+											"wordWrap": false
+										},
+										{
+											"_type": "UMLOperationView",
+											"_id": "AAAAAAFdb/H/DYAWWbI=",
+											"_parent": {
+												"$ref": "AAAAAAFPyz7/UkeY3as="
+											},
+											"model": {
+												"$ref": "AAAAAAFdb/H+n4ATSaA="
+											},
+											"visible": true,
+											"enabled": true,
+											"lineColor": "#000000",
+											"fillColor": "#ffff91",
+											"fontColor": "#000000",
+											"font": "Arial;13;0",
+											"showShadow": true,
+											"containerChangeable": false,
+											"containerExtending": false,
+											"left": 871,
+											"top": 4043,
+											"width": 1478,
+											"height": 13,
+											"autoResize": false,
+											"underline": false,
+											"text": "-fdynNewMixedVelocities(out nu: vector, qt_b: vector, dx_b: vector, wf_omega_b: vector, dq_j: vector)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -13530,7 +13704,7 @@
 									"left": 866,
 									"top": 1728,
 									"width": 1488,
-									"height": 2243,
+									"height": 2333,
 									"autoResize": false
 								},
 								{
@@ -13594,7 +13768,7 @@
 							"left": 866,
 							"top": 1500,
 							"width": 1488,
-							"height": 2471,
+							"height": 2561,
 							"autoResize": false,
 							"stereotypeDisplay": "label",
 							"showVisibility": true,
@@ -14677,7 +14851,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+jpos_left_feet: vector",
+											"text": "+jpos_left_foot: vector",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -14793,7 +14967,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+jpos_right_feet: vector",
+											"text": "+jpos_right_foot: vector",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -27645,7 +27819,7 @@
 									"containerChangeable": false,
 									"containerExtending": false,
 									"left": 2447,
-									"top": 3993,
+									"top": 4083,
 									"width": 0,
 									"height": 13,
 									"autoResize": false,
@@ -27679,7 +27853,7 @@
 									"containerChangeable": false,
 									"containerExtending": false,
 									"left": 1566,
-									"top": 4002,
+									"top": 4092,
 									"width": 35,
 									"height": 13,
 									"autoResize": false,
@@ -27714,7 +27888,7 @@
 									"containerChangeable": false,
 									"containerExtending": false,
 									"left": 2477,
-									"top": 3994,
+									"top": 4084,
 									"width": 0,
 									"height": 13,
 									"autoResize": false,
@@ -27746,7 +27920,7 @@
 								"$ref": "AAAAAAFTEtPLMGv58w8="
 							},
 							"lineStyle": 2,
-							"points": "702:2792;702:4000;2462:4000;2462:1976;2596:1976",
+							"points": "702:2792;702:4090;2462:4090;2462:1976;2596:1976",
 							"stereotypeDisplay": "label",
 							"showVisibility": true,
 							"showProperty": true,
@@ -39994,6 +40168,7 @@
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
+									"type": "",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -40185,6 +40360,7 @@
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
+									"type": "",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -40392,6 +40568,7 @@
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
+									"type": "",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -40631,6 +40808,7 @@
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
+									"type": "",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -40870,6 +41048,7 @@
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
+									"type": "",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -41125,6 +41304,7 @@
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
+									"type": "",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44001,11 +44181,59 @@
 						},
 						{
 							"_type": "UMLOperation",
+							"_id": "AAAAAAFdeMiRRHNYtno=",
+							"_parent": {
+								"$ref": "AAAAAAFPyz7/T0ePgyg="
+							},
+							"name": "ctcLinksConfigState",
+							"visibility": "public",
+							"isStatic": false,
+							"isLeaf": false,
+							"parameters": [
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdeNo87cRKFo0=",
+									"_parent": {
+										"$ref": "AAAAAAFdeMiRRHNYtno="
+									},
+									"name": "clink_conf",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "struct",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "out"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdeNo878RLlKc=",
+									"_parent": {
+										"$ref": "AAAAAAFdeMiRRHNYtno="
+									},
+									"name": "obj",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								}
+							],
+							"concurrency": "sequential",
+							"isQuery": false,
+							"isAbstract": false
+						},
+						{
+							"_type": "UMLOperation",
 							"_id": "AAAAAAFbOMLY/3h/JT8=",
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setCLinkConfigState",
+							"name": "ctcLinksConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -44048,11 +44276,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLY/3h/JT8="
 									},
-									"name": "clink_l",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "string",
+									"type": "logical",
+									"multiplicity": "2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44064,11 +44293,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLY/3h/JT8="
 									},
-									"name": "clink_r",
+									"name": "clnk_idx",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "string",
+									"type": "integer",
+									"multiplicity": "1..2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44089,23 +44319,6 @@
 									"isOrdered": false,
 									"isUnique": false,
 									"direction": "in"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFbONqnZpYAG84=",
-									"_parent": {
-										"$ref": "AAAAAAFbOMLY/3h/JT8="
-									},
-									"name": "contact",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "logical",
-									"multiplicity": "2",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
 								}
 							],
 							"concurrency": "sequential",
@@ -44118,7 +44331,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setCLinkConfigState",
+							"name": "ctcLinksConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -44161,11 +44374,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLVp3gWc18="
 									},
-									"name": "clink_l",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "string",
+									"type": "logical",
+									"multiplicity": "2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44177,11 +44391,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLVp3gWc18="
 									},
-									"name": "clink_r",
+									"name": "clnk_idx",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "string",
+									"type": "integer",
+									"multiplicity": "1..2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44209,23 +44424,6 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLVp3gWc18="
 									},
-									"name": "contact",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "logical",
-									"multiplicity": "2",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFbONn1J5OgttE=",
-									"_parent": {
-										"$ref": "AAAAAAFbOMLVp3gWc18="
-									},
 									"name": "k_p",
 									"visibility": "public",
 									"isStatic": false,
@@ -44247,7 +44445,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setCLinkConfigState",
+							"name": "ctcLinksConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -44290,11 +44488,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLO33etFkA="
 									},
-									"name": "clink_l",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "string",
+									"type": "logical",
+									"multiplicity": "2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44306,11 +44505,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLO33etFkA="
 									},
-									"name": "clink_r",
+									"name": "clnk_idx",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "string",
+									"type": "integer",
+									"multiplicity": "1..2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44338,7 +44538,87 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLO33etFkA="
 									},
-									"name": "contact",
+									"name": "k_p",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "double",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFbONjRTI9HONw=",
+									"_parent": {
+										"$ref": "AAAAAAFbOMLO33etFkA="
+									},
+									"name": "k_v",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "double",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								}
+							],
+							"concurrency": "sequential",
+							"isQuery": false,
+							"isAbstract": false
+						},
+						{
+							"_type": "UMLOperation",
+							"_id": "AAAAAAFdeMiNb3LvNn8=",
+							"_parent": {
+								"$ref": "AAAAAAFPyz7/T0ePgyg="
+							},
+							"name": "ctcLinksConfigState",
+							"visibility": "public",
+							"isStatic": false,
+							"isLeaf": false,
+							"parameters": [
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdeNk+hcGDDfk=",
+									"_parent": {
+										"$ref": "AAAAAAFdeMiNb3LvNn8="
+									},
+									"name": "clink_conf",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "struct",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "out"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdeNk+h8GEOq8=",
+									"_parent": {
+										"$ref": "AAAAAAFdeMiNb3LvNn8="
+									},
+									"name": "obj",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdeNk+h8GFpYU=",
+									"_parent": {
+										"$ref": "AAAAAAFdeMiNb3LvNn8="
+									},
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -44351,9 +44631,42 @@
 								},
 								{
 									"_type": "UMLParameter",
-									"_id": "AAAAAAFbONjRTI9HONw=",
+									"_id": "AAAAAAFdeNk+icGGv7M=",
 									"_parent": {
-										"$ref": "AAAAAAFbOMLO33etFkA="
+										"$ref": "AAAAAAFdeMiNb3LvNn8="
+									},
+									"name": "clnk_idx",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "integer",
+									"multiplicity": "2",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdeNk+isGH/CU=",
+									"_parent": {
+										"$ref": "AAAAAAFdeMiNb3LvNn8="
+									},
+									"name": "veT_lnk",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "matrix",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdeNk+i8GIQnk=",
+									"_parent": {
+										"$ref": "AAAAAAFdeMiNb3LvNn8="
 									},
 									"name": "k_p",
 									"visibility": "public",
@@ -44367,9 +44680,9 @@
 								},
 								{
 									"_type": "UMLParameter",
-									"_id": "AAAAAAFbONjRTY9Ikk0=",
+									"_id": "AAAAAAFdeNk+jMGJErc=",
 									"_parent": {
-										"$ref": "AAAAAAFbOMLO33etFkA="
+										"$ref": "AAAAAAFdeMiNb3LvNn8="
 									},
 									"name": "k_v",
 									"visibility": "public",
@@ -44392,7 +44705,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setCLinkConfigState",
+							"name": "ctcLinksConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -44435,11 +44748,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLKCndEd1A="
 									},
-									"name": "clink_l",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "string",
+									"type": "logical",
+									"multiplicity": "2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44451,11 +44765,11 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLKCndEd1A="
 									},
-									"name": "clink_r",
+									"name": "clnk_idx",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "string",
+									"type": "integer",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44467,7 +44781,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLKCndEd1A="
 									},
-									"name": "q_j",
+									"name": "veT_lnk",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -44483,55 +44797,6 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLKCndEd1A="
 									},
-									"name": "veT_ll",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "vector",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFbOMfGHJX+PtQ=",
-									"_parent": {
-										"$ref": "AAAAAAFbOMLKCndEd1A="
-									},
-									"name": "veT_rl",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "vector",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFbOMfGHJX/4Ko=",
-									"_parent": {
-										"$ref": "AAAAAAFbOMLKCndEd1A="
-									},
-									"name": "contact",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "logical",
-									"multiplicity": "2",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFbOMfGHJYAGwQ=",
-									"_parent": {
-										"$ref": "AAAAAAFbOMLKCndEd1A="
-									},
 									"name": "k_p",
 									"visibility": "public",
 									"isStatic": false,
@@ -44544,7 +44809,7 @@
 								},
 								{
 									"_type": "UMLParameter",
-									"_id": "AAAAAAFbOMfGHJYBYZ8=",
+									"_id": "AAAAAAFbOMfGHJX+PtQ=",
 									"_parent": {
 										"$ref": "AAAAAAFbOMLKCndEd1A="
 									},
@@ -44569,7 +44834,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setFeetConfigState",
+							"name": "feetConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -44612,11 +44877,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLfV3jo1uM="
 									},
-									"name": "q_j",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "vector",
+									"type": "logical",
+									"multiplicity": "2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44628,12 +44894,11 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLfV3jo1uM="
 									},
-									"name": "contact",
+									"name": "q_j",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "logical",
-									"multiplicity": "2",
+									"type": "vector",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44650,7 +44915,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setFeetConfigState",
+							"name": "feetConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -44693,11 +44958,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLkR3lRnNE="
 									},
-									"name": "q_j",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "vector",
+									"type": "logical",
+									"multiplicity": "2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44709,12 +44975,11 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOMLkR3lRnNE="
 									},
-									"name": "contact",
+									"name": "q_j",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "logical",
-									"multiplicity": "2",
+									"type": "vector",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44747,7 +45012,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setFeetConfigState",
+							"name": "feetConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -44790,11 +45055,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOOLQJeT24MM="
 									},
-									"name": "q_j",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "vector",
+									"type": "logical",
+									"multiplicity": "2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44806,12 +45072,11 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOOLQJeT24MM="
 									},
-									"name": "contact",
+									"name": "q_j",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "logical",
-									"multiplicity": "2",
+									"type": "vector",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -44860,7 +45125,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setFeetConfigState",
+							"name": "feetConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -44903,55 +45168,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFbOOLLxOSN7n8="
 									},
-									"name": "q_j",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "vector",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFbOOkM2Yj0NdY=",
-									"_parent": {
-										"$ref": "AAAAAAFbOOLLxOSN7n8="
-									},
-									"name": "veT_ll",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "vector",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFbOOkM2oj1J1Q=",
-									"_parent": {
-										"$ref": "AAAAAAFbOOLLxOSN7n8="
-									},
-									"name": "veT_rl",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "vector",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFbOOkM24j26Jw=",
-									"_parent": {
-										"$ref": "AAAAAAFbOOLLxOSN7n8="
-									},
-									"name": "contact",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -44964,7 +45181,23 @@
 								},
 								{
 									"_type": "UMLParameter",
-									"_id": "AAAAAAFbOOkM3Ij355s=",
+									"_id": "AAAAAAFbOOkM2Yj0NdY=",
+									"_parent": {
+										"$ref": "AAAAAAFbOOLLxOSN7n8="
+									},
+									"name": "veT_lnk",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "matrix",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFbOOkM2oj1J1Q=",
 									"_parent": {
 										"$ref": "AAAAAAFbOOLLxOSN7n8="
 									},
@@ -44980,7 +45213,7 @@
 								},
 								{
 									"_type": "UMLParameter",
-									"_id": "AAAAAAFbOOkM3Yj4LcE=",
+									"_id": "AAAAAAFbOOkM24j26Jw=",
 									"_parent": {
 										"$ref": "AAAAAAFbOOLLxOSN7n8="
 									},
@@ -45005,7 +45238,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setHandConfigState",
+							"name": "handConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -45048,11 +45281,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFWmLlR0TR+bVI="
 									},
-									"name": "q_j",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "vector",
+									"type": "logical",
+									"multiplicity": "2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -45064,12 +45298,11 @@
 									"_parent": {
 										"$ref": "AAAAAAFWmLlR0TR+bVI="
 									},
-									"name": "contact",
+									"name": "q_j",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "logical",
-									"multiplicity": "2",
+									"type": "vector",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -45086,7 +45319,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setHandConfigState",
+							"name": "handConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -45129,11 +45362,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFWmLkg0TLjiQ8="
 									},
-									"name": "q_j",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "vector",
+									"type": "logical",
+									"multiplicity": "2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -45145,12 +45379,11 @@
 									"_parent": {
 										"$ref": "AAAAAAFWmLkg0TLjiQ8="
 									},
-									"name": "contact",
+									"name": "q_j",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "logical",
-									"multiplicity": "2",
+									"type": "vector",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -45183,7 +45416,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setHandConfigState",
+							"name": "handConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -45226,11 +45459,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFWmLjGOy/b63c="
 									},
-									"name": "q_j",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "vector",
+									"type": "logical",
+									"multiplicity": "2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -45242,12 +45476,11 @@
 									"_parent": {
 										"$ref": "AAAAAAFWmLjGOy/b63c="
 									},
-									"name": "contact",
+									"name": "q_j",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "logical",
-									"multiplicity": "2",
+									"type": "vector",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -45296,7 +45529,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPyz7/T0ePgyg="
 							},
-							"name": "setHandConfigState",
+							"name": "handConfigState",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -45339,11 +45572,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFWmLDS6xRS/EY="
 									},
-									"name": "q_j",
+									"name": "cstate",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "vector",
+									"type": "logical",
+									"multiplicity": "2",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -45355,11 +45589,11 @@
 									"_parent": {
 										"$ref": "AAAAAAFWmLDS6xRS/EY="
 									},
-									"name": "veT_ll",
+									"name": "veT_lnk",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "vector",
+									"type": "matrix",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -45371,7 +45605,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFWmLDS6xRS/EY="
 									},
-									"name": "veT_rl",
+									"name": "q_j",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
@@ -45387,23 +45621,6 @@
 									"_parent": {
 										"$ref": "AAAAAAFWmLDS6xRS/EY="
 									},
-									"name": "contact",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "logical",
-									"multiplicity": "2",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFWmLW42hWK7Z8=",
-									"_parent": {
-										"$ref": "AAAAAAFWmLDS6xRS/EY="
-									},
 									"name": "k_p",
 									"visibility": "public",
 									"isStatic": false,
@@ -45416,7 +45633,7 @@
 								},
 								{
 									"_type": "UMLParameter",
-									"_id": "AAAAAAFWmL5mUIjZgJI=",
+									"_id": "AAAAAAFWmLW42hWK7Z8=",
 									"_parent": {
 										"$ref": "AAAAAAFWmLDS6xRS/EY="
 									},
@@ -45472,7 +45689,6 @@
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -45509,18 +45725,431 @@
 									"isOrdered": false,
 									"isUnique": false,
 									"direction": "in"
+								}
+							],
+							"concurrency": "sequential",
+							"isQuery": false,
+							"isAbstract": false
+						},
+						{
+							"_type": "UMLOperation",
+							"_id": "AAAAAAFdgETLyvSZNPo=",
+							"_parent": {
+								"$ref": "AAAAAAFPyz7/T0ePgyg="
+							},
+							"name": "getFDynVisualizationData",
+							"visibility": "public",
+							"isStatic": false,
+							"isLeaf": false,
+							"parameters": [
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEtMZkXwUwA=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETLyvSZNPo="
+									},
+									"name": "vis_data",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "struct",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "out"
 								},
 								{
 									"_type": "UMLParameter",
-									"_id": "AAAAAAFWqOz4xRBj3BE=",
+									"_id": "AAAAAAFdgEtMaEXxpZM=",
 									"_parent": {
-										"$ref": "AAAAAAFWqOxmfA/16iI="
+										"$ref": "AAAAAAFdgETLyvSZNPo="
+									},
+									"name": "obj",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEtMaEXy0Xg=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETLyvSZNPo="
+									},
+									"name": "stmChi",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "matrix",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEtMaUXzUFk=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETLyvSZNPo="
+									},
+									"name": "fhTrqControl",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "function_handle",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEtMaUX0eog=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETLyvSZNPo="
 									},
 									"name": "clink_conf",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
 									"type": "struct",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEtMakX1SX4=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETLyvSZNPo="
+									},
+									"name": "f_e",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "vector",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEtMa0X2DE8=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETLyvSZNPo="
+									},
+									"name": "a_c",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "vector",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								}
+							],
+							"concurrency": "sequential",
+							"isQuery": false,
+							"isAbstract": false
+						},
+						{
+							"_type": "UMLOperation",
+							"_id": "AAAAAAFdgETPkvUCr3U=",
+							"_parent": {
+								"$ref": "AAAAAAFPyz7/T0ePgyg="
+							},
+							"name": "getFDynVisualizationData",
+							"visibility": "public",
+							"isStatic": false,
+							"isLeaf": false,
+							"parameters": [
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEhgDz5ju6M=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETPkvUCr3U="
+									},
+									"name": "vis_data",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "struct",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "out"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEhgED5kvlE=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETPkvUCr3U="
+									},
+									"name": "obj",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEhgED5l7sw=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETPkvUCr3U="
+									},
+									"name": "stmChi",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "matrix",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEhgET5meLA=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETPkvUCr3U="
+									},
+									"name": "fhTrqControl",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "function_handle",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEhgEj5ne2w=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETPkvUCr3U="
+									},
+									"name": "feet_conf",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "struct",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEhgEz5odeQ=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETPkvUCr3U="
+									},
+									"name": "hand_conf",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "struct",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEhgEz5pKTQ=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETPkvUCr3U="
+									},
+									"name": "fe_h",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "vector",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEhgFD5q4jE=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETPkvUCr3U="
+									},
+									"name": "ac_f",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "vector",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								}
+							],
+							"concurrency": "sequential",
+							"isQuery": false,
+							"isAbstract": false
+						},
+						{
+							"_type": "UMLOperation",
+							"_id": "AAAAAAFdgETHOfQwFlY=",
+							"_parent": {
+								"$ref": "AAAAAAFPyz7/T0ePgyg="
+							},
+							"name": "getFDynVisualizationData",
+							"visibility": "public",
+							"isStatic": false,
+							"isLeaf": false,
+							"parameters": [
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEacIzb0jYk=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETHOfQwFlY="
+									},
+									"name": "vis_data",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "struct",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "out"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEacJTb1THY=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETHOfQwFlY="
+									},
+									"name": "obj",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEacJTb2Uss=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETHOfQwFlY="
+									},
+									"name": "stmChi",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "matrix",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEacJjb3XY4=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETHOfQwFlY="
+									},
+									"name": "fhTrqControl",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "function_handle",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEacKDb4C0w=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETHOfQwFlY="
+									},
+									"name": "fhTotCWrench",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "function_handle",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEePjTsfqJQ=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETHOfQwFlY="
+									},
+									"name": "feet_conf",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "struct",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEePjjsgSiE=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETHOfQwFlY="
+									},
+									"name": "hand_conf",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "struct",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEePjzsheg8=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETHOfQwFlY="
+									},
+									"name": "f_cp",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "vector",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdgEePkDsiPVw=",
+									"_parent": {
+										"$ref": "AAAAAAFdgETHOfQwFlY="
+									},
+									"name": "ac_f",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "vector",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -48975,22 +49604,6 @@
 									"isOrdered": false,
 									"isUnique": false,
 									"direction": "out"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFSxiKtivf2x3c=",
-									"_parent": {
-										"$ref": "AAAAAAFRaDgE883vD74="
-									},
-									"name": "obj",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
 								}
 							],
 							"concurrency": "sequential",
@@ -50387,6 +51000,102 @@
 							"concurrency": "sequential",
 							"isQuery": false,
 							"isAbstract": false
+						},
+						{
+							"_type": "UMLOperation",
+							"_id": "AAAAAAFdb/H+n4ATSaA=",
+							"_parent": {
+								"$ref": "AAAAAAFPyz7/T0ePgyg="
+							},
+							"name": "fdynNewMixedVelocities",
+							"visibility": "private",
+							"isStatic": false,
+							"isLeaf": false,
+							"parameters": [
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdcAAiFIHJ8t0=",
+									"_parent": {
+										"$ref": "AAAAAAFdb/H+n4ATSaA="
+									},
+									"name": "nu",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "vector",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "out"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdcAAiFYHKCSk=",
+									"_parent": {
+										"$ref": "AAAAAAFdb/H+n4ATSaA="
+									},
+									"name": "qt_b",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "vector",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdcAAiFoHL/b0=",
+									"_parent": {
+										"$ref": "AAAAAAFdb/H+n4ATSaA="
+									},
+									"name": "dx_b",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "vector",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdcAAiF4HMePE=",
+									"_parent": {
+										"$ref": "AAAAAAFdb/H+n4ATSaA="
+									},
+									"name": "wf_omega_b",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "vector",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								},
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAFdcAAiGIHNV9g=",
+									"_parent": {
+										"$ref": "AAAAAAFdb/H+n4ATSaA="
+									},
+									"name": "dq_j",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "vector",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"direction": "in"
+								}
+							],
+							"concurrency": "sequential",
+							"isQuery": false,
+							"isAbstract": false
 						}
 					],
 					"isAbstract": false,
@@ -50805,7 +51514,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPzGIpt5fzmzI="
 							},
-							"name": "jpos_left_feet",
+							"name": "jpos_left_foot",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -50877,7 +51586,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFPzGIpt5fzmzI="
 							},
-							"name": "jpos_right_feet",
+							"name": "jpos_right_foot",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,

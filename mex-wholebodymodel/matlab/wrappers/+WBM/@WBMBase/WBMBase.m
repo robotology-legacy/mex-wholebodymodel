@@ -377,7 +377,7 @@ classdef WBMBase < handle
 
         function tau_fr = frictionForces(obj, dq_j)
             if (nargin == 1)
-                [~,~,~,dq_j] = getState(obj);
+                [~,~,~,dq_j] = mexWholeBodyModel('get-state');
             end
             epsilon = 1e-12; % min. value to treat a number as zero ...
 
@@ -594,7 +594,7 @@ classdef WBMBase < handle
         end
 
         function [nw_p_b, nw_R_b] = computeNewWorld2Base(obj, urdf_link_name, q_j)
-            [ow_vqT_b,~,~,~] = getState(obj); % VQ-transformation (from base to old world) ...
+            [ow_vqT_b,~,~,~] = mexWholeBodyModel('get-state'); % VQ-transformation (from base to old world) ...
 
             % get the homogeneous transformation matrix H (from base to old world):
             [ow_p_b, ow_R_b] = WBM.utilities.tfms.frame2posRotm(ow_vqT_b);
