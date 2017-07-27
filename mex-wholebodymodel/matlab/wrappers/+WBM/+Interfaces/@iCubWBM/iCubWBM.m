@@ -479,10 +479,6 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             jlmts = obj.mwbm_icub.joint_limits;
         end
 
-        function set.ndof(obj, ndof)
-            obj.mwbm_icub.ndof = ndof;
-        end
-
         function ndof = get.ndof(obj)
             if isempty(obj.mwbm_icub)
                 ndof = 0; return
