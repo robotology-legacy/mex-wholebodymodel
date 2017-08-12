@@ -62,7 +62,7 @@ disp('Start the numerical integration...');
 ode_options = odeset('RelTol', 1e-3, 'AbsTol', 1e-4);         % setup the error tolerances ...
 [t, chi]    = ode15s(fhFwdDyn, tspan, chi_init, ode_options); % ODE-Solver
 % or, optional:
-%[t, chi] = wbm_icub.intForwardDynamics(tspan, chi_init, fhTrqControl, ode_options, feet_conf, ac_0);
+%[t, chi] = wbm_icub.intForwardDynamics(tspan, chi_init, fhTrqControl, ode_options, feet_conf, ac_0, 'fpc');
 
 disp('Numerical integration finished.');
 
@@ -84,5 +84,4 @@ wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 wbm_icub.plotCoMTrajectory(chi);
 
 % get the visualization data of the forward dynamics integration for plots and animations:
-fe_0 = wbm_icub.zeroExtForces(feet_conf);
-vis_data = wbm_icub.getFDynVisData(chi, fhTrqControl, feet_conf, fe_0, ac_0);
+vis_data = wbm_icub.getFDynVisData(chi, fhTrqControl, feet_conf, ac_0, 'fpc');

@@ -33,11 +33,15 @@ classdef (Abstract) IWBM < handle
 
         ddq_j = jointAcc(obj, tau, q_j, dq_j, stFltb)
 
-        ddq_j = jointAccFPC(obj, tau, q_j, dq_j, stFltb) % FPC ... feet pose correction
+        ddq_j = jointAccEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % EF ... External Forces at the hands (no pose correction)
 
-        ddq_j = jointAccFHPC(obj, tau, fe_h, q_j, dq_j, stFltb) % FHPC ... feet & hand pose correction
+        ddq_j = jointAccPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % PL ... PayLoad at the hands (no pose correction)
 
-        ddq_j = jointAccFHPCPL(obj, tau, fhTotCWrench, f_cp, q_j, dq_j, stFltb) % FHPCPL ... feet & hand pose correction with payload
+        ddq_j = jointAccFPC(obj, tau, ac_f, q_j, dq_j, stFltb) % FPC ... Feet Pose Correction (no external forces)
+
+        ddq_j = jointAccFPCEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % FPCEF ... Feet Pose Correction with External Forces (at the hands)
+
+        ddq_j = jointAccFPCPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % FPCPL ... Feet Pose Correction with PayLoad (at the hands)
 
         ac_h = handAcc(obj, tau, q_j, dq_j, stFltb)
 
@@ -57,7 +61,7 @@ classdef (Abstract) IWBM < handle
 
         tau_j = invHybridDyn(obj, q_j, dq_j, ddq_j, stFltb)
 
-        [t, stmChi] = fwdDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, varargin)
+        [t, stmChi] = fwdDyn(obj, tspan, stvChi_0, fhTrqControl, ode_opt, varargin)
 
         visFwdDyn(obj, stmChi, sim_tstep, vis_ctrl)
 

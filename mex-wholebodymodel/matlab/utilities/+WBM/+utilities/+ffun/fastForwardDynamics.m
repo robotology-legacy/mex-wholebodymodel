@@ -46,8 +46,8 @@ function dstvChi = fastForwardDynamics(t, stvChi, fhTrqControl, robot_model, rob
     %   [2] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, pp. 269-270, eq. (6.5) & (6.6).
     Jc_t      = Jc.';
     JcMinv    = Jc / M; % x*M = Jc --> x = Jc * M^(-1)
-    Upsilon_c = JcMinv * Jc_t; % inverse mass matrix Upsilon_c = Lambda^(-1) = Jc * M^(-1) * Jc^T
-                               % in contact space {c} (Lambda^(-1) ... inverse pseudo-kinetic energy matrix).
+    Upsilon_c = JcMinv * Jc_t; % inverse mass matrix Upsilon_c = Lambda^(-1) = Jc * M^(-1) * Jc^T in contact space {c},
+                               % Lambda^(-1) ... inverse pseudo-kinetic energy matrix.
     % calculate the contact forces ...
     f_c = Upsilon_c \ (JcMinv*(c_qv - tau_gen) - djcdq);
     % (this calculation method is numerically more accurate and robust than the calculation variant with the cartmass-function.)

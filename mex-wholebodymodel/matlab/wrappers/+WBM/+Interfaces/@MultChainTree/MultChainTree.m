@@ -1,14 +1,15 @@
 classdef MultChainTree < WBM.Interfaces.IMultChainTree
     properties(Dependent)
+        % public properties for fast get/set methods:
         name@char       % the name of the robot.
         manuf@char      % the name of the manufacturer (annotation)
         comment@char    % general comment (annotation)
         wbm_info@struct % general information about whole body model of the robot.
-        wbm_params@WBM.wbmBaseRobotParams
+        wbm_params@WBM.wbmBaseRobotParams % base model and configuration parameters of the robot.
         plotopt3d@WBM.absSimConfig
         base_link@char        % floating base link (fixed reference link) of the robot.
-        ctrl_link@char        % current kinematic link of the robot that is controlled by the system.
         ee_links              % kinematic links of the end-effectors (hands) that are controlled by the system.
+        link@char             % current kinematic link of the robot that is controlled by the system.
         gravity@double vector % gravity vector (direction of the gravity)
         base@double    matrix % base transform of the robot (pose of the robot)
         tool@double    matrix % tool transform (from the end-effector to the tool-tip)
@@ -23,12 +24,12 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         mwbm_info = struct( 'robot_name',  '', ...
                             'robot_manuf', '', ...
                             'comment',     '' );
-        mlnk_name_ctrl@char
+        mlnk_name@char
         mlnk_names_ee
     end
 
     methods
-        function bot = MultChainTree(robot_wbm, ctrl_lnk_name, varargin)
+        function bot = MultChainTree(robot_wbm, lnk_name, varargin)
             % some error checks ...
             if ( (nargin < 2) || (nargin > 3) )
                 error('MultChainTree::MultChainTree: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
@@ -39,7 +40,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             % initialization:
             bot.mwbm = robot_wbm;
             % set the initial link to be controlled by the system ...
-            bot.ctrl_link = ctrl_lnk_name;
+            bot.link = lnk_name;
 
             % options:
             if (nargin == 3)
@@ -137,7 +138,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function wf_H_lnk = fkine(bot, q_j)
-            wf_H_lnk = bot.mwbm.fwdKin(bot.mlnk_name_ctrl, q_j);
+            wf_H_lnk = bot.mwbm.fwdKin(bot.mlnk_name, q_j);
         end
 
         function wf_H_lnk = A(bot, lnk_name, q_j)
@@ -161,7 +162,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function djdq_lnk = jacob_dot(bot, q_j, dq_j)
-            djdq_lnk = bot.mwbm.jacobDot(bot.mlnk_name_ctrl, q_j, dq_j);
+            djdq_lnk = bot.mwbm.jacobDot(bot.mlnk_name, q_j, dq_j);
         end
 
         function wf_J_lnk = jacob0(bot, q_j, varargin)
@@ -173,11 +174,11 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             opt = tb_optparse(opt, varargin); % function from the RTB of Peter Corke.
 
             stFltb   = bot.mwbm.getBaseState();
-            wf_J_lnk = bot.mwbm.jacob(bot.mlnk_name_ctrl, q_j, stFltb);
+            wf_J_lnk = bot.mwbm.jacob(bot.mlnk_name, q_j, stFltb);
 
             if opt.rpy
                 % compute the analytical Jacobian with the Euler rotation rate in ZYX (RPY) order:
-                wf_H_lnk = bot.mwbm.fwdKin(bot.mlnk_name_ctrl, q_j, stFltb);
+                wf_H_lnk = bot.mwbm.fwdKin(bot.mlnk_name, q_j, stFltb);
                 Er_inv   = WBM.utilities.tfms.tform2angRateTF(wf_H_lnk, 'eul', 'ZYX');
                 if (rcond(Er_inv) < eps)
                     error('MultChainTree::jacob0: %s', WBM.wbmErrorMsg.SINGULAR_MAT);
@@ -188,7 +189,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
                 wf_J_lnk = wf_rX_lnk * wf_J_lnk;
             elseif opt.eul
                 % compute the analytical Jacobian with the Euler rotation rate in ZYZ order:
-                wf_H_lnk = bot.mwbm.fwdKin(bot.mlnk_name_ctrl, q_j, stFltb);
+                wf_H_lnk = bot.mwbm.fwdKin(bot.mlnk_name, q_j, stFltb);
                 Er_inv   = WBM.utilities.tfms.tform2angRateTF(wf_H_lnk, 'eul', 'ZYZ');
                 if (rcond(Er_inv) < eps)
                     error('MultChainTree::jacob0: %s', WBM.wbmErrorMsg.SINGULAR_MAT);
@@ -251,7 +252,7 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             stFltb = bot.mwbm.getBaseState();
 
             M        = bot.mwbm.massMatrix(q_j, stFltb);
-            wf_J_lnk = bot.mwbm.jacob(bot.mlnk_name_ctrl, q_j, stFltb);
+            wf_J_lnk = bot.mwbm.jacob(bot.mlnk_name, q_j, stFltb);
             % calculate the Cartesian mass matrix (pseudo-kinetic energy matrix)
             % Mx = (J * M^(-1) * J^T)^(-1) in operational space:
             [Mx,~,~] = WBM.utilities.tfms.cartmass(wf_J_lnk, M);
@@ -321,15 +322,15 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             rlnk_name = bot.mwbm.base_link;
         end
 
-        function set.ctrl_link(bot, lnk_name)
+        function set.link(bot, lnk_name)
             if isempty(lnk_name)
-                error('MultChainTree::set.ctrl_link: %s', WBM.wbmErrorMsg.EMPTY_STRING);
+                error('MultChainTree::set.link: %s', WBM.wbmErrorMsg.EMPTY_STRING);
             end
-            bot.mlnk_name_ctrl = lnk_name;
+            bot.mlnk_name = lnk_name;
         end
 
-        function lnk_name = get.ctrl_link(bot)
-            lnk_name = bot.mlnk_name_ctrl;
+        function lnk_name = get.link(bot)
+            lnk_name = bot.mlnk_name;
         end
 
         function set.ee_links(bot, lnk_names)

@@ -25,6 +25,7 @@ function clink_conf = ctcLinksConfigState(obj, varargin)
             else
                 error('WBM::ctcLinksConfigState: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
+            checkCState(cstate);
             checkGainValues(k_p, k_v);
         case 5
             cstate   = varargin{1,1};
@@ -33,6 +34,7 @@ function clink_conf = ctcLinksConfigState(obj, varargin)
             k_p      = varargin{1,4}; % (1)
 
             checkGainValue(k_p);
+            checkCState(cstate);
             % set k_v for critical damping (3)
             % Source: Introduction to Robotics: Mechanics and Control, John J. Craig, 3rd Edition,
             %         Pearson/Prentice Hall, 2005, p. 274, eq. (9.47).
@@ -42,25 +44,35 @@ function clink_conf = ctcLinksConfigState(obj, varargin)
             clnk_idx = varargin{1,2};
             q_j      = varargin{1,3};
 
+            checkCState(cstate);
+
             k_p = obj.DF_STIFFNESS; % use the default stiffness value ...
             k_v = 2*sqrt(k_p); % (3)
-        case 1
+        case 3
+            cstate   = varargin{1,1};
+            clnk_idx = varargin{1,2};
+
+            checkCState(cstate);
+            nLnks = getLinkNbr(clnk_idx);
+
+            clink_conf.contact.left  = cstate(1,1);
+            clink_conf.contact.right = cstate(1,2);
+
+            clink_conf = setContactLinks(clink_conf, clnk_idx, nLnks);
+            return
+        case 2
+            clnk_idx = varargin{1,1};
+
             clink_conf.contact.left  = false;
             clink_conf.contact.right = false;
+
+            nLnks = getLinkNbr(clnk_idx);
+            clink_conf = setContactLinks(clink_conf, clnk_idx, nLnks);
             return
         otherwise
             error('WBM::ctcLinksConfigState: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
-    % further error checks ...
-    if ( ~islogical(cstate) || ~isrow(cstate) )
-        error('WBM::ctcLinksConfigState: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
-    end
-    WBM.utilities.chkfun.checkRVecDim(cstate, 2, 'WBM::ctcLinksConfigState');
-
-    nLnks = size(clnk_idx,2); % row-vector
-    if ( (nLnks < 1) || (nLnks > 2) )
-        error('WBM::ctcLinksConfigState: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
-    end
+    nLnks = getLinkNbr(clnk_idx);
 
     %% Setup the configuration structure for the
     %  qualitative state of the contact links:
@@ -71,82 +83,105 @@ function clink_conf = ctcLinksConfigState(obj, varargin)
     clink_conf.contact.left  = ctc_l;
     clink_conf.contact.right = ctc_r;
 
-    if (nLnks == 2)
-        % both contact links (in independence of
-        % the contact state condition):
-        clnk_idx_l = clnk_idx(1,1);
-        clnk_idx_r = clnk_idx(1,2);
+    % set the corresponding contact links to each contact ...
+    clink_conf = setContactLinks(clink_conf, clnk_idx, nLnks);
 
-        clink_conf.lnk_idx_l = clnk_idx_l;
-        clink_conf.lnk_idx_r = clnk_idx_r;
-
-        % set the desired pose of the links as reference:
-        if tf_data
-            checkTFDim(veT_lnk, nLnks);
-            % get the vector Euler-angle transformations (veT) ...
-            clink_conf.des_pose.veT_llnk = veT_lnk(1:6,1); % left contact link
-            clink_conf.des_pose.veT_rlnk = veT_lnk(1:6,2); % right contact link
-            eul_ll = veT_lnk(4:6,1);
-            eul_rl = veT_lnk(4:6,2);
-        else
-            % calculate the desired poses (using veT) ...
-            stFltb = getFloatingBaseState(obj);
-            wf_R_b_arr = reshape(stFltb.wf_R_b, 9, 1);
-            [clink_conf.des_pose.veT_llnk, eul_ll] = calcDesiredRefPose(obj, wf_R_b_arr, stFltb.wf_p_b, q_j, clnk_idx_l);
-            [clink_conf.des_pose.veT_rlnk, eul_rl] = calcDesiredRefPose(obj, wf_R_b_arr, stFltb.wf_p_b, q_j, clnk_idx_r);
-        end
-        % set the angular velocity transformations for the contact links:
-        clink_conf.des_pose.avT_llnk = WBM.utilities.tfms.eul2angVelTF(eul_ll);
-        clink_conf.des_pose.avT_rlnk = WBM.utilities.tfms.eul2angVelTF(eul_rl);
-    elseif ( nLnks && ctc_l ) % nLnks = 1
-        % only left contact link:
-        clink_conf.lnk_idx_l = clnk_idx;
-
-        % set the desired reference pose:
-        if tf_data
-            checkTFDim(veT_lnk, nLnks);
-
-            clink_conf.des_pose.veT_llnk = veT_lnk;
-            eul_ll = veT_lnk(4:6,1);
-        else
-            % calculate desired pose (veT) ...
-            stFltb = getFloatingBaseState(obj);
-            wf_R_b_arr = reshape(stFltb.wf_R_b, 9, 1);
-            [clink_conf.des_pose.veT_llnk, eul_ll] = calcDesiredRefPose(obj, wf_R_b_arr, stFltb.wf_p_b, q_j, clnk_idx);
-        end
-        % angular velocity transformation (avT):
-        clink_conf.des_pose.avT_llnk = WBM.utilities.tfms.eul2angVelTF(eul_ll);
-    elseif ( nLnks && ctc_r ) % nLnks = 1
-        % only right contact link:
-        clink_conf.lnk_idx_r = clnk_idx;
-
-        % desired reference pose:
-        if tf_data
-            checkTFDim(veT_lnk, nLnks);
-
-            clink_conf.des_pose.veT_rlnk = veT_lnk;
-            eul_rl = veT_lnk(4:6,1);
-        else
-            % calculate pose (veT) ...
-            stFltb = getFloatingBaseState(obj);
-            wf_R_b_arr = reshape(stFltb.wf_R_b, 9, 1);
-            [clink_conf.des_pose.veT_rlnk, eul_rl] = calcDesiredRefPose(obj, wf_R_b_arr, stFltb.wf_p_b, q_j, clnk_idx);
-        end
-        % angular velocity transformation (avT):
-        clink_conf.des_pose.avT_rlnk = WBM.utilities.tfms.eul2angVelTF(eul_rl);
+    % reference poses:
+    if tf_data
+        % set the desired poses of the links as reference ...
+        checkTFDim(veT_lnk, nLnks);
+        clink_conf = setDesiredRefPose(obj, clink_conf, nLnks, veT_lnk);
     else
-        % both contact links are not in contact with any surface ...
-        error('WBM::ctcLinksConfigState: %s', WBM.wbmErrorMsg.NO_LNK_IN_CTC);
+        % calculate the desired poses ...
+        stFltb = getFloatingBaseState(obj);
+        wf_R_b_arr = reshape(stFltb.wf_R_b, 9, 1);
+        clink_conf = setDesiredRefPose(obj, clink_conf, nLnks, clnk_idx, ...
+                                       wf_R_b_arr, stFltb.wf_p_b, q_j);
     end
-    % set the correction values (gains) for the links
-    % to avoid numerical integration errors:
+    % set the correction values (gains) for the
+    % links to avoid numerical integration errors:
     clink_conf.ctrl_gains.k_p = k_p; % control gain for the link positions.
     clink_conf.ctrl_gains.k_v = k_v; % control gain for the link velocities (linear & angular).
 end
 %% END of ctcLinksConfigState.
 
 
-%% DESIRED REFERENCE POSE, CHECK GAINS & VE-TRANSFORMATIONS:
+%% CONTACT LINKS, DESIRED REFERENCE POSES, CHECK CSTATE, GAINS & VE-TRANSFORMATIONS:
+
+function clink_conf = setContactLinks(clink_conf, clnk_idx, nLnks)
+    if (nLnks == 2)
+        % both contact links (in independence
+        % of the contact state condition):
+        clink_conf.lnk_idx_l = clnk_idx(1,1);
+        clink_conf.lnk_idx_r = clnk_idx(1,2);
+    elseif ( nLnks && clink_conf.contact.left ) % nLnks = 1
+        % only left contact link:
+        clink_conf.lnk_idx_l = clnk_idx;
+    elseif ( nLnks && clink_conf.contact.right ) % nLnks = 1
+        % only right contact link:
+        clink_conf.lnk_idx_r = clnk_idx;
+    else
+        % both contact links are not in contact with any surface ...
+        error('setContactLinks: %s', WBM.wbmErrorMsg.NO_LNK_IN_CTC);
+    end
+end
+
+function clink_conf = setDesiredRefPose(obj, clink_conf, nLnks, varargin)
+    switch nargin
+        case 7
+            clnk_idx   = varargin{1,1};
+            wf_R_b_arr = varargin{1,2};
+            wf_p_b     = varargin{1,3};
+            q_j        = varargin{1,4};
+        case 4
+            veT_lnk    = varargin{1,1};
+        otherwise
+            error('setDesiredRefPose: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+    end
+
+    if (nLnks == 2)
+        % both contact links (in independence of the contact state condition):
+        % set the desired pose of the links as reference ...
+        if (nargin == 4)
+            % set the given VE-transformations (veT) and Euler-angles ...
+            clink_conf.des_pose.veT_llnk = veT_lnk(1:6,1); % left contact link
+            clink_conf.des_pose.veT_rlnk = veT_lnk(1:6,2); % right contact link
+            eul_ll = veT_lnk(4:6,1);
+            eul_rl = veT_lnk(4:6,2);
+        else
+            % calculate the desired poses (using veT) ...
+            [clink_conf.des_pose.veT_llnk, eul_ll] = calcDesiredRefPose(obj, wf_R_b_arr, wf_p_b, q_j, clnk_idx(1,1)); % left link
+            [clink_conf.des_pose.veT_rlnk, eul_rl] = calcDesiredRefPose(obj, wf_R_b_arr, wf_p_b, q_j, clnk_idx(1,2)); % right link
+        end
+        % set the angular velocity transformations for the contact links ...
+        clink_conf.des_pose.avT_llnk = WBM.utilities.tfms.eul2angVelTF(eul_ll);
+        clink_conf.des_pose.avT_rlnk = WBM.utilities.tfms.eul2angVelTF(eul_rl);
+    elseif ( nLnks && clink_conf.contact.left ) % nLnks = 1
+        % only left contact link:
+        if (nargin == 4)
+            % set the given VE-transformation and Euler-angle ...
+            clink_conf.des_pose.veT_llnk = veT_lnk;
+            eul_ll = veT_lnk(4:6,1);
+        else
+            % calculate desired pose (veT) ...
+            [clink_conf.des_pose.veT_llnk, eul_ll] = calcDesiredRefPose(obj, wf_R_b_arr, wf_p_b, q_j, clnk_idx);
+        end
+        % set the angular velocity transformation (avT) ...
+        clink_conf.des_pose.avT_llnk = WBM.utilities.tfms.eul2angVelTF(eul_ll);
+    elseif ( nLnks && clink_conf.contact.right ) % nLnks = 1
+        % only right contact link:
+        if (nargin == 4)
+            clink_conf.des_pose.veT_rlnk = veT_lnk;
+            eul_rl = veT_lnk(4:6,1);
+        else
+            [clink_conf.des_pose.veT_rlnk, eul_rl] = calcDesiredRefPose(obj, wf_R_b_arr, wf_p_b, q_j, clnk_idx);
+        end
+        clink_conf.des_pose.avT_rlnk = WBM.utilities.tfms.eul2angVelTF(eul_rl);
+    else
+        % both contact links are not in contact with any surface ...
+        error('setDesiredRefPose: %s', WBM.wbmErrorMsg.NO_LNK_IN_CTC);
+    end
+end
 
 function [veT_cl, eul_cl] = calcDesiredRefPose(obj, wf_R_b_arr, wf_p_b, q_j, clnk_idx)
     % calculate the desired (reference) pose for the contact link in dependency
@@ -160,6 +195,20 @@ function [veT_cl, eul_cl] = calcDesiredRefPose(obj, wf_R_b_arr, wf_p_b, q_j, cln
 
     % desired pose (using vector Euler-angle transformation (veT)):
     veT_cl = vertcat(p_cl, eul_cl);
+end
+
+function nLnks = getLinkNbr(clnk_idx)
+    nLnks = size(clnk_idx,2); % row-vector
+    if ( (nLnks < 1) || (nLnks > 2) )
+        error('WBM::ctcLinksConfigState: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
+    end
+end
+
+function checkCState(cstate)
+    if ( ~islogical(cstate) || ~isrow(cstate) )
+        error('WBM::ctcLinksConfigState: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+    end
+    WBM.utilities.chkfun.checkRVecDim(cstate, 2, 'WBM::ctcLinksConfigState');
 end
 
 function checkGainValues(k_p, k_v)

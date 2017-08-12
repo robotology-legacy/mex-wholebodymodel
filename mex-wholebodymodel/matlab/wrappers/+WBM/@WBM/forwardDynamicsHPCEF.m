@@ -1,4 +1,4 @@
-function dstvChi = forwardDynamicsFHPC(obj, t, stvChi, fhTrqControl, feet_conf, hand_conf, fe_h, ac_f)
+function dstvChi = forwardDynamicsHPCEF(obj, t, stvChi, fhTrqControl, hand_conf, fe_h, ac_h)
     % get the state parameters from the current state vector "stvChi" ...
     stp = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
 
@@ -9,15 +9,15 @@ function dstvChi = forwardDynamicsFHPC(obj, t, stvChi, fhTrqControl, feet_conf, 
     % update the state for the optimized mode ...
     setState(obj, stp.q_j, stp.dq_j, v_b);
 
-    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, feet_conf); % optimized mode
+    [M, c_qv, Jc_h, djcdq_h] = wholeBodyDynamicsCS(obj, hand_conf); % optimized mode
 
     % get the current control torques from the controller ...
-    tau = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_f, djcdq_f, feet_conf);
+    tau = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_h, djcdq_h, hand_conf);
 
     % new mixed generalized velocity vector ...
     nu  = fdynNewMixedVelocities(obj, stp.qt_b, stp.dx_b, wf_omega_b, stp.dq_j);
     % joint acceleration dnu = ddq_j (optimized mode):
-    dnu = jointAccelerationsFHPC(obj, feet_conf, hand_conf, tau, fe_h, ac_f, ...
-                                 Jc_f, djcdq_f, M, c_qv, stp.dq_j, nu_s);
+    dnu = jointAccelerationsHPCEF(obj, hand_conf, tau, fe_h, ac_h, ...
+                                  Jc_h, djcdq_h, M, c_qv, stp.dq_j, nu_s);
     dstvChi = vertcat(nu, dnu);
 end

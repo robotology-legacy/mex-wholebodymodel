@@ -7,6 +7,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     R          ...  rotation (matrix)
     T, TF      ...  transformation (vector/matrix)
     X          ...  adjoint transformation (matrix)
+    ac         ...  contact acceleration(s)
     acc        ...  acceleration(s)
     adj        ...  adjacency (matrix)
     arT        ...  angle rate transformation (matrix)
@@ -142,6 +143,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     stv        ...  state vector
     stvqT      ...  state vector-quaternion transformation [VQS-Transformation of the current state vector] (7x1-vector) (*)
     sz         ...  size(s)
+    ..._t      ...  "transposed" (end of variable name), "_t" declares that a matrix or vector is transposed, e.g. "M_t", "v_t", etc.
     tform, tfm ...  transformation matrix
     tr         ...  translation(s) OR trace
     trans      ...  translation(s)

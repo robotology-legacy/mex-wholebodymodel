@@ -93,35 +93,50 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         end
 
         function ddq_j = jointAcc(obj, tau, q_j, dq_j, stFltb)
-            if (nargin == 4) % much faster than the exist-function
+            if (nargin == 4)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            ddq_j = obj.mwbm_icub.jointAcceleration(tau, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            ddq_j = obj.mwbm_icub.jointAccelerations(tau, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccFPC(obj, tau, q_j, dq_j, stFltb) % FPC ... feet pose correction
+        function ddq_j = jointAccEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % EF ... External Forces at the hands (no pose correction)
+            if (nargin == 7)
+                stFltb = obj.mwbm_icub.getFloatingBaseState();
+            end
+            ddq_j = obj.mwbm_icub.jointAccelerationsEF(obj.mfeet_conf, obj.mhand_conf, tau, fe_h, ac_h, ac_f, ...
+                                                       stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+        end
+
+        function ddq_j = jointAccPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % PL ... PayLoad at the hands (no pose correction)
+            if (nargin == 7)
+                stFltb = obj.mwbm_icub.getFloatingBaseState();
+            end
+            ddq_j = obj.mwbm_icub.jointAccelerationsPL(obj.mfeet_conf, obj.mhand_conf, tau, fhTotCWrench, f_cp, ac_f, ...
+                                                       stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+        end
+
+        function ddq_j = jointAccFPC(obj, tau, ac_f, q_j, dq_j, stFltb) % FPC ... Feet Pose Correction (no external forces)
             if (nargin == 5)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            ac_0  = obj.mwbm_icub.zeroCtcAcc(obj.mfeet_conf);
-            ddq_j = obj.mwbm_icub.jointAccelerationsFPC(obj.mfeet_conf, tau, ac_0, stFltb.wf_R_b, ...
+            ddq_j = obj.mwbm_icub.jointAccelerationsFPC(obj.mfeet_conf, tau, ac_f, stFltb.wf_R_b, ...
                                                         stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccFHPC(obj, tau, fe_h, q_j, dq_j, stFltb) % FHPC ... feet & hand pose correction
-            if (nargin == 5)
+        function ddq_j = jointAccFPCEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % FPCEF ... Feet Pose Correction with External Forces (at the hands)
+            if (nargin == 7)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            ddq_j = obj.mwbm_icub.jointAccelerationsFHPC(obj.mfeet_conf, obj.mhand_conf, tau, fe_h, ...
-                                                         stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            ddq_j = obj.mwbm_icub.jointAccelerationsFPCEF(obj.mfeet_conf, obj.mhand_conf, tau, fe_h, ac_h, ac_f, ...
+                                                          stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccFHPCPL(obj, tau, fhTotCWrench, f_cp, q_j, dq_j, stFltb) % FHPCPL ... feet & hand pose correction with payload
-            if (nargin == 6)
+        function ddq_j = jointAccFPCPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % FPCPL ... Feet Pose Correction with PayLoad (at the hands)
+            if (nargin == 7)
                 stFltb = obj.mwbm_icub.getFloatingBaseState();
             end
-            ddq_j = obj.mwbm_icub.jointAccelerationsFHPCPL(obj.mfeet_conf, obj.mhand_conf, tau, fhTotCWrench, f_cp, ...
-                                                           stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            ddq_j = obj.mwbm_icub.jointAccelerationsFPCPL(obj.mfeet_conf, obj.mhand_conf, tau, fhTotCWrench, f_cp, ac_f, ...
+                                                          stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function ac_h = handAcc(obj, tau, q_j, dq_j, stFltb)
@@ -189,42 +204,46 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                                                   stFltb.v_b, ddq_j);
         end
 
-        function [t, stmChi] = fwdDyn(obj, tspan, fhTrqControl, stvChi_0, ode_opt, varargin)
+        function [t, stmChi] = fwdDyn(obj, tspan, stvChi_0, fhTrqControl, ode_opt, varargin)
             f_cfg = ~isempty(obj.mfeet_conf);
             h_cfg = ~isempty(obj.mhand_conf);
 
             if (f_cfg && h_cfg)
-                switch nargin
-                    case 8
-                        % forward dynamics with feet and hand pose correction and payload:
-                        % fhTotCWrench = varargin{1}
-                        % f_cp         = varargin{2}
-                        % ac_f         = varargin{3}
-                        [t, stmChi] = obj.mwbm_icub.intForwardDynamicsFHPCPL(tspan, stvChi_0, fhTrqControl, ode_opt, varargin{1,1}, ...
-                                                                             obj.mfeet_conf, obj.mhand_conf, varargin{1,2}, varargin{1,3});
-                    case 7
-                        % forward dynamics with feet and hand pose correction:
-                        % fe_h = varargin{1}
-                        % ac_f = varargin{2}
-                        [t, stmChi] = obj.mwbm_icub.intForwardDynamicsFHPC(tspan, stvChi_0, fhTrqControl, ode_opt, obj.mfeet_conf, ...
-                                                                           obj.mhand_conf, varargin{1,2}, varargin{1,3});
-                    otherwise
-                        error('iCubWBM::fwdDyn: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+                % feet and hands:
+                % nargin = 11: pc_type = varargin{4}
+                if isa(varargin{1,1}, 'function_handle')
+                    % with payload:
+                    % fhTotCWrench = varargin{1}
+                    % f_cp         = varargin{2}
+                    % ac_f         = varargin{3}
+                    [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, varargin{1,1}, ...
+                                                                   obj.mfeet_conf, obj.mhand_conf, varargin{2:end});
+                else
+                    % with external forces:
+                    % fe_c = varargin{1}
+                    % ac   = varargin{2}
+                    % ac_f = varargin{3}
+                    [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, obj.mfeet_conf, ...
+                                                                   obj.mhand_conf, varargin{1:end});
                 end
             elseif h_cfg
-                % only with hand pose correction:
-                % fe_h = varargin{1}
-                % ac_f = varargin{2}
-                [t, stmChi] = obj.mwbm_icub.intForwardDynamicsHPC(tspan, stvChi_0, fhTrqControl, ode_opt, ...
-                                                                  obj.mhand_conf, varargin{1,1}, varargin{1,2});
+                % only hands:
+                % fe_h      = varargin{1}
+                % ac_h      = varargin{2}
+                % pc_type   = varargin{3}
+                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, ...
+                                                               obj.mhand_conf, varargin{1:3});
             elseif f_cfg
-                % only with feet pose correction:
-                % ac_f = varargin{1}
-                [t, stmChi] = obj.mwbm_icub.intForwardDynamicsFPC(tspan, stvChi_0, fhTrqControl, ode_opt, ...
-                                                                  obj.mfeet_conf, varargin{1,1});
+                % only feet:
+                % ac_f      = varargin{1}
+                % pc_type   = varargin{2}
+                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, ...
+                                                               obj.mfeet_conf, varargin{1,1}, varargin{1,2});
             else
-                % simple forward dynamics without any pose corrections:
-                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt);
+                % forward dynamics without any pose corrections
+                % and contact link configurations:
+                % nargin = 6: pc_type = varargin{1}
+                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, varargin{:});
             end
         end
 
@@ -337,7 +356,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         end
 
         function robot_name = get.robot_name(obj)
-            robot_name = sprintf('%s, model: %s', obj.mrobot_name, obj.robot_model);
+            robot_name = obj.mrobot_name;
         end
 
         function set.robot_model(obj, model_name)
@@ -477,6 +496,10 @@ classdef iCubWBM < WBM.Interfaces.IWBM
 
         function jlmts = get.jlimits(obj)
             jlmts = obj.mwbm_icub.joint_limits;
+        end
+
+        function set.ndof(obj, ndof)
+            obj.mwbm_icub.ndof = ndof;
         end
 
         function ndof = get.ndof(obj)

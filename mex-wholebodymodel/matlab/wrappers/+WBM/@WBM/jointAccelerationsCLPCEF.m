@@ -1,4 +1,4 @@
-function [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_c, varargin)
+function [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clink_conf, tau, fe_c, ac, varargin)
     switch nargin
         case 11
             if iscolumn(varargin{1,3})
@@ -15,8 +15,8 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_
                 wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
                 [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clink_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
                 % get the contact forces and the corresponding generalized forces ...
-                [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, djcdq, M, c_qv, ...
-                                                   wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, nu);
+                [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, ...
+                                                     wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, nu);
             else
                 % optimized mode (with friction):
                 % djcdq = varargin{2}
@@ -26,8 +26,8 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_
                 M    = varargin{1,3};
                 c_qv = varargin{1,4};
 
-                [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, varargin{1,2}, ...
-                                                   M, c_qv, varargin{5:6});
+                [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, ...
+                                                     varargin{1,2}, M, c_qv, varargin{5:6});
             end
         case 10
             % optimized mode (without friction):
@@ -37,8 +37,8 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_
             M    = varargin{1,3};
             c_qv = varargin{1,4};
 
-            [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, varargin{1,2}, ...
-                                               M, c_qv, varargin{1,5});
+            [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, ...
+                                                 varargin{1,2}, M, c_qv, varargin{1,5});
         case 9
             % semi-optimized mode (without friction):
             % wf_R_b = varargin{1}
@@ -47,16 +47,16 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_
             % nu     = varargin{4}
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
             [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clink_conf);
-            [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, djcdq, ...
-                                               M, c_qv, wf_R_b_arr, varargin{2:4});
+            [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, djcdq, ...
+                                                 M, c_qv, wf_R_b_arr, varargin{2:4});
         case 6
             % optimized mode (without friction):
             nu = varargin{1,1};
 
             [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clink_conf);
-            [f_c, tau_gen] = contactForcesCLPC(obj, clink_conf, tau, f_e, a_c, Jc, djcdq, M, c_qv, nu);
+            [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, nu);
         otherwise
-            error('WBM::jointAccelerationsCLPC: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+            error('WBM::jointAccelerationsCLPCEF: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 
     % Joint Acceleration q_ddot (derived from the state-space equation):
@@ -67,6 +67,6 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPC(obj, clink_conf, tau, f_e, a_
 
     if (nargout == 2)
         % data structure of the calculated forward dynamics parameters ...
-        fd_prms = struct('tau_gen', tau_gen, 'f_c', f_c, 'a_c', a_c, 'f_e', f_e);
+        fd_prms = struct('tau_gen', tau_gen, 'f_c', f_c, 'a_c', ac, 'f_e', fe_c);
     end
 end
