@@ -26,8 +26,8 @@ Legend of abbreviations and acronyms which are used for the variable names:
     cfrict     ...  Coulomb friction
     chn        ...  chain
     chnt       ...  chain tree
-    clink, cl  ...  contact link
-    clnk       ...  contact link
+    cl         ...  contact link(s)
+    clink/clnk ...  contact link
     clp        ...  contact link pose
     cm         ...  center of mass
     cmo        ...  column major order

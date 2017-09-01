@@ -29,7 +29,7 @@ classdef (Abstract) IWBM < handle
 
         feet_conf = feetConfig(obj, varargin)
 
-        hand_conf = handConfig(obj, varargin)
+        hand_conf = handsConfig(obj, varargin)
 
         ddq_j = jointAcc(obj, tau, q_j, dq_j, stFltb)
 

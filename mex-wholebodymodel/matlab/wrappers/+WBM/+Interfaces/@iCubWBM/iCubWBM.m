@@ -85,11 +85,11 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         end
 
         function feet_conf = feetConfig(obj, varargin)
-            feet_conf = obj.mwbm_icub.feetConfigState(varargin{:});
+            feet_conf = obj.mwbm_icub.configStateFeet(varargin{:});
         end
 
-        function hand_conf = handConfig(obj, varargin)
-            hand_conf = obj.mwbm_icub.handConfigState(varargin{:});
+        function hand_conf = handsConfig(obj, varargin)
+            hand_conf = obj.mwbm_icub.configStateHands(varargin{:});
         end
 
         function ddq_j = jointAcc(obj, tau, q_j, dq_j, stFltb)

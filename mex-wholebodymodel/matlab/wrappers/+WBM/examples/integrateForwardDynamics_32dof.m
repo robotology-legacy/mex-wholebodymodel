@@ -41,7 +41,7 @@ fhTrqControl = @(t, M, c_qv, stp, nu, Jc, djcdq, feet_conf)zeroTrqsController(si
 %       function with feet pose correction (FPC). It defines the current feet pose and
 %       on which foot the legged robot is currently in contact with the ground.
 feet_on_ground = [true, true]; % [l_foot, r_foot]
-feet_conf = wbm_icub.feetConfigState(feet_on_ground, qj_init);
+feet_conf = wbm_icub.configStateFeet(feet_on_ground, qj_init, 'quat');
 
 %% ODE-Solver:
 %  Setup the function handle of the form f(t,chi), where chi refers to the dynamic state

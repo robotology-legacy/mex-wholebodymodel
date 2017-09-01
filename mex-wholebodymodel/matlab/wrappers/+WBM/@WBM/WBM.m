@@ -351,30 +351,14 @@ classdef WBM < WBM.WBMBase
             end
         end
 
-        clink_conf = ctcLinksConfigState(obj, varargin)
+        clink_conf = configStateCLinks(obj, varargin)
 
-        function feet_conf = feetConfigState(obj, cstate, varargin)
-            lfoot_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'l_sole'));
-            rfoot_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'r_sole'));
-
-            if ( isempty(lfoot_idx) || isempty(rfoot_idx) )
-                error('WBM::feetConfigState: %s', WBM.wbmErrorMsg.LNK_NOT_IN_LIST);
-            end
-            feet_idx = horzcat(lfoot_idx, rfoot_idx);
-
-            feet_conf = ctcLinksConfigState(obj, cstate, feet_idx, varargin{:});
+        function feet_conf = configStateFeet(obj, cstate, varargin)
+            feet_conf = createConfigStateCL(obj, cstate, 'l_sole', 'r_sole', varargin{:});
         end
 
-        function hand_conf = handConfigState(obj, cstate, varargin)
-            lhand_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'l_hand'));
-            rhand_idx = find(strcmp(obj.mwbm_config.ccstr_link_names, 'r_hand'));
-
-            if ( isempty(lhand_idx) || isempty(rhand_idx) )
-                error('WBM::handConfigState: %s', WBM.wbmErrorMsg.LNK_NOT_IN_LIST);
-            end
-            hand_idx = horzcat(lhand_idx, rhand_idx);
-
-            hand_conf = ctcLinksConfigState(obj, cstate, hand_idx, varargin{:});
+        function hand_conf = configStateHands(obj, cstate, varargin)
+            hand_conf = createConfigStateCL(obj, cstate, 'l_hand', 'r_hand', varargin{:});
         end
 
         vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
@@ -1285,6 +1269,23 @@ classdef WBM < WBM.WBMBase
             M    = a_prms.M;
             c_qv = a_prms.c_qv;
             Jc_f = a_prms.Jc_f;
+        end
+
+        function clink_conf = createConfigStateCL(obj, cstate, clink_l, clink_r, varargin)
+            clnk_idx_l = find(strcmp(obj.mwbm_config.ccstr_link_names, clink_l));
+            clnk_idx_r = find(strcmp(obj.mwbm_config.ccstr_link_names, clink_r));
+
+            if ( isempty(clnk_idx_l) || isempty(clnk_idx_r) )
+                error('WBM::createConfigStateCL: %s', WBM.wbmErrorMsg.LNK_NOT_IN_LIST);
+            end
+            clink_idx = horzcat(clnk_idx_l, clnk_idx_r);
+
+            n = size(varargin,2);
+            if ~ischar(varargin{1,n}) % n = 3, 2 or 1
+                varargin{1,n+1} = 'eul'; % default rotation type
+            end
+
+            clink_conf = configStateCLinks(obj, cstate, clink_idx, varargin{:});
         end
 
     end
