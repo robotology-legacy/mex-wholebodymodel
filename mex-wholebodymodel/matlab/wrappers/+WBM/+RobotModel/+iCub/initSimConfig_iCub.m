@@ -18,16 +18,16 @@ function sim_config = initSimConfig_iCub(scn_mode)
     %    <http://wiki.icub.org/wiki/ICub_Model_naming_conventions>.
     %
     % Link names which are related to a specific parent joint of the robot model:
-    %                                                                    idx:        | parent joints:
-    joint_lnk_names = {'root_link'; ...                                %  1,         | --,
-                       'r_hip_1'; 'r_lower_leg'; 'r_sole'; ...         %  2,  3,  4, | r_hip_pitch, r_knee, r_foot* --> r_foot_ft_sensor,
-                       'l_hip_1'; 'l_lower_leg'; 'l_sole'; ...         %  5,  6,  7, | l_hip_pitch, l_knee, l_foot* --> l_foot_ft_sensor,
-                       'neck_1'; ...                                   %  8,         | neck_pitch,
-                       'r_shoulder_1'; 'r_elbow_1'; 'r_gripper'; ...   %  9, 10, 11, | r_shoulder_pitch, r_elbow, r_hand_dh_frame** --> r_hand* --> r_wrist_yaw,
-                       'l_shoulder_1'; 'l_elbow_1'; 'l_gripper'; ...   % 12, 13, 14, | l_shoulder_pitch, l_elbow, l_hand_dh_frame** --> l_hand* --> l_wrist_yaw,
-                       'com'};                                         % 15          | --
-                                                                       %             |
-                                                                       %             | (* ... link; ** ... link frame)
+    %                                                                  idx:        | parent joints:
+    jnt_lnk_names = {'root_link'; ...                                %  1,         | --,
+                     'r_hip_1'; 'r_lower_leg'; 'r_sole'; ...         %  2,  3,  4, | r_hip_pitch, r_knee, r_foot* --> r_foot_ft_sensor,
+                     'l_hip_1'; 'l_lower_leg'; 'l_sole'; ...         %  5,  6,  7, | l_hip_pitch, l_knee, l_foot* --> l_foot_ft_sensor,
+                     'neck_1'; ...                                   %  8,         | neck_pitch,
+                     'r_shoulder_1'; 'r_elbow_1'; 'r_gripper'; ...   %  9, 10, 11, | r_shoulder_pitch, r_elbow, r_hand_dh_frame** --> r_hand* --> r_wrist_yaw,
+                     'l_shoulder_1'; 'l_elbow_1'; 'l_gripper'; ...   % 12, 13, 14, | l_shoulder_pitch, l_elbow, l_hand_dh_frame** --> l_hand* --> l_wrist_yaw,
+                     'com'};                                         % 15          | --
+                                                                     %             |
+                                                                     %             | (* ... link; ** ... link frame)
 
     % Set of joint-pair indexes to describe the configuration of the iCub-robot's
     % skeleton (connectivity graph). Each pair of joints is connected with a rigid
@@ -38,19 +38,19 @@ function sim_config = initSimConfig_iCub(scn_mode)
     %
     % Joint pair indexes for the x, y and z-positions (translations) in the 3D-space:
     %                       x1 x2   y1 y2   z1 z2
-    joint_pair_idx = uint8([ 1  8    1  8    1  8;
-                             1  2    1  2    1  2;
-                             2  3    2  3    2  3;
-                             3  4    3  4    3  4;
-                             1  5    1  5    1  5;
-                             5  6    5  6    5  6;
-                             6  7    6  7    6  7;
-                             8  9    8  9    8  9;
-                             9 10    9 10    9 10;
-                            10 11   10 11   10 11;
-                             8 12    8 12    8 12;
-                            12 13   12 13   12 13;
-                            13 14   13 14   13 14]);
+    jnt_pair_idx = uint8([ 1  8    1  8    1  8;
+                           1  2    1  2    1  2;
+                           2  3    2  3    2  3;
+                           3  4    3  4    3  4;
+                           1  5    1  5    1  5;
+                           5  6    5  6    5  6;
+                           6  7    6  7    6  7;
+                           8  9    8  9    8  9;
+                           9 10    9 10    9 10;
+                          10 11   10 11   10 11;
+                           8 12    8 12    8 12;
+                          12 13   12 13   12 13;
+                          13 14   13 14   13 14]);
 
     % List with constant scale factors to define the sizes of the shapes (patches) for
     % the links (edges) of the robot's skeleton. They form the shape of the robot's body:
@@ -100,7 +100,7 @@ function sim_config = initSimConfig_iCub(scn_mode)
                            0.11    0   0];
 
     % Create the body model of the animated robot in the simulation:
-    sim_body = WBM.wbmSimBody(joint_lnk_names, joint_pair_idx);
+    sim_body = WBM.wbmSimBody(jnt_lnk_names, jnt_pair_idx);
 
     % Geometry properties for the shape of the robot body:
     sim_body.shape_geom = shape_geom;
@@ -110,8 +110,8 @@ function sim_config = initSimConfig_iCub(scn_mode)
     sim_body.draw_prop.joints.color = WBM.wbmColor.orange;
 
     env_settings = WBM.wbmSimEnvironment;
-    env_settings.ground_shape   = WBM.genericSimConfig.DF_GROUND_SHAPE;
-    env_settings.origin_pt_size = 4.5;
+    env_settings.grnd_shape   = WBM.genericSimConfig.DF_GROUND_SHAPE;
+    env_settings.orig_pt_size = 4.5;
 
     switch scn_mode
         case 'LightScn'
@@ -120,20 +120,20 @@ function sim_config = initSimConfig_iCub(scn_mode)
             sim_body.draw_prop.shape.face_color = WBM.wbmColor.royalblue4;
             sim_body.draw_prop.shape.edge_color = WBM.wbmColor.royalblue4;
 
-            env_settings.background_color_opt   = 'white';
-            env_settings.ground_color           = WBM.wbmColor.papayawhip;
-            env_settings.ground_edge_color      = 'black';
-            env_settings.origin_pt_color        = 'black';
+            env_settings.bkgrd_color_opt = 'white';
+            env_settings.grnd_color      = WBM.wbmColor.papayawhip;
+            env_settings.grnd_edge_color = 'black';
+            env_settings.orig_pt_color   = 'black';
         case 'DarkScn'
             % draw settings for the dark scene ...
             sim_body.draw_prop.links.color      = WBM.wbmColor.seashell4;
             sim_body.draw_prop.shape.edge_color = WBM.wbmColor.steelblue;
             sim_body.draw_prop.shape.face_color = WBM.wbmColor.steelblue;
 
-            env_settings.background_color_opt = 'black';
-            env_settings.ground_color         = WBM.wbmColor.snow;
-            env_settings.ground_edge_color    = 'none';
-            env_settings.origin_pt_color      = WBM.wbmColor.violetred;
+            env_settings.bkgrd_color_opt = 'black';
+            env_settings.grnd_color      = WBM.wbmColor.snow;
+            env_settings.grnd_edge_color = 'none';
+            env_settings.orig_pt_color   = WBM.wbmColor.violetred;
         otherwise
             error('initSimConfig_iCub: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
     end

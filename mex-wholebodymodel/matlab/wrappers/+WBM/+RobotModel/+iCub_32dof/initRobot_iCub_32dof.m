@@ -20,7 +20,7 @@ function [wbm_icub, ndof] = initRobot_iCub_32dof(wf2fixLnk)
     icub_config.ccstr_link_names = {'l_sole', 'r_sole'};
 
     % Setup the body of the iCub-Robot with the initial body (joint) positions (in degrees):
-    [icub_config.body, joint_names_body] = WBM.RobotModel.iCub_arms_torso_free.setupBody_iCub_atf();
+    [icub_config.body, jnt_names_body] = WBM.RobotModel.iCub_arms_torso_free.setupBody_iCub_atf();
     icub_config.jpos_torso     = [0; 0; 0];
     icub_config.jpos_left_arm  = [0; 0; 0; 0; 0; 0; 0];
     icub_config.jpos_left_leg  = [0; 0; 0; 0; 0; 0];
@@ -32,8 +32,8 @@ function [wbm_icub, ndof] = initRobot_iCub_32dof(wf2fixLnk)
     qj_init_body = vertcat(icub_config.jpos_torso, icub_config.jpos_left_arm, icub_config.jpos_right_arm, ...
                            icub_config.jpos_left_leg, icub_config.jpos_right_leg);
 
-    [rev_joint_names, ndof] = WBM.utilities.getJointNamesFromURDF(icub_model.urdf_robot_name, 'revolute');
-    qj_init                 = WBM.utilities.initJointsFromNameList(rev_joint_names, ndof, joint_names_body, qj_init_body);
+    [rev_jnt_names, ndof] = WBM.utilities.getJointNamesFromURDF(icub_model.urdf_robot_name, 'revolute');
+    qj_init               = WBM.utilities.initJointsFromNameList(rev_jnt_names, ndof, jnt_names_body, qj_init_body);
 
     % Init-State Parameters:
     icub_config.init_state_params.x_b     = zeros(3,1);

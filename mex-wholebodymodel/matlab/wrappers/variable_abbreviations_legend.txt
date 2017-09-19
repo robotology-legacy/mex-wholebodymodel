@@ -17,9 +17,11 @@ Legend of abbreviations and acronyms which are used for the variable names:
     b          ...  base
     bf         ...  base frame
     bgn        ...  begin
+    bkgrd      ...  background
     c          ...  Cartesian OR contact OR constraint
     c...       ...  cell array (begin of variable name)
     cX         ...  co-adjoint transformation (matrix)
+    cap        ...  capture
     ccstr      ...  contact constraint
     cent       ...  centroidal
     centf      ...  centrifugal OR centrifugal force(s)
@@ -47,6 +49,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     dp         ...  data point
     ds         ...  dimensions
     dstv       ...  derivative of state vector
+    elms       ...  elements
     et         ...  elapsed time
     ex, exc    ...  exception
     fb         ...  floating base
@@ -58,12 +61,15 @@ Legend of abbreviations and acronyms which are used for the variable names:
     flnk       ...  fixed link
     flt, fltg  ...  floating
     fltb       ...  floating base
+    fps        ...  frames per second
     frict      ...  friction
     frm        ...  frame
+    ft         ...  foot
     fwd        ...  forward
     fwnd       ...  figure window
     g          ...  gravity acceleration (vector)
     gen        ...  generalized
+    grnd, grd  ...  ground
     h...       ...  "handle" to an object (begin of variable name), e.g. hFig = handle to the figure object
     ..._h      ...  "hat" (end of variable name), 'h' declares that this variable is an unit vector of length 1, e.g. "f1_h", "fcp_h", etc.
     h_c        ...  centroidal momentum (vector)
@@ -87,6 +93,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ...m       ...  "matrix" (end of variable name), like "skewm", "adjointm", etc.
     mat        ...  matrix
     mom        ...  moment/momentum
+    mov        ...  movie
     mult       ...  multiplier(s)
     ndof       ...  number degrees of freedom
     nflds      ...  number of fields
@@ -98,6 +105,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     onb        ...  orthonormal basis
     op         ...  operator
     or         ...  orientation
+    orig       ...  origin
     ow         ...  old world
     p          ...  position OR translation (vector)
     p...       ...  pointer to an object/variable/array (begin of variable name, only in C++)
@@ -157,10 +165,15 @@ Legend of abbreviations and acronyms which are used for the variable names:
     veT        ...  vector Euler-angle transformation [translation with Euler angles] (6x1-vector)
     vel        ...  velocit(y/ies)
     vfrict     ...  viscous friction
+    vh...      ...  vector of handles to objects (begin of variable name), e.g. vhdp = vector handle of data point objects
+    vid        ...  video
+    vp         ...  viewpoint(s)
     vpos       ...  vector position [translation] (vector)
     vqT        ...  vector-quaternion transformation [VQS-Transformation] (7x1-vector) (*)
+    vtcs       ...  vertices
     vtr        ...  vector translation (vector)
-    vtx        ...  vert(ex/ices)
+    vtx        ...  vertex
+    vwpts      ...  viewpoints
     vxT        ...  vector axis-angle transformation [translation with axis angles] (7x1-vector)
     w          ...  world
     wbm        ...  whole body model

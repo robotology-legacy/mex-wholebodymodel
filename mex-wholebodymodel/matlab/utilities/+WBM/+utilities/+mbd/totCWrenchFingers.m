@@ -21,20 +21,20 @@ function wc_tot = totCWrenchFingers(f_cp, a_R_c, a_p_c, varargin)
                 % mu_s    = varargin{1}
                 % gamma_s = varargin{2}
                 for i = 1:n_c
-                    w_c    = WBM.utilities.mbd.ctcwrench(f_cp{1,i}, a_R_c, a_p_c, varargin{1:2});
+                    w_c    = WBM.utilities.mbd.cwrench(f_cp{1,i}, a_R_c, a_p_c, varargin{1:2});
                     wc_tot = wc_tot + w_c;
                 end
             case 5
                 % point contact w. friction:
                 % mu_s = varargin{1}
                 for i = 1:n_c
-                    w_c    = WBM.utilities.mbd.ctcwrench(f_cp{1,i}, a_R_c, a_p_c, varargin{1,1});
+                    w_c    = WBM.utilities.mbd.cwrench(f_cp{1,i}, a_R_c, a_p_c, varargin{1,1});
                     wc_tot = wc_tot + w_c;
                 end
             case 4
                 % frictionless contact model:
                 for i = 1:n_c
-                    w_c    = WBM.utilities.mbd.ctcwrench(f_cp{1,i}, a_R_c, a_p_c);
+                    w_c    = WBM.utilities.mbd.cwrench(f_cp{1,i}, a_R_c, a_p_c);
                     wc_tot = wc_tot + w_c;
                 end
             otherwise

@@ -1,4 +1,4 @@
-function G_c = ctcmap(varargin)
+function G_c = cmap(varargin)
     %% Contact map:
     %  Sources:
     %   [1] A Mathematical Introduction to Robotic Manipulation, Murray & Li & Sastry, CRC Press, 1994, pp. 218-220.
@@ -17,8 +17,8 @@ function G_c = ctcmap(varargin)
             a_p_c = varargin{1,2};
             % ctc_type = varargin{3}
 
-            WBM.utilities.chkfun.checkMatDim(a_R_c, 3, 3, 'ctcmap');
-            WBM.utilities.chkfun.checkCVecDim(a_p_c, 3, 'ctcmap');
+            WBM.utilities.chkfun.checkMatDim(a_R_c, 3, 3, 'cmap');
+            WBM.utilities.chkfun.checkCVecDim(a_p_c, 3, 'cmap');
 
             a_cX_c = WBM.utilities.tfms.coadjoint(a_R_c, a_p_c);
             B_c    = WBM.utilities.mbd.wbasis(varargin{1,3});
@@ -30,7 +30,7 @@ function G_c = ctcmap(varargin)
             a_p_c    = varargin{1,1};
             ctc_type = varargin{1,2};
 
-            WBM.utilities.chkfun.checkCVecDim(a_p_c, 3, 'ctcmap');
+            WBM.utilities.chkfun.checkCVecDim(a_p_c, 3, 'cmap');
 
             switch ctc_type
                 case 'pcwf'
@@ -53,9 +53,9 @@ function G_c = ctcmap(varargin)
                     G_c(4,1) =  a_p_c(2,1);
                     G_c(5,1) = -a_p_c(1,1);
                 otherwise
-                    error('ctcmap: %s', WBM.wbmErrorMsg.UNKNOWN_CTC_MODEL);
+                    error('cmap: %s', WBM.wbmErrorMsg.UNKNOWN_CTC_MODEL);
             end
         otherwise
-            error('ctcmap: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+            error('cmap: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
 end

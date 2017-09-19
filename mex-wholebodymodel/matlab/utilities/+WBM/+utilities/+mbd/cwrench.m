@@ -1,5 +1,4 @@
-% function [w_c, FC_c, WC_c] = ctcwrench(f_cp, varargin)
-function [w_c, wc_prms] = ctcwrench(f_cp, varargin)
+function [w_c, wc_prms] = cwrench(f_cp, varargin)
     vlen = size(f_cp,1); % f_cp (force applied to the object at contact point a_p_c)
                          % must be a column-vector or a scalar.
     %% Contact wrench:
@@ -41,7 +40,7 @@ function [w_c, wc_prms] = ctcwrench(f_cp, varargin)
             mu_s    = varargin{1,3};
             gamma_s = varargin{1,4};
 
-            G_c = WBM.utilities.mbd.ctcmap(varargin{1,1}, varargin{1,2}, 'sfc'); % contact map
+            G_c = WBM.utilities.mbd.cmap(varargin{1,1}, varargin{1,2}, 'sfc'); % contact map
         case 4
             switch vlen
                 case 4
@@ -49,15 +48,15 @@ function [w_c, wc_prms] = ctcwrench(f_cp, varargin)
                     % a_p_c = varargin{1}
                     mu_s    = varargin{1,2};
                     gamma_s = varargin{1,3};
-                    G_c = WBM.utilities.mbd.ctcmap(varargin{1,1}, 'sfc');
+                    G_c = WBM.utilities.mbd.cmap(varargin{1,1}, 'sfc');
                 case 3
                     % point contact w. friction (general case):
                     % a_R_c = varargin{1}
                     % a_p_c = varargin{2}
                     mu_s = varargin{1,3};
-                    G_c = WBM.utilities.mbd.ctcmap(varargin{1,1}, varargin{1,2}, 'pcwf');
+                    G_c = WBM.utilities.mbd.cmap(varargin{1,1}, varargin{1,2}, 'pcwf');
                 otherwise
-                    error('ctcwrench: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                    error('cwrench: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
         case 3
             switch vlen
@@ -65,14 +64,14 @@ function [w_c, wc_prms] = ctcwrench(f_cp, varargin)
                     % point contact w. friction (special case):
                     % a_p_c = varargin{1}
                     mu_s = varargin{1,2};
-                    G_c = WBM.utilities.mbd.ctcmap(varargin{1,1}, 'pcwf');
+                    G_c = WBM.utilities.mbd.cmap(varargin{1,1}, 'pcwf');
                 case 1 % f_cp is a scalar (not a vector) ...
                     % frictionless contact model (general case):
                     % a_R_c = varargin{1}
                     % a_p_c = varargin{2}
-                    WBM.utilities.chkfun.checkValLTZero(f_cp, 'ctcwrench');
+                    WBM.utilities.chkfun.checkValLTZero(f_cp, 'cwrench');
 
-                    G_c = WBM.utilities.mbd.ctcmap(varargin{1,1}, varargin{1,2}, 'fpc');
+                    G_c = WBM.utilities.mbd.cmap(varargin{1,1}, varargin{1,2}, 'fpc');
                     w_c  = G_c * f_cp;
 
                     if (nargout == 2)
@@ -81,18 +80,18 @@ function [w_c, wc_prms] = ctcwrench(f_cp, varargin)
                     end
                     return
                 otherwise
-                    error('ctcwrench: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                    error('cwrench: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
         case 2
             % frictionless contact model (special case):
             % a_p_c = varargin{1}
             if (vlen ~= 1)
                 % f_cp is not a scalar ...
-                error('ctcwrench: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+                error('cwrench: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            WBM.utilities.chkfun.checkValLTZero(f_cp, 'ctcwrench');
+            WBM.utilities.chkfun.checkValLTZero(f_cp, 'cwrench');
 
-            G_c = WBM.utilities.mbd.ctcmap(varargin{1,1}, 'fpc');
+            G_c = WBM.utilities.mbd.cmap(varargin{1,1}, 'fpc');
             w_c  = G_c * f_cp;
 
             if (nargout == 2)
@@ -100,7 +99,7 @@ function [w_c, wc_prms] = ctcwrench(f_cp, varargin)
             end
             return
         otherwise
-            error('ctcwrench: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+            error('cwrench: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
     % Based on the frictional contact models, calculate the contact wrench w_c and
     % the corresponding friction cone FC of the contact point a_p_c:
@@ -111,21 +110,21 @@ function [w_c, wc_prms] = ctcwrench(f_cp, varargin)
     f_n = f_cp(3,1); % normal force (direction inward toward the object surface)
 
     if ( (f_x == 0) && (f_y == 0) )
-        error('ctcwrench: Contact point force f_cp must have at least one tangential force!');
+        error('cwrench: Contact point force f_cp must have at least one tangential force!');
     end
 
     % check the friction cone constraints:
-    WBM.utilities.chkfun.checkValLTZero(f_n, 'ctcwrench');
+    WBM.utilities.chkfun.checkValLTZero(f_n, 'cwrench');
 
     f_t = sqrt(f_x*f_x + f_y*f_y); % magnitude of the tangential contact forces.
     if (f_t > mu_s*f_n) % max. magnitude (radius) of the friction cone.
-        error('ctcwrench: Contact point force f_cp has left the friction cone!');
+        error('cwrench: Contact point force f_cp has left the friction cone!');
     end
     if (vlen == 4)
         % soft-finger contact model:
         % m_z = f_cp(4)
         if (abs(f_cp(4,1)) > gamma_s*f_n) % additional FC constraint ...
-            error('ctcwrench: The frictional torque m_z has exceeded the limit!');
+            error('cwrench: The frictional torque m_z has exceeded the limit!');
         end
     end
     % Define the unit vectors for the approximation of the friction cone FC:
@@ -181,7 +180,7 @@ function [w_c, wc_prms] = ctcwrench(f_cp, varargin)
         wc_prms = struct('FC_c', FC_c, 'Wp_c', w_p, 'alpha_s', alpha_s);
     end
 end
-%% END of ctcwrench.
+%% END of cwrench.
 
 
 %% PRIMITIVE FORCES (ALONG EDGES OF PC):

@@ -16,11 +16,11 @@ classdef wbmSimBody < handle
     end
 
     properties(SetAccess = private, GetAccess = public)
-        joint_lnk_names@cell vector
-        joint_pair_idx@uint8 matrix
-        nJoints@uint8        scalar = 0;
-        nLinks@uint8         scalar = 0;
-        nFeets@uint8         scalar = 0;
+        jnt_lnk_names@cell vector
+        jnt_pair_idx@uint8 matrix
+        nJnts@uint8        scalar = 0;
+        nLnks@uint8        scalar = 0;
+        nFeet@uint8        scalar = 0;
     end
 
     properties(Access = private)
@@ -34,29 +34,29 @@ classdef wbmSimBody < handle
     end
 
     methods
-        function obj = wbmSimBody(joint_lnk_names, joint_pair_idx, draw_prop)
-            if ( (nargin < 2) || (nargin > 3) )
+        function obj = wbmSimBody(jnt_lnk_names, jnt_pair_idx, draw_prop)
+            if (nargin < 2)
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
-            if ( ~iscellstr(joint_lnk_names) || ~ismatrix(joint_pair_idx) )
+            if ( ~iscellstr(jnt_lnk_names) || ~ismatrix(jnt_pair_idx) )
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            if ~iscolumn(joint_lnk_names)
+            if ~iscolumn(jnt_lnk_names)
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
 
-            obj.joint_lnk_names = joint_lnk_names;
-            obj.nJoints = size(obj.joint_lnk_names,1);
-            obj.nLinks  = obj.nJoints - 2; % a tree has n-1 edges (links) + without 'CoM' ...
+            obj.jnt_lnk_names = jnt_lnk_names;
+            obj.nJnts = size(jnt_lnk_names,1);
+            obj.nLnks = obj.nJnts - 2; % a tree has n-1 edges (links) + without 'CoM' ...
 
-            [m,n] = size(joint_pair_idx);
-            if ( (m ~= obj.nLinks) || (n ~= 6) )
+            [m,n] = size(jnt_pair_idx);
+            if ( (m ~= obj.nLnks) || (n ~= 6) )
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
-            obj.joint_pair_idx = joint_pair_idx;
+            obj.jnt_pair_idx = jnt_pair_idx;
 
             % initialize the draw properties for the body of the animated robot ...
-            if exist('draw_prop', 'var')
+            if (nargin == 3)
                 obj.draw_prop = draw_prop;
                 return
             end
@@ -93,7 +93,7 @@ classdef wbmSimBody < handle
 
         function set.shape_size_sf(obj, size_sf)
             [m,n] = size(size_sf);
-            if ( (m ~= obj.nLinks) || (n ~= 2) )
+            if ( (m ~= obj.nLnks) || (n ~= 2) )
                 error('wbmSimBody::set.shape_size_sf: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
             obj.mshape_geom.size_sf = size_sf;
@@ -133,7 +133,7 @@ classdef wbmSimBody < handle
                 error('wbmSimBody::set.foot_joints: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             obj.mfoot_geom.joints = foot_jnts;
-            obj.nFeets = length(obj.mfoot_geom.joints);
+            obj.nFeet = uint8(length(obj.mfoot_geom.joints));
         end
 
         function foot_jnts = get.foot_joints(obj)

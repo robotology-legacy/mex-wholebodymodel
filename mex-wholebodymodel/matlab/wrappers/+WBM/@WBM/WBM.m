@@ -776,7 +776,7 @@ classdef WBM < WBM.WBMBase
                     end
 
                     len = length(chain_names);
-                    if (len > obj.mwbm_config.body.nChains)
+                    if (len > obj.mwbm_config.body.nChns)
                         error('WBM::getJntChainsState: %s', WBM.wbmErrorMsg.WRONG_ARR_SIZE);
                     end
 
@@ -1138,7 +1138,7 @@ classdef WBM < WBM.WBMBase
         end
 
         function [jnt_q, jnt_dq] = getJointValues(obj, q_j, dq_j, joint_idx, len)
-            if (len > obj.mwbm_config.body.nJoints)
+            if (len > obj.mwbm_config.body.nJnts)
                 error('WBM::getJointValues: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
             end
             % get the joint values of the index list ...
@@ -1287,6 +1287,8 @@ classdef WBM < WBM.WBMBase
 
             clink_conf = configStateCLinks(obj, cstate, clink_idx, varargin{:});
         end
+
+        [] = visualizeSimRobot(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
 
     end
 end

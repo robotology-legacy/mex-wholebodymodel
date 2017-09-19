@@ -1,20 +1,32 @@
-function sim_config = setupSimulation(~, sim_config)
+function sim_config = setupSimulation(~, sim_config, rot3d)
+    switch nargin
+        case 3
+            if ~islogical(rot3d)
+                error('WBM::setupSimulation: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+            end
+        case 2
+            % no mouse-base rotation on all axes (default)
+            rot3d = false;
+        otherwise
+            error('WBM::setupSimulation: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+    end
     % check if sim_config is an instance from a derived class of "wbmSimConfig" ...
     if ~isa(sim_config, 'WBM.absSimConfig')
         error('WBM::setupSimulation: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
 
-    if ~isempty(sim_config.hMainFigure)
-        clf(sim_config.hMainFigure); % clear the figure window ...
+    if ~isempty(sim_config.hWndFigure)
+        clf(sim_config.hWndFigure); % clear the figure window ...
     end
 
-    % init the main figure window for the simulation:
-    sim_config.hMainFigure = figure('Name', sim_config.main_title, 'Position', sim_config.main_pos);
-    set(sim_config.hMainFigure, 'NumberTitle', 'off', 'MenuBar', 'none', 'BackingStore', 'off');
+    % init the figure window for the simulation:
+    fig_pos = horzcat(sim_config.wnd_pos, sim_config.wnd_size);
+    sim_config.hWndFigure = figure('Name', sim_config.wnd_title, 'Position', fig_pos);
+    set(sim_config.hWndFigure, 'NumberTitle', 'off', 'MenuBar', 'none', 'BackingStore', 'off');
 
-    if ~strcmp(sim_config.environment.background_color_opt, 'white')
+    if ~strcmp(sim_config.environment.bkgrd_color_opt, 'white')
         % change the color option of the axis background, axis lines and labels, and the figure background ...
-        colordef(sim_config.hMainFigure, sim_config.environment.background_color_opt);
+        colordef(sim_config.hWndFigure, sim_config.environment.background_color_opt);
     end % else, use the default system colors ...
 
     % setup the rendering method of the current figure handle:
@@ -35,8 +47,18 @@ function sim_config = setupSimulation(~, sim_config)
     end
     % split up the main figure into a 2x2 grid, create and setup the axes for each
     % 3D-subplot and draw a solid patch (rectangle) on the bottom of the axes:
-    figure(sim_config.hMainFigure);
-    for i = 1:4
+    figure(sim_config.hWndFigure);
+    if rot3d
+        % enable mouse-base rotation on all axes within the figure ...
+        rotate3d on;
+    end
+
+    nAxes = sim_config.nAxes;
+    if (size(sim_config.hAxes,2) ~= nAxes)
+        error('WBM::setupSimulation: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
+    end
+
+    for i = 1:nAxes
         sim_config.hAxes(1,i) = subplot('Position', sim_config.axes_pos(i,1:4));
         axis(sim_config.axis_limits);
 
@@ -53,16 +75,14 @@ function sim_config = setupSimulation(~, sim_config)
             % for older Matlab versions (<= R2014a) ...
             set(gca, 'DrawMode', 'fast');
         end
-        % enable mouse-base rotation on all axes ...
-        rotate3d(gca, 'on');
 
         hold on; % retain plots in the current axes ...
-        % draw the colored rectangle ...
-        fill3(sim_config.environment.ground_shape(1,1:4), sim_config.environment.ground_shape(2,1:4), ...
-              sim_config.environment.ground_shape(3,1:4), sim_config.environment.ground_color);
-        % draw the origin point of the axis onto the rectangle ...
-        sim_config.plot_objs{1,i} = plot3(0, 0, 0, 'Marker', '.', 'MarkerSize', 4, 'MarkerEdgeColor', 'k');
+        % draw the colored ground floor (rectangle) ...
+        fill3(sim_config.environment.grnd_shape(1,1:4), sim_config.environment.grnd_shape(2,1:4), ...
+              sim_config.environment.grnd_shape(3,1:4), sim_config.environment.grnd_color);
+        % draw the origin point of the axis onto the floor (rectangle) ...
+        sim_config.gfx_objects{1,i} = plot3(0, 0, 0, 'Marker', '.', 'MarkerSize', 4, 'MarkerEdgeColor', 'k');
     end
     % set the current axes handle of the main figure to the first subplot ...
-    set(sim_config.hMainFigure, 'CurrentAxes', sim_config.hAxes(1,1));
+    set(sim_config.hWndFigure, 'CurrentAxes', sim_config.hAxes(1,1));
 end
