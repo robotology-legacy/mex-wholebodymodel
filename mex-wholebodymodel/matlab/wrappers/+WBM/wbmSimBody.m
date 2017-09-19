@@ -49,10 +49,7 @@ classdef wbmSimBody < handle
             obj.nJnts = size(jnt_lnk_names,1);
             obj.nLnks = obj.nJnts - 2; % a tree has n-1 edges (links) + without 'CoM' ...
 
-            [m,n] = size(jnt_pair_idx);
-            if ( (m ~= obj.nLnks) || (n ~= 6) )
-                error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-            end
+            WBM.utilities.chkfun.checkMatDim(jnt_pair_idx, obj.nLnks, 6, 'wbmSimBody::wbmSimBody');
             obj.jnt_pair_idx = jnt_pair_idx;
 
             % initialize the draw properties for the body of the animated robot ...
@@ -92,10 +89,7 @@ classdef wbmSimBody < handle
         end
 
         function set.shape_size_sf(obj, size_sf)
-            [m,n] = size(size_sf);
-            if ( (m ~= obj.nLnks) || (n ~= 2) )
-                error('wbmSimBody::set.shape_size_sf: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-            end
+            WBM.utilities.chkfun.checkMatDim(size_sf, obj.nLnks, 2, 'wbmSimBody::set.shape_size_sf');
             obj.mshape_geom.size_sf = size_sf;
         end
 
@@ -104,10 +98,7 @@ classdef wbmSimBody < handle
         end
 
         function set.shape_faces(obj, shape_faces)
-            [m,n] = size(shape_faces);
-            if ( (m ~= 6) || (n ~= 4) )
-                error('wbmSimBody::set.shape_faces: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-            end
+            WBM.utilities.chkfun.checkMatDim(shape_faces, 6, 4, 'wbmSimBody::set.shape_faces');
             obj.mshape_geom.faces = shape_faces;
         end
 
@@ -157,10 +148,7 @@ classdef wbmSimBody < handle
         end
 
         function set.foot_shape_ds(obj, foot_ds)
-            [m,n] = size(foot_ds);
-            if ( (m ~= 8) || (n ~= 3) )
-                error('wbmSimBody::set.foot_shape_ds: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
-            end
+            WBM.utilities.chkfun.checkMatDim(foot_ds, 8, 3, 'wbmSimBody::set.foot_shape_ds');
             obj.mfoot_geom.shape_ds = foot_ds;
         end
 

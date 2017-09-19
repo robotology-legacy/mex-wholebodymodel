@@ -165,10 +165,8 @@ function animateSimRobot(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, sim_t
         shape_geom = sim_config.robot_body.shape_geom;
         foot_geom  = sim_config.robot_body.foot_geom;
 
-        idx1 = nJnts + 1;
-        idx2 = nJnts + nLnks;
-        % idx1 = 3;
-        % idx2 = 2 + nLnks;
+        idx1 = 3;
+        idx2 = 2 + nLnks;
         idx3 = idx2 + 1;
 
         while (t <= nSteps)
@@ -207,10 +205,8 @@ function animateSimRobot(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, sim_t
         end
     elseif drawSkel
         % animate only the skeleton of the robot:
-        idx1 = nJnts + 1;
-        idx2 = nJnts + nLnks;
-        % idx1 = 3;
-        % idx2 = 2 + nLnks;
+        idx1 = 3;
+        idx2 = 2 + nLnks;
 
         while (t <= nSteps)
             tic;
@@ -236,8 +232,7 @@ function animateSimRobot(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, sim_t
         shape_geom = sim_config.robot_body.shape_geom;
         foot_geom  = sim_config.robot_body.foot_geom;
 
-        idx3 = nJnts + nLnks + 1;
-        % idx3 = 3 + nLnks;
+        idx3 = 3 + nLnks;
 
         while (t <= nSteps)
             tic;
@@ -310,10 +305,8 @@ function vidfrms = animateSimRobotMov(sim_config, hSimRobot, fkin_jnts, nGObjs, 
         shape_geom = sim_config.robot_body.shape_geom;
         foot_geom  = sim_config.robot_body.foot_geom;
 
-        idx1 = nJnts + 1;
-        idx2 = nJnts + nLnks;
-        % idx1 = 3;
-        % idx2 = 2 + nLnks;
+        idx1 = 3;
+        idx2 = 2 + nLnks;
         idx3 = idx2 + 1;
 
         while (t <= nSteps)
@@ -343,10 +336,8 @@ function vidfrms = animateSimRobotMov(sim_config, hSimRobot, fkin_jnts, nGObjs, 
         end
     elseif drawSkel
         % animate only the skeleton of the robot:
-        idx1 = nJnts + 1;
-        idx2 = nJnts + nLnks;
-        % idx1 = 3;
-        % idx2 = 2 + nLnks;
+        idx1 = 3;
+        idx2 = 2 + nLnks;
 
         while (t <= nSteps)
             [hSimRobot(1:nJnts,1), fkin_jnts] = updateJointNodes(hSimRobot(1:nJnts,1), fkin_jnts, nJnts, t);
@@ -366,8 +357,7 @@ function vidfrms = animateSimRobotMov(sim_config, hSimRobot, fkin_jnts, nGObjs, 
         shape_geom = sim_config.robot_body.shape_geom;
         foot_geom  = sim_config.robot_body.foot_geom;
 
-        idx3 = nJnts + nLnks + 1;
-        % idx3 = 3 + nLnks;
+        idx3 = 3 + nLnks;
 
         while (t <= nSteps)
             [hSimRobot(1:nJnts,1), fkin_jnts] = updateJointNodes(hSimRobot(1:nJnts,1), fkin_jnts, nJnts, t);
@@ -410,8 +400,7 @@ function gfx_objects = updateSimRobotAxes(gfx_objects, hAxes, nAxes)
 end
 
 function [hJntNodes, fkin_jnts] = createJointNodes(fkin_jnts, sim_config, vis_ctrl)
-    nJnts     = sim_config.robot_body.nJnts;
-    hJntNodes = gobjects(nJnts,1); % initialize array for graphic objects (joint nodes)
+    nJnts = sim_config.robot_body.nJnts;
 
     % plot properties for the joint nodes of the robot's skeleton ...
     jnt_plot_prop = sim_config.robot_body.draw_prop.joints;
@@ -426,78 +415,38 @@ function [hJntNodes, fkin_jnts] = createJointNodes(fkin_jnts, sim_config, vis_ct
         com_plot_prop.color  = 'none';
     end
 
-    % draw the data points (nodes) for the joints of the robot's skeleton:
-    for i = 1:nJnts-1
-        [hJntNodes(i,1), fkin_jnts.pos(i,1:3)] = plotFKinJointPos(fkin_jnts.vqT(1,1:7,i), jnt_plot_prop);
-    end
+    % draw the the joints and the CoM of the robot's skeleton:
+    fk_vqT = squeeze(fkin_jnts.vqT(1,1:7,1:nJnts)).';
+    [hJntNodes, fkin_jnts.pos(1:nJnts,1:3)] = plotFKinJointPositions(fkin_jnts.pos, fk_vqT, nJnts, jnt_plot_prop, com_plot_prop);
+end
+
+function [vhdp_j, vpos_j] = plotFKinJointPositions(vpos_j, vqT_j, nJnts, jnt_plot_prop, com_plot_prop)
+    k = nJnts - 1;
+    vpos_j(1:nJnts,1:3) = vqT_j(1:nJnts,1:3);
+    vhdp_j = gobjects(2,1); % initialize array for graphic objects (data points)
+
+    % draw the data points (nodes) of the joints of the robot's skeleton:
+    vhdp_j(1,1) = plot3(vpos_j(1,1), vpos_j(1,2), vpos_j(1,3), 'LineStyle', 'none', 'Marker', jnt_plot_prop.marker, ...
+                        'MarkerSize', jnt_plot_prop.marker_sz, 'MarkerEdgeColor', jnt_plot_prop.color);
+    set(vhdp_j(1,1), 'XData', vpos_j(2:k,1), 'YData', vpos_j(2:k,2), 'ZData', vpos_j(2:k,3));
+
     % draw the position of the center of mass (CoM):
-    [hJntNodes(nJnts,1), fkin_jnts.pos(nJnts,1:3)] = plotFKinJointPos(fkin_jnts.vqT(1,1:7,nJnts), com_plot_prop);
+    vhdp_j(2,1) = plot3(vpos_j(nJnts,1), vpos_j(nJnts,2), vpos_j(nJnts,3), 'LineStyle', 'none', 'Marker', com_plot_prop.marker, ...
+                        'MarkerSize', com_plot_prop.marker_sz, 'MarkerEdgeColor', com_plot_prop.color);
 end
-
-function [hdp_j, pos_j] = plotFKinJointPos(vqT, plot_prop)
-    % get the new joint position (translation) of the computed forward kinematics ...
-    pos_j = vqT(1,1:3);
-    % create a 3D data point for the new translation of the current joint ...
-    hdp_j = plot3(pos_j(1,1), pos_j(1,2), pos_j(1,3), 'LineStyle', 'none', 'Marker', plot_prop.marker, ...
-                  'MarkerSize', plot_prop.marker_sz, 'MarkerEdgeColor', plot_prop.color);
-end
-
-% function [hJntNodes, fkin_jnts] = createJointNodes(fkin_jnts, sim_config, vis_ctrl)
-%     nJnts = sim_config.robot_body.nJnts;
-
-%     % plot properties for the joint nodes of the robot's skeleton ...
-%     jnt_plot_prop = sim_config.robot_body.draw_prop.joints;
-%     if ~vis_ctrl.drawJnts
-%         jnt_plot_prop.marker = 'none';
-%         jnt_plot_prop.color  = 'none';
-%     end
-%     % plot properties for the center of mass (CoM) ...
-%     com_plot_prop = sim_config.robot_body.draw_prop.com;
-%     if ~vis_ctrl.drawCom
-%         com_plot_prop.marker = 'none';
-%         com_plot_prop.color  = 'none';
-%     end
-
-%     fk_vqT = squeeze(fkin_jnts.vqT(1,1:7,1:nJnts)).';
-%     [hJntNodes, fkin_jnts.pos(1:nJnts,1:3)] = plotFKinJointPositions(fkin_jnts.pos, fk_vqT, nJnts, jnt_plot_prop, com_plot_prop);
-% end
-
-% function [vhdp_j, vpos_j] = plotFKinJointPositions(vpos_j, vqT_j, nJnts, jnt_plot_prop, com_plot_prop)
-%     k = nJnts - 1;
-%     vpos_j(1:nJnts,1:3) = vqT_j(1:nJnts,1:3);
-%     vhdp_j = gobjects(2,1); % initialize array for graphic objects (data points)
-
-%     % draw the data points (nodes) for the joints of the robot's skeleton:
-%     vhdp_j(1,1) = plot3(vpos_j(1,1), vpos_j(1,2), vpos_j(1,3), 'LineStyle', 'none', 'Marker', jnt_plot_prop.marker, ...
-%                         'MarkerSize', jnt_plot_prop.marker_sz, 'MarkerEdgeColor', jnt_plot_prop.color);
-%     set(vhdp_j(1,1), 'XData', vpos_j(2:k,1), 'YData', vpos_j(2:k,2), 'ZData', vpos_j(2:k,3));
-
-%     % draw the position of the center of mass (CoM):
-%     vhdp_j(2,1) = plot3(vpos_j(nJnts,1), vpos_j(nJnts,2), vpos_j(nJnts,3), 'LineStyle', 'none', 'Marker', com_plot_prop.marker, ...
-%                         'MarkerSize', com_plot_prop.marker_sz, 'MarkerEdgeColor', com_plot_prop.color);
-% end
-
-% function [vhdp_j, vpos_j] = updateFKinJointPositions(vhdp_j, vpos_j, vqT_j, nJnts)
-%     k = nJnts - 1;
-%     vpos_j(1:nJnts,1:3) = vqT_j(1:nJnts,1:3);
-
-%     set(vhdp_j(1,1), 'XData', vpos_j(1:k,1), 'YData', vpos_j(1:k,2), 'ZData', vpos_j(1:k,3));
-%     set(vhdp_j(2,1), 'XData', vpos_j(nJnts,1), 'YData', vpos_j(nJnts,2), 'ZData', vpos_j(nJnts,3));
-% end
 
 function [vhdp_j, vpos_j] = updateFKinJointPositions(vhdp_j, vpos_j, vqT_j, nJnts)
-    % update the forward kinematic translations (positions) ...
-    for i = 1:nJnts
-        % get the translation (position) of the current instance ...
-        vpos_j(i,1:3) = vqT_j(i,1:3);
-        % update the position of the current 3D data-point ...
-        set(vhdp_j(i,1), 'XData', vpos_j(i,1), 'YData', vpos_j(i,2), 'ZData', vpos_j(i,3));
-    end
+    k = nJnts - 1;
+    vpos_j(1:nJnts,1:3) = vqT_j(1:nJnts,1:3); % get the new translations ...
+
+    % update the positions of all 3D data-points ...
+    set(vhdp_j(1,1), 'XData', vpos_j(1:k,1), 'YData', vpos_j(1:k,2), 'ZData', vpos_j(1:k,3));       % joint nodes
+    set(vhdp_j(2,1), 'XData', vpos_j(nJnts,1), 'YData', vpos_j(nJnts,2), 'ZData', vpos_j(nJnts,3)); % CoM
 end
 
 function jnt_pair_pos = getLinkPositions(vpos_j, jnt_pair_idx, nLnks)
-    % compute the position parameter matrix for the links (joint pairs) of the
-    % robot with a predefined joint pair list:
+    % compute the position parameter matrix for the links (joint pairs)
+    % of the robot with a predefined joint pair list:
     jnt_pair_pos = zeros(nLnks,6);
     for i = 1:nLnks
         idx = jnt_pair_idx(i,1:6);

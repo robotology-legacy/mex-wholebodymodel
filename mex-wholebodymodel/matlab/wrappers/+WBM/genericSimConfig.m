@@ -58,7 +58,7 @@ classdef genericSimConfig < WBM.absSimConfig
         gfx_objects@cell   vector
 
         mkvideo@logical    scalar = false;
-        vid_axes_id@uint8  scalar = 0; % 0 ... capture all axes (entire figure window) for the movie
+        vid_axes_id@uint8  scalar = 0; % 0 ... capture all axes (entire figure window) for the video
         vid_filename@char         = WBM.genericSimConfig.DF_VID_FILENAME;
         vid_fps@double     scalar = WBM.genericSimConfig.DF_VID_FPS;
     end
@@ -76,10 +76,10 @@ classdef genericSimConfig < WBM.absSimConfig
             obj.wnd_title  = wnd_title;
             obj.robot_body = rob_sim_body;
 
-            obj.hAxes    = zeros(1,obj.nAxes);
+            obj.hAxes       = zeros(1,obj.nAxes);
             obj.gfx_objects = cell(1,obj.nAxes);
 
-            if exist('env_settings', 'var')
+            if (nargin == 3)
                 obj.environment = env_settings;
                 return
             end
