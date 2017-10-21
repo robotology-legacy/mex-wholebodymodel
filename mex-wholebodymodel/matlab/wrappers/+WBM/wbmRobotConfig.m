@@ -1,4 +1,4 @@
-classdef wbmBaseRobotConfig
+classdef wbmRobotConfig < handle
     properties
         nCstrs@uint16         scalar = 0;
         ccstr_link_names@cell vector

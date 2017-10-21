@@ -1,4 +1,4 @@
-classdef wbmFltgBaseState
+classdef wbmFltgBaseState < handle
     properties
         wf_R_b@double matrix
         wf_p_b@double vector

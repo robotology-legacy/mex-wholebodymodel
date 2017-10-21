@@ -1,4 +1,4 @@
-classdef wbmHumanoidConfig < WBM.wbmBaseRobotConfig
+classdef wbmHumanoidConfig < WBM.wbmRobotConfig
     properties
         jpos_head@double       vector
         jpos_torso@double      vector

@@ -54,7 +54,7 @@ function [m_rb, I_cm] = massInertiaGObj(obj_type, rho, varargin)
 
             r2   = r*r;
             V    = pi*r2*h; % volume of the solid cylinder
-            m_rb = rho*V; % mass of the solid cylinder
+            m_rb = rho*V;   % mass of the solid cylinder
 
             I_xx = m_rb/12*(3*r2 + h*h); % I_yy = I_xx
             I_zz = 0.5*m_rb*r2;
@@ -66,17 +66,14 @@ function [m_rb, I_cm] = massInertiaGObj(obj_type, rho, varargin)
             if (nargin ~= 5)
                 error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
-            r_o = varargin{1,1}; % outer radius
-            h   = varargin{1,2}; % height
-            t_m = varargin{1,3}; % thickness of the material
+            ri = varargin{1,1}; % inner radius
+            ro = varargin{1,2}; % outer radius
+            h  = varargin{1,3}; % height
 
-            if (t_m <= 0)
-                error('massInertiaGObj: %s', WBM.wbmErrorMsg.VALUE_LTE_ZERO);
-            end
-            r_i = r_o - t_m; % inner radius
+            checkThickness(ri, ro);
 
-            ro2 = r_o*r_o;
-            ri2 = r_i*r_i;
+            ro2 = ro*ro;
+            ri2 = ri*ri;
 
             V    = pi*h*(ro2 - ri2); % volume of the cylindrical tube
             m_rb = rho*V; % mass of the cylindrical tube
@@ -87,7 +84,7 @@ function [m_rb, I_cm] = massInertiaGObj(obj_type, rho, varargin)
             % inertia tensor at CoM:
             I_cm = inertiaTensorCM(I_xx, I_xx, I_zz);
         case 'ssph'
-            % solid sphere:
+            % solid sphere (ball):
             if (nargin ~= 3)
                 error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
@@ -100,27 +97,24 @@ function [m_rb, I_cm] = massInertiaGObj(obj_type, rho, varargin)
             % inertia tensor at CoM:
             I_cm = (2/5*m_rb*r2) * eye(3,3);
         case 'sphs'
-            % sphere shell:
+            % spherical shell:
             if (nargin ~= 4)
                 error('massInertiaGObj: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
-            r_o = varargin{1,1}; % outer radius
-            t_m = varargin{1,2}; % thickness of the material
+            ri = varargin{1,1};
+            ro = varargin{1,2};
 
-            if (t_m <= 0)
-                error('massInertiaGObj: %s', WBM.wbmErrorMsg.VALUE_LTE_ZERO);
-            end
-            r_i = r_o - t_m; % inner radius
+            checkThickness(ri, ro);
 
-            % powers of r_o & r_i ...
-            ro2 = r_o*r_o;
-            ro3 = ro2*r_o;
-            ro5 = ro3*r_o*r_o;
-            ri3 = r_i*r_i*r_i;
-            ri5 = ri3*r_i*r_i;
+            % powers of ro & ri ...
+            ro2 = ro*ro;
+            ro3 = ro2*ro;
+            ro5 = ro3*ro*ro;
+            ri3 = ri*ri*ri;
+            ri5 = ri3*ri*ri;
 
-            V    = 4/3*pi*(ro3 - ri3); % volume of the sphere shell
-            m_rb = rho*V; % mass of the sphere shell
+            V    = 4/3*pi*(ro3 - ri3); % volume of the spherical shell
+            m_rb = rho*V; % mass of the spherical shell
 
             % inertia tensor at CoM:
             I_cm = (2/5*m_rb*( (ro5 - ri5) / (ro3 - ri3) )) * eye(3,3);
@@ -131,7 +125,7 @@ end
 %% END of massInertiaGObj.
 
 
-%% INERTIA TENSOR:
+%% INERTIA TENSOR & CHECK FUNCTION:
 
 function I_cm = inertiaTensorCM(I_xx, I_yy, I_zz)
     % create the inertia tensor of an object with the origin of
@@ -140,4 +134,11 @@ function I_cm = inertiaTensorCM(I_xx, I_yy, I_zz)
     I_cm(1,1) = I_xx;
     I_cm(2,2) = I_yy;
     I_cm(3,3) = I_zz;
+end
+
+function checkThickness(ri, ro)
+    % verify the thickness of the material ...
+    if ((ro - ri) <= 0)
+        error('massInertiaGObj: %s', WBM.wbmErrorMsg.VALUE_LTE_ZERO);
+    end
 end

@@ -6,8 +6,8 @@ classdef WBM < WBM.WBMBase
         init_stvChi@double   vector
         init_state@WBM.wbmStateParams
         robot_body@WBM.wbmBody
-        robot_config@WBM.wbmBaseRobotConfig
-        robot_params@WBM.wbmBaseRobotParams
+        robot_config@WBM.wbmRobotConfig
+        robot_params@WBM.wbmRobotParams
     end
 
     properties(Constant)
@@ -20,28 +20,28 @@ classdef WBM < WBM.WBMBase
     end
 
     properties(Access = protected)
-        mwbm_config@WBM.wbmBaseRobotConfig
-        mwf2fixLnk@logical scalar
+        mwbm_config@WBM.wbmRobotConfig
+        mwf2fixlnk@logical scalar
     end
 
     methods
         % Constructor:
-        function obj = WBM(robot_model, robot_config, wf2fixLnk)
+        function obj = WBM(robot_model, robot_config, wf2fixlnk)
             % call the constructor of the superclass ...
             obj = obj@WBM.WBMBase(robot_model);
 
             switch nargin
                 case 3
-                    obj.mwf2fixLnk = wf2fixLnk;
+                    obj.mwf2fixlnk = wf2fixlnk;
                 case 2
                     % set default value ...
-                    obj.mwf2fixLnk = false;
+                    obj.mwf2fixlnk = false;
                 otherwise
                     error('WBM::WBM: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
 
             initConfig(obj, robot_config);
-            if obj.mwf2fixLnk
+            if obj.mwf2fixlnk
                 if ~isempty(obj.mwbm_model.urdf_fixed_link)
                     % use the previous set fixed link of the robot model ...
                     updateWorldFrameFromFixLnk(obj);
@@ -363,13 +363,14 @@ classdef WBM < WBM.WBMBase
 
         vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
 
-        sim_config = setupSimulation(~, sim_config)
+        sim_config = setupSimulation(~, sim_config, rot3d)
 
         [] = visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
 
         function simulateForwardDynamics(obj, pos_out, sim_config, sim_tstep, nRpts, vis_ctrl)
+            if ( sim_config.mkvideo && (nRpts > 1) ), nRpts = 1; end
             if ~exist('vis_ctrl', 'var')
-                % use the default ctrl-values ...
+                % use the default vis-ctrl values ...
                 for i = 1:nRpts
                     visualizeForwardDynamics(obj, pos_out, sim_config, sim_tstep);
                 end
@@ -432,8 +433,10 @@ classdef WBM < WBM.WBMBase
             if ( ~iscell(pl_data) && ~isstruct(pl_data{1,1}) )
                 error('WBM::setPayloadLinks: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
+            % Note: Index 1 and 2 are always reserved for the left and right hand of the
+            % humanoid robot. All further indices can be used for other links on which
+            % additionally special payloads are mounted (e.g. knapsack, tools, etc.).
             n = size(pl_data,2);
-
             obj.mwbm_config.nPlds = n; % number of payloads ...
             obj.mwbm_config.payload_links(1,1:n) = WBM.wbmPayloadLink;
             for i = 1:n
@@ -442,6 +445,12 @@ classdef WBM < WBM.WBMBase
                 obj.mwbm_config.payload_links(1,i).lnk_p_cm       = pl_lnk.lnk_p_cm;
                 obj.mwbm_config.payload_links(1,i).m_rb           = pl_lnk.m_rb;
                 obj.mwbm_config.payload_links(1,i).I_cm           = pl_lnk.I_cm;
+                if isfield(pl_lnk, 'vb_idx')
+                    obj.mwbm_config.payload_links(1,i).vb_idx = pl_lnk.vb_idx;
+                else
+                    % payload is not linked with a volume body object ...
+                    obj.mwbm_config.payload_links(1,i).vb_idx = 0;
+                end
             end
         end
 
@@ -460,17 +469,19 @@ classdef WBM < WBM.WBMBase
             pl_links   = obj.mwbm_config.payload_links;
             clnk_names = cell(nPlds,1);
             cpos       = clnk_names;
-            mass       = zeros(nPlds,1);
+            idx        = zeros(nPlds,1);
+            mass       = idx;
             inertia    = clnk_names;
 
             for i = 1:nPlds
                 clnk_names{i,1} = pl_links(1,i).urdf_link_name;
                 cpos{i,1}       = pl_links(1,i).lnk_p_cm;
+                idx(i,1)        = pl_links(1,i).vb_idx;
                 mass(i,1)       = pl_links(1,i).m_rb;
                 inertia{i,1}    = pl_links(1,i).I_cm;
             end
-            cplds  = horzcat(clnk_names, cpos, num2cell(mass), inertia);
-            pl_tbl = cell2table(cplds, 'VariableNames', {'link_name', 'pos', 'mass', 'inertia'});
+            cplds  = horzcat(clnk_names, cpos, num2cell(mass), num2cell(idx), inertia);
+            pl_tbl = cell2table(cplds, 'VariableNames', {'link_name', 'pos', 'mass', 'vb_idx', 'inertia'});
         end
 
         function wf_H_cm = payloadFrame(obj, varargin)
@@ -830,14 +841,14 @@ classdef WBM < WBM.WBMBase
             end
         end
 
-        function [jnt_q, jnt_dq] = getStateJointIdx(obj, joint_idx, q_j, dq_j)
+        function [jnt_q, jnt_dq] = getStateJointIdx(obj, jnt_idx, q_j, dq_j)
             switch nargin
                 case {2, 4}
                     % check the index list ...
-                    if isempty(joint_idx)
+                    if isempty(jnt_idx)
                         error('WBM::getStateJointIdx: %s', WBM.wbmErrorMsg.EMPTY_VECTOR);
                     end
-                    if ( ~isvector(joint_idx) && ~isinteger(joint_idx) )
+                    if ( ~isvector(jnt_idx) && ~isinteger(jnt_idx) )
                         error('WBM::getStateJointIdx: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
                     end
 
@@ -845,10 +856,10 @@ classdef WBM < WBM.WBMBase
                         % get the values ...
                         [~,q_j,~,dq_j] = mexWholeBodyModel('get-state');
                     end
-                    len = length(joint_idx);
+                    len = length(jnt_idx);
 
                     % get the angle and velocity of each joint ...
-                    [jnt_q, jnt_dq] = getJointValues(obj, q_j, dq_j, joint_idx, len);
+                    [jnt_q, jnt_dq] = getJointValues(obj, q_j, dq_j, jnt_idx, len);
                 otherwise
                     error('WBM::getStateJointIdx: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
@@ -1005,10 +1016,10 @@ classdef WBM < WBM.WBMBase
         end
 
         function robot_params = get.robot_params(obj)
-            robot_params = WBM.wbmBaseRobotParams;
+            robot_params = WBM.wbmRobotParams;
             robot_params.model     = obj.mwbm_model;
             robot_params.config    = obj.mwbm_config;
-            robot_params.wf2fixLnk = obj.mwf2fixLnk;
+            robot_params.wf2fixlnk = obj.mwf2fixlnk;
         end
 
         function dispConfig(obj, prec)
@@ -1087,8 +1098,8 @@ classdef WBM < WBM.WBMBase
     methods(Access = private)
         function initConfig(obj, robot_config)
             % check if robot_config is an instance of a class that
-            % is derived from "wbmBaseRobotConfig" ...
-            if ~isa(robot_config, 'WBM.wbmBaseRobotConfig')
+            % is derived from "wbmRobotConfig" ...
+            if ~isa(robot_config, 'WBM.wbmRobotConfig')
                 error('WBM::initConfig: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             % further error checks ...
@@ -1107,7 +1118,7 @@ classdef WBM < WBM.WBMBase
                 error('WBM::initConfig: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
             end
 
-            obj.mwbm_config = WBM.wbmBaseRobotConfig;
+            obj.mwbm_config = WBM.wbmRobotConfig;
             obj.mwbm_config.nCstrs           = nCstrs;
             obj.mwbm_config.ccstr_link_names = robot_config.ccstr_link_names;
 
@@ -1137,13 +1148,13 @@ classdef WBM < WBM.WBMBase
             obj.mwbm_config.init_state_params = robot_config.init_state_params;
         end
 
-        function [jnt_q, jnt_dq] = getJointValues(obj, q_j, dq_j, joint_idx, len)
+        function [jnt_q, jnt_dq] = getJointValues(obj, q_j, dq_j, jnt_idx, len)
             if (len > obj.mwbm_config.body.nJnts)
-                error('WBM::getJointValues: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
+                error('WBM::getJointValues: %s', WBM.wbmErrorMsg.WRONG_VEC_LEN);
             end
             % get the joint values of the index list ...
-            jnt_q(1:len,1)  = q_j(joint_idx,1);  % angle
-            jnt_dq(1:len,1) = dq_j(joint_idx,1); % velocity
+            jnt_q(1:len,1)  = q_j(jnt_idx,1);  % angle
+            jnt_dq(1:len,1) = dq_j(jnt_idx,1); % velocity
         end
 
         function result = checkInitStateDimensions(obj, stp_init)

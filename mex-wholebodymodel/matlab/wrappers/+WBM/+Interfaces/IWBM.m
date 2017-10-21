@@ -4,8 +4,8 @@ classdef (Abstract) IWBM < handle
         robot_name@char
         robot_model@char
         robot_manuf@char
-        robot_params@WBM.wbmBaseRobotParams
-        sim_config@WBM.absSimConfig
+        robot_params@WBM.wbmRobotParams
+        sim_config@WBM.wbmSimConfig
         base_link@char
         base_tform@double matrix
         tool_tform@double matrix
@@ -19,7 +19,7 @@ classdef (Abstract) IWBM < handle
     methods(Abstract)
         initRobot(obj, robot_wbm)
 
-        initRobotFcn(obj, fhInitRobotWBM, wf2fixLnk)
+        initRobotFcn(obj, fhInitRobotWBM, wf2fixlnk)
 
         initRobotParams(obj, robot_params)
 

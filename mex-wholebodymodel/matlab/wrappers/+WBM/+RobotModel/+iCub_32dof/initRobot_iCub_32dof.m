@@ -1,10 +1,10 @@
-function [wbm_icub, ndof] = initRobot_iCub_32dof(wf2fixLnk)
+function [wbm_icub, ndof] = initRobot_iCub_32dof(wf2fixlnk)
     %% Initialize the model of the iCub-Robot with 32 degrees of freedom:
     %  Source for the joint configurations,
     %       [1] Yarp-WholeBodyInterface: <https://github.com/robotology/yarp-wholebodyinterface/blob/master/app/robots/icubGazeboSim/yarpWholeBodyInterface.ini>
 
     %% Base (default) model parameters:
-    icub_model = WBM.wbmBaseRobotModel;
+    icub_model = WBM.wbmRobotModel;
     %icub_model.ndof            = 0; % unknown at the moment
     icub_model.urdf_robot_name = which('model32dof.urdf');
     %icub_model.urdf_fixed_link = 'l_sole';
@@ -44,11 +44,11 @@ function [wbm_icub, ndof] = initRobot_iCub_32dof(wf2fixLnk)
     icub_config.init_state_params.dq_j    = zeros(ndof,1);
 
     %% Initialize the mex-WholeBodyModel for the iCub-Robot:
-    if ~exist('wf2fixLnk', 'var')
+    if ~exist('wf2fixlnk', 'var')
         % by default: the world frame will be NOT set to a fixed link ...
         wbm_icub = WBM.WBM(icub_model, icub_config);
         return
     end
     % else, user specific ...
-    wbm_icub = WBM.WBM(icub_model, icub_config, wf2fixLnk);
+    wbm_icub = WBM.WBM(icub_model, icub_config, wf2fixlnk);
 end

@@ -318,7 +318,7 @@ end
 function nLnks = getLinkNbr(clnk_idx)
     nLnks = size(clnk_idx,2); % row-vector
     if ( (nLnks < 1) || (nLnks > 2) )
-        error('WBM::configStateCLinks: %s', WBM.wbmErrorMsg.WRONG_VEC_SIZE);
+        error('WBM::configStateCLinks: %s', WBM.wbmErrorMsg.WRONG_VEC_LEN);
     end
 end
 

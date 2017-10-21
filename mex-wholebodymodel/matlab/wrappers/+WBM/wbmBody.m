@@ -1,4 +1,4 @@
-classdef wbmBody
+classdef wbmBody < handle
     properties(SetAccess = private, GetAccess = public)
        chains@cell matrix
        nChns@uint8 scalar = 0;

@@ -69,6 +69,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     fwnd       ...  figure window
     g          ...  gravity acceleration (vector)
     gen        ...  generalized
+    gp         ...  grid point(s)
     grnd, grd  ...  ground
     h...       ...  "handle" to an object (begin of variable name), e.g. hFig = handle to the figure object
     ..._h      ...  "hat" (end of variable name), 'h' declares that this variable is an unit vector of length 1, e.g. "f1_h", "fcp_h", etc.
@@ -89,9 +90,11 @@ Legend of abbreviations and acronyms which are used for the variable names:
     lnk        ...  link
     lnkfr      ...  link frame (frame to a specified link in the current joint of the robot)
     lwr        ...  lower
-    m...       ...  "member" (begin of variable name), 'm' declares that this variable is a private member variable, e.g. "mwbm", "mstv", etc.
+    m...       ...  "member" (begin of variable name), 'm' declares that this variable is a private or protected member variable, e.g. "mwbm", "mstv", etc.
     ...m       ...  "matrix" (end of variable name), like "skewm", "adjointm", etc.
     mat        ...  matrix
+    mg         ...  mesh grid
+    mgC        ...  mesh grid coordinates matrix
     mom        ...  moment/momentum
     mov        ...  movie
     mult       ...  multiplier(s)
@@ -162,6 +165,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     upr        ...  upper
     v          ...  vector
     vX         ...  (mixed) velocity transformation (matrix)
+    vb         ...  volume body
     veT        ...  vector Euler-angle transformation [translation with Euler angles] (6x1-vector)
     vel        ...  velocit(y/ies)
     vfrict     ...  viscous friction

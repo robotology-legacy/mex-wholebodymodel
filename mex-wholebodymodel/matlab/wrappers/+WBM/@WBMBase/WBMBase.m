@@ -8,7 +8,7 @@ classdef WBMBase < handle
         ndof@uint16        scalar
         frict_coeff@struct
         joint_limits@struct
-        robot_model@WBM.wbmBaseRobotModel
+        robot_model@WBM.wbmRobotModel
     end
 
     properties(Constant)
@@ -17,7 +17,7 @@ classdef WBMBase < handle
     end
 
     properties(Access = protected)
-        mwbm_model@WBM.wbmBaseRobotModel
+        mwbm_model@WBM.wbmRobotModel
     end
 
     methods
@@ -32,15 +32,16 @@ classdef WBMBase < handle
             setInitWorldFrame(obj, robot_model.wf_R_b_init, robot_model.wf_p_b_init, robot_model.g_wf);
         end
 
-        % Copy-function:
+        % Copy function: Replacement for the "matlab.mixin.Copyable.copy()" to create deep object copies.
+        % Source: <http://undocumentedmatlab.com/blog/general-use-object-copy>
         function newObj = copy(obj)
             try
-                % Matlab-tuning: try to use directly the memory (faster)
-                % note: this works only for R2010b or newer.
+                % Matlab-tuning: Try to use directly the memory (faster).
+                % Note: This works only for R2010b or newer.
                 objByteArray = getByteStreamFromArray(obj);
                 newObj = getArrayFromByteStream(objByteArray);
             catch
-                % else, for R2010a and earlier, serialize via a
+                % else, for R2010a or earlier, serialize via a
                 % temporary file (slower).
                 fname = [tempname '.mat'];
                 save(fname, 'obj');
@@ -541,7 +542,7 @@ classdef WBMBase < handle
 
     methods(Access = private)
         function initWBM(obj, robot_model)
-            if ~isa(robot_model, 'WBM.wbmBaseRobotModel')
+            if ~isa(robot_model, 'WBM.wbmRobotModel')
                 error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             % verify ndof ...
@@ -549,7 +550,7 @@ classdef WBMBase < handle
                 error('WBMBase::initWBM: %s', WBM.wbmErrorMsg.MAX_NUM_LIMIT);
             end
 
-            obj.mwbm_model = WBM.wbmBaseRobotModel;
+            obj.mwbm_model = WBM.wbmRobotModel;
             obj.mwbm_model.ndof            = robot_model.ndof;
             obj.mwbm_model.urdf_fixed_link = robot_model.urdf_fixed_link;
 

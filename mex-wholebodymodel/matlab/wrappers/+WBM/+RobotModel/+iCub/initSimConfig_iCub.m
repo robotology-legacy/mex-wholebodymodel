@@ -37,7 +37,7 @@ function sim_config = initSimConfig_iCub(scn_mode)
     % the full configuration of the robot system.
     %
     % Joint pair indexes for the x, y and z-positions (translations) in the 3D-space:
-    %                       x1 x2   y1 y2   z1 z2
+    %                     x1 x2   y1 y2   z1 z2
     jnt_pair_idx = uint8([ 1  8    1  8    1  8;
                            1  2    1  2    1  2;
                            2  3    2  3    2  3;
@@ -74,10 +74,10 @@ function sim_config = initSimConfig_iCub(scn_mode)
     % of the links or the shapes of the feet. Each row represents one polygon (rectangle):
     shape_geom.faces = uint8([1 2 3 4;
                               1 4 8 5;
-                              5 8 7 6;
-                              7 3 2 6;
                               2 6 5 1;
-                              3 7 8 4]);
+                              3 7 8 4;
+                              5 8 7 6;
+                              7 3 2 6]);
 
     % Joint indices of those joints, where the left and the right foot is connected to:
     foot_geom.joints = uint8([4 7]);
@@ -113,6 +113,18 @@ function sim_config = initSimConfig_iCub(scn_mode)
     env_settings.grnd_shape   = WBM.genericSimConfig.DF_GROUND_SHAPE;
     env_settings.orig_pt_size = 4.5;
 
+    % Draw some geometric volume bodies in the environment:
+    R_r = eye(3,3); % rectangular orientation
+    R_2 = [-0.9     0  -0.1;
+            0    -0.9     0;
+           -0.1     0   0.9];
+
+    env_settings.vb_objects      = repmat(WBM.vbCuboid, 3, 1);
+    env_settings.vb_objects(1,1) = WBM.vbCuboid(0.1, [0.3; 0.3; 0.3], R_r);
+    env_settings.vb_objects(2,1) = WBM.vbCylinder(0.1, 0.2, [-0.2; 0.4; 0.4], R_2);
+    env_settings.vb_objects(3,1) = WBM.vbSphere(0.1, [-0.3; 0.3; 0.2], R_r);
+
+    % Set scene mode:
     switch scn_mode
         case 'LightScn'
             % draw settings for the light scene ...
@@ -140,4 +152,5 @@ function sim_config = initSimConfig_iCub(scn_mode)
 
     % Create the configuration object for the WBM-Simulator:
     sim_config = WBM.genericSimConfig('iCub-Simulator:', sim_body, env_settings);
+    sim_config.show_light = true;
 end

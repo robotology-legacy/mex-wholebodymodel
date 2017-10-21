@@ -11,6 +11,7 @@ function visualizeSimRobot(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
     % "pos_out" of the integration part of the forward dynamics function ...
     vqT_b = pos_out(1:nSteps,1:7);
     q_j   = pos_out(1:nSteps,8:vlen);
+    q_j   = q_j.';
 
     nJnts = sim_config.robot_body.nJnts; % number of nodes (virtual joints) to be plotted
     nLnks = sim_config.robot_body.nLnks; % number of edges (virtual links) to be plotted
@@ -25,8 +26,8 @@ function visualizeSimRobot(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
     % of each joint of the robot's joint name list:
     fkin_jnts.vqT(1:nSteps,1:7,1) = vqT_b; % use the base data instead the forward kin. of the 'root_link' ...
     for i = 1:nSteps
-        q   = q_j(i,1:ndof).';
-        vqT = squeeze(vqT_b(i,1:7).');
+        q   = q_j(1:ndof,i);
+        vqT = squeeze(vqT_b(i,1:7)).';
 
         for j = 2:nJnts
             fkin_jnts.vqT(i,1:7,j) = fkinVQTransformation(obj, sim_config.robot_body.jnt_lnk_names{j,1}, q, vqT);
@@ -34,31 +35,94 @@ function visualizeSimRobot(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
     end
 
     if sim_config.mkvideo
-        % allocate the data structure for the movie frames ...
-        vidfrms(1:nSteps,1) = struct('cdata', [], 'colormap', []);
-
-        % create and draw the initial shape of the robot in base position:
-        [sim_config, hSimRobot, fkin_jnts, nGObjs, vidfrms(1,1)] = createSimRobot(sim_config, fkin_jnts, vis_ctrl);
-        % animate the robot (update each time step all positions of the graphic objects):
-        vidfrms(2:nSteps,1) = animateSimRobotMov(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, vis_ctrl);
-
+        % show and animate the robot (update at each time step all positions of the
+        % graphic objects) and return a set of videoframes of all iteration steps:
+        if ~isempty(sim_config.pl_stack)
+            % with payload:
+            % get for each time step the positions and orientations (frames) of the payload objects ...
+            [vqT_vb, vb_idx, nVBds] = getPayloadFrames(obj, vqT_b, q_j, sim_config, nSteps);
+            vidfrms = makeSimRobotVideoPL(fkin_jnts, vqT_vb, vb_idx, nVBds, sim_config, nSteps, vis_ctrl);
+        else
+            % without payload:
+            vidfrms = makeSimRobotVideo(fkin_jnts, sim_config, nSteps, vis_ctrl);
+        end
         vid = VideoWriter(sim_config.vid_filename, 'Uncompressed AVI');
         vid.FrameRate = sim_config.vid_fps;
 
         open(vid);
         writeVideo(vid, vidfrms);
         close(vid);
-    else
-        [sim_config, hSimRobot, fkin_jnts, nGObjs] = createSimRobot(sim_config, fkin_jnts, vis_ctrl);
-        animateSimRobot(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, sim_tstep, vis_ctrl);
+        return
     end
+    % else, show only the robot animation:
+    if ~isempty(sim_config.pl_stack)
+        % with payload:
+        [vqT_vb, vb_idx, nVBds] = getPayloadFrames(obj, vqT_b, q_j, sim_config, nSteps);
+        animateSimRobotPL(fkin_jnts, vqT_vb, vb_idx, nVBds, sim_config, sim_tstep, nSteps, vis_ctrl);
+        return
+    end
+    % without payload ...
+    animateSimRobot(fkin_jnts, sim_config, sim_tstep, nSteps, vis_ctrl);
 end
 %% END of visualizeSimRobot.
 
 
 %% DRAW GRAPHICS & ANIMATION FUNCTIONS:
 
-function [sim_config, hSimRobot, fkin_jnts, nGObjs, vidfrm] = createSimRobot(sim_config, fkin_jnts, vis_ctrl)
+function [vqT_vb, vb_idx, nVBds] = getPayloadFrames(obj, vqT_b, q_j, sim_config, nSteps)
+    ndof  = obj.mwbm_model.ndof;
+    nVBds = size(sim_config.pl_stack,1);
+
+    vb_idx = zeros(nVBds,1);
+    vqT_vb = zeros(nSteps,7*nVBds);
+
+    i = -6;
+    for j = 1:nVBds
+        vb_idx(j,1) = sim_config.pl_stack{j,1};
+        manip       = sim_config.pl_stack{j,2};
+        switch manip
+            case {'lh', 'bh'}
+                % left hand or both hands:
+                pl_idx = 1;
+            case 'rh'
+                % right hand:
+                pl_idx = 2;
+            otherwise
+                error('getPayloadFrames: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+        end
+        % get the utilization time indices:
+        ti_s = sim_config.pl_time_idx(j,1); % start
+        ti_e = sim_config.pl_time_idx(j,2); % end
+
+        i  = i + 7;
+        ci = i:7*j; % column indices
+
+        if ((ti_s-1) >= 1)
+            % set the initial frame of the object's CoM before the obj. is grabbed:
+            ri_1 = 1:(ti_s-1); % time indices where the initial CoM doesn't move
+            vqT_init = sim_config.environment.vb_objects(j,1).frame;
+            vqT_vb(ri_1,ci) = repmat(vqT_init, ri_1, 1);
+        end
+
+        % set the frames of the object while it was taken and manipulated with the hand(s) ...
+        for k = ti_s:ti_e
+            q   = q_j(1:ndof,k);
+            vqT = squeeze(vqT_b(k,1:7)).';
+            [wf_p_b, wf_R_b] = WBM.utilities.tfms.frame2posRotm(vqT);
+
+            wf_H_cm = payloadFrame(obj, wf_R_b, wf_p_b, q, pl_idx);
+            vqT_vb(k,ci) = WBM.utilities.tfms.tform2frame(wf_H_cm);
+        end
+
+        if ((ti_e+1) <= nSteps)
+            % set the final frame of the object's CoM after releasing the object:
+            ri_2 = (ti_e+1):nSteps; % time indices of the new final pos. of the CoM
+            vqT_vb(ri_2,ci) = repmat(vqT_vb(ti_e,ci), ri_2, 1);
+        end
+    end
+end
+
+function [sim_config, hSimRobot, fkin_jnts, nRGObj, vidfrm] = createSimRobot(sim_config, fkin_jnts, vis_ctrl)
     gobjs_0 = gobjects(0);
     hLnkLines  = gobjs_0;
     hLnkShapes = gobjs_0;
@@ -91,10 +155,10 @@ function [sim_config, hSimRobot, fkin_jnts, nGObjs, vidfrm] = createSimRobot(sim
     end
 
     hSimRobot = vertcat(hJntNodes, hLnkLines, hLnkShapes);
-    nGObjs    = size(hSimRobot,1); % number of graphic objects to be drawn
+    nRGObj    = size(hSimRobot,1); % number of graphic objects of the robot to be drawn
 
     % draw the robot in all subplot positions (axes) of the figure window ...
-    sim_config = drawSimRobotAxes(sim_config, hSimRobot, nGObjs);
+    sim_config = drawSimRobotAxes(sim_config, hSimRobot);
 
     if (nargout == 5)
         if (sim_config.vid_axes_id > 0)
@@ -108,22 +172,14 @@ function [sim_config, hSimRobot, fkin_jnts, nGObjs, vidfrm] = createSimRobot(sim
     end
 end
 
-function sim_config = drawSimRobotAxes(sim_config, hSimRobot, nGObjs)
+function sim_config = drawSimRobotAxes(sim_config, hSimRobot)
     if ~iscellstr(sim_config.axes_views)
         error('drawSimRobotAxes: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
     nAxes = sim_config.nAxes;
-
-    if ~isempty(sim_config.gfx_objects)
-        % delete all graphic objects of all
-        % subplots in the main figure ...
-        for i = 1:nAxes
-            delete(sim_config.gfx_objects{1,i});
-        end
-    end
     % put all graphics objects into the axes of the first
     % subplot of the figure window (left bottom if nAxes > 2):
-    sim_config.gfx_objects{1,1} = hSimRobot(1:nGObjs,1);
+    sim_config.gfx_objects{1,1} = vertcat(hSimRobot, sim_config.gfx_objects{1,1});
     setView(sim_config.axes_vwpts, sim_config.axes_views{1,1});
 
     if (nAxes > 1)
@@ -146,7 +202,10 @@ function setView(axes_vwpts, axes_view)
     view(axes_vwpts{idx,2}); % set the viewpoint
 end
 
-function animateSimRobot(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, sim_tstep, vis_ctrl)
+function animateSimRobot(fkin_jnts, sim_config, sim_tstep, nSteps, vis_ctrl)
+    % create and draw the initial shape of the robot in base position ...
+    [sim_config, hSimRobot, fkin_jnts, nRGObj] = createSimRobot(sim_config, fkin_jnts, vis_ctrl);
+
     nJnts = sim_config.robot_body.nJnts;
     nLnks = sim_config.robot_body.nLnks;
     nFeet = sim_config.robot_body.nFeet;
@@ -181,15 +240,15 @@ function animateSimRobot(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, sim_t
             hSimRobot(idx1:idx2,1) = updateRobotSkeleton(hSimRobot(idx1:idx2,1), fkin_jnts.pair_pos, nLnks);
 
             % update the shape positions of the corresponding link shapes (hull) of the robot ...
-            hSimRobot(idx3:nGObjs,1) = updateRobotBody(hSimRobot(idx3:nGObjs,1), fkin_jnts.pair_pos, ...
+            hSimRobot(idx3:nRGObj,1) = updateRobotBody(hSimRobot(idx3:nRGObj,1), fkin_jnts.pair_pos, ...
                                                        nLnks, nFeet, foot_geom, shape_geom.size_sf);
-            % update all graphics objects in the first subplot ...
-            sim_config.gfx_objects{1,1} = hSimRobot(1:nGObjs,1);
+            % update in the first subplot all graphics objects of the robot ...
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
 
             % delete all old graphic objects in the remaining subplots and copy the updated
             % graphic objects to a specified array of each subplot. The new graphics elements
             % are children of the current axes handle (subplots):
-            sim_config.gfx_objects = updateSimRobotAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
 
             % update the visualization speed to keep the simulation very close to real time ...
             % (note: this part can't transfered into an own function, else the
@@ -216,8 +275,8 @@ function animateSimRobot(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, sim_t
 
             hSimRobot(idx1:idx2,1) = updateRobotSkeleton(hSimRobot(idx1:idx2,1), fkin_jnts.pair_pos, nLnks);
 
-            sim_config.gfx_objects{1,1} = hSimRobot(1:nGObjs,1);
-            sim_config.gfx_objects      = updateSimRobotAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
 
             tdiff = vis_speed * sim_tstep - toc();
             if (tdiff > 0)
@@ -240,11 +299,11 @@ function animateSimRobot(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, sim_t
 
             fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
 
-            hSimRobot(idx3:nGObjs,1) = updateRobotBody(hSimRobot(idx3:nGObjs,1), fkin_jnts.pair_pos, ...
+            hSimRobot(idx3:nRGObj,1) = updateRobotBody(hSimRobot(idx3:nRGObj,1), fkin_jnts.pair_pos, ...
                                                        nLnks, nFeet, foot_geom, shape_geom.size_sf);
 
-            sim_config.gfx_objects{1,1} = hSimRobot(1:nGObjs,1);
-            sim_config.gfx_objects      = updateSimRobotAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
 
             tdiff = vis_speed * sim_tstep - toc();
             if (tdiff > 0)
@@ -262,8 +321,8 @@ function animateSimRobot(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, sim_t
 
             fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
 
-            sim_config.gfx_objects{1,1} = hSimRobot(1:nGObjs,1);
-            sim_config.gfx_objects      = updateSimRobotAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
 
             tdiff = vis_speed * sim_tstep - toc();
             if (tdiff > 0)
@@ -276,7 +335,12 @@ function animateSimRobot(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, sim_t
     end
 end
 
-function vidfrms = animateSimRobotMov(sim_config, hSimRobot, fkin_jnts, nGObjs, nSteps, vis_ctrl)
+function vidfrms = makeSimRobotVideo(fkin_jnts, sim_config, nSteps, vis_ctrl)
+    % allocate the data structure for the video frames ...
+    vidfrms(1:nSteps,1) = struct('cdata', [], 'colormap', []);
+    % create and draw the initial shape of the robot in base position ...
+    [sim_config, hSimRobot, fkin_jnts, nRGObj, vidfrms(1,1)] = createSimRobot(sim_config, fkin_jnts, vis_ctrl);
+
     nJnts = sim_config.robot_body.nJnts;
     nLnks = sim_config.robot_body.nLnks;
     nFeet = sim_config.robot_body.nFeet;
@@ -287,9 +351,6 @@ function vidfrms = animateSimRobotMov(sim_config, hSimRobot, fkin_jnts, nGObjs, 
     drawSkel = vis_ctrl.drawSkel;
     drawBody = vis_ctrl.drawBody;
 
-    % allocate the data structure for the movie frames ...
-    vidfrms(1:nSteps-1,1) = struct('cdata', [], 'colormap', []);
-
     if (sim_config.vid_axes_id > 0)
         % capture only the specified subplot frame ...
         hObj = gca;
@@ -298,7 +359,7 @@ function vidfrms = animateSimRobotMov(sim_config, hSimRobot, fkin_jnts, nGObjs, 
         hObj = sim_config.hWndFigure;
     end
 
-    t = 2; % (t = 1 is initial base position)
+    t = 2;
 
     if (drawSkel && drawBody)
         % animate the full body of the robot (skeleton and the link shapes):
@@ -310,28 +371,20 @@ function vidfrms = animateSimRobotMov(sim_config, hSimRobot, fkin_jnts, nGObjs, 
         idx3 = idx2 + 1;
 
         while (t <= nSteps)
-            % update the forward kinematic translations (positions) of the joint nodes ...
             [hSimRobot(1:nJnts,1), fkin_jnts] = updateJointNodes(hSimRobot(1:nJnts,1), fkin_jnts, nJnts, t);
 
-            % update the position parameter matrix of the links of the robot ...
             fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
 
-            % update the link lines of the skeleton with respect to the new joint positions ...
             hSimRobot(idx1:idx2,1) = updateRobotSkeleton(hSimRobot(idx1:idx2,1), fkin_jnts.pair_pos, nLnks);
 
-            % update the shape positions of the corresponding link shapes (hull) of the robot ...
-            hSimRobot(idx3:nGObjs,1) = updateRobotBody(hSimRobot(idx3:nGObjs,1), fkin_jnts.pair_pos, ...
+            hSimRobot(idx3:nRGObj,1) = updateRobotBody(hSimRobot(idx3:nRGObj,1), fkin_jnts.pair_pos, ...
                                                        nLnks, nFeet, foot_geom, shape_geom.size_sf);
-            % update all graphics objects in the first subplot ...
-            sim_config.gfx_objects{1,1} = hSimRobot(1:nGObjs,1);
 
-            % delete all old graphic objects in the remaining subplots and copy the updated
-            % graphic objects to a specified array of each subplot. The new graphics elements
-            % are children of the current axes handle (subplots):
-            sim_config.gfx_objects = updateSimRobotAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
 
             % capture the current state of the axes (frame) for the video ...
-            vidfrms(t-1,1) = getframe(hObj);
+            vidfrms(t,1) = getframe(hObj);
             t = t + 1;
         end
     elseif drawSkel
@@ -346,10 +399,10 @@ function vidfrms = animateSimRobotMov(sim_config, hSimRobot, fkin_jnts, nGObjs, 
 
             hSimRobot(idx1:idx2,1) = updateRobotSkeleton(hSimRobot(idx1:idx2,1), fkin_jnts.pair_pos, nLnks);
 
-            sim_config.gfx_objects{1,1} = hSimRobot(1:nGObjs,1);
-            sim_config.gfx_objects      = updateSimRobotAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
 
-            vidfrms(t-1,1) = getframe(hObj);
+            vidfrms(t,1) = getframe(hObj);
             t = t + 1;
         end
     elseif drawBody
@@ -364,13 +417,13 @@ function vidfrms = animateSimRobotMov(sim_config, hSimRobot, fkin_jnts, nGObjs, 
 
             fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
 
-            hSimRobot(idx3:nGObjs,1) = updateRobotBody(hSimRobot(idx3:nGObjs,1), fkin_jnts.pair_pos, ...
+            hSimRobot(idx3:nRGObj,1) = updateRobotBody(hSimRobot(idx3:nRGObj,1), fkin_jnts.pair_pos, ...
                                                        nLnks, nFeet, foot_geom, shape_geom.size_sf);
 
-            sim_config.gfx_objects{1,1} = hSimRobot(1:nGObjs,1);
-            sim_config.gfx_objects      = updateSimRobotAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
 
-            vidfrms(t-1,1) = getframe(hObj);
+            vidfrms(t,1) = getframe(hObj);
             t = t + 1;
         end
     else
@@ -380,16 +433,275 @@ function vidfrms = animateSimRobotMov(sim_config, hSimRobot, fkin_jnts, nGObjs, 
 
             fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
 
-            sim_config.gfx_objects{1,1} = hSimRobot(1:nGObjs,1);
-            sim_config.gfx_objects      = updateSimRobotAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
 
-            vidfrms(t-1,1) = getframe(hObj);
+            vidfrms(t,1) = getframe(hObj);
             t = t + 1;
         end
     end
 end
 
-function gfx_objects = updateSimRobotAxes(gfx_objects, hAxes, nAxes)
+function animateSimRobotPL(fkin_jnts, vqT_vb, vb_idx, nVBds, sim_config, sim_tstep, nSteps, vis_ctrl)
+    [sim_config, hSimRobot, fkin_jnts, nRGObj] = createSimRobot(sim_config, fkin_jnts, vis_ctrl);
+
+    nJnts = sim_config.robot_body.nJnts;
+    nLnks = sim_config.robot_body.nLnks;
+    nFeet = sim_config.robot_body.nFeet;
+    nAxes = sim_config.nAxes;
+
+    jnt_pair_idx = sim_config.robot_body.jnt_pair_idx;
+
+    vis_speed = vis_ctrl.vis_speed;
+    drawSkel  = vis_ctrl.drawSkel;
+    drawBody  = vis_ctrl.drawBody;
+
+    t = 2;
+
+    % animate the robot and the payload objects:
+    if (drawSkel && drawBody)
+        % full robot body (skeleton and the link shapes):
+        shape_geom = sim_config.robot_body.shape_geom;
+        foot_geom  = sim_config.robot_body.foot_geom;
+
+        idx1 = 3;
+        idx2 = 2 + nLnks;
+        idx3 = idx2 + 1;
+
+        while (t <= nSteps)
+            tic;
+            [hSimRobot(1:nJnts,1), fkin_jnts] = updateJointNodes(hSimRobot(1:nJnts,1), fkin_jnts, nJnts, t);
+
+            fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
+
+            hSimRobot(idx1:idx2,1) = updateRobotSkeleton(hSimRobot(idx1:idx2,1), fkin_jnts.pair_pos, nLnks);
+
+            hSimRobot(idx3:nRGObj,1) = updateRobotBody(hSimRobot(idx3:nRGObj,1), fkin_jnts.pair_pos, ...
+                                                       nLnks, nFeet, foot_geom, shape_geom.size_sf);
+
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects{1,1} = updatePayloadObj(sim_config.gfx_objects{1,1}, nRGObj, ...
+                                                           sim_config.environment.vb_objects, vqT_vb, vb_idx, nVBds);
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+
+            tdiff = vis_speed * sim_tstep - toc();
+            if (tdiff > 0)
+                pause(tdiff);
+            else
+                vis_speed = vis_speed + 1;
+            end
+            t = t + vis_speed;
+        end
+    elseif drawSkel
+        % only the skeleton of the robot:
+        idx1 = 3;
+        idx2 = 2 + nLnks;
+
+        while (t <= nSteps)
+            tic;
+            [hSimRobot(1:nJnts,1), fkin_jnts] = updateJointNodes(hSimRobot(1:nJnts,1), fkin_jnts, nJnts, t);
+
+            fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
+
+            hSimRobot(idx1:idx2,1) = updateRobotSkeleton(hSimRobot(idx1:idx2,1), fkin_jnts.pair_pos, nLnks);
+
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects{1,1} = updatePayloadObj(sim_config.gfx_objects{1,1}, nRGObj, ...
+                                                           sim_config.environment.vb_objects, vqT_vb, vb_idx, nVBds);
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+
+            tdiff = vis_speed * sim_tstep - toc();
+            if (tdiff > 0)
+                pause(tdiff);
+            else
+                vis_speed = vis_speed + 1;
+            end
+            t = t + vis_speed;
+        end
+    elseif drawBody
+        % only the link shapes (hull) of the robot:
+        shape_geom = sim_config.robot_body.shape_geom;
+        foot_geom  = sim_config.robot_body.foot_geom;
+
+        idx3 = 3 + nLnks;
+
+        while (t <= nSteps)
+            tic;
+            [hSimRobot(1:nJnts,1), fkin_jnts] = updateJointNodes(hSimRobot(1:nJnts,1), fkin_jnts, nJnts, t);
+
+            fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
+
+            hSimRobot(idx3:nRGObj,1) = updateRobotBody(hSimRobot(idx3:nRGObj,1), fkin_jnts.pair_pos, ...
+                                                       nLnks, nFeet, foot_geom, shape_geom.size_sf);
+
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects{1,1} = updatePayloadObj(sim_config.gfx_objects{1,1}, nRGObj, ...
+                                                           sim_config.environment.vb_objects, vqT_vb, vb_idx, nVBds);
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+
+            tdiff = vis_speed * sim_tstep - toc();
+            if (tdiff > 0)
+                pause(tdiff);
+            else
+                vis_speed = vis_speed + 1;
+            end
+            t = t + vis_speed;
+        end
+    else
+        % only the joint nodes (data points) of the robot:
+        while (t <= nSteps)
+            tic;
+            [hSimRobot(1:nJnts,1), fkin_jnts] = updateJointNodes(hSimRobot(1:nJnts,1), fkin_jnts, nJnts, t);
+
+            fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
+
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects{1,1} = updatePayloadObj(sim_config.gfx_objects{1,1}, nRGObj, ...
+                                                           sim_config.environment.vb_objects, vqT_vb, vb_idx, nVBds);
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+
+            tdiff = vis_speed * sim_tstep - toc();
+            if (tdiff > 0)
+                pause(tdiff);
+            else
+                vis_speed = vis_speed + 1;
+            end
+            t = t + vis_speed;
+        end
+    end
+end
+
+function vidfrms = makeSimRobotVideoPL(fkin_jnts, vqT_vb, vb_idx, nVBds, sim_config, nSteps, vis_ctrl)
+    % allocate the data structure for the video frames ...
+    vidfrms(1:nSteps,1) = struct('cdata', [], 'colormap', []);
+
+    [sim_config, hSimRobot, fkin_jnts, nRGObj, vidfrms(1,1)] = createSimRobot(sim_config, fkin_jnts, vis_ctrl);
+
+    nJnts = sim_config.robot_body.nJnts;
+    nLnks = sim_config.robot_body.nLnks;
+    nFeet = sim_config.robot_body.nFeet;
+    nAxes = sim_config.nAxes;
+
+    jnt_pair_idx = sim_config.robot_body.jnt_pair_idx;
+
+    drawSkel = vis_ctrl.drawSkel;
+    drawBody = vis_ctrl.drawBody;
+
+    if (sim_config.vid_axes_id > 0)
+        % capture only the specified subplot frame ...
+        hObj = gca;
+    else
+        % capture the entire figure window ...
+        hObj = sim_config.hWndFigure;
+    end
+
+    t = 2;
+
+    % animate the robot and the payload objects:
+    if (drawSkel && drawBody)
+        % full robot body (skeleton and the link shapes):
+        shape_geom = sim_config.robot_body.shape_geom;
+        foot_geom  = sim_config.robot_body.foot_geom;
+
+        idx1 = 3;
+        idx2 = 2 + nLnks;
+        idx3 = idx2 + 1;
+
+        while (t <= nSteps)
+            [hSimRobot(1:nJnts,1), fkin_jnts] = updateJointNodes(hSimRobot(1:nJnts,1), fkin_jnts, nJnts, t);
+
+            fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
+
+            hSimRobot(idx1:idx2,1) = updateRobotSkeleton(hSimRobot(idx1:idx2,1), fkin_jnts.pair_pos, nLnks);
+
+            hSimRobot(idx3:nRGObj,1) = updateRobotBody(hSimRobot(idx3:nRGObj,1), fkin_jnts.pair_pos, ...
+                                                       nLnks, nFeet, foot_geom, shape_geom.size_sf);
+
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects{1,1} = updatePayloadObj(sim_config.gfx_objects{1,1}, nRGObj, ...
+                                                           sim_config.environment.vb_objects, vqT_vb, vb_idx, nVBds);
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+
+            % capture the current state of the axes (frame) for the video ...
+            vidfrms(t,1) = getframe(hObj);
+            t = t + 1;
+        end
+    elseif drawSkel
+        % only the skeleton of the robot:
+        idx1 = 3;
+        idx2 = 2 + nLnks;
+
+        while (t <= nSteps)
+            [hSimRobot(1:nJnts,1), fkin_jnts] = updateJointNodes(hSimRobot(1:nJnts,1), fkin_jnts, nJnts, t);
+
+            fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
+
+            hSimRobot(idx1:idx2,1) = updateRobotSkeleton(hSimRobot(idx1:idx2,1), fkin_jnts.pair_pos, nLnks);
+
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects{1,1} = updatePayloadObj(sim_config.gfx_objects{1,1}, nRGObj, ...
+                                                           sim_config.environment.vb_objects, vqT_vb, vb_idx, nVBds);
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+
+            vidfrms(t,1) = getframe(hObj);
+            t = t + 1;
+        end
+    elseif drawBody
+        % only the link shapes (hull) of the robot:
+        shape_geom = sim_config.robot_body.shape_geom;
+        foot_geom  = sim_config.robot_body.foot_geom;
+
+        idx3 = 3 + nLnks;
+
+        while (t <= nSteps)
+            [hSimRobot(1:nJnts,1), fkin_jnts] = updateJointNodes(hSimRobot(1:nJnts,1), fkin_jnts, nJnts, t);
+
+            fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
+
+            hSimRobot(idx3:nRGObj,1) = updateRobotBody(hSimRobot(idx3:nRGObj,1), fkin_jnts.pair_pos, ...
+                                                       nLnks, nFeet, foot_geom, shape_geom.size_sf);
+
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects{1,1} = updatePayloadObj(sim_config.gfx_objects{1,1}, nRGObj, ...
+                                                           sim_config.environment.vb_objects, vqT_vb, vb_idx, nVBds);
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+
+            vidfrms(t,1) = getframe(hObj);
+            t = t + 1;
+        end
+    else
+        % only the joint nodes (data points) of the robot:
+        while (t <= nSteps)
+            [hSimRobot(1:nJnts,1), fkin_jnts] = updateJointNodes(hSimRobot(1:nJnts,1), fkin_jnts, nJnts, t);
+
+            fkin_jnts.pair_pos = getLinkPositions(fkin_jnts.pos, jnt_pair_idx, nLnks);
+
+            sim_config.gfx_objects{1,1}(1:nRGObj,1) = hSimRobot;
+            sim_config.gfx_objects{1,1} = updatePayloadObj(sim_config.gfx_objects{1,1}, nRGObj, ...
+                                                           sim_config.environment.vb_objects, vqT_vb, vb_idx, nVBds);
+            sim_config.gfx_objects = updateSimAxes(sim_config.gfx_objects, sim_config.hAxes, nAxes);
+
+            vidfrms(t,1) = getframe(hObj);
+            t = t + 1;
+        end
+    end
+end
+
+function gobj_arr = updatePayloadObj(gobj_arr, nRGObj, vb_objects, vqT_vb, vb_idx, nVBds)
+    i = -6;
+    for j = 1:nVBds
+        i  = i + 7;
+        io = vb_idx(1,j); % object index
+        ig = nRGObj + io; % graphic objects index
+
+        vb_obj = vb_objects(io,1);
+        vb_obj.frame = vqT_vb(t,i:7*j);
+
+        gobj_arr(ig,1) = vb_obj.updGObj(gobj_arr(ig,1));
+    end
+end
+
+function gfx_objects = updateSimAxes(gfx_objects, hAxes, nAxes)
     if (nAxes > 1)
         for i = 2:nAxes
             delete(gfx_objects{1,i});
@@ -579,7 +891,7 @@ function hLnkShapes = createRobotBody(jnt_pair_pos, nLnks, nFeet, foot_geom, sha
 end
 
 function [hJntNodes, fkin_jnts] = updateJointNodes(hJntNodes, fkin_jnts, nJnts, t)
-    new_fk_vqT = (squeeze(fkin_jnts.vqT(t,1:7,1:nJnts))).';
+    new_fk_vqT = squeeze(fkin_jnts.vqT(t,1:7,1:nJnts)).';
     [hJntNodes, fkin_jnts.pos] = updateFKinJointPositions(hJntNodes, fkin_jnts.pos, new_fk_vqT, nJnts);
 end
 

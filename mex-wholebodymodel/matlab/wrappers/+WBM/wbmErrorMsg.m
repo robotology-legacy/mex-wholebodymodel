@@ -14,6 +14,7 @@ classdef wbmErrorMsg
         NAME_NOT_EXIST    = 'The name does not exist in the list!';
         NOT_HOMOG_MAT     = 'Matrix is not homogeneous!';
         NO_LNK_IN_CTC     = 'At least one link must be in contact with the ground or object!';
+        OBJ_NOT_OBSTACLE  = 'The object is not defined as an obstacle!';
         SINGULAR_MAT      = 'Singular matrix!';
         STRING_MISMATCH   = 'String mismatch!';
         UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';
@@ -31,6 +32,6 @@ classdef wbmErrorMsg
         WRONG_NARGIN      = 'Incorrect number of input arguments!';
         WRONG_NARGOUT     = 'Incorrect number of output arguments!';
         WRONG_VEC_DIM     = 'Wrong vector dimension!';
-        WRONG_VEC_SIZE    = 'Wrong vector size!';
+        WRONG_VEC_LEN     = 'Wrong vector length!';
     end
 end

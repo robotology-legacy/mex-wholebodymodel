@@ -5,7 +5,7 @@ function icub_body = setupBody_iCub()
     %   [2] iCub Model Naming Convention: <http://wiki.icub.org/wiki/ICub_Model_naming_conventions>
 
     % Effectors (list of all chain names):
-    chain_names = {'ROBOT_TORSO'; 'ROBOT_LEFT_ARM'; 'ROBOT_RIGHT_ARM'; 'ROBOT_LEFT_LEG'; 'ROBOT_RIGHT_LEG'};
+    chn_names = {'ROBOT_TORSO'; 'ROBOT_LEFT_ARM'; 'ROBOT_RIGHT_ARM'; 'ROBOT_LEFT_LEG'; 'ROBOT_RIGHT_LEG'};
 
     % Chains (lists with all joints of each chain):
     % Note: The joint names must be named as defined in the naming convention [2] and
@@ -20,10 +20,10 @@ function icub_body = setupBody_iCub()
 
     % Joint name list:
     % Note: The order of the joint names is set as defined in the listing of ROBOT_MEX_WBI_TOOLBOX in [1].
-    joint_names = vertcat(robot_torso_joints, robot_left_arm_joints, robot_right_arm_joints, robot_left_leg_joints, robot_right_leg_joints);
+    jnt_names = vertcat(robot_torso_joints, robot_left_arm_joints, robot_right_arm_joints, robot_left_leg_joints, robot_right_leg_joints);
 
-    chain_idx = [1 3; 4 8; 9 13; 14 19; 20 25]; % joint index pairs to define the start and the end of each chain ...
-    joint_idx = (1:25).';
+    chn_idx = [1 3; 4 8; 9 13; 14 19; 20 25]; % joint index pairs to define the start and the end of each chain ...
+    jnt_idx = (1:25).';
 
-    icub_body = WBM.wbmBody(chain_names, chain_idx, joint_names, joint_idx);
+    icub_body = WBM.wbmBody(chn_names, chn_idx, jnt_names, jnt_idx);
 end

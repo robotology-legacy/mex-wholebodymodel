@@ -5,8 +5,8 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         manuf@char      % the name of the manufacturer (annotation)
         comment@char    % general comment (annotation)
         wbm_info@struct % general information about whole body model of the robot.
-        wbm_params@WBM.wbmBaseRobotParams % base model and configuration parameters of the robot.
-        plotopt3d@WBM.absSimConfig
+        wbm_params@WBM.wbmRobotParams % base model and configuration parameters of the robot.
+        plotopt3d@WBM.wbmSimConfig
         base_link@char        % floating base link (fixed reference link) of the robot.
         ee_links              % kinematic links of the end-effectors (hands) that are controlled by the system.
         link@char             % current kinematic link of the robot that is controlled by the system.

@@ -4,8 +4,8 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         robot_name@char
         robot_model@char
         robot_manuf@char
-        robot_params@WBM.wbmBaseRobotParams
-        sim_config@WBM.absSimConfig
+        robot_params@WBM.wbmRobotParams
+        sim_config@WBM.wbmSimConfig
         base_link@char
         base_tform@double matrix
         tool_tform@double matrix
@@ -21,7 +21,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         mrobot_name@char
         mrobot_model@char
         mrobot_manuf@char
-        msim_config@WBM.absSimConfig
+        msim_config@WBM.wbmSimConfig
         mbase_tform@double matrix
         mtool_tform@double matrix
         mfeet_conf@struct
@@ -30,11 +30,11 @@ classdef iCubWBM < WBM.Interfaces.IWBM
 
     methods
         % Constructor:
-        function obj = iCubWBM(robot_model, robot_config, wf2fixLnk)
+        function obj = iCubWBM(robot_model, robot_config, wf2fixlnk)
             switch nargin
                 % initialize the mex-WholeBodyModel for the iCub-Robot:
                 case 3
-                    obj.mwbm_icub = WBM.WBM(robot_model, robot_config, wf2fixLnk);
+                    obj.mwbm_icub = WBM.WBM(robot_model, robot_config, wf2fixlnk);
                 case 2
                     obj.mwbm_icub = WBM.WBM(robot_model, robot_config);
                 otherwise
@@ -54,22 +54,22 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             obj.mwbm_icub = copy(robot_wbm);
         end
 
-        function initRobotFcn(obj, fhInitRobotWBM, wf2fixLnk)
+        function initRobotFcn(obj, fhInitRobotWBM, wf2fixlnk)
             if ~isa(fhInitRobotWBM, 'function_handle')
                 error('iCubWBM::initRobotFcn: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE)
             end
 
-            if ~exist('wf2fixLnk', 'var')
-                wf2fixLnk = true;
+            if ~exist('wf2fixlnk', 'var')
+                wf2fixlnk = true;
             end
-            obj.mwbm_icub = fhInitRobotWBM(wf2fixLnk);
+            obj.mwbm_icub = fhInitRobotWBM(wf2fixlnk);
         end
 
         function initRobotParams(obj, robot_params)
-            if ~isa(robot_params, 'WBM.wbmBaseRobotParams')
+            if ~isa(robot_params, 'WBM.wbmRobotParams')
                 error('iCubWBM::initRobotParams: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            obj.mwbm_icub = WBM.WBM(robot_params.model, robot_params.config, robot_params.wf2fixLnk);
+            obj.mwbm_icub = WBM.WBM(robot_params.model, robot_params.config, robot_params.wf2fixlnk);
         end
 
         function delete(obj)

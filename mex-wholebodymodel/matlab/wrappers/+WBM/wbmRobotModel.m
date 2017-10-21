@@ -1,6 +1,6 @@
-classdef wbmBaseRobotModel
+classdef wbmRobotModel < handle
     properties
-        ndof@uint16   scalar = 0;
+        ndof@uint16        scalar = 0;
         urdf_robot_name@char
         urdf_fixed_link@char % reference link (= floating base link) to the world frame (WF).
         wf_R_b_init@double matrix = eye(3,3);   % initial orientation of the base frame to the WF.
@@ -8,7 +8,7 @@ classdef wbmBaseRobotModel
         g_wf@double        vector = zeros(3,1); % gravity in the WF.
         frict_coeff = struct( 'v', [], ...
                               'c', [] );
-        jlmts = struct( 'lwr', [], ...
-                        'upr', [] );
+        jlmts       = struct( 'lwr', [], ...
+                              'upr', [] );
     end
 end

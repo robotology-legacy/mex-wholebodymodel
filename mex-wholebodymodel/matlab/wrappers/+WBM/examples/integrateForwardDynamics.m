@@ -6,8 +6,8 @@ import WBM.RobotModel.iCub.*
 
 
 %% Initialization of the WBM for the iCub-Robot:
-wf2fixLnk   = true; % set the world frame to a fixed link
-wbm_icub    = initRobot_iCub(wf2fixLnk);
+wf2fixlnk   = true; % set the world frame to a fixed link
+wbm_icub    = initRobot_iCub(wf2fixlnk);
 icub_model  = wbm_icub.robot_model;
 icub_config = wbm_icub.robot_config;
 

@@ -1,23 +1,18 @@
 function dcm = quat2rotm(quat)
-    WBM.utilities.chkfun.checkVecSize(quat, 4, 'quat2rotm');
-
-    if iscolumn(quat)
-        qnorm = quat.'*quat;
-    else
-        % quat is a row-vector ...
-        qnorm = quat*quat.';
-    end
+    WBM.utilities.chkfun.checkVecLen(quat, 4, 'quat2rotm');
+    quat  = quat(:); % make sure that quat is a column vector
+    qnorm = quat.'*quat;
 
     if (qnorm > 1)
         % normalize ...
         quat = quat./sqrt(qnorm); % comp. faster than "quat./norm(quat)"
     end
     % scalar (real) part:
-    q_0 = quat(1);
+    q_0 = quat(1,1);
     % vector (imaginary) part:
-    q_1 = quat(2);
-    q_2 = quat(3);
-    q_3 = quat(4);
+    q_1 = quat(2,1);
+    q_2 = quat(3,1);
+    q_3 = quat(4,1);
 
     %% Compute the Direction Cosine Matrix (DCM) by applying the Euler-Rodrigues Parameterization
     % for efficent computing of the rotation matrix R(s,r) in SO(3) with,

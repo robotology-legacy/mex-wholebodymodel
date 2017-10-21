@@ -1,4 +1,4 @@
-classdef (Abstract) absSimConfig
+classdef (Abstract) wbmSimConfig < handle
     properties(Abstract, Dependent)
         % public properties for fast get/set methods:
         custom_view@double vector % custom viewpoint for a perspective view.
@@ -35,5 +35,18 @@ classdef (Abstract) absSimConfig
         axis_limits@double vector
 
         gfx_objects@cell   vector
+
+        show_light@logical scalar
+        light_pos@double   vector
+
+        mkvideo@logical    scalar
+        vid_axes_id@uint8  scalar
+        vid_filename@char
+        vid_fps@double     scalar
+    end
+
+    properties(Abstract, SetAccess = protected, GetAccess = public)
+        pl_stack@cell     matrix
+        pl_time_idx@uint8 matrix
     end
 end

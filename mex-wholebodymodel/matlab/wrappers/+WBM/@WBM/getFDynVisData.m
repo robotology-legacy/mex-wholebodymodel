@@ -556,7 +556,7 @@ end
 
 function vis_data = getVisDataFPCEF(obj, stmChi, fhTrqControl, feet_conf, clink_conf, fe_c, ac, ac_f, noi)
     if ~iscolumn(ac_f)
-        error('getVisDataFPCEF: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+        error('getVisDataFPCEF: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
     len = obj.mwbm_config.stvLen;
 
@@ -660,7 +660,7 @@ end
 
 function vis_data = getVisDataFHPCEF(obj, stmChi, fhTrqControl, feet_conf, hand_conf, fe_h, ac_h, ac_f, noi)
     if ~iscolumn(ac_f)
-        error('getVisDataFHPCEF: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+        error('getVisDataFHPCEF: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
     len = obj.mwbm_config.stvLen;
 
