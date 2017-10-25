@@ -1,4 +1,4 @@
-function [wbm_icub, ndof] = initRobot_iCub_atf(wf2fixlnk)
+function [wbm_icub, ndof] = initRobotICub_atf(wf2fixlnk)
     %% Initialize the model of the iCub-Robot with an arms and torso free configuration:
     %  Source for the joint configurations,
     %       [1] Yarp-WholeBodyInterface: <https://github.com/robotology/yarp-wholebodyinterface/blob/master/app/robots/icubGazeboSim/yarpWholeBodyInterface.ini>
@@ -20,7 +20,7 @@ function [wbm_icub, ndof] = initRobot_iCub_atf(wf2fixlnk)
     icub_config.ccstr_link_names = {'l_sole', 'r_sole'};
 
     % Setup the body of the iCub-Robot with the initial body (joint) positions (in degrees):
-    [icub_config.body, jnt_names_body] = WBM.RobotModel.iCub_arms_torso_free.setupBody_iCub_atf();
+    [icub_config.body, jnt_names_body] = WBM.RobotModel.iCub_arms_torso_free.setupBodyICub_atf();
     icub_config.jpos_torso     = [0; 0; 0];
     icub_config.jpos_left_arm  = [0; 30; 0; 45; 0; 0; 0];
     icub_config.jpos_left_leg  = [25.5; 0.1; 0; -18.5; -5.5; -0.1];

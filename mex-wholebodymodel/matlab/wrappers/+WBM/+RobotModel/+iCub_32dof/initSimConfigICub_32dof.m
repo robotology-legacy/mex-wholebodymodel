@@ -1,4 +1,4 @@
-function sim_config = initSimConfig_iCub_32dof(urdf_file_name, scn_mode)
+function sim_config = initSimConfigICub_32dof(urdf_file_name, scn_mode)
     if ~exist('scn_mode', 'var')
         scn_mode = 'LightScn'; % default scene for the simulation.
     end
@@ -133,7 +133,7 @@ function sim_config = initSimConfig_iCub_32dof(urdf_file_name, scn_mode)
             env_settings.grnd_edge_color = 'none';
             env_settings.orig_pt_color   = WBM.wbmColor.violetred;
         otherwise
-            error('initSimConfig_iCub: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+            error('initSimConfigICub: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
     end
 
     % Create the configuration object for the WBM-Simulator:

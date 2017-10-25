@@ -6,6 +6,10 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous
         frame@double  vector % VQ-transformation (pos. & orientation) of the object
     end
 
+    properties(Constant)
+        DF_FRAME@double    vector = [0; 0; 0; 1; 0; 0; 0];
+    end
+
     properties(Abstract)
         line_width@double  scalar
         edge_color
@@ -19,6 +23,7 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous
         obj_type@char             % type of the object (obstacle (obs) or volume body (bdy))
         isobstacle@logical scalar % defines if the cuboid is an obstacle
         issolid@logical    scalar % defines if the object is solid
+        init_frame@double  vector % initial frame (pos. & orientation) of the object
         dimension@double   vector % dimension (width, length & height) of the object
         com@double         vector % position of the object's center of mass (CoM)
         rho@double         scalar % volumetric mass density of the object
@@ -28,15 +33,17 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous
     end
 
     methods(Abstract)
+        setInitFrame(obj, varargin)
         hgo    = getGObj(obj)
         hgo    = updGObj(obj, hgo)
         hmg    = drawMGrid(obj, pt_color)
-        result = ptInObj(obj, pos)
+        result = ptInObj(obj, pt_pos)
     end
 
     methods(Static, Sealed, Access = protected)
         function default_object = getDefaultScalarElement()
             default_object = WBM.vbCuboid;
         end
+
     end
 end

@@ -1,4 +1,4 @@
-function icub_body = setupBody_iCub()
+function icub_body = setupBodyICub()
     %% Define the effectors and the chains for the body of the iCub-Robot:
     % Sources:
     %   [1] Yarp-WholeBodyInterface: <https://github.com/robotology/yarp-wholebodyinterface/blob/master/app/robots/icubGazeboSim/yarpWholeBodyInterface.ini>

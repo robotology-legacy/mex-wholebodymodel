@@ -1,6 +1,6 @@
 classdef wbmPayloadLink
     properties
-        urdf_link_name@char
+        urdf_link_name@char        = 'none';
         lnk_p_cm@double     vector = zeros(3,1);
 
         vb_idx@uint16       scalar = 0;

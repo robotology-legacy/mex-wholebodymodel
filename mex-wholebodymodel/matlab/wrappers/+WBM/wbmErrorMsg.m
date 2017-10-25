@@ -15,6 +15,7 @@ classdef wbmErrorMsg
         NOT_HOMOG_MAT     = 'Matrix is not homogeneous!';
         NO_LNK_IN_CTC     = 'At least one link must be in contact with the ground or object!';
         OBJ_NOT_OBSTACLE  = 'The object is not defined as an obstacle!';
+        PL_LNK_NOT_DEF    = 'The payload link is not defined!';
         SINGULAR_MAT      = 'Singular matrix!';
         STRING_MISMATCH   = 'String mismatch!';
         UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';

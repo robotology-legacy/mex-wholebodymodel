@@ -20,6 +20,7 @@ classdef vbCuboid < WBM.vbObject
         obj_type@char             = 'bdy';      % type of object: obstacle (obs) or volume body (bdy) (default: bdy)
         isobstacle@logical scalar = false;      % defines if the cuboid is an obstacle (default: false)
         issolid@logical    scalar = false;      % defines if the cuboid is solid (default: false)
+        init_frame@double  vector = WBM.vbCuboid.DF_FRAME; % initial frame (pos. & orientation) of the cuboid
         dimension@double   vector = zeros(1,3); % dimension (width, length & height) of the cuboid
         vertices@double    matrix = zeros(8,3); % vertex positions of the cuboid at the given origin and orientation
         com@double         vector = zeros(3,1); % position of the center of mass (CoM)
@@ -119,6 +120,30 @@ classdef vbCuboid < WBM.vbObject
             setCuboidAtPosRotm(obj);
         end
 
+        function setInitFrame(obj, varargin)
+            % set the cuboid to the given initial pos. and orientation:
+            switch nargin
+                case 3
+                    p = varargin{1,1};
+                    R = varargin{1,2};
+
+                    obj.init_frame = WBM.utilities.tfms.posRotm2frame(p, R);
+                    obj.mcub_orig  = p;
+                    obj.mcub_rotm  = R;
+                case 2
+                    vqT = varargin{1,1};
+
+                    [obj.mcub_orig, obj.mcub_rotm] = WBM.utilities.tfms.frame2posRotm(vqT);
+                    obj.init_frame = vqT;
+                case 1
+                    % use the current initial frame ...
+                    [obj.mcub_orig, obj.mcub_rotm] = WBM.utilities.tfms.frame2posRotm(obj.init_frame);
+                otherwise
+                    error('vbCuboid::setInitFrame: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+            end
+            setCuboidAtPosRotm(obj);
+        end
+
         function hgo = getGObj(obj)
             hgo = patch('Vertices', obj.vertices, 'LineWidth', obj.line_width, 'EdgeColor', obj.edge_color, ...
                         'Faces', obj.mfaces, 'FaceColor', obj.face_color, 'FaceAlpha', obj.face_alpha);
@@ -126,7 +151,6 @@ classdef vbCuboid < WBM.vbObject
 
         function hgo = updGObj(obj, hgo)
             hgo.Vertices = obj.vertices;
-            % set(hgo, 'Vertices', obj.vertices);
         end
 
         function hmg = drawMGrid(obj, pt_color)
@@ -141,20 +165,20 @@ classdef vbCuboid < WBM.vbObject
                            'Marker', '.', 'MarkerEdgeColor', pt_color);
         end
 
-        function result = ptInObj(obj, pos)
+        function result = ptInObj(obj, pt_pos)
             % half length of each side of the cuboid ...
             lx_h = obj.mcub_vtx_s(7,1);
             ly_h = obj.mcub_vtx_s(7,2);
             lz_h = obj.mcub_vtx_s(7,3);
 
-            if isvector(pos)
-                WBM.utilities.chkfun.checkVecLen(pos, 3, 'vbCuboid::ptInObj')
-                pos = pos(:); % make sure that pos is a column vector
+            if isvector(pt_pos)
+                WBM.utilities.chkfun.checkVecLen(pt_pos, 3, 'vbCuboid::ptInObj')
+                pt_pos = pt_pos(:); % make sure that pt_pos is a column vector
 
                 % get the distance of the given point to the CoM and rotate this
                 % point back to the initial condition of the cuboid (rect. pos.
                 % with CoM at origin 0):
-                d_r = obj.mcub_rotm.' * (pos - obj.com); % back-rotated distance
+                d_r = obj.mcub_rotm.' * (pt_pos - obj.com); % back-rotated distance
                 d_x = d_r(1,1);
                 d_y = d_r(2,1);
                 d_z = d_r(3,1);
@@ -166,8 +190,8 @@ classdef vbCuboid < WBM.vbObject
                 res_z = (d_z > -lz_h) && (d_z < lz_h);
 
                 result = (res_x && res_y && res_z);
-            elseif ismatrix(pos)
-                [m,n] = size(pos);
+            elseif ismatrix(pt_pos)
+                [m,n] = size(pt_pos);
                 if (n ~= 3)
                     error('vbCuboid::ptInObj: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
                 end
@@ -175,7 +199,7 @@ classdef vbCuboid < WBM.vbObject
                 ds = zeros(m,3);
                 cm = obj.com.';
                 for i = 1:m
-                    ds(i,1:3) = pos(i,1:3) - cm;
+                    ds(i,1:3) = pt_pos(i,1:3) - cm;
                 end
                 ds_r = ds * obj.mcub_rotm; % back-rotated distances,
                                            % ds_r = (R^T * ds^T)^T
@@ -244,11 +268,9 @@ classdef vbCuboid < WBM.vbObject
 
     methods(Access = private)
         function setObjData(obj, orig, rotm, obj_prop)
-            WBM.utilities.chkfun.checkCVecDim(orig, 3, 'vbCuboid::setObjData');
-            WBM.utilities.chkfun.checkMatDim(rotm, 3, 3, 'vbCuboid::setObjData');
-
-            obj.mcub_orig = orig;
-            obj.mcub_rotm = rotm;
+            obj.init_frame = WBM.utilities.tfms.posRotm2frame(orig, rotm);
+            obj.mcub_orig  = orig;
+            obj.mcub_rotm  = rotm;
 
             if (nargin == 4)
                 % set the object properties of the cuboid ...

@@ -1,4 +1,4 @@
-function wbm_icub = initRobot_iCub(wf2fixlnk)
+function wbm_icub = initRobotICub(wf2fixlnk)
     %% Base (default) model parameters:
     icub_model = WBM.wbmRobotModel;
     icub_model.ndof            = 25;
@@ -15,11 +15,11 @@ function wbm_icub = initRobot_iCub(wf2fixlnk)
     %icub_config.nCstrs           = 2;
     icub_config.ccstr_link_names = {'l_sole', 'r_sole'};
     %icub_config.nPlds = 0;
-    %icub_config.payload_links = [];
+    %icub_config.payload_links = WBM.wbmPayloadLink.empty;
 
     % Setup the body of the iCub-Robot with the initial body (joint) positions (in degrees):
     % Note: This configuration assumes an iCub-Robot with 25 DoFs.
-    icub_config.body           = WBM.RobotModel.iCub.setupBody_iCub();
+    icub_config.body           = WBM.RobotModel.iCub.setupBodyICub();
     icub_config.jpos_torso     = [-10.0; 0.0; 0.0];
     icub_config.jpos_left_arm  = [-19.7; 29.7; 0.0; 44.9; 0.0];
     icub_config.jpos_left_leg  = [25.5; 0.1; 0.0; -38.5; -5.5; -0.1];

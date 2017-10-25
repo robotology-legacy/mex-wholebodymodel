@@ -318,8 +318,8 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             wf_J_tt = obj.mwbm_icub.jacobianTool(stFltb.wf_R_b, stFltb.wf_p_b, q_j, 1);
         end
 
-        function payload(obj, pl_data)
-            obj.mwbm_icub.setLinkPayloads(pl_data);
+        function payload(obj, pl_lnk_data)
+            obj.mwbm_icub.setPayloadLinks(pl_lnk_data);
         end
 
         function f_pl = ploadForces(obj, fhTotCWrench, f_cp, tau, q_j, dq_j, stFltb)

@@ -425,31 +425,56 @@ classdef WBM < WBM.WBMBase
             zlabel('$z_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
         end
 
-        function setPayloadLinks(obj, pl_data)
+        function setPayloadLinks(obj, pl_lnk_data)
             % verify the input data ...
-            if isempty(pl_data)
+            if isempty(pl_lnk_data)
                 error('WBM::setPayloadLinks: %s', WBM.wbmErrorMsg.EMPTY_ARRAY);
             end
-            if ( ~iscell(pl_data) && ~isstruct(pl_data{1,1}) )
+            if isstruct(pl_lnk_data)
+                pl_lnk_data = {pl_lnk_data};
+            elseif ( iscell(pl_lnk_data) && isstruct(pl_lnk_data{1,1}) )
+                pl_lnk_data = pl_lnk_data(:);
+            else
                 error('WBM::setPayloadLinks: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             % Note: Index 1 and 2 are always reserved for the left and right hand of the
-            % humanoid robot. All further indices can be used for other links on which
-            % additionally special payloads are mounted (e.g. knapsack, tools, etc.).
-            n = size(pl_data,2);
+            % humanoid robot. The default index is always 1. All further indices can be
+            % used for other links, on which additionally special payloads are mounted
+            % (e.g. battery pack at torso, knapsack at torso, tools, etc.).
+            n = size(pl_lnk_data,1);
             obj.mwbm_config.nPlds = n; % number of payloads ...
-            obj.mwbm_config.payload_links(1,1:n) = WBM.wbmPayloadLink;
-            for i = 1:n
-                pl_lnk = pl_data{1,i};
-                obj.mwbm_config.payload_links(1,i).urdf_link_name = pl_lnk.name;
-                obj.mwbm_config.payload_links(1,i).lnk_p_cm       = pl_lnk.lnk_p_cm;
-                obj.mwbm_config.payload_links(1,i).m_rb           = pl_lnk.m_rb;
-                obj.mwbm_config.payload_links(1,i).I_cm           = pl_lnk.I_cm;
-                if isfield(pl_lnk, 'vb_idx')
-                    obj.mwbm_config.payload_links(1,i).vb_idx = pl_lnk.vb_idx;
-                else
-                    % payload is not linked with a volume body object ...
-                    obj.mwbm_config.payload_links(1,i).vb_idx = 0;
+
+            lnk_names_lh = {'l_hand', 'l_wrist_1'};
+            lnk_names_rh = {'r_hand', 'r_wrist_1'};
+            lh = ~isempty(find(ismember(pl_lnk_data{1,1}.name, lnk_names_lh), 1));
+            if (n > 1)
+                rh = ~isempty(find(ismember(pl_lnk_data{2,1}.name, lnk_names_rh), 1));
+            else % if n = 1:
+                rh = ~isempty(find(ismember(pl_lnk_data{1,1}.name, lnk_names_rh), 1));
+            end
+
+            if (lh && rh)
+                len = n;
+                obj.mwbm_config.payload_links(1,1:n) = WBM.wbmPayloadLink;
+                setPayloadLinkData(obj, 1, pl_lnk_data{1,1});
+                setPayloadLinkData(obj, 2, pl_lnk_data{2,1});
+            elseif lh
+                len = n + 1;
+                obj.mwbm_config.payload_links(1,1:len) = WBM.wbmPayloadLink;
+                setPayloadLinkData(obj, 1, pl_lnk_data{1,1});
+            elseif rh
+                len = n + 1;
+                obj.mwbm_config.payload_links(1,1:len) = WBM.wbmPayloadLink;
+                setPayloadLinkData(obj, 2, pl_lnk_data{1,1});
+            else
+                len = n + 2;
+                obj.mwbm_config.payload_links(1,1:len) = WBM.wbmPayloadLink;
+            end
+
+            if (len > 2)
+                for i = 3:len
+                    pl_lnk = pl_lnk_data{i,1};
+                    setPayloadLinkData(obj, i, pl_lnk);
                 end
             end
         end
@@ -497,6 +522,8 @@ classdef WBM < WBM.WBMBase
                     pl_link_name = obj.mwbm_config.payload_links(1,pl_idx).urdf_link_name;
                     lnk_p_cm     = obj.mwbm_config.payload_links(1,pl_idx).lnk_p_cm;
 
+                    WBM.utilities.chkfun.checkPayloadLink(pl_link_name, 'WBM::payloadFrame');
+
                     wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
                     wf_H_lnk = mexWholeBodyModel('transformation-matrix', wf_R_b_arr, varargin{1,2}, varargin{1,3}, pl_link_name);
                 case 4
@@ -510,6 +537,8 @@ classdef WBM < WBM.WBMBase
                     pl_idx       = varargin{1,1};
                     pl_link_name = obj.mwbm_config.payload_links(1,pl_idx).urdf_link_name;
                     lnk_p_cm     = obj.mwbm_config.payload_links(1,pl_idx).lnk_p_cm;
+
+                    WBM.utilities.chkfun.checkPayloadLink(pl_link_name, 'WBM::payloadFrame');
 
                     wf_H_lnk = mexWholeBodyModel('transformation-matrix', pl_link_name);
                 case 1
@@ -543,9 +572,11 @@ classdef WBM < WBM.WBMBase
 
         function [M_pl, frms] = generalizedInertiaPL(obj, pl_idx, varargin)
             pl_link_name = obj.mwbm_config.payload_links(1,pl_idx).urdf_link_name;
-            lnk_p_cm     = obj.mwbm_config.payload_links(1,pl_idx).lnk_p_cm;
-            m_rb         = obj.mwbm_config.payload_links(1,pl_idx).m_rb;
-            I_cm         = obj.mwbm_config.payload_links(1,pl_idx).I_cm;
+            WBM.utilities.chkfun.checkPayloadLink(pl_link_name, 'WBM::generalizedInertiaPL');
+
+            lnk_p_cm = obj.mwbm_config.payload_links(1,pl_idx).lnk_p_cm;
+            m_rb     = obj.mwbm_config.payload_links(1,pl_idx).m_rb;
+            I_cm     = obj.mwbm_config.payload_links(1,pl_idx).I_cm;
 
             switch nargin
                 case 5
@@ -1300,6 +1331,19 @@ classdef WBM < WBM.WBMBase
         end
 
         [] = visualizeSimRobot(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
+
+        function setPayloadLinkData(obj, pl_idx, pl_lnk)
+            obj.mwbm_config.payload_links(1,pl_idx).urdf_link_name = pl_lnk.name;
+            obj.mwbm_config.payload_links(1,pl_idx).lnk_p_cm       = pl_lnk.lnk_p_cm;
+            obj.mwbm_config.payload_links(1,pl_idx).m_rb           = pl_lnk.m_rb;
+            obj.mwbm_config.payload_links(1,pl_idx).I_cm           = pl_lnk.I_cm;
+            if isfield(pl_lnk, 'vb_idx')
+                obj.mwbm_config.payload_links(1,pl_idx).vb_idx = pl_lnk.vb_idx;
+            else
+                % the payload is not linked with a volume body object ...
+                obj.mwbm_config.payload_links(1,pl_idx).vb_idx = 0;
+            end
+        end
 
     end
 end

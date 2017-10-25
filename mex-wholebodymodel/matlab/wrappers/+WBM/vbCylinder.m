@@ -20,6 +20,7 @@ classdef vbCylinder < WBM.vbObject
         obj_type@char             = 'bdy';      % type of object: obstacle (obs) or volume body (bdy) (default: bdy)
         isobstacle@logical scalar = false;      % defines if the cylinder is an obstacle (default: false)
         issolid@logical    scalar = false;      % defines if the cylinder is solid (default: false)
+        init_frame@double  vector = WBM.vbCylinder.DF_FRAME; % initial frame (pos. & orientation) of the cylinder
         dimension@double   vector = zeros(1,3); % dimension (inner/outer radius & height) of the cylinder
         vertices@struct           = struct('X', [], 'Y', [], 'Z', []); % vertex positions of the cylinder at the given origin and orientation
         com@double         vector = zeros(3,1); % position of the center of mass (CoM)
@@ -102,6 +103,30 @@ classdef vbCylinder < WBM.vbObject
             setCylinderAtPosRotm(obj);
         end
 
+        function setInitFrame(obj, varargin)
+            % set the cylinder to the given initial pos. and orientation:
+            switch nargin
+                case 3
+                    p = varargin{1,1};
+                    R = varargin{1,2};
+
+                    obj.init_frame = WBM.utilities.tfms.posRotm2frame(p, R);
+                    obj.mcyl_orig  = p;
+                    obj.mcyl_rotm  = R;
+                case 2
+                    vqT = varargin{1,1};
+
+                    [obj.mcyl_orig, obj.mcyl_rotm] = WBM.utilities.tfms.frame2posRotm(vqT);
+                    obj.init_frame = vqT;
+                case 1
+                    % use the current initial frame ...
+                    [obj.mcyl_orig, obj.mcyl_rotm] = WBM.utilities.tfms.frame2posRotm(obj.init_frame);
+                otherwise
+                    error('vbCylinder::setInitFrame: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+            end
+            setCylinderAtPosRotm(obj);
+        end
+
         function hgo = getGObj(obj)
             hgo = surf(obj.vertices.X, obj.vertices.Y, obj.vertices.Z, 'LineWidth', obj.line_width, ...
                        'EdgeColor', obj.edge_color, 'FaceColor', obj.face_color, 'FaceAlpha', obj.face_alpha);
@@ -125,7 +150,7 @@ classdef vbCylinder < WBM.vbObject
                            'Marker', '.', 'MarkerEdgeColor', pt_color);
         end
 
-        function result = ptInObj(obj, pos)
+        function result = ptInObj(obj, pt_pos)
             % calculation approach is taken and adapted from:
             % <https://stackoverflow.com/questions/19899612/cylinder-with-filled-top-and-bottom-in-matlab> and
             % <https://de.mathworks.com/matlabcentral/answers/43534-how-to-speed-up-the-process-of-determining-if-a-point-is-inside-a-cylinder>
@@ -133,14 +158,14 @@ classdef vbCylinder < WBM.vbObject
             h = obj.dimension(1,3);
             hgt_h = h*0.5;
 
-            if isvector(pos)
-                WBM.utilities.chkfun.checkVecLen(pos, 3, 'vbCylinder::ptInObj')
-                pos = pos(:); % make sure that pos is a column vector
+            if isvector(pt_pos)
+                WBM.utilities.chkfun.checkVecLen(pt_pos, 3, 'vbCylinder::ptInObj')
+                pt_pos = pt_pos(:); % make sure that pt_pos is a column vector
 
                 % get the distance of the given point to the CoM and rotate this
                 % point back to the initial condition of the cylinder (rect. pos.
                 % with CoM at origin 0):
-                d_r = obj.mcyl_rotm.' * (pos - obj.com); % back-rotated distance
+                d_r = obj.mcyl_rotm.' * (pt_pos - obj.com); % back-rotated distance
                 d_x = d_r(1,1);
                 d_y = d_r(2,1);
                 d_z = d_r(3,1);
@@ -151,8 +176,8 @@ classdef vbCylinder < WBM.vbObject
                 res2 = (d_z > -hgt_h) && (d_z < hgt_h); % bottom & top
 
                 result = (res1 && res2);
-            elseif ismatrix(pos)
-                [m,n] = size(pos);
+            elseif ismatrix(pt_pos)
+                [m,n] = size(pt_pos);
                 if (n ~= 3)
                     error('vbCylinder::ptInObj: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
                 end
@@ -160,7 +185,7 @@ classdef vbCylinder < WBM.vbObject
                 ds = zeros(m,3);
                 cm = obj.com.';
                 for i = 1:m
-                    ds(i,1:3) = pos(i,1:3) - cm;
+                    ds(i,1:3) = pt_pos(i,1:3) - cm;
                 end
                 ds_r = ds * obj.mcyl_rotm; % back-rotated distances,
                                            % ds_r = (R^T * ds^T)^T
@@ -228,11 +253,9 @@ classdef vbCylinder < WBM.vbObject
 
     methods(Access = private)
         function setObjData(obj, orig, rotm, obj_prop)
-            WBM.utilities.chkfun.checkCVecDim(orig, 3, 'vbCylinder::setObjData');
-            WBM.utilities.chkfun.checkMatDim(rotm, 3, 3, 'vbCylinder::setObjData');
-
-            obj.mcyl_orig = orig;
-            obj.mcyl_rotm = rotm;
+            obj.init_frame = WBM.utilities.tfms.posRotm2frame(orig, rotm);
+            obj.mcyl_orig  = orig;
+            obj.mcyl_rotm  = rotm;
 
             if (nargin == 4)
                 % set the object properties of the cylinder ...

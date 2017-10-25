@@ -20,6 +20,7 @@ classdef vbSphere < WBM.vbObject
         obj_type@char             = 'bdy';      % type of object: obstacle (obs) or volume body (bdy) (default: bdy)
         isobstacle@logical scalar = false;      % defines if the sphere is an obstacle (default: false)
         issolid@logical    scalar = false;      % defines if the sphere is solid (default: false)
+        init_frame@double  vector = WBM.vbSphere.DF_FRAME; % initial frame (pos. & orientation) of the sphere
         dimension@double   vector = zeros(1,2); % dimension (inner/outer radius) of the sphere
         vertices@struct           = struct('X', [], 'Y', [], 'Z', []); % vertex positions of the sphere at the given origin and orientation
         com@double         vector = zeros(3,1); % position of the center of mass (CoM)
@@ -96,6 +97,30 @@ classdef vbSphere < WBM.vbObject
             setSphereAtPosRotm(obj);
         end
 
+        function setInitFrame(obj, varargin)
+            % set the sphere to the given initial pos. and orientation:
+            switch nargin
+                case 3
+                    p = varargin{1,1};
+                    R = varargin{1,2};
+
+                    obj.init_frame = WBM.utilities.tfms.posRotm2frame(p, R);
+                    obj.msph_orig  = p;
+                    obj.msph_rotm  = R;
+                case 2
+                    vqT = varargin{1,1};
+
+                    [obj.msph_orig, obj.msph_rotm] = WBM.utilities.tfms.frame2posRotm(vqT);
+                    obj.init_frame = vqT;
+                case 1
+                    % use the current initial frame ...
+                    [obj.msph_orig, obj.msph_rotm] = WBM.utilities.tfms.frame2posRotm(obj.init_frame);
+                otherwise
+                    error('vbSphere::setInitFrame: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+            end
+            setSphereAtPosRotm(obj);
+        end
+
         function gobj = getGObj(obj)
             gobj = surf(obj.vertices.X, obj.vertices.Y, obj.vertices.Z, 'LineWidth', obj.line_width, ...
                         'EdgeColor', obj.edge_color, 'FaceColor', obj.face_color, 'FaceAlpha', obj.face_alpha);
@@ -119,23 +144,23 @@ classdef vbSphere < WBM.vbObject
                            'Marker', '.', 'MarkerEdgeColor', pt_color);
         end
 
-        function result = ptInObj(obj, pos)
+        function result = ptInObj(obj, pt_pos)
             r = obj.dimension(1,2); % outer radius
 
-            if isvector(pos)
-                WBM.utilities.chkfun.checkVecLen(pos, 3, 'vbSphere::ptInObj')
-                pos = pos(:); % make sure that pos is a column vector
+            if isvector(pt_pos)
+                WBM.utilities.chkfun.checkVecLen(pt_pos, 3, 'vbSphere::ptInObj')
+                pt_pos = pt_pos(:); % make sure that pt_pos is a column vector
 
                 % get the distance of the given point to the sphere's CoM:
-                d   = pos - obj.com;
+                d   = pt_pos - obj.com;
                 d_x = d(1,1);
                 d_y = d(2,1);
                 d_z = d(3,1);
 
                 % check if the point position is below the surface of the sphere:
                 result = sqrt(d_x*d_x + d_y*d_y + d_z*d_z) < r;
-            elseif ismatrix(pos)
-                [m,n] = size(pos);
+            elseif ismatrix(pt_pos)
+                [m,n] = size(pt_pos);
                 if (n ~= 3)
                     error('vbSphere::ptInObj: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
                 end
@@ -143,7 +168,7 @@ classdef vbSphere < WBM.vbObject
                 ds = zeros(m,3);
                 cm = obj.com.';
                 for i = 1:m
-                    ds(i,1:3) = pos(i,1:3) - cm;
+                    ds(i,1:3) = pt_pos(i,1:3) - cm;
                 end
                 ds_x = ds(1:m,1);
                 ds_y = ds(1:m,2);
@@ -206,11 +231,9 @@ classdef vbSphere < WBM.vbObject
 
     methods(Access = private)
         function setObjData(obj, orig, rotm, obj_prop)
-            WBM.utilities.chkfun.checkCVecDim(orig, 3, 'vbSphere::setObjData');
-            WBM.utilities.chkfun.checkMatDim(rotm, 3, 3, 'vbSphere::setObjData');
-
-            obj.msph_orig = orig;
-            obj.msph_rotm = rotm;
+            obj.init_frame = WBM.utilities.tfms.posRotm2frame(orig, rotm);
+            obj.msph_orig  = orig;
+            obj.msph_rotm  = rotm;
 
             if (nargin == 4)
                 % set the object properties of the sphere ...
@@ -304,7 +327,7 @@ classdef vbSphere < WBM.vbObject
         function initMeshgrid(obj, r)
             % the sphere is defined as an obstacle:
             ms   = obj.msph_msz; % mesh size
-            r_mg = r - ms; % radius of the internal meshgrid
+            r_mg = r - ms;       % radius of the internal meshgrid
 
             % create a cubic 3D-grid that covers the scaled sphere:
             gp_x = -r_mg:ms:r_mg;

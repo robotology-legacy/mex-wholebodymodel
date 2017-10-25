@@ -122,49 +122,32 @@ classdef genericSimConfig < WBM.wbmSimConfig
             end
             WBM.utilities.chkfun.checkRVecDim(vp, 2, 'genericSimConfig::addView');
 
+            if strcmp(vp_name, obj.axes_views)
+                error('genericSimConfig::addView: The name is already reserved!');
+            end
             len = size(obj.maxes_vwpts,1);
-            pos = len + 1;
-            obj.maxes_vwpts{pos,1} = vp_name;
-            obj.maxes_vwpts{pos,2} = vp;
-        end
-
-        function setPayloadStack(obj, vb_idx, manip)
-            if ( ~isvector(vb_idx) || ~iscellstr(manip) )
-                error('genericSimConfig::setPayloadStack: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
-            end
-            len = length(vb_idx);
-            if (len ~= length(manip))
-                error('genericSimConfig::setPayloadStack: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
-            end
-            % make sure that both lists are column vectors ...
-            vb_idx = vb_idx(:);
-            manip  = manip(:);
-
-            % create the payload stack with object index and the used manipulators:
-            obj.pl_stack = cell(len, 2);
-            obj.pl_stack{1:len,1} = vb_idx;
-
-            for i = 1:len
-                m = manip{i,1};
-                switch m
-                    case {'lh', 'rh', 'bh'}
-                        % left hand, right hand or both hands:
-                        obj.pl_stack{i,2} = m;
-                    otherwise
-                        error('genericSimConfig::setPayloadStack: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
-                end
-            end
-            % initialize the utilization time index of the given payload objects:
-            obj.pl_time_idx = zeros(len,2); % [start_idx, end_idx]
+            idx = len + 1;
+            obj.maxes_vwpts{idx,1} = vp_name;
+            obj.maxes_vwpts{idx,2} = vp;
         end
 
         function vp = get.custom_view(obj)
-            vp = obj.maxes_vwpts{10,1};
+            idx = find(strcmp(obj.maxes_vwpts(1:end,1), 'custom'));
+            if isempty(idx)
+                error('genericSimConfig::get.custom_view: %s', WBM.wbmErrorMsg.NAME_NOT_EXIST);
+            end
+            vp = obj.maxes_vwpts{idx,2};
         end
 
         function set.custom_view(obj, vp)
             WBM.utilities.chkfun.checkRVecDim(vp, 2, 'genericSimConfig::set.custom_view');
-            obj.maxes_vwpts{10,2} = vp;
+            idx = find(strcmp(obj.maxes_vwpts(1:end,1), 'custom'));
+            if isempty(idx)
+                % define a custom viewpoint ...
+                idx = size(obj.maxes_vwpts,1) + 1;
+                obj.maxes_vwpts{idx,1} = 'custom';
+            end
+            obj.maxes_vwpts{idx,2} = vp;
         end
 
         function axes_vp = get.axes_vwpts(obj)

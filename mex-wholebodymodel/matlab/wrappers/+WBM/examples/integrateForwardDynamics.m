@@ -7,7 +7,7 @@ import WBM.RobotModel.iCub.*
 
 %% Initialization of the WBM for the iCub-Robot:
 wf2fixlnk   = true; % set the world frame to a fixed link
-wbm_icub    = initRobot_iCub(wf2fixlnk);
+wbm_icub    = initRobotICub(wf2fixlnk);
 icub_model  = wbm_icub.robot_model;
 icub_config = wbm_icub.robot_config;
 
@@ -68,10 +68,53 @@ fprintf('Number of integrations: %d\n', noi);
 
 %% iCub-Simulator:
 
-% setup the window and plot parameters for the WBM-simulator:
-sim_config = initSimConfig_iCub();           % shows the simulation with a light scene as default.
-%sim_config = initSimConfig_iCub('DarkScn'); % optional, shows the simulation with a dark scene.
+% Setup the window, the environment and the draw parameters for the WBM-simulator:
+
+% create some geometric volume bodies for the simulation environment ...
+rotm_r = eye(3,3); % rect. orientation
+rotm_2 = [-0.9     0  -0.1;
+           0    -0.9     0;
+          -0.1     0   0.9];
+
+vb_objects      = repmat(WBM.vbCuboid, 3, 1);
+vb_objects(1,1) = WBM.vbCuboid(0.1, [0.1; 0.1; 0.6], rotm_r);
+vb_objects(2,1) = WBM.vbCylinder(0.1, 0.2, [-0.2; 0.4; 0.4], rotm_2);
+vb_objects(3,1) = WBM.vbSphere(0.1, [-0.3; 0.3; 0.2], rotm_r);
+
+show_light = true;
+sim_config = initSimConfigICub(vb_objects, show_light);             % shows the simulation with a light scene as default.
+%sim_config = initSimConfigICub(vb_objects, 'DarkScn', show_light); % optional, shows the simulation with a dark scene.
 sim_config = wbm_icub.setupSimulation(sim_config);
+
+% define some payload links and link each payload link to a specified volume body:
+% note: payload links are usually links of a manipulator (end-effector) or in
+%       special cases, links on which additionally special payloads are mounted
+%       (e.g. battery pack at torso, knapsack at torso, tools, etc.).
+pl_lnk_l.name     = 'l_hand';
+pl_lnk_l.lnk_p_cm = [0; 0; -0.05];
+pl_lnk_l.m_rb     = sim_config.environment.vb_objects(1,1).m_rb;
+pl_lnk_l.I_cm     = sim_config.environment.vb_objects(1,1).I_cm;
+pl_lnk_l.vb_idx   = 1;
+
+wbm_icub.setPayloadLinks(pl_lnk_l);
+% link the index of the volume body object with the left hand (left manipulator)
+% and set the utilization time indices (start, end) of the object:
+sim_config.setPayloadStack(pl_lnk_l.vb_idx, 'lh');
+sim_config.setPayloadUtilTime(1, 1, 35);
+% optional:
+pl_lnk_r.name     = 'r_hand';
+pl_lnk_r.lnk_p_cm = [0; 0; 0.05];
+pl_lnk_r.m_rb     = sim_config.environment.vb_objects(2,1).m_rb;
+pl_lnk_r.I_cm     = sim_config.environment.vb_objects(2,1).I_cm;
+pl_lnk_r.vb_idx   = 2;
+
+pl_lnk_data = {pl_lnk_l, pl_lnk_r};
+wbm_icub.setPayloadLinks(pl_lnk_data);
+
+sim_config.setPayloadStack([pl_lnk_l.vb_idx, pl_lnk_r.vb_idx], {'lh', 'rh'});
+sim_config.setPayloadUtilTime(1, 1, 35);
+sim_config.setPayloadUtilTime(2, 1, 33);
+
 x_out = wbm_icub.getPositionsData(chi);
 % show and repeat the simulation 2 times ...
 nRpts = 2;

@@ -258,8 +258,8 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             [Mx,~,~] = WBM.utilities.tfms.cartmass(wf_J_lnk, M);
         end
 
-        function payload(bot, pl_data)
-            bot.mwbm.payload(pl_data);
+        function payload(bot, pl_lnk_data)
+            bot.mwbm.payload(pl_lnk_data);
         end
 
         function f_pl = pay(bot, fhTotCWrench, f_cp, tau, q_j, dq_j)

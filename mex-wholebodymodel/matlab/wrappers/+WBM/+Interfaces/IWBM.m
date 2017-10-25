@@ -83,7 +83,7 @@ classdef (Abstract) IWBM < handle
 
         wf_J_tt = jacobTool(obj, t_idx, q_j, stFltb) % Jacobian matrix in tool-frame
 
-        payload(obj, pl_data)
+        payload(obj, pl_lnk_data)
 
         f_pl = ploadForces(obj, fhTotCWrench, f_cp, tau, q_j, dq_j, stFltb)
 

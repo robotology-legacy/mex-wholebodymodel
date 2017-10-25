@@ -54,7 +54,7 @@ classdef (Abstract) IMultChainTree < handle
 
         Mx = cinertia(bot, q_j)
 
-        payload(bot, pl_data)
+        payload(bot, pl_lnk_data)
 
         f_pl = pay(bot, fhTotCWrench, f_cp, tau, q_j, dq_j)
 

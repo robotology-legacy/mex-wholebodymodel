@@ -6,7 +6,7 @@ import WBM.RobotModel.iCub_32dof.*
 
 %% Initialization of the WBM for the iCub-Robot:
 wf2fixlnk        = true; % set the world frame to a fixed link
-[wbm_icub, ndof] = initRobot_iCub_32dof(wf2fixlnk);
+[wbm_icub, ndof] = initRobotICub_32dof(wf2fixlnk);
 wbm_icub.ndof    = ndof;
 icub_model       = wbm_icub.robot_model;
 icub_config      = wbm_icub.robot_config;
@@ -71,9 +71,9 @@ fprintf('Number of integrations: %d\n', noi);
 
 %% iCub-Simulator:
 
-% setup the window and plot parameters for the WBM-simulator:
-sim_config = initSimConfig_iCub_32dof(icub_model.urdf_robot_name);           % shows the simulation with a light scene as default.
-%sim_config = initSimConfig_iCub_atf(icub_model.urdf_robot_name, 'DarkScn'); % optional, shows the simulation with a dark scene.
+% setup the window and draw parameters for the WBM-simulator:
+sim_config = initSimConfigICub_32dof(icub_model.urdf_robot_name);           % shows the simulation with a light scene as default.
+%sim_config = initSimConfigICub_atf(icub_model.urdf_robot_name, 'DarkScn'); % optional, shows the simulation with a dark scene.
 sim_config = wbm_icub.setupSimulation(sim_config);
 x_out = wbm_icub.getPositionsData(chi);
 % show and repeat the simulation 2 times ...

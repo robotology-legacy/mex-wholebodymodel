@@ -1,6 +1,41 @@
-function sim_config = initSimConfig_iCub(scn_mode)
-    if ~exist('scn_mode', 'var')
-        scn_mode = 'LightScn'; % default scene for the simulation.
+function sim_config = initSimConfigICub(varargin)
+    % default values for the simulation:
+    vb_objects = WBM.vbObject.empty;
+    scn_mode   = 'LightScn';
+    show_light = false;
+
+    if (nargin > 0)
+        % process input arguments ...
+        switch nargin
+            case 3
+                vb_objects = varargin{1,1};
+                scn_mode   = varargin{1,2};
+                show_light = varargin{1,3};
+            case 2
+                argin = varargin{1,1};
+                if ( isvector(argin) && isa(argin(1,1), 'WBM.vbObject') )
+                    vb_objects = argin;
+                    if ischar(varargin{1,2})
+                        scn_mode = varargin{1,2};
+                    else
+                        show_light = varargin{1,2};
+                    end
+                elseif ischar(argin)
+                    scn_mode   = argin;
+                    show_light = varargin{1,2};
+                else
+                    error('initSimConfigICub: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+                end
+            case 1
+                argin = varargin{1,1};
+                if ( isvector(argin) && isa(argin(1,1), 'WBM.vbObject') )
+                    vb_objects = argin;
+                elseif ischar(argin)
+                    scn_mode = argin;
+                else
+                    show_light = argin;
+                end
+        end
     end
 
     % List of link and frame names that are deduced from their 'parent joints' or
@@ -113,16 +148,10 @@ function sim_config = initSimConfig_iCub(scn_mode)
     env_settings.grnd_shape   = WBM.genericSimConfig.DF_GROUND_SHAPE;
     env_settings.orig_pt_size = 4.5;
 
-    % Draw some geometric volume bodies in the environment:
-    R_r = eye(3,3); % rectangular orientation
-    R_2 = [-0.9     0  -0.1;
-            0    -0.9     0;
-           -0.1     0   0.9];
-
-    env_settings.vb_objects      = repmat(WBM.vbCuboid, 3, 1);
-    env_settings.vb_objects(1,1) = WBM.vbCuboid(0.1, [0.3; 0.3; 0.3], R_r);
-    env_settings.vb_objects(2,1) = WBM.vbCylinder(0.1, 0.2, [-0.2; 0.4; 0.4], R_2);
-    env_settings.vb_objects(3,1) = WBM.vbSphere(0.1, [-0.3; 0.3; 0.2], R_r);
+    if ~isempty(vb_objects)
+        % draw some geometric volume bodies in the environment ...
+        env_settings.vb_objects = vb_objects;
+    end
 
     % Set scene mode:
     switch scn_mode
@@ -147,10 +176,10 @@ function sim_config = initSimConfig_iCub(scn_mode)
             env_settings.grnd_edge_color = 'none';
             env_settings.orig_pt_color   = WBM.wbmColor.violetred;
         otherwise
-            error('initSimConfig_iCub: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+            error('initSimConfigICub: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
     end
 
     % Create the configuration object for the WBM-Simulator:
     sim_config = WBM.genericSimConfig('iCub-Simulator:', sim_body, env_settings);
-    sim_config.show_light = true;
+    sim_config.show_light = show_light;
 end
