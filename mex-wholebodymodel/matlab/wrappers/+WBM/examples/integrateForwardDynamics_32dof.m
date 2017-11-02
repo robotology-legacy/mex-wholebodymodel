@@ -81,7 +81,7 @@ nRpts = 2;
 wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:
-wbm_icub.plotCoMTrajectory(chi);
+wbm_icub.plotCoMTrajectory(x_out);
 
 % get the visualization data of the forward dynamics integration for plots and animations:
 vis_data = wbm_icub.getFDynVisData(chi, fhTrqControl, feet_conf, ac_0, 'fpc');

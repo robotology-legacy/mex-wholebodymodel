@@ -21,33 +21,50 @@ classdef (Abstract) wbmSimConfig < handle
     properties(Abstract)
         robot_body@WBM.wbmSimBody
         environment@WBM.wbmSimEnvironment
+        trajectories@WBM.wbmLinkTrajectory vector
 
         hWndFigure@matlab.ui.Figure
         wnd_title@char
-        wnd_pos@double     vector
-        wnd_size@double    vector
+        wnd_pos@double      vector
+        wnd_size@double     vector
 
-        nAxes@uint8        scalar
-        hAxes@double       vector
-        axes_pos@double    matrix
-        axes_colors@double matrix
-        axes_views@cell    vector
-        axis_limits@double vector
+        nAxes@uint8         scalar
+        hAxes@double        vector
+        axes_pos@double     matrix
+        axes_colors@double  matrix
+        axes_views@cell     vector
+        axis_limits@double  vector
 
-        gfx_objects@cell   vector
+        vwpts_annot@cell    vector
+        gfx_objects@cell    vector
 
-        show_light@logical scalar
-        light_pos@double   vector
+        show_light@logical  scalar
+        light_pos@double    vector
 
-        mkvideo@logical    scalar
-        vid_axes_id@uint8  scalar
+        show_titles@logical scalar
+        tit_font_sz@double  scalar
+        tit_font_color
+
+        show_legend@logical scalar
+        lgd_font_sz@double  scalar
+        lgd_font_color
+        lgd_bkgrd_color
+        lgd_edge_color
+        lgd_location@char
+        lgd_orient@char
+
+        mkvideo@logical     scalar
+        vid_axes_idx@uint8  scalar
         vid_filename@char
-        vid_fps@double     scalar
+        vid_fps@double      scalar
     end
 
     properties(Abstract, SetAccess = protected, GetAccess = public)
-        pl_stack@cell     matrix
-        pl_time_idx@uint8 matrix
+        pl_stack@cell      matrix
+        pl_time_idx@uint32 matrix
+
+        zoom_axes@double   matrix
+        shift_axes@cell    matrix
     end
 
     methods(Sealed)
@@ -84,7 +101,7 @@ classdef (Abstract) wbmSimConfig < handle
                 end
             end
             % initialize the utilization time indices of the given payload objects:
-            obj.pl_time_idx = uint8(zeros(len,2)); % [start_idx, end_idx]
+            obj.pl_time_idx = uint32(zeros(len,2)); % [start_idx, end_idx]
         end
 
         function setPayloadUtilTime(obj, obj_idx, start_idx, end_idx)

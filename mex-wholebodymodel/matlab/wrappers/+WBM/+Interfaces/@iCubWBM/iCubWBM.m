@@ -248,8 +248,8 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         end
 
         function visFwdDyn(obj, stmChi, sim_tstep, vis_ctrl)
-            pos_out = obj.mwbm_icub.getPositionsData(stmChi);
-            obj.mwbm_icub.visualizeForwardDynamics(pos_out, obj.msim_config, sim_tstep, vis_ctrl);
+            stmPos = obj.mwbm_icub.getPositionsData(stmChi);
+            obj.mwbm_icub.visualizeForwardDynamics(stmPos, obj.msim_config, sim_tstep, vis_ctrl);
         end
 
         function wf_H_lnk = fwdKin(obj, lnk_name, q_j, stFltb)

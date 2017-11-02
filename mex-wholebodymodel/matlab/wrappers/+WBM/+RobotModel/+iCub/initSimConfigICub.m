@@ -154,6 +154,7 @@ function sim_config = initSimConfigICub(varargin)
     end
 
     % Set scene mode:
+    dark_scn = false;
     switch scn_mode
         case 'LightScn'
             % draw settings for the light scene ...
@@ -167,6 +168,7 @@ function sim_config = initSimConfigICub(varargin)
             env_settings.orig_pt_color   = 'black';
         case 'DarkScn'
             % draw settings for the dark scene ...
+            dark_scn = true;
             sim_body.draw_prop.links.color      = WBM.wbmColor.seashell4;
             sim_body.draw_prop.shape.edge_color = WBM.wbmColor.steelblue;
             sim_body.draw_prop.shape.face_color = WBM.wbmColor.steelblue;
@@ -182,4 +184,10 @@ function sim_config = initSimConfigICub(varargin)
     % Create the configuration object for the WBM-Simulator:
     sim_config = WBM.genericSimConfig('iCub-Simulator:', sim_body, env_settings);
     sim_config.show_light = show_light;
+    if dark_scn
+        sim_config.light_pos = [-0.25  -0.15  1];
+        sim_config.lgd_font_color  = WBM.wbmColor.gray;
+        sim_config.lgd_bkgrd_color = 'black';
+        sim_config.lgd_edge_color  = WBM.wbmColor.dimgray;
+    end
 end

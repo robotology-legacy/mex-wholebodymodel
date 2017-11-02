@@ -23,6 +23,7 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous
         obj_type@char             % type of the object (obstacle (obs) or volume body (bdy))
         isobstacle@logical scalar % defines if the cuboid is an obstacle
         issolid@logical    scalar % defines if the object is solid
+        istool@logical     scalar % defines if the object is a tool
         init_frame@double  vector % initial frame (pos. & orientation) of the object
         dimension@double   vector % dimension (width, length & height) of the object
         com@double         vector % position of the object's center of mass (CoM)

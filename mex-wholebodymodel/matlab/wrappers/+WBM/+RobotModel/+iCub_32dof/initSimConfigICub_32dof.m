@@ -142,6 +142,6 @@ function sim_config = initSimConfigICub_32dof(urdf_file_name, scn_mode)
     sim_config.wnd_pos    = [60  600];
     sim_config.wnd_size   = [600 300];
     sim_config.axes_views = {'custom', 'side_l'};
-    sim_config.axes_pos   = [0.5  0.02  0.5  1;
-                             0    0.02  0.5  1];
+    sim_config.axes_pos   = [0.54  0.09  0.45  0.90;
+                             0.01  0.09  0.45  0.90];
 end

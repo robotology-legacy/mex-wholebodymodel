@@ -1,5 +1,18 @@
 function jnt_name = getJointAnnotationICub(lnk_group_name, idx)
+    % Further informations about the joint names are available at the "iCub Model naming conventions",
+    % <http://wiki.icub.org/wiki/ICub_Model_naming_conventions>.
     switch lnk_group_name
+        case 'head'
+            switch idx
+                case 1
+                    jnt_name = 'neck pitch';
+                case 2
+                    jnt_name = 'neck roll';
+                case 3
+                    jnt_name = 'neck yaw';
+                otherwise
+                    error('getJointAnnotationICub:%s: %s', lnk_group_name, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
+            end
         case 'torso'
             switch idx
                 case 1
@@ -23,6 +36,10 @@ function jnt_name = getJointAnnotationICub(lnk_group_name, idx)
                     jnt_name = 'r. elbow';
                 case 5
                     jnt_name = 'r. wrist prosup';
+                case 6
+                    jnt_name = 'r. wrist pitch';
+                case 7
+                    jnt_name = 'r. wrist yaw';
                 otherwise
                     error('getJointAnnotationICub:%s: %s', lnk_group_name, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
             end
@@ -38,6 +55,10 @@ function jnt_name = getJointAnnotationICub(lnk_group_name, idx)
                     jnt_name = 'l. elbow';
                 case 5
                     jnt_name = 'l. wrist prosup';
+                case 6
+                    jnt_name = 'l. wrist pitch';
+                case 7
+                    jnt_name = 'l. wrist yaw';
                 otherwise
                     error('getJointAnnotationICub:%s: %s', lnk_group_name, WBM.wbmErrorMsg.IDX_OUT_OF_BOUNDS);
             end

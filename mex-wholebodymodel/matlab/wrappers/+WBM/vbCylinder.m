@@ -20,6 +20,7 @@ classdef vbCylinder < WBM.vbObject
         obj_type@char             = 'bdy';      % type of object: obstacle (obs) or volume body (bdy) (default: bdy)
         isobstacle@logical scalar = false;      % defines if the cylinder is an obstacle (default: false)
         issolid@logical    scalar = false;      % defines if the cylinder is solid (default: false)
+        istool@logical     scalar = false;      % defines if the cylinder is a tool (default: false)
         init_frame@double  vector = WBM.vbCylinder.DF_FRAME; % initial frame (pos. & orientation) of the cylinder
         dimension@double   vector = zeros(1,3); % dimension (inner/outer radius & height) of the cylinder
         vertices@struct           = struct('X', [], 'Y', [], 'Z', []); % vertex positions of the cylinder at the given origin and orientation
@@ -146,8 +147,14 @@ classdef vbCylinder < WBM.vbObject
             if (nargin == 1)
                 pt_color = 'green';
             end
-            hmg = scatter3(obj.mgrid.X(:), obj.mgrid.Y(:), obj.mgrid.Z(:), ...
-                           'Marker', '.', 'MarkerEdgeColor', pt_color);
+            if (nargout == 1)
+                hmg = scatter3(obj.mgrid.X(:), obj.mgrid.Y(:), obj.mgrid.Z(:), ...
+                               'Marker', '.', 'MarkerEdgeColor', pt_color);
+                return
+            end
+            % else ...
+            scatter3(obj.mgrid.X(:), obj.mgrid.Y(:), obj.mgrid.Z(:), ...
+                     'Marker', '.', 'MarkerEdgeColor', pt_color);
         end
 
         function result = ptInObj(obj, pt_pos)
@@ -266,8 +273,18 @@ classdef vbCylinder < WBM.vbObject
                 obj.edge_color  = obj_prop.edge_color;
                 obj.face_color  = obj_prop.face_color;
                 obj.face_alpha  = obj_prop.face_alpha;
-                obj.description = obj_prop.description;
-                obj.ismovable   = obj_prop.ismovable;
+
+                if isfield(obj_prop, 'description')
+                    obj.description = obj_prop.description;
+                end
+
+                if isfield(obj_prop, 'ismovable')
+                    obj.ismovable = obj_prop.ismovable;
+                end
+
+                if isfield(obj_prop, 'istool')
+                    obj.istool = obj_prop.istool;
+                end
 
                 if isfield(obj_prop, 'nfcs')
                     obj.mcyl_nfcs = obj_prop.nfcs;

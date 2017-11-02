@@ -1,7 +1,8 @@
 classdef wbmRobotModel < handle
     properties
-        ndof@uint16        scalar = 0;
+        yarp_robot_type@char      = 'iCub'; % default robot type
         urdf_robot_name@char
+        ndof@uint16        scalar = 0;
         urdf_fixed_link@char % reference link (= floating base link) to the world frame (WF).
         wf_R_b_init@double matrix = eye(3,3);   % initial orientation of the base frame to the WF.
         wf_p_b_init@double vector = zeros(3,1); % initial position of the base frame to the WF.

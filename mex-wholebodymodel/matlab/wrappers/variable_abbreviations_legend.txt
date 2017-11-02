@@ -47,9 +47,11 @@ Legend of abbreviations and acronyms which are used for the variable names:
     df, dflt   ...  default
     dim        ...  dimension
     dp         ...  data point
+    dpts       ...  data points
     ds         ...  dimensions
     dstv       ...  derivative of state vector
     elms       ...  elements
+    ept, ep    ...  endpoint
     et         ...  elapsed time
     ex, exc    ...  exception
     fb         ...  floating base
@@ -71,6 +73,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     gen        ...  generalized
     gp         ...  grid point(s)
     grnd, grd  ...  ground
+    grp        ...  group
     h...       ...  "handle" to an object (begin of variable name), e.g. hFig = handle to the figure object
     ..._h      ...  "hat" (end of variable name), 'h' declares that this variable is an unit vector of length 1, e.g. "f1_h", "fcp_h", etc.
     h_c        ...  centroidal momentum (vector)
@@ -82,7 +85,9 @@ Legend of abbreviations and acronyms which are used for the variable names:
     jpos       ...  joint position(s)
     jspc       ...  joint space
     ker        ...  kernel (null space)
+    lctn, loc  ...  location
     len        ...  length
+    lgd        ...  legend
     lgt, lt    ...  light
     ll         ...  lower limit(s) OR left link
     llnk       ...  left link
@@ -146,8 +151,10 @@ Legend of abbreviations and acronyms which are used for the variable names:
     sc         ...  scalar OR scaled
     scn        ...  scene
     sf         ...  scale factor(s)
+    shf, sh    ...  shift
     shp        ...  shape
     skewm      ...  skew-symmetric matrix
+    spt, sp    ...  start point
     st         ...  state
     stm        ...  state matrix
     stp        ...  state parameter(s)
@@ -157,6 +164,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     sz         ...  size(s)
     ..._t      ...  "transposed" (end of variable name), "_t" declares that a matrix or vector is transposed, e.g. "M_t", "v_t", etc.
     tform, tfm ...  transformation matrix
+    tl         ...  trajectory line
     tr         ...  translation(s) OR trace
     trans      ...  translation(s)
     trq        ...  torque

@@ -77,7 +77,7 @@ rotm_2 = [-0.9     0  -0.1;
           -0.1     0   0.9];
 
 vb_objects      = repmat(WBM.vbCuboid, 3, 1);
-vb_objects(1,1) = WBM.vbCuboid(0.1, [0.1; 0.1; 0.6], rotm_r);
+vb_objects(1,1) = WBM.vbCuboid(0.1, [0.15; 0.10; 0.61], rotm_r);
 vb_objects(2,1) = WBM.vbCylinder(0.1, 0.2, [-0.2; 0.4; 0.4], rotm_2);
 vb_objects(3,1) = WBM.vbSphere(0.1, [-0.3; 0.3; 0.2], rotm_r);
 
@@ -89,12 +89,12 @@ sim_config = wbm_icub.setupSimulation(sim_config);
 % define some payload links and link each payload link to a specified volume body:
 % note: payload links are usually links of a manipulator (end-effector) or in
 %       special cases, links on which additionally special payloads are mounted
-%       (e.g. battery pack at torso, knapsack at torso, tools, etc.).
-pl_lnk_l.name     = 'l_hand';
+%       (e.g. battery pack or knapsack at torso, tools, etc.).
+pl_lnk_l.name     = 'l_gripper'; % --> l_hand_dh_frame --> l_hand
 pl_lnk_l.lnk_p_cm = [0; 0; -0.05];
-pl_lnk_l.m_rb     = sim_config.environment.vb_objects(1,1).m_rb;
-pl_lnk_l.I_cm     = sim_config.environment.vb_objects(1,1).I_cm;
 pl_lnk_l.vb_idx   = 1;
+%pl_lnk_l.m_rb     = sim_config.environment.vb_objects(1,1).m_rb; % optional
+%pl_lnk_l.I_cm     = sim_config.environment.vb_objects(1,1).I_cm;
 
 wbm_icub.setPayloadLinks(pl_lnk_l);
 % link the index of the volume body object with the left hand (left manipulator)
@@ -102,26 +102,52 @@ wbm_icub.setPayloadLinks(pl_lnk_l);
 sim_config.setPayloadStack(pl_lnk_l.vb_idx, 'lh');
 sim_config.setPayloadUtilTime(1, 1, 35);
 % optional:
-pl_lnk_r.name     = 'r_hand';
-pl_lnk_r.lnk_p_cm = [0; 0; 0.05];
-pl_lnk_r.m_rb     = sim_config.environment.vb_objects(2,1).m_rb;
-pl_lnk_r.I_cm     = sim_config.environment.vb_objects(2,1).I_cm;
-pl_lnk_r.vb_idx   = 2;
+%pl_lnk_r.name     = 'r_gripper'; % --> r_hand_dh_frame --> r_hand
+%pl_lnk_r.lnk_p_cm = [0; 0; 0.05];
+%pl_lnk_r.m_rb     = sim_config.environment.vb_objects(2,1).m_rb;
+%pl_lnk_r.I_cm     = sim_config.environment.vb_objects(2,1).I_cm;
+%pl_lnk_r.vb_idx   = 2;
 
-pl_lnk_data = {pl_lnk_l, pl_lnk_r};
-wbm_icub.setPayloadLinks(pl_lnk_data);
+%pl_lnk_data = {pl_lnk_l, pl_lnk_r};
+%wbm_icub.setPayloadLinks(pl_lnk_data);
 
-sim_config.setPayloadStack([pl_lnk_l.vb_idx, pl_lnk_r.vb_idx], {'lh', 'rh'});
-sim_config.setPayloadUtilTime(1, 1, 35);
-sim_config.setPayloadUtilTime(2, 1, 33);
+%sim_config.setPayloadStack([pl_lnk_l.vb_idx, pl_lnk_r.vb_idx], {'lh', 'rh'});
+%sim_config.setPayloadUtilTime(1, 1, 35);
+%sim_config.setPayloadUtilTime(2, 1, 33);
 
+% get the positions data of the integration output chi:
 x_out = wbm_icub.getPositionsData(chi);
+
+% show the trajectory curves of some specified links:
+lnk_trajects = repmat(WBM.wbmLinkTrajectory, 3, 1);
+lnk_trajects(1,1).urdf_link_name = 'l_gripper';
+lnk_trajects(2,1).urdf_link_name = 'r_gripper';
+lnk_trajects(3,1).urdf_link_name = 'r_lower_leg';
+
+lnk_trajects(1,1).jnt_annot_pos = {'left_arm', 7};
+lnk_trajects(2,1).jnt_annot_pos = {'right_arm', 7};
+lnk_trajects(3,1).jnt_annot_pos = {'right_leg', 4};
+
+lnk_trajects(1,1).line_color = WBM.wbmColor.forestgreen;
+lnk_trajects(1,1).ept_color  = WBM.wbmColor.forestgreen;
+lnk_trajects(2,1).line_color = WBM.wbmColor.tomato;
+lnk_trajects(2,1).ept_color  = WBM.wbmColor.tomato;
+lnk_trajects(3,1).line_color = 'magenta';
+lnk_trajects(3,1).ept_color  = 'magenta';
+
+sim_config.trajectories = wbm_icub.setTrajectoriesData(lnk_trajects, x_out, [1; 1; 1], [35; 35; 40]);
+sim_config.show_legend  = true;
+
+% zoom and shift some specified axes (optional):
+%sim_config.zoomAxes([1 4], [0.9  1.1]);    % axes indices, zoom factors (90%, 110%)
+%sim_config.shiftAxes(4, [0  0.05  -0.12]); %             , shift vectors (x, y, z)
+
 % show and repeat the simulation 2 times ...
 nRpts = 2;
 wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 
 %% Plot the results -- CoM-trajectory:
-wbm_icub.plotCoMTrajectory(chi);
+wbm_icub.plotCoMTrajectory(x_out);
 
 % get the visualization data of the forward dynamics integration for plots and animations:
 vis_data = wbm_icub.getFDynVisData(chi, fhTrqControl);

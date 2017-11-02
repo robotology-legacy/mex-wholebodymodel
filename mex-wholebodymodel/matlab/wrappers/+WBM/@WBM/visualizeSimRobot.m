@@ -1,16 +1,16 @@
-function visualizeSimRobot(obj, pos_out, sim_config, sim_tstep, vis_ctrl)
+function visualizeSimRobot(obj, stmPos, sim_config, sim_tstep, vis_ctrl)
     % check the dimension and get the number of instances of the simulation result ...
     ndof = obj.mwbm_model.ndof;
     vlen = ndof + 7;
-    [nSteps, len] = size(pos_out);
+    [nSteps, len] = size(stmPos);
     if (len ~= vlen)
         error('WBM::visualizeSimRobot: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
     end
 
-    % get the translation, orientation and joint positions from the output vector
-    % "pos_out" of the integration part of the forward dynamics function ...
-    vqT_b = pos_out(1:nSteps,1:7);
-    q_j   = pos_out(1:nSteps,8:vlen);
+    % get the translations, orientations and joint positions from the output vector
+    % "stmPos" of the integration part of the forward dynamics function:
+    vqT_b = stmPos(1:nSteps,1:7);
+    q_j   = stmPos(1:nSteps,8:vlen);
     q_j   = q_j.';
 
     nJnts = sim_config.robot_body.nJnts; % number of nodes (virtual joints) to be plotted
@@ -163,9 +163,9 @@ function [sim_config, hSimRobot, fkin_jnts, nRGObj, vidfrm] = createSimRobot(sim
     sim_config = drawSimRobotAxes(sim_config, hSimRobot);
 
     if (nargout == 5)
-        if (sim_config.vid_axes_id > 0)
+        if (sim_config.vid_axes_idx > 0)
             % capture only the specified subplot frame ...
-            set(sim_config.hWndFigure, 'CurrentAxes', sim_config.hAxes(1,sim_config.vid_axes_id));
+            set(sim_config.hWndFigure, 'CurrentAxes', sim_config.hAxes(1,sim_config.vid_axes_idx));
             vidfrm = getframe(gca);
             return
         end
@@ -182,13 +182,12 @@ function sim_config = drawSimRobotAxes(sim_config, hSimRobot)
     % put all graphics objects into the axes of the first
     % subplot of the figure window (left bottom if nAxes > 2):
     sim_config.gfx_objects{1,1} = vertcat(hSimRobot, sim_config.gfx_objects{1,1});
-    setView(sim_config.axes_vwpts, sim_config.axes_views{1,1});
-
+    setView(sim_config, 1);
     if (nAxes > 1)
         for i = 2:nAxes
             set(sim_config.hWndFigure, 'CurrentAxes', sim_config.hAxes(1,i));
             sim_config.gfx_objects{1,i} = copyobj(sim_config.gfx_objects{1,1}, sim_config.hAxes(1,i));
-            setView(sim_config.axes_vwpts, sim_config.axes_views{1,i});
+            setView(sim_config, i);
         end
         % set back the current axes handle to the first subplot ...
         set(sim_config.hWndFigure, 'CurrentAxes', sim_config.hAxes(1,1));
@@ -196,12 +195,23 @@ function sim_config = drawSimRobotAxes(sim_config, hSimRobot)
     drawnow; % draw all plots of the initial robot body in the main figure ...
 end
 
-function setView(axes_vwpts, axes_view)
-    idx = find(strcmp(axes_vwpts(:,1), axes_view));
+function setView(sim_config, ax_idx)
+    idx = find(strcmp(sim_config.axes_vwpts(:,1), sim_config.axes_views{1,ax_idx}));
     if isempty(idx)
         error('setView: %s', WBM.wbmErrorMsg.NAME_NOT_EXIST);
     end
-    view(axes_vwpts{idx,2}); % set the viewpoint
+    view(sim_config.axes_vwpts{idx,2}); % set the viewpoint
+
+    if sim_config.show_titles
+        % set the title of each viewpoint:
+        ht = title(sim_config.vwpts_annot{1,idx}, 'Interpreter', 'none', ...
+                   'FontSize', sim_config.tit_font_sz, 'FontWeight', 'normal', ...
+                   'Color', sim_config.tit_font_color);
+        % justify the title on the left bottom side ...
+        ht.HorizontalAlignment = 'left';
+        ht.Units               = 'normalized';
+        ht.Position = horzcat(0.05, -0.08, ht.Position(1,3));
+    end
 end
 
 function animateSimRobot(fkin_jnts, sim_config, sim_tstep, nSteps, vis_ctrl)
@@ -356,7 +366,7 @@ function vidfrms = makeSimRobotVideo(fkin_jnts, sim_config, nSteps, vis_ctrl)
     drawSkel = vis_ctrl.drawSkel;
     drawBody = vis_ctrl.drawBody;
 
-    if (sim_config.vid_axes_id > 0)
+    if (sim_config.vid_axes_idx > 0)
         % capture only the specified subplot frame ...
         hObj = gca;
     else
@@ -596,7 +606,7 @@ function vidfrms = makeSimRobotVideoPL(fkin_jnts, vqT_vb, vb_idx, nVBds, sim_con
     drawSkel = vis_ctrl.drawSkel;
     drawBody = vis_ctrl.drawBody;
 
-    if (sim_config.vid_axes_id > 0)
+    if (sim_config.vid_axes_idx > 0)
         % capture only the specified subplot frame ...
         hObj = gca;
     else
