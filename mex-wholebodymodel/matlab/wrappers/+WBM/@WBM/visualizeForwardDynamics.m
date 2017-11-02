@@ -30,7 +30,7 @@ end
 %% END of visualizeForwardDynamics.
 
 
-%% ENVIRONMENT INITIALIZATION & LIGHT:
+%% ENVIRONMENT INITIALIZATION, LIGHT, TRAJECTORIES, LEGEND, ZOOM & SHIFT AXES:
 
 function sim_config = initSimEnvironment(obj, sim_config)
     nAxes = sim_config.nAxes;
