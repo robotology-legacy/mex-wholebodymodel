@@ -434,7 +434,7 @@ classdef WBM < WBM.WBMBase
             ylabel('$y_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
             zlabel('$z_{\mathbf{x_b}}$', 'Interpreter', 'latex', 'FontSize', prop.label_fnt_sz);
 
-            legend(hsp, 'initial position', 'Location', 'northeast');
+            legend(hsp, 'init. position', 'Location', 'northeast');
         end
 
         function setPayloadLinks(obj, pl_lnk_data)
