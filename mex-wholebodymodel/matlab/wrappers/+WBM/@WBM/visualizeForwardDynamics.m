@@ -203,7 +203,7 @@ end
 
 function ax_lim = zoomAxis(ax_lim, zfac)
     % Scale the axis limits for zooming.
-    % Sources: <https://stackoverflow.com/questions/33022127/work-with-the-zoom-in-the-figure>
+    % Source: <https://stackoverflow.com/questions/33022127/work-with-the-zoom-in-the-figure>
     ax_min = ax_lim(1,1);
     ax_max = ax_lim(1,2);
     r_zf = 1/zfac; % reciprocal zoom factor

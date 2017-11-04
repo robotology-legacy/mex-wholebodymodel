@@ -20,6 +20,8 @@ classdef (Abstract) IMultChainTree < handle
     end
 
     methods(Abstract)
+        newBot = copy(bot)
+
         [q_j, dq_j, wf_H_b, v_b] = getstate(bot)
 
         setcontact(bot, ctc_mode, varargin) % for closed-loop & non-closed loop contacts
@@ -60,7 +62,7 @@ classdef (Abstract) IMultChainTree < handle
 
         resv = islimit(bot, q_j)
 
-        plot3d(bot, x_out, sim_tstep, vis_ctrl)
+        plot3d(bot, stmChi, sim_tstep, vis_ctrl)
 
     end
 end

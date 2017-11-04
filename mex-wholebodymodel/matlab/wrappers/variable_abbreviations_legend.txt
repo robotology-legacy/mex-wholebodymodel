@@ -79,6 +79,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     h_c        ...  centroidal momentum (vector)
     hf         ...  half
     hgt        ...  height
+    id         ...  identity
     idx        ...  index(es)
     jlim, jl   ...  joint limit(s)
     jnt        ...  joint

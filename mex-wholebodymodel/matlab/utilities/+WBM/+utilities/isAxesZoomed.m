@@ -1,6 +1,6 @@
 function result = isAxesZoomed(hax)
     % Determine the axes zoom state.
-    % Sources: <https://undocumentedmatlab.com/blog/determining-axes-zoom-state>
+    % Source: <https://undocumentedmatlab.com/blog/determining-axes-zoom-state>
     if ~nargin
         hax = gca;
     end

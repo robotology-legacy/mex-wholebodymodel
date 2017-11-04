@@ -1,14 +1,13 @@
 classdef iCubWBM < WBM.Interfaces.IWBM
     properties(Dependent)
         % public properties for fast get/set methods:
-        robot_name@char
-        robot_model@char
-        robot_manuf@char
+        robot_name@char  = 'iCub';
+        robot_model@char = '';
+        robot_manuf@char = 'Istituto Italiano di Tecnologia (IIT) - Genoa, Italy.';
         robot_params@WBM.wbmRobotParams
         sim_config@WBM.wbmSimConfig
         base_link@char
         base_tform@double matrix
-        tool_tform@double matrix
         feet_conf@struct
         hand_conf@struct
         gravity@double    vector
@@ -18,12 +17,12 @@ classdef iCubWBM < WBM.Interfaces.IWBM
 
     properties(Access = protected)
         mwbm_icub@WBM.WBM
-        mrobot_name@char
-        mrobot_model@char
-        mrobot_manuf@char
+        mrobot_name@char  = '';
+        mrobot_model@char = '';
+        mrobot_manuf@char = '';
         msim_config@WBM.wbmSimConfig
-        mbase_tform@double matrix
-        mtool_tform@double matrix
+        mbase_tform@double matrix = eye(4,4);
+        mtool_tform@cell   vector = {};
         mfeet_conf@struct
         mhand_conf@struct
     end
@@ -40,11 +39,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                 otherwise
                     error('iCubWBM::iCubWBM: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
-            obj.mrobot_name  = 'iCub';
-            obj.mrobot_manuf = 'Istituto Italiano di Tecnologia (IIT) - Genoa, Italy.';
-
-            obj.mbase_tform = eye(4,4);
-            obj.mtool_tform = obj.mbase_tform;
+            setToolTform(obj);
         end
 
         function initRobot(obj, robot_wbm)
@@ -52,6 +47,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                 error('iCubWBM::initRobot: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             obj.mwbm_icub = copy(robot_wbm);
+            setToolTform(obj);
         end
 
         function initRobotFcn(obj, fhInitRobotWBM, wf2fixlnk)
@@ -63,13 +59,20 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                 wf2fixlnk = true;
             end
             obj.mwbm_icub = fhInitRobotWBM(wf2fixlnk);
+            setToolTform(obj);
         end
 
         function initRobotParams(obj, robot_params)
             if ~isa(robot_params, 'WBM.wbmRobotParams')
                 error('iCubWBM::initRobotParams: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            obj.mwbm_icub = WBM.WBM(robot_params.model, robot_params.config, robot_params.wf2fixlnk);
+            rob_params    = copy(robot_params); % copy the robot parameter data ...
+            obj.mwbm_icub = WBM.WBM(rob_params.model, rob_params.config, rob_params.wf2fixlnk);
+            setToolTform(obj);
+        end
+
+        function newObj = copy(obj)
+            newObj = WBM.utilities.copyObj(obj);
         end
 
         function delete(obj)
@@ -77,131 +80,131 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         end
 
         function [vqT_b, q_j, v_b, dq_j] = getState(obj)
-            [vqT_b, q_j, v_b, dq_j] = obj.mwbm_icub.getState();
+            [vqT_b, q_j, v_b, dq_j] = getState(obj.mwbm_icub);
         end
 
         function stFltb = getBaseState(obj)
-            stFltb = obj.mwbm_icub.getFloatingBaseState();
+            stFltb = getFloatingBaseState(obj.mwbm_icub);
         end
 
-        function feet_conf = feetConfig(obj, varargin)
-            feet_conf = obj.mwbm_icub.configStateFeet(varargin{:});
+        function feet_conf = feetConfig(obj, cstate, varargin)
+            feet_conf = configStateFeet(obj.mwbm_icub, cstate, varargin{:});
         end
 
-        function hand_conf = handsConfig(obj, varargin)
-            hand_conf = obj.mwbm_icub.configStateHands(varargin{:});
+        function hand_conf = handsConfig(obj, cstate, varargin)
+            hand_conf = configStateHands(obj.mwbm_icub, cstate, varargin{:});
         end
 
         function ddq_j = jointAcc(obj, tau, q_j, dq_j, stFltb)
             if (nargin == 4)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            ddq_j = obj.mwbm_icub.jointAccelerations(tau, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            ddq_j = jointAccelerations(obj.mwbm_icub, tau, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function ddq_j = jointAccEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % EF ... External Forces at the hands (no pose correction)
             if (nargin == 7)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            ddq_j = obj.mwbm_icub.jointAccelerationsEF(obj.mfeet_conf, obj.mhand_conf, tau, fe_h, ac_h, ac_f, ...
-                                                       stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            ddq_j = jointAccelerationsEF(obj.mwbm_icub, obj.mfeet_conf, obj.mhand_conf, tau, fe_h, ac_h, ac_f, ...
+                                         stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function ddq_j = jointAccPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % PL ... PayLoad at the hands (no pose correction)
             if (nargin == 7)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            ddq_j = obj.mwbm_icub.jointAccelerationsPL(obj.mfeet_conf, obj.mhand_conf, tau, fhTotCWrench, f_cp, ac_f, ...
-                                                       stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            ddq_j = jointAccelerationsPL(obj.mwbm_icub, obj.mfeet_conf, obj.mhand_conf, tau, fhTotCWrench, f_cp, ac_f, ...
+                                         stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function ddq_j = jointAccFPC(obj, tau, ac_f, q_j, dq_j, stFltb) % FPC ... Feet Pose Correction (no external forces)
             if (nargin == 5)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            ddq_j = obj.mwbm_icub.jointAccelerationsFPC(obj.mfeet_conf, tau, ac_f, stFltb.wf_R_b, ...
-                                                        stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            ddq_j = jointAccelerationsFPC(obj.mwbm_icub, obj.mfeet_conf, tau, ac_f, stFltb.wf_R_b, ...
+                                          stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function ddq_j = jointAccFPCEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % FPCEF ... Feet Pose Correction with External Forces (at the hands)
             if (nargin == 7)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            ddq_j = obj.mwbm_icub.jointAccelerationsFPCEF(obj.mfeet_conf, obj.mhand_conf, tau, fe_h, ac_h, ac_f, ...
-                                                          stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            ddq_j = jointAccelerationsFPCEF(obj.mwbm_icub, obj.mfeet_conf, obj.mhand_conf, tau, fe_h, ac_h, ac_f, ...
+                                            stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function ddq_j = jointAccFPCPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % FPCPL ... Feet Pose Correction with PayLoad (at the hands)
             if (nargin == 7)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            ddq_j = obj.mwbm_icub.jointAccelerationsFPCPL(obj.mfeet_conf, obj.mhand_conf, tau, fhTotCWrench, f_cp, ac_f, ...
-                                                          stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            ddq_j = jointAccelerationsFPCPL(obj.mwbm_icub, obj.mfeet_conf, obj.mhand_conf, tau, fhTotCWrench, f_cp, ac_f, ...
+                                            stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function ac_h = handAcc(obj, tau, q_j, dq_j, stFltb)
             if (nargin == 4)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
             nu   = vertcat(stFltb.v_b, dq_j); % mixed generalized velocity
-            ac_0 = obj.mwbm_icub.zeroCtcAcc(obj.mfeet_conf);
-            ac_h = obj.mwbm_icub.handAccelerations(obj.mfeet_conf, obj.mhand_conf, tau, ac_0, stFltb.wf_R_b, ...
-                                                   stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, nu);
+            ac_0 = zeroCtcAcc(obj.mwbm_icub, obj.mfeet_conf);
+            ac_h = handAccelerations(obj.mwbm_icub, obj.mfeet_conf, obj.mhand_conf, tau, ac_0, ...
+                                     stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, nu);
         end
 
         function vc_h = handVel(obj, q_j, dq_j, stFltb)
             if (nargin == 3)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            vc_h = obj.mwbm_icub.handVelocities(obj.mhand_conf, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            vc_h = handVelocities(obj.mwbm_icub, obj.mhand_conf, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function c_qv = corForces(obj, q_j, dq_j, stFltb)
             if (nargin == 3)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            c_qv = obj.mwbm_icub.coriolisBiasForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            c_qv = coriolisBiasForces(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function tau_fr = frictForces(obj, dq_j)
-            tau_fr = obj.mwbm_icub.frictionForces(dq_j);
+            tau_fr = frictionForces(obj.mwbm_icub, dq_j);
         end
 
         function c_qv = genBiasForces(obj, q_j, dq_j, stFltb)
             if (nargin == 3)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            c_qv = obj.mwbm_icub.generalizedBiasForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            c_qv = generalizedBiasForces(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function tau_gen = genForces(obj, Je_t, f_e, q_j, dq_j, stFltb)
             if (nargin == 5)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            tau_gen = obj.mwbm_icub.generalizedForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, Je_t, f_e);
+            tau_gen = generalizedForces(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, Je_t, f_e);
         end
 
         function g_q = gravForces(obj, q_j, stFltb)
             if (nargin == 2)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            g_q = obj.mwbm_icub.gravityForces(stFltb.wf_R_b, stFltb.wf_p_b, q_j);
+            g_q = gravityForces(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j);
         end
 
         function tau_j = invDyn(obj, q_j, dq_j, ddq_j, dv_b, stFltb)
             if (nargin == 5)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, ...
-                                                  stFltb.v_b, ddq_j, dv_b);
+            tau_j = inverseDynamics(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, ...
+                                    stFltb.v_b, ddq_j, dv_b);
         end
 
         function tau_j = invHybridDyn(obj, q_j, dq_j, ddq_j, stFltb)
             if (nargin == 4)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            tau_j = obj.mwbm_icub.inverseDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, ...
-                                                  stFltb.v_b, ddq_j);
+            tau_j = inverseDynamics(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, ...
+                                    stFltb.v_b, ddq_j);
         end
 
         function [t, stmChi] = fwdDyn(obj, tspan, stvChi_0, fhTrqControl, ode_opt, varargin)
@@ -216,139 +219,184 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                     % fhTotCWrench = varargin{1}
                     % f_cp         = varargin{2}
                     % ac_f         = varargin{3}
-                    [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, varargin{1,1}, ...
-                                                                   obj.mfeet_conf, obj.mhand_conf, varargin{2:end});
+                    [t, stmChi] = intForwardDynamics(obj.mwbm_icub, tspan, stvChi_0, fhTrqControl, ode_opt, varargin{1,1}, ...
+                                                     obj.mfeet_conf, obj.mhand_conf, varargin{2:end});
                 else
                     % with external forces:
                     % fe_c = varargin{1}
                     % ac   = varargin{2}
                     % ac_f = varargin{3}
-                    [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, obj.mfeet_conf, ...
-                                                                   obj.mhand_conf, varargin{1:end});
+                    [t, stmChi] = intForwardDynamics(obj.mwbm_icub, tspan, stvChi_0, fhTrqControl, ode_opt, obj.mfeet_conf, ...
+                                                     obj.mhand_conf, varargin{1:end});
                 end
             elseif h_cfg
                 % only hands:
                 % fe_h      = varargin{1}
                 % ac_h      = varargin{2}
                 % pc_type   = varargin{3}
-                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, ...
-                                                               obj.mhand_conf, varargin{1:3});
+                [t, stmChi] = intForwardDynamics(obj.mwbm_icub, tspan, stvChi_0, fhTrqControl, ode_opt, ...
+                                                 obj.mhand_conf, varargin{1:3});
             elseif f_cfg
                 % only feet:
                 % ac_f      = varargin{1}
                 % pc_type   = varargin{2}
-                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, ...
-                                                               obj.mfeet_conf, varargin{1,1}, varargin{1,2});
+                [t, stmChi] = intForwardDynamics(obj.mwbm_icub, tspan, stvChi_0, fhTrqControl, ode_opt, ...
+                                                 obj.mfeet_conf, varargin{1,1}, varargin{1,2});
             else
                 % forward dynamics without any pose corrections
                 % and contact link configurations:
                 % nargin = 6: pc_type = varargin{1}
-                [t, stmChi] = obj.mwbm_icub.intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, varargin{:});
+                [t, stmChi] = intForwardDynamics(obj.mwbm_icub, tspan, stvChi_0, fhTrqControl, ode_opt, varargin{:});
             end
         end
 
         function visFwdDyn(obj, stmChi, sim_tstep, vis_ctrl)
-            stmPos = obj.mwbm_icub.getPositionsData(stmChi);
-            obj.mwbm_icub.visualizeForwardDynamics(stmPos, obj.msim_config, sim_tstep, vis_ctrl);
+            stmPos = getPositionsData(obj.mwbm_icub, stmChi);
+            visualizeForwardDynamics(obj.mwbm_icub, stmPos, obj.msim_config, sim_tstep, vis_ctrl);
         end
 
         function wf_H_lnk = fwdKin(obj, lnk_name, q_j, stFltb)
             if (nargin == 3)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            vqT_lnk  = obj.mwbm_icub.forwardKinematics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, lnk_name);
+            vqT_lnk  = forwardKinematics(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, lnk_name);
             wf_H_lnk = WBM.utilities.tfms.frame2tform(vqT_lnk);
         end
 
         function wf_H_lnk = linkFrame(obj, lnk_name, q_j, stFltb) % link transformation matrix
             if (nargin == 3)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            wf_H_lnk = obj.mwbm_icub.transformationMatrix(stFltb.wf_R_b, stFltb.wf_p_b, q_j, lnk_name);
+            wf_H_lnk = transformationMatrix(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, lnk_name);
         end
 
         function wf_H_tt = toolFrame(obj, t_idx, q_j, stFltb) % tool-tip transformation matrix
             if (nargin == 3)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            wf_H_tt = obj.mwbm_icub.toolFrame(stFltb.wf_R_b, stFltb.wf_p_b, q_j, t_idx);
+            wf_H_tt = toolFrame(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, t_idx);
+        end
+
+        function wf_H_cm = ploadFrame(obj, pl_idx, q_j, stFltb) % transformation matrix of the payload's CoM
+            if (nargin == 3)
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
+            end
+            wf_H_cm = payloadFrame(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, pl_idx);
         end
 
         function M = massMatrix(obj, q_j, stFltb)
             if (nargin == 2)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            M = obj.mwbm_icub.massMatrix(stFltb.wf_R_b, stFltb.wf_p_b, q_j);
+            M = massMatrix(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j);
         end
 
         function h_c = centMoment(obj, q_j, dq_j, stFltb)
             if (nargin == 3)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            h_c = obj.mwbm_icub.centroidalMomentum(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            h_c = centroidalMomentum(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function [M, c_qv, h_c] = wholeBodyDyn(obj, q_j, dq_j, stFltb)
             if (nargin == 3)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            [M, c_qv, h_c] = obj.mwbm_icub.wholeBodyDynamics(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
+            [M, c_qv, h_c] = wholeBodyDynamics(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
         function wf_J_lnk = jacob(obj, lnk_name, q_j, stFltb)
             if (nargin == 3)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            wf_J_lnk = obj.mwbm_icub.jacobian(stFltb.wf_R_b, stFltb.wf_p_b, q_j, lnk_name);
+            wf_J_lnk = jacobian(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, lnk_name);
         end
 
         function djdq_lnk = jacobDot(obj, lnk_name, q_j, dq_j, stFltb)
             if (nargin == 4)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
-            djdq_lnk = obj.mwbm_icub.dJdq(stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, lnk_name);
+            djdq_lnk = dJdq(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, lnk_name);
         end
 
-        function wf_J_tt = jacobTool(obj, q_j, stFltb) % Jacobian matrix in tool-frame
-            if (nargin == 2)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+        function wf_J_tt = jacobTool(obj, t_idx, q_j, stFltb) % Jacobian matrix in tool-frame
+            if (nargin == 3)
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
             % compute the Jacobian of the tool-tip:
-            % use the default tool (1st element of the tool list)
-            wf_J_tt = obj.mwbm_icub.jacobianTool(stFltb.wf_R_b, stFltb.wf_p_b, q_j, 1);
+            wf_J_tt = jacobianTool(obj.mwbm_icub, stFltb.wf_R_b, stFltb.wf_p_b, q_j, t_idx);
         end
 
         function payload(obj, pl_lnk_data)
-            obj.mwbm_icub.setPayloadLinks(pl_lnk_data);
+            setPayloadLinks(obj.mwbm_icub, pl_lnk_data);
         end
 
         function f_pl = ploadForces(obj, fhTotCWrench, f_cp, tau, q_j, dq_j, stFltb)
             if (nargin == 6)
-                stFltb = obj.mwbm_icub.getFloatingBaseState();
+                stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
             nu    = vertcat(stFltb.v_b, dq_j); % mixed generalized velocity
-            acf_0 = obj.mwbm_icub.zeroCtcAcc(obj.mfeet_conf);
-            [ac_h, a_prms] = obj.mwbm_icub.handAccelerations(obj.mfeet_conf, obj.mhand_conf, tau, acf_0, stFltb.wf_R_b, ...
-                                                             stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, nu);
+            acf_0 = zeroCtcAcc(obj.mwbm_icub, obj.mfeet_conf);
+            [ac_h, a_prms] = handAccelerations(obj.mwbm_icub, obj.mfeet_conf, obj.mhand_conf, tau, acf_0, ...
+                                               stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b, nu);
             v_pl = a_prms.Jc_h * dq_j;
             a_pl = ac_h;
             % calculate the payload forces of the hands:
-            f_pl = obj.mwbm_icub.handPayloadForces(obj.mhand_conf, fhTotCWrench, f_cp, v_pl, a_pl);
+            f_pl = handPayloadForces(obj.mwbm_icub, obj.mhand_conf, fhTotCWrench, f_cp, v_pl, a_pl);
         end
 
         function resv = isJntLimit(obj, q_j)
-            resv = obj.mwbm_icub.isJointLimit(q_j);
+            resv = isJointLimit(obj.mwbm_icub, q_j);
         end
 
         function dispParams(obj, prec)
             if (nargin == 2)
-               obj.mwbm_icub.dispModel(prec);
-               obj.mwbm_icub.dispConfig(prec);
+               dispModel(obj.mwbm_icub, prec);
+               dispConfig(obj.mwbm_icub, prec);
                return
             end
             % else, display the values with the default precision ...
-            obj.mwbm_icub.dispModel();
-            obj.mwbm_icub.dispConfig();
+            dispModel(obj.mwbm_icub);
+            dispConfig(obj.mwbm_icub);
+        end
+
+        function setToolTform(obj, ee_H_tt, t_idx)
+            if (nargin == 1)
+                % initialize the tool-tip transformation matrices:
+                [tool_lnks, nTools] = getToolLinks(obj.mwbm_icub);
+                if (nTools > 0)
+                    % get the tool-tip transformations from the WBM-object:
+                    % note: the first element is always the default tool link.
+                    obj.mtool_tform = cell(nTools,1);
+                    for t_idx = 1:nTools
+                        ee_H_tt = WBM.utilities.tfms.frame2tform(tool_lnks(t_idx,1).ee_vqT_tt);
+                        obj.mtool_tform{t_idx,1} = ee_H_tt;
+                    end
+                else
+                    n = obj.mwbm_icub.MAX_NUM_TOOLS;
+                    obj.mtool_tform = cell(n,1);
+
+                    H_id = eye(4,4);
+                    for t_idx = 1:n
+                        obj.mtool_tform{t_idx,1} = H_id;
+                    end
+                end
+                return
+            end
+            % else, update the transformation matrix of the default tool-tip ...
+            if ~WBM.utilities.isHomog(ee_H_tt)
+                error('iCubWBM::setToolTform: %s', WBM.wbmErrorMsg.NOT_HOMOG_MAT);
+            end
+            ee_vqT_tt = WBM.utilities.tfms.tform2frame(ee_H_tt);
+            updateToolFrame(obj.mwbm_icub, ee_vqT_tt, t_idx);
+            obj.mtool_tform{t_idx,1} = ee_H_tt;
+        end
+
+        function ee_H_tt = getToolTform(obj, t_idx)
+            if (t_idx > obj.mwbm_icub.MAX_NUM_TOOLS)
+                error('iCubWBM::getToolTform: %s', WBM.wbmErrorMsg.MAX_NUM_LIMIT);
+            end
+            ee_H_tt = obj.mtool_tform{t_idx,1};
         end
 
         function set.robot_name(obj, robot_name)
@@ -397,7 +445,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         end
 
         function set.sim_config(obj, sim_config)
-            obj.msim_config = obj.mwbm_icub.setupSimulation(sim_config);
+            obj.msim_config = setupSimulation(obj.mwbm_icub, sim_config);
         end
 
         function sim_config = get.sim_config(obj)
@@ -408,13 +456,13 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             if isempty(rlnk_name)
                 error('iCubWBM::set.base_link: %s', WBM.wbmErrorMsg.EMPTY_STRING);
             end
-            [~,q_j,~,~] = obj.mwbm_icub.getState();
+            [~,q_j,~,~] = getState(obj.mwbm_icub);
             % update the fixed link ...
             obj.mwbm_icub.fixed_link = rlnk_name;
             % calculate the the position and orientation of the new base link
             % (fixed link) to the world frame (WF) and set the WF at this new base:
-            [wf_p_b, wf_R_b] = obj.mwbm_icub.getWorldFrameFromFixLnk(rlnk_name, q_j);
-            obj.mwbm_icub.setWorldFrame(wf_R_b, wf_p_b);
+            [wf_p_b, wf_R_b] = getWorldFrameFromFixLnk(obj.mwbm_icub, rlnk_name, q_j);
+            setWorldFrame(obj.mwbm_icub, wf_R_b, wf_p_b);
         end
 
         function rlnk_name = get.base_link(obj)
@@ -435,38 +483,12 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                 error('iCubWBM::set.base_tform: %s', WBM.wbmErrorMsg.NOT_HOMOG_MAT);
             end
             [wf_p_b, wf_R_b] = WBM.utilities.tfms.tform2posRotm(wf_H_b);
-            obj.mwbm_icub.setInitWorldFrame(wf_R_b, wf_p_b);
+            setInitWorldFrame(obj.mwbm_icub, wf_R_b, wf_p_b);
             obj.mbase_tform = wf_H_b;
         end
 
         function wf_H_b = get.base_tform(obj)
             wf_H_b = obj.mbase_tform;
-        end
-
-        function set.tool_tform(obj, ee_H_tt)
-            if (nargin == 1)
-                % try to get the tool-tip transformation matrix
-                % from the WBM-object of the iCub ...
-                [tool_lnks, nTools] = obj.mwbm_icub.getToolLinks();
-                if (nTools > 0)
-                    % use the default tool (is always the first element of the list)
-                    obj.mtool_tform = WBM.utilities.tfms.frame2tform(tool_lnks(1,1).ee_vqT_tt);
-                else
-                    obj.mtool_tform = eye(4,4);
-                end
-                return
-            end
-            % else, update the transformation matrix of the default tool-tip ...
-            if ~WBM.utilities.isHomog(ee_H_tt)
-                error('iCubWBM::set.tool_tform: %s', WBM.wbmErrorMsg.NOT_HOMOG_MAT);
-            end
-            ee_vqT_tt = WBM.utilities.tfms.tform2frame(ee_H_tt);
-            obj.mwbm_icub.updateToolFrame(ee_vqT_tt, 1);
-            obj.mtool_tform = ee_H_tt;
-        end
-
-        function ee_H_tt = get.tool_tform(obj)
-            ee_H_tt = obj.mtool_tform;
         end
 
         function set.feet_conf(obj, feet_conf)
@@ -487,7 +509,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
 
         function set.gravity(obj, g_wf)
             obj.mwbm_icub.g_wf = g_wf;
-            obj.mwbm_icub.setInitWorldFrame();
+            setInitWorldFrame(obj.mwbm_icub);
         end
 
         function g_wf = get.gravity(obj)

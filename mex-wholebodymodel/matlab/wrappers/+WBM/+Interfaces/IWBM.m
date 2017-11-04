@@ -8,7 +8,6 @@ classdef (Abstract) IWBM < handle
         sim_config@WBM.wbmSimConfig
         base_link@char
         base_tform@double matrix
-        tool_tform@double matrix
         feet_conf@struct
         hand_conf@struct
         gravity@double    vector
@@ -23,13 +22,15 @@ classdef (Abstract) IWBM < handle
 
         initRobotParams(obj, robot_params)
 
+        newObj = copy(obj)
+
         [vqT_b, q_j, v_b, dq_j] = getState(obj)
 
         stFltb = getBaseState(obj)
 
-        feet_conf = feetConfig(obj, varargin)
+        feet_conf = feetConfig(obj, cstate, varargin)
 
-        hand_conf = handsConfig(obj, varargin)
+        hand_conf = handsConfig(obj, cstate, varargin)
 
         ddq_j = jointAcc(obj, tau, q_j, dq_j, stFltb)
 
@@ -71,6 +72,8 @@ classdef (Abstract) IWBM < handle
 
         wf_H_tt = toolFrame(obj, t_idx, q_j, stFltb) % tool-tip transformation matrix
 
+        wf_H_cm = ploadFrame(obj, pl_idx, q_j, stFltb) % transformation matrix of the payload's CoM
+
         M = massMatrix(obj, q_j, stFltb)
 
         h_c = centMoment(obj, q_j, dq_j, stFltb)
@@ -90,6 +93,10 @@ classdef (Abstract) IWBM < handle
         resv = isJntLimit(obj, q_j)
 
         dispParams(obj, prec)
+
+        setToolTform(obj, ee_H_tt, t_idx)
+
+        ee_H_tt = getToolTform(obj, t_idx)
 
     end
 end
