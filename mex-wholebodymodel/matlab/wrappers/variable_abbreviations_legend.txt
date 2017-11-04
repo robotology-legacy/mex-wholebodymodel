@@ -26,6 +26,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     cent       ...  centroidal
     centf      ...  centrifugal OR centrifugal force(s)
     cfrict     ...  Coulomb friction
+    chkfun     ...  check functions
     chn        ...  chain
     chnt       ...  chain tree
     cl         ...  contact link(s)
@@ -56,6 +57,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ex, exc    ...  exception
     fb         ...  floating base
     fcn        ...  function
+    ffun       ...  fast functions
     fh...      ...  function handle OR file handle (begin of variable name)
     fix        ...  fixed
     fk         ...  forward kinematic(s)
@@ -100,6 +102,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     m...       ...  "member" (begin of variable name), 'm' declares that this variable is a private or protected member variable, e.g. "mwbm", "mstv", etc.
     ...m       ...  "matrix" (end of variable name), like "skewm", "adjointm", etc.
     mat        ...  matrix
+    mbd        ...  multi body dynamics
     mg         ...  mesh grid
     mgC        ...  mesh grid coordinates matrix
     mom        ...  moment/momentum
@@ -164,6 +167,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     stvqT      ...  state vector-quaternion transformation [VQS-Transformation of the current state vector] (7x1-vector) (*)
     sz         ...  size(s)
     ..._t      ...  "transposed" (end of variable name), "_t" declares that a matrix or vector is transposed, e.g. "M_t", "v_t", etc.
+    tfms       ...  transformations
     tform, tfm ...  transformation matrix
     tl         ...  trajectory line
     tr         ...  translation(s) OR trace
