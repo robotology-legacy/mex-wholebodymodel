@@ -77,7 +77,7 @@ function [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, foot_conf, hand_conf, t
     % calculate the payload forces of the hands:
     f_pl = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp, v_pl, a_pl);
 
-    % compute the contact forces of the hands (without pose correction):
+    % compute the contact forces of the hands (without pose corrections):
     [fc_h,~] = contactForcesEF(obj, tau, f_pl, ac_h, a_prms.Jc_h, a_prms.djcdq_h, M, c_qv, dq_j); % optimized mode
     % calculate the total joint acceleration vector ddq_j in
     % dependency of the contact forces of the feet and hands:

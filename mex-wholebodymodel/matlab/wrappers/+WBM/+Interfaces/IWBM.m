@@ -35,15 +35,15 @@ classdef (Abstract) IWBM < handle
 
         ddq_j = jointAcc(obj, tau, q_j, dq_j, stFltb)
 
-        ddq_j = jointAccEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % EF ... External Forces at the hands (no pose correction)
+        ddq_j = jointAccEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % EF ... External Forces at the hands (no pose corrections)
 
-        ddq_j = jointAccPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % PL ... PayLoad at the hands (no pose correction)
+        ddq_j = jointAccPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % PL ... PayLoad at the hands (no pose corrections)
 
-        ddq_j = jointAccFPC(obj, tau, ac_f, q_j, dq_j, stFltb) % FPC ... Foot Pose Correction (no external forces)
+        ddq_j = jointAccFPC(obj, tau, ac_f, q_j, dq_j, stFltb) % FPC ... Foot Pose Corrections (no external forces)
 
-        ddq_j = jointAccFPCEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % FPCEF ... Foot Pose Correction with External Forces (at the hands)
+        ddq_j = jointAccFPCEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % FPCEF ... Foot Pose Corrections with External Forces (at the hands)
 
-        ddq_j = jointAccFPCPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % FPCPL ... Foot Pose Correction with PayLoad (at the hands)
+        ddq_j = jointAccFPCPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % FPCPL ... Foot Pose Corrections with PayLoad (at the hands)
 
         ac_h = handAcc(obj, tau, q_j, dq_j, stFltb)
 

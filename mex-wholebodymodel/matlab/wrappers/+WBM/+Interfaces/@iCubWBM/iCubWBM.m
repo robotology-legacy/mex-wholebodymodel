@@ -103,7 +103,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             ddq_j = jointAccelerations(obj.mwbm_icub, tau, stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % EF ... External Forces at the hands (no pose correction)
+        function ddq_j = jointAccEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % EF ... External Forces at the hands (no pose corrections)
             if (nargin == 7)
                 stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
@@ -111,7 +111,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                                          stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % PL ... PayLoad at the hands (no pose correction)
+        function ddq_j = jointAccPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % PL ... PayLoad at the hands (no pose corrections)
             if (nargin == 7)
                 stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
@@ -119,7 +119,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                                          stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccFPC(obj, tau, ac_f, q_j, dq_j, stFltb) % FPC ... Foot Pose Correction (no external forces)
+        function ddq_j = jointAccFPC(obj, tau, ac_f, q_j, dq_j, stFltb) % FPC ... Foot Pose Corrections (no external forces)
             if (nargin == 5)
                 stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
@@ -127,7 +127,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                                           stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccFPCEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % FPCEF ... Foot Pose Correction with External Forces (at the hands)
+        function ddq_j = jointAccFPCEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % FPCEF ... Foot Pose Corrections with External Forces (at the hands)
             if (nargin == 7)
                 stFltb = getFloatingBaseState(obj.mwbm_icub);
             end
@@ -135,7 +135,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
                                             stFltb.wf_R_b, stFltb.wf_p_b, q_j, dq_j, stFltb.v_b);
         end
 
-        function ddq_j = jointAccFPCPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % FPCPL ... Foot Pose Correction with PayLoad (at the hands)
+        function ddq_j = jointAccFPCPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % FPCPL ... Foot Pose Corrections with PayLoad (at the hands)
             if (nargin == 7)
                 stFltb = getFloatingBaseState(obj.mwbm_icub);
             end

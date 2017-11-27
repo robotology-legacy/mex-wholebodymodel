@@ -47,12 +47,12 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                     error('WBM::getFDynVisData: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
         case 'fpc'
-            % only foot pose correction:
+            % only foot pose corrections:
             switch narg
                 case 9
                     % pc_type = varargin{6}
                     if isstruct(varargin{1,1})
-                        % extended forward dynamics with foot pose correction
+                        % extended forward dynamics with foot pose corrections
                         % and external forces at the given contact links:
                         % foot_conf = varargin{1}
                         % clnk_conf = varargin{2}
@@ -61,7 +61,7 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                         % ac_f      = varargin{5} (must be either zero or constant)
                         vis_data = getVisDataFPCEF(obj, stmChi, fhTrqControl, varargin{1:5}, noi);
                     else
-                        % extended forward dynamics with foot pose correction
+                        % extended forward dynamics with foot pose corrections
                         % and payload at the hands:
                         % fhTotCWrench = varargin{1}
                         % foot_conf    = varargin{2}
@@ -71,7 +71,7 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                         vis_data = getVisDataFPCPL(obj, stmChi, fhTrqControl, varargin{1:5}, noi);
                     end
                 case 6
-                    % extended forward dynamics with only foot pose correction:
+                    % extended forward dynamics with only foot pose corrections:
                     % pc_type = varargin{3}
                     % ---------------------
                     % ac_f    = varargin{2}
@@ -83,11 +83,11 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                     error('WBM::getFDynVisData: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
         case 'hpc'
-            % only hand pose correction:
+            % only hand pose corrections:
             if (narg ~= 7)
                 error('WBM::getFDynVisData: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
-            % extended forward dynamics with hand pose correction
+            % extended forward dynamics with hand pose corrections
             % and external forces at the hands:
             % pc_type   = varargin{4}
             % -----------------------
@@ -102,7 +102,7 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
             end
             % pc_type = varargin{6}
             if isstruct(varargin{1,1})
-                % extended forward dynamics with foot and hand pose correction
+                % extended forward dynamics with foot and hand pose corrections
                 % and external forces at the hands:
                 % foot_conf = varargin{1}
                 % hand_conf = varargin{2}

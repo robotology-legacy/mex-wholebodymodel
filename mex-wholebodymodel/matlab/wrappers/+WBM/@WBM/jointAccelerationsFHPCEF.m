@@ -70,7 +70,7 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPCEF(obj, foot_conf, hand_conf, 
             error('WBM::jointAccelerationsFHPCEF: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
     % compute the contact forces of the feet and hands
-    % with friction and pose correction (optimized mode):
+    % with friction and pose corrections (optimized mode):
     [fc_f, tau_gen] = footContactForcesPC(obj, foot_conf, tau, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j, nu);
     [fc_h,~] = contactForcesCLPCEF(obj, hand_conf, tau, fe_h, ac_h, Jc_h, djcdq_h, M, c_qv, dq_j, nu);
 

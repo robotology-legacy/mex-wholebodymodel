@@ -38,7 +38,7 @@ fhTrqControl = @(t, M, c_qv, stp, nu, Jc, djcdq, foot_conf)zeroTrqsController(si
 
 % Configuration structure for the foot state:
 % Note: The state of the foot configurations is needed for the extended forward dynamics
-%       function with foot pose correction (FPC). It defines the current foot poses and
+%       function with foot pose corrections (FPC). It defines the current foot poses and
 %       on which foot the legged robot is currently in contact with the ground.
 foot_contact = [true, true]; % [l_foot, r_foot]
 foot_conf = wbm_icub.footConfigState(foot_contact, qj_init);

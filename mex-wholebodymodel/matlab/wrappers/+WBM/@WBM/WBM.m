@@ -163,10 +163,10 @@ classdef WBM < WBM.WBMBase
             % (this calculation method is numerically more accurate and robust than the calculation variant with the cartmass-function.)
         end
 
-        [f_c, tau_gen] = contactForcesEF(obj, tau, fe_c, ac, Jc, djcdq, M, c_qv, dq_j) % EF ... External Forces at the contact links (without pose correction)
+        [f_c, tau_gen] = contactForcesEF(obj, tau, fe_c, ac, Jc, djcdq, M, c_qv, dq_j) % EF ... External Forces at the contact links (without pose corrections)
 
-        [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, varargin) % CLPCEF ... Contact Link Pose Correction with External Forces
-                                                                                                           %            (at the contact links)
+        [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, varargin) % CLPCEF ... Contact Link Pose Corrections with External Forces
+                                                                                                          %            (at the contact links)
 
         function [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clnk_conf, varargin) % in dependency of the contact state (CS)
             % wf_R_b_arr = varargin{1}
@@ -271,14 +271,14 @@ classdef WBM < WBM.WBMBase
             end
         end
 
-        [ddq_j, fd_prms] = jointAccelerationsEF(obj, foot_conf, clnk_conf, tau, fe_c, ac, varargin) % EF ... External Forces at the contact links (no pose correction)
+        [ddq_j, fd_prms] = jointAccelerationsEF(obj, foot_conf, clnk_conf, tau, fe_c, ac, varargin) % EF ... External Forces at the contact links (no pose corrections)
 
-        [ddq_j, fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % PL ... PayLoad at the hands (no pose correction)
+        [ddq_j, fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % PL ... PayLoad at the hands (no pose corrections)
 
-        [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clnk_conf, tau, fe_c, ac, varargin) % CLPCEF ... Contact Link Pose Correction with External Forces
+        [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clnk_conf, tau, fe_c, ac, varargin) % CLPCEF ... Contact Link Pose Corrections with External Forces
                                                                                               %            (at the contact links)
 
-        function [ddq_j, fd_prms] = jointAccelerationsFPC(obj, foot_conf, tau, ac_f, varargin) % FPC ... Foot Pose Correction (no external forces)
+        function [ddq_j, fd_prms] = jointAccelerationsFPC(obj, foot_conf, tau, ac_f, varargin) % FPC ... Foot Pose Corrections (no external forces)
             fe_0 = zeroExtForces(obj, foot_conf);
             if (nargout == 2)
                 [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, foot_conf, tau, fe_0, ac_f, varargin{:});
@@ -288,11 +288,11 @@ classdef WBM < WBM.WBMBase
             ddq_j = jointAccelerationsCLPCEF(obj, foot_conf, tau, fe_0, ac_f, varargin{:});
         end
 
-        [ddq_j, fd_prms] = jointAccelerationsFPCEF(obj, foot_conf, clnk_conf, tau, fe_c, ac, varargin) % FPCEF ... Foot Pose Correction with External Forces (at the contact links)
+        [ddq_j, fd_prms] = jointAccelerationsFPCEF(obj, foot_conf, clnk_conf, tau, fe_c, ac, varargin) % FPCEF ... Foot Pose Corrections with External Forces (at the contact links)
 
-        [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % FPCPL ... Foot Pose Correction with PayLoad (at the hands)
+        [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % FPCPL ... Foot Pose Corrections with PayLoad (at the hands)
 
-        function [ddq_j, fd_prms] = jointAccelerationsHPCEF(obj, hand_conf, tau, fe_h, ac_h, varargin) % HPCEF ... Hand Pose Correction with External Forces (at the hands)
+        function [ddq_j, fd_prms] = jointAccelerationsHPCEF(obj, hand_conf, tau, fe_h, ac_h, varargin) % HPCEF ... Hand Pose Corrections with External Forces (at the hands)
             if (nargout == 2)
                 [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, hand_conf, tau, fe_h, ac_h, varargin{:});
                 return
@@ -301,9 +301,9 @@ classdef WBM < WBM.WBMBase
             ddq_j = jointAccelerationsCLPCEF(obj, hand_conf, tau, fe_h, ac_h, varargin{:});
         end
 
-        [ddq_j, fd_prms] = jointAccelerationsFHPCEF(obj, foot_conf, hand_conf, tau, fe_h, ac_h, varargin) % FHPCEF ... Foot & Hand Pose Correction with External Forces (at the hands)
+        [ddq_j, fd_prms] = jointAccelerationsFHPCEF(obj, foot_conf, hand_conf, tau, fe_h, ac_h, varargin) % FHPCEF ... Foot & Hand Pose Corrections with External Forces (at the hands)
 
-        [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % FHPCPL ... Foot & Hand Pose Correction with PayLoad (at the hands)
+        [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % FHPCPL ... Foot & Hand Pose Corrections with PayLoad (at the hands)
 
         [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, varargin)
 
@@ -1316,7 +1316,7 @@ classdef WBM < WBM.WBMBase
             [fc_f, tau_gen] = contactForcesEF(obj, tau, fe_0, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j); % with friction
         end
 
-        function [fc_f, tau_gen] = footContactForcesPC(obj, foot_conf, tau, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j, nu) % PC ... Pose Correction
+        function [fc_f, tau_gen] = footContactForcesPC(obj, foot_conf, tau, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j, nu) % PC ... Pose Corrections
             fe_0 = zeroExtForces(obj, foot_conf);
             [fc_f, tau_gen] = contactForcesCLPCEF(obj, foot_conf, tau, fe_0, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j, nu); % with friction, optimized mode
         end

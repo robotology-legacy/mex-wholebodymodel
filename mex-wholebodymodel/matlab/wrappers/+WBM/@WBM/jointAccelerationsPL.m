@@ -1,6 +1,6 @@
 function [ddq_j, fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin)
     switch nargin
-        case 12 % normal modes (without pose correction):
+        case 12 % normal modes (without pose corrections):
             % wf_R_b = varargin{2}
             % wf_p_b = varargin{3}
             % q_j    = varargin{4}
@@ -23,7 +23,7 @@ function [ddq_j, fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau,
             [ac_h, a_prms]  = handAccelerations(obj, foot_conf, hand_conf, tau, ac_f, ...
                                                 varargin{1:3}, dq_j, varargin{1,5});
             [M, c_qv, Jc_f] = getWBDynFeet(obj, a_prms);
-        case 8 % optimized modes (without pose correction):
+        case 8 % optimized modes (without pose corrections):
             ac_f = varargin{1,1};
             dq_j = varargin{1,2};
 

@@ -59,7 +59,7 @@ function [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, od
                     error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
         case 'fpc'
-            % only foot pose correction:
+            % only foot pose corrections:
             switch narg
                 case 11
                     % pc_type = varargin{6}
@@ -89,7 +89,7 @@ function [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, od
                                                                  foot_conf, hand_conf, varargin{1,4}, varargin{1,5});
                     end
                 case 8
-                    % extended function with only foot pose correction:
+                    % extended function with only foot pose corrections:
                     % ac_f    = varargin{2}
                     % pc_type = varargin{3}
                     foot_conf = varargin{1,1};
@@ -101,7 +101,7 @@ function [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, od
                     error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
         case 'hpc'
-            % only hand pose correction:
+            % only hand pose corrections:
             if (narg ~= 9)
                 error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end

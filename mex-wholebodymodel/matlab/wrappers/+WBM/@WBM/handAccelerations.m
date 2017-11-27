@@ -12,7 +12,7 @@ function [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, vara
 
     f_data = true;
     switch nargin
-        case 11 % with pose correction:
+        case 11 % with pose corrections:
             if iscolumn(varargin{1,4})
                 % normal mode:
                 % wf_R_b = varargin{2}
@@ -38,11 +38,11 @@ function [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, vara
                 [Jc_h, djcdq_h] = contactJacobians(obj, hand_idx);
                 f_data = false;
             end
-            % compute the foot contact forces with pose correction (PC) and the
+            % compute the foot contact forces with pose corrections (PC) and the
             % corresponding generalized forces with friction ...
             [fc_f, tau_gen] = footContactForcesPC(obj, foot_conf, tau, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j, nu);
         case 10
-            % normal mode (without pose correction):
+            % normal mode (without pose corrections):
             % wf_R_b = varargin{2}
             % wf_p_b = varargin{3}
             % q_j    = varargin{4}
@@ -55,7 +55,7 @@ function [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, vara
             % compute the foot contact forces with the corresponding generalized forces ...
             [fc_f, tau_gen] = footContactForces(obj, foot_conf, tau, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j); % with friction
         case 7 % optimized modes:
-            % with pose correction:
+            % with pose corrections:
             ac_f = varargin{1,1};
             dq_j = varargin{1,2};
             nu   = varargin{1,3};
@@ -63,7 +63,7 @@ function [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, vara
             [M, c_qv, Jc_f, djcdq_f, Jc_h, djcdq_h] = wholeBodyDynFHCS(obj, foot_conf, hand_idx);
             [fc_f, tau_gen] = footContactForcesPC(obj, foot_conf, tau, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j, nu);
         case 6
-            % without pose correction:
+            % without pose corrections:
             ac_f = varargin{1,1};
             dq_j = varargin{1,2};
 
