@@ -8,11 +8,12 @@ classdef (Abstract) IWBM < handle
         sim_config@WBM.wbmSimConfig
         base_link@char
         base_tform@double matrix
-        feet_conf@struct
+        foot_conf@struct
         hand_conf@struct
         gravity@double    vector
         jlimits@struct
         ndof@uint16       scalar
+        hwbm@WBM.WBM
     end
 
     methods(Abstract)
@@ -28,9 +29,9 @@ classdef (Abstract) IWBM < handle
 
         stFltb = getBaseState(obj)
 
-        feet_conf = feetConfig(obj, cstate, varargin)
+        foot_conf = footConfig(obj, cstate, varargin)
 
-        hand_conf = handsConfig(obj, cstate, varargin)
+        hand_conf = handConfig(obj, cstate, varargin)
 
         ddq_j = jointAcc(obj, tau, q_j, dq_j, stFltb)
 
@@ -38,11 +39,11 @@ classdef (Abstract) IWBM < handle
 
         ddq_j = jointAccPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % PL ... PayLoad at the hands (no pose correction)
 
-        ddq_j = jointAccFPC(obj, tau, ac_f, q_j, dq_j, stFltb) % FPC ... Feet Pose Correction (no external forces)
+        ddq_j = jointAccFPC(obj, tau, ac_f, q_j, dq_j, stFltb) % FPC ... Foot Pose Correction (no external forces)
 
-        ddq_j = jointAccFPCEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % FPCEF ... Feet Pose Correction with External Forces (at the hands)
+        ddq_j = jointAccFPCEF(obj, tau, fe_h, ac_h, ac_f, q_j, dq_j, stFltb) % FPCEF ... Foot Pose Correction with External Forces (at the hands)
 
-        ddq_j = jointAccFPCPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % FPCPL ... Feet Pose Correction with PayLoad (at the hands)
+        ddq_j = jointAccFPCPL(obj, tau, fhTotCWrench, f_cp, ac_f, q_j, dq_j, stFltb) % FPCPL ... Foot Pose Correction with PayLoad (at the hands)
 
         ac_h = handAcc(obj, tau, q_j, dq_j, stFltb)
 

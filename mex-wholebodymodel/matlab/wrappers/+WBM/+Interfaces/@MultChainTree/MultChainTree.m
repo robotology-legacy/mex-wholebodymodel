@@ -97,10 +97,10 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
 
         function setcontact(bot, ctc_mode, varargin) % for closed-loop & non-closed loop contacts
             switch ctc_mode
-                case 'feet'
-                    bot.mwbm.feet_conf = getFeetConfig(bot.mwbm, varargin{:});
+                case 'foot'
+                    bot.mwbm.foot_conf = footConfig(bot.mwbm, varargin{:});
                 case 'hand'
-                    bot.mwbm.hand_conf = getHandConfig(bot.mwbm, varargin{:});
+                    bot.mwbm.hand_conf = handConfig(bot.mwbm, varargin{:});
                 otherwise
                     error('MultChainTree::setcontact: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
             end
@@ -282,7 +282,12 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
         end
 
         function plot3d(bot, stmChi, sim_tstep, vis_ctrl)
-            visFwdDyn(bot.mwbm, stmChi, sim_tstep, vis_ctrl);
+            if (nargin == 4)
+                visFwdDyn(bot.mwbm, stmChi, sim_tstep, vis_ctrl);
+                return
+            end
+            % else, use the default vis-control values ...
+            visFwdDyn(bot.mwbm, stmChi, sim_tstep);
         end
 
         function set.name(bot, robot_name)

@@ -22,6 +22,7 @@ function [f_pl, pl_prms] = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp,
 
         % calculate the total contact wrench for each hand:
         n  = size(f_cp,1);
+        if mod(n,2), error('handPayloadForces: The vector length is not even!'); end
         sp = n*0.5; % split position
         fcp_l = f_cp(1:sp,1);
         fcp_r = f_cp((sp+1):n,1);

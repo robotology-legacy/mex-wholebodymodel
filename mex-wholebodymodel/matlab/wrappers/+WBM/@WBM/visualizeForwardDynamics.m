@@ -21,6 +21,9 @@ function visualizeForwardDynamics(obj, stmPos, sim_config, sim_tstep, vis_ctrl)
         otherwise
             error('WBM::visualizeForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
+    if isempty(sim_config)
+        error('WBM::visualizeForwardDynamics: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
+    end
     % initial plot of the animation environment (reset all subplots in the
     % main figure and reinitialize them with a new ground floor) ...
     sim_config = initSimEnvironment(obj, sim_config);

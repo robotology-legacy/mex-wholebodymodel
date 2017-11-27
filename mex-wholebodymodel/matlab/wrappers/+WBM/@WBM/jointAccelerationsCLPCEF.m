@@ -1,4 +1,4 @@
-function [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clink_conf, tau, fe_c, ac, varargin)
+function [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clnk_conf, tau, fe_c, ac, varargin)
     switch nargin
         case 11
             if iscolumn(varargin{1,3})
@@ -13,9 +13,9 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clink_conf, tau, fe_c,
                 % compute the whole body dynamics and for each contact constraint
                 % the Jacobian and the derivative Jacobian ...
                 wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-                [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clink_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clnk_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
                 % get the contact forces and the corresponding generalized forces ...
-                [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, ...
+                [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, ...
                                                      wf_R_b_arr, wf_p_b, q_j, dq_j, v_b, nu);
             else
                 % optimized mode (with friction):
@@ -26,7 +26,7 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clink_conf, tau, fe_c,
                 M    = varargin{1,3};
                 c_qv = varargin{1,4};
 
-                [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, ...
+                [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc, ...
                                                      varargin{1,2}, M, c_qv, varargin{5:6});
             end
         case 10
@@ -37,7 +37,7 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clink_conf, tau, fe_c,
             M    = varargin{1,3};
             c_qv = varargin{1,4};
 
-            [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, ...
+            [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc, ...
                                                  varargin{1,2}, M, c_qv, varargin{1,5});
         case 9
             % semi-optimized mode (without friction):
@@ -46,15 +46,15 @@ function [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clink_conf, tau, fe_c,
             % q_j    = varargin{3}
             % nu     = varargin{4}
             wf_R_b_arr = reshape(varargin{1,1}, 9, 1);
-            [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clink_conf);
-            [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, djcdq, ...
+            [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clnk_conf);
+            [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc, djcdq, ...
                                                  M, c_qv, wf_R_b_arr, varargin{2:4});
         case 6
             % optimized mode (without friction):
             nu = varargin{1,1};
 
-            [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clink_conf);
-            [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, nu);
+            [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clnk_conf);
+            [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, nu);
         otherwise
             error('WBM::jointAccelerationsCLPCEF: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end

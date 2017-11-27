@@ -165,10 +165,10 @@ classdef WBM < WBM.WBMBase
 
         [f_c, tau_gen] = contactForcesEF(obj, tau, fe_c, ac, Jc, djcdq, M, c_qv, dq_j) % EF ... External Forces at the contact links (without pose correction)
 
-        [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, varargin) % CLPCEF ... Contact Link Pose Correction with External Forces
+        [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, varargin) % CLPCEF ... Contact Link Pose Correction with External Forces
                                                                                                            %            (at the contact links)
 
-        function [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clink_conf, varargin) % in dependency of the contact state (CS)
+        function [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCS(obj, clnk_conf, varargin) % in dependency of the contact state (CS)
             % wf_R_b_arr = varargin{1}
             % wf_p_b     = varargin{2}
             % q_j        = varargin{3}
@@ -177,7 +177,7 @@ classdef WBM < WBM.WBMBase
 
             % check which link is in contact with the ground/object and calculate the
             % multibody dynamics and the corresponding the contact Jacobians:
-            clink_idx = getContactIdx(obj, clink_conf);
+            clink_idx = getContactIdx(obj, clnk_conf);
             if ~clink_idx
                 % both links have no contact to the ground/object ...
                 n = obj.mwbm_model.ndof + 6;
@@ -192,14 +192,14 @@ classdef WBM < WBM.WBMBase
             [M, c_qv, Jc, djcdq] = wholeBodyDynamicsCC(obj, varargin{:});
         end
 
-        function [Jc, djcdq] = contactJacobiansCS(obj, clink_conf, varargin) % in dependency of the contact state (CS)
+        function [Jc, djcdq] = contactJacobiansCS(obj, clnk_conf, varargin) % in dependency of the contact state (CS)
             % wf_R_b_arr = varargin{1}
             % wf_p_b     = varargin{2}
             % q_j        = varargin{3}
             % dq_j       = varargin{4}
             % v_b        = varargin{5}
 
-            clink_idx = getContactIdx(obj, clink_conf);
+            clink_idx = getContactIdx(obj, clnk_conf);
             if ~clink_idx
                 % both links have no contact to the ground/object ...
                 n = obj.mwbm_model.ndof + 6;
@@ -271,26 +271,26 @@ classdef WBM < WBM.WBMBase
             end
         end
 
-        [ddq_j, fd_prms] = jointAccelerationsEF(obj, feet_conf, clink_conf, tau, fe_c, ac, varargin) % EF ... External Forces at the contact links (no pose correction)
+        [ddq_j, fd_prms] = jointAccelerationsEF(obj, foot_conf, clnk_conf, tau, fe_c, ac, varargin) % EF ... External Forces at the contact links (no pose correction)
 
-        [ddq_j, fd_prms] = jointAccelerationsPL(obj, feet_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % PL ... PayLoad at the hands (no pose correction)
+        [ddq_j, fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % PL ... PayLoad at the hands (no pose correction)
 
-        [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clink_conf, tau, fe_c, ac, varargin) % CLPCEF ... Contact Link Pose Correction with External Forces
+        [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clnk_conf, tau, fe_c, ac, varargin) % CLPCEF ... Contact Link Pose Correction with External Forces
                                                                                               %            (at the contact links)
 
-        function [ddq_j, fd_prms] = jointAccelerationsFPC(obj, feet_conf, tau, ac_f, varargin) % FPC ... Feet Pose Correction (no external forces)
-            fe_0 = zeroExtForces(obj, feet_conf);
+        function [ddq_j, fd_prms] = jointAccelerationsFPC(obj, foot_conf, tau, ac_f, varargin) % FPC ... Foot Pose Correction (no external forces)
+            fe_0 = zeroExtForces(obj, foot_conf);
             if (nargout == 2)
-                [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, feet_conf, tau, fe_0, ac_f, varargin{:});
+                [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, foot_conf, tau, fe_0, ac_f, varargin{:});
                 return
             end
             % else ...
-            ddq_j = jointAccelerationsCLPCEF(obj, feet_conf, tau, fe_0, ac_f, varargin{:});
+            ddq_j = jointAccelerationsCLPCEF(obj, foot_conf, tau, fe_0, ac_f, varargin{:});
         end
 
-        [ddq_j, fd_prms] = jointAccelerationsFPCEF(obj, feet_conf, clink_conf, tau, fe_c, ac, varargin) % FPCEF ... Feet Pose Correction with External Forces (at the contact links)
+        [ddq_j, fd_prms] = jointAccelerationsFPCEF(obj, foot_conf, clnk_conf, tau, fe_c, ac, varargin) % FPCEF ... Foot Pose Correction with External Forces (at the contact links)
 
-        [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, feet_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % FPCPL ... Feet Pose Correction with PayLoad (at the hands)
+        [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % FPCPL ... Foot Pose Correction with PayLoad (at the hands)
 
         function [ddq_j, fd_prms] = jointAccelerationsHPCEF(obj, hand_conf, tau, fe_h, ac_h, varargin) % HPCEF ... Hand Pose Correction with External Forces (at the hands)
             if (nargout == 2)
@@ -301,36 +301,36 @@ classdef WBM < WBM.WBMBase
             ddq_j = jointAccelerationsCLPCEF(obj, hand_conf, tau, fe_h, ac_h, varargin{:});
         end
 
-        [ddq_j, fd_prms] = jointAccelerationsFHPCEF(obj, feet_conf, hand_conf, tau, fe_h, ac_h, varargin) % FHPCEF ... Feet & Hand Pose Correction with External Forces (at the hands)
+        [ddq_j, fd_prms] = jointAccelerationsFHPCEF(obj, foot_conf, hand_conf, tau, fe_h, ac_h, varargin) % FHPCEF ... Foot & Hand Pose Correction with External Forces (at the hands)
 
-        [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % FHPCPL ... Feet & Hand Pose Correction with PayLoad (at the hands)
+        [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % FHPCPL ... Foot & Hand Pose Correction with PayLoad (at the hands)
 
-        [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, varargin)
+        [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, varargin)
 
         [vc_h, v_prms] = handVelocities(obj, hand_conf, varargin)
 
         dstvChi = forwardDynamics(obj, t, stvChi, fhTrqControl)
 
-        dstvChi = forwardDynamicsEF(obj, t, stvChi, fhTrqControl, feet_conf, clink_conf, fe_c, ac, ac_f)
+        dstvChi = forwardDynamicsEF(obj, t, stvChi, fhTrqControl, foot_conf, clnk_conf, fe_c, ac, ac_f)
 
-        dstvChi = forwardDynamicsPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, f_cp, ac_f)
+        dstvChi = forwardDynamicsPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f)
 
-        dstvChi = forwardDynamicsFPC(obj, t, stvChi, fhTrqControl, feet_conf, ac_f)
+        dstvChi = forwardDynamicsFPC(obj, t, stvChi, fhTrqControl, foot_conf, ac_f)
 
-        dstvChi = forwardDynamicsFPCEF(obj, t, stvChi, fhTrqControl, feet_conf, clink_conf, fe_c, ac, ac_f)
+        dstvChi = forwardDynamicsFPCEF(obj, t, stvChi, fhTrqControl, foot_conf, clnk_conf, fe_c, ac, ac_f)
 
-        dstvChi = forwardDynamicsFPCPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, f_cp, ac_f)
+        dstvChi = forwardDynamicsFPCPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f)
 
         dstvChi = forwardDynamicsHPCEF(obj, t, stvChi, fhTrqControl, hand_conf, fe_h, ac_h)
 
-        dstvChi = forwardDynamicsFHPCEF(obj, t, stvChi, fhTrqControl, feet_conf, hand_conf, fe_h, ac_h, ac_f)
+        dstvChi = forwardDynamicsFHPCEF(obj, t, stvChi, fhTrqControl, foot_conf, hand_conf, fe_h, ac_h, ac_f)
 
-        dstvChi = forwardDynamicsFHPCPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, f_cp, ac_f)
+        dstvChi = forwardDynamicsFHPCPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f)
 
         [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, ode_opt, varargin)
 
-        function ac_0 = zeroCtcAcc(obj, clink_conf)
-            nctc = uint8(clink_conf.contact.left) + uint8(clink_conf.contact.right);
+        function ac_0 = zeroCtcAcc(obj, clnk_conf)
+            nctc = uint8(clnk_conf.contact.left) + uint8(clnk_conf.contact.right);
             switch nctc
                 case 1
                     ac_0 = obj.ZERO_CVEC_6;
@@ -341,8 +341,8 @@ classdef WBM < WBM.WBMBase
             end
         end
 
-        function fe_0 = zeroExtForces(obj, clink_conf)
-            nctc = uint8(clink_conf.contact.left) + uint8(clink_conf.contact.right);
+        function fe_0 = zeroExtForces(obj, clnk_conf)
+            nctc = uint8(clnk_conf.contact.left) + uint8(clnk_conf.contact.right);
             switch nctc
                 case 1
                     fe_0 = obj.ZERO_CVEC_6;
@@ -351,13 +351,13 @@ classdef WBM < WBM.WBMBase
             end
         end
 
-        clink_conf = configStateCLinks(obj, varargin)
+        clnk_conf = clnkConfigState(obj, varargin)
 
-        function feet_conf = configStateFeet(obj, cstate, varargin)
-            feet_conf = createConfigStateCL(obj, cstate, 'l_sole', 'r_sole', varargin{:});
+        function foot_conf = footConfigState(obj, cstate, varargin)
+            foot_conf = createConfigStateCL(obj, cstate, 'l_sole', 'r_sole', varargin{:});
         end
 
-        function hand_conf = configStateHands(obj, cstate, varargin)
+        function hand_conf = handConfigState(obj, cstate, varargin)
             hand_conf = createConfigStateCL(obj, cstate, 'l_hand', 'r_hand', varargin{:});
         end
 
@@ -1291,48 +1291,48 @@ classdef WBM < WBM.WBMBase
             nu = vertcat(dx_b, dqt_b, dq_j);
         end
 
-        function clink_idx = getContactIdx(~, clink_conf)
-            ctc_l = clink_conf.contact.left;  % CS-left
-            ctc_r = clink_conf.contact.right; % CS-right
+        function clink_idx = getContactIdx(~, clnk_conf)
+            ctc_l = clnk_conf.contact.left;  % CS-left
+            ctc_r = clnk_conf.contact.right; % CS-right
 
             % check the contact state (CS) of the contact links:
             if (ctc_l && ctc_r)
                 % both links have contact to the ground/object ...
-                clink_idx = horzcat(clink_conf.lnk_idx_l, clink_conf.lnk_idx_r);
+                clink_idx = horzcat(clnk_conf.lnk_idx_l, clnk_conf.lnk_idx_r);
             elseif ctc_l
                 % only the left link has contact ...
-                clink_idx = clink_conf.lnk_idx_l;
+                clink_idx = clnk_conf.lnk_idx_l;
             elseif ctc_r
                 % only the right link has contact ...
-                clink_idx = clink_conf.lnk_idx_r;
+                clink_idx = clnk_conf.lnk_idx_r;
             else
                 % no contacts ...
                 clink_idx = 0;
             end
         end
 
-        function [fc_f, tau_gen] = feetContactForces(obj, feet_conf, tau, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j)
-            fe_0 = zeroExtForces(obj, feet_conf);
+        function [fc_f, tau_gen] = footContactForces(obj, foot_conf, tau, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j)
+            fe_0 = zeroExtForces(obj, foot_conf);
             [fc_f, tau_gen] = contactForcesEF(obj, tau, fe_0, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j); % with friction
         end
 
-        function [fc_f, tau_gen] = feetContactForcesPC(obj, feet_conf, tau, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j, nu) % PC ... Pose Correction
-            fe_0 = zeroExtForces(obj, feet_conf);
-            [fc_f, tau_gen] = contactForcesCLPCEF(obj, feet_conf, tau, fe_0, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j, nu); % with friction, optimized mode
+        function [fc_f, tau_gen] = footContactForcesPC(obj, foot_conf, tau, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j, nu) % PC ... Pose Correction
+            fe_0 = zeroExtForces(obj, foot_conf);
+            [fc_f, tau_gen] = contactForcesCLPCEF(obj, foot_conf, tau, fe_0, ac_f, Jc_f, djcdq_f, M, c_qv, dq_j, nu); % with friction, optimized mode
         end
 
-        function [M, c_qv, Jc_f, djcdq_f, Jc, djcdq] = fullWholeBodyDynCS(obj, feet_conf, clink_conf, wf_R_b, wf_p_b, q_j, dq_j, v_b) % in dependency of the contact state (CS)
+        function [M, c_qv, Jc_f, djcdq_f, Jc, djcdq] = fullWholeBodyDynCS(obj, foot_conf, clnk_conf, wf_R_b, wf_p_b, q_j, dq_j, v_b) % in dependency of the contact state (CS)
             % compute whole body dynamics and the contact Jacobians of all contact constraints (incl. feet):
             switch nargin
                 case 8
                     % normal mode:
                     wf_R_b_arr = reshape(wf_R_b, 9, 1);
-                    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, feet_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
-                    [Jc, djcdq] = contactJacobiansCS(obj, clink_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, foot_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
+                    [Jc, djcdq] = contactJacobiansCS(obj, clnk_conf, wf_R_b_arr, wf_p_b, q_j, dq_j, v_b);
                 case 3
                     % optimized mode:
-                    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, feet_conf);
-                    [Jc, djcdq] = contactJacobiansCS(obj, clink_conf);
+                    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, foot_conf);
+                    [Jc, djcdq] = contactJacobiansCS(obj, clnk_conf);
                 otherwise
                     error('WBM::fullWholeBodyDynCS: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
@@ -1344,7 +1344,7 @@ classdef WBM < WBM.WBMBase
             Jc_f = a_prms.Jc_f;
         end
 
-        function clink_conf = createConfigStateCL(obj, cstate, clink_l, clink_r, varargin)
+        function clnk_conf = createConfigStateCL(obj, cstate, clink_l, clink_r, varargin)
             clnk_idx_l = find(strcmp(obj.mwbm_config.ccstr_link_names, clink_l));
             clnk_idx_r = find(strcmp(obj.mwbm_config.ccstr_link_names, clink_r));
 
@@ -1358,7 +1358,7 @@ classdef WBM < WBM.WBMBase
                 varargin{1,n+1} = 'eul'; % default rotation type
             end
 
-            clink_conf = configStateCLinks(obj, cstate, clink_idx, varargin{:});
+            clnk_conf = clnkConfigState(obj, cstate, clink_idx, varargin{:});
         end
 
         [] = visualizeSimRobot(obj, stmPos, sim_config, sim_tstep, vis_ctrl)

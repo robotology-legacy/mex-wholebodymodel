@@ -36,20 +36,20 @@ len = size(g_init,1);
 %       a real controller function instead to avoid integration errors.
 fhTrqControl = @(t, M, c_qv, stp, nu, Jc, djcdq, foot_conf)zeroTrqsController(size(g_init(7:len,1)));
 
-% Configuration structure for the feet state:
-% Note: The state of the feet configuration is needed for the extended forward dynamics
-%       function with feet pose correction (FPC). It defines the current feet pose and
+% Configuration structure for the foot state:
+% Note: The state of the foot configurations is needed for the extended forward dynamics
+%       function with foot pose correction (FPC). It defines the current foot poses and
 %       on which foot the legged robot is currently in contact with the ground.
-feet_on_ground = [true, true]; % [l_foot, r_foot]
-feet_conf = wbm_icub.configStateFeet(feet_on_ground, qj_init);
+foot_contact = [true, true]; % [l_foot, r_foot]
+foot_conf = wbm_icub.footConfigState(foot_contact, qj_init);
 
 %% ODE-Solver:
 %  Setup the function handle of the form f(t,chi), where chi refers to the dynamic state
 %  of the system. It evaluates the right side of the nonlinear first-order ODEs of the
 %  form chi' = f(t,chi) and returns a vector of rates of change (vector of derivatives)
 %  which will be integrated by the solver.
-ac_0 = wbm_icub.zeroCtcAcc(feet_conf);
-fhFwdDyn = @(t, chi)wbm_icub.forwardDynamicsFPC(t, chi, fhTrqControl, feet_conf, ac_0);
+ac_0 = wbm_icub.zeroCtcAcc(foot_conf);
+fhFwdDyn = @(t, chi)wbm_icub.forwardDynamicsFPC(t, chi, fhTrqControl, foot_conf, ac_0);
 
 % specifying the time interval of the integration ...
 sim_time.start = 0.0;
@@ -62,7 +62,7 @@ disp('Start the numerical integration...');
 ode_options = odeset('RelTol', 1e-3, 'AbsTol', 1e-4);         % setup the error tolerances ...
 [t, chi]    = ode15s(fhFwdDyn, tspan, chi_init, ode_options); % ODE-Solver
 % or, optional:
-%[t, chi] = wbm_icub.intForwardDynamics(tspan, chi_init, fhTrqControl, ode_options, feet_conf, ac_0, 'fpc');
+%[t, chi] = wbm_icub.intForwardDynamics(tspan, chi_init, fhTrqControl, ode_options, foot_conf, ac_0, 'fpc');
 
 disp('Numerical integration finished.');
 
@@ -84,4 +84,4 @@ wbm_icub.simulateForwardDynamics(x_out, sim_config, sim_time.step, nRpts);
 wbm_icub.plotCoMTrajectory(x_out);
 
 % get the visualization data of the forward dynamics integration for plots and animations:
-vis_data = wbm_icub.getFDynVisData(chi, fhTrqControl, feet_conf, ac_0, 'fpc');
+vis_data = wbm_icub.getFDynVisData(chi, fhTrqControl, foot_conf, ac_0, 'fpc');

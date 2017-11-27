@@ -1,4 +1,4 @@
-function [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, varargin)
+function [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, varargin)
     switch nargin
         % fe_c ... external forces affecting on the contact links
         % ac   ... mixed generalized contact accelerations
@@ -13,7 +13,7 @@ function [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc
             tau_fr  = frictionForces(obj, dq_j);         % friction torques (negated torque values)
             tau_gen = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S_j*(tau + (-tau_fr)),
                                                          % S_j = [0_(6xn); I_(nxn)] ... joint selection matrix
-            perror_cl = poseErrorCL(obj, clink_conf, varargin{1:3});
+            perror_cl = poseErrorCL(obj, clnk_conf, varargin{1:3});
         case 13
             % without friction:
             % wf_R_b_arr = varargin{1}
@@ -22,7 +22,7 @@ function [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc
             nu = varargin{1,4};
 
             tau_gen   = vertcat(zeros(6,1), tau);
-            perror_cl = poseErrorCL(obj, clink_conf, varargin{1:3});
+            perror_cl = poseErrorCL(obj, clnk_conf, varargin{1:3});
         case 11 % optimized modes:
             % with friction:
             dq_j = varargin{1,1};
@@ -30,13 +30,13 @@ function [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc
 
             tau_fr    = frictionForces(obj, dq_j);
             tau_gen   = vertcat(zeros(6,1), tau + tau_fr);
-            perror_cl = poseErrorCL(obj, clink_conf);
+            perror_cl = poseErrorCL(obj, clnk_conf);
         case 10
             % without friction:
             nu = varargin{1,1};
 
             tau_gen   = vertcat(zeros(6,1), tau);
-            perror_cl = poseErrorCL(obj, clink_conf);
+            perror_cl = poseErrorCL(obj, clnk_conf);
         otherwise
             error('WBM::contactForcesCLPCEF: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
@@ -45,8 +45,8 @@ function [f_c, tau_gen] = contactForcesCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc
         f_c = obj.ZERO_CVEC_12;
         return
     end
-    k_p = clink_conf.ctrl_gains.k_p; % control gain for correcting the link positions (position feedback).
-    k_v = clink_conf.ctrl_gains.k_v; % control gain for correcting the velocities (rate feedback).
+    k_p = clnk_conf.ctrl_gains.k_p; % control gain for correcting the link positions (position feedback).
+    k_v = clnk_conf.ctrl_gains.k_v; % control gain for correcting the velocities (rate feedback).
 
     % Calculation of the contact force vector for a closed-loop control system with additional
     % velocity and position correction for the contact links (position-regulation system):
@@ -67,33 +67,33 @@ end
 
 %% POSE TRANSFORMATIONS & POSE ERROR FUNCTIONS:
 
-function perror_cl = poseErrorCL(obj, clink_conf, varargin)
-    switch clink_conf.rtype
+function perror_cl = poseErrorCL(obj, clnk_conf, varargin)
+    switch clnk_conf.rtype
         case 'e'
             % use Euler-angles:
-            perror_cl = poseErrorCLE(obj, clink_conf, varargin{:});
+            perror_cl = poseErrorCLE(obj, clnk_conf, varargin{:});
         case 'q'
             % use quaternions:
-            perror_cl = poseErrorCLQ(obj, clink_conf, varargin{:});
+            perror_cl = poseErrorCLQ(obj, clnk_conf, varargin{:});
         otherwise
             error('poseErrorCL: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
     end
 end
 
-function perror_cl = poseErrorCLE(obj, clink_conf, varargin) % via Euler-angles
-    ctc_l = clink_conf.contact.left;
-    ctc_r = clink_conf.contact.right;
+function perror_cl = poseErrorCLE(obj, clnk_conf, varargin) % via Euler-angles
+    ctc_l = clnk_conf.contact.left;
+    ctc_r = clnk_conf.contact.right;
 
     % check which link is in contact with the ground or object and calculate the corresponding
     % error between the reference (desired) and the new link transformations:
     if (ctc_l && ctc_r)
         % both links are in contact with the ground/object:
-        clink_l = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_l};
-        clink_r = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_r};
+        clink_l = obj.mwbm_config.ccstr_link_names{1,clnk_conf.lnk_idx_l};
+        clink_r = obj.mwbm_config.ccstr_link_names{1,clnk_conf.lnk_idx_r};
 
         % set the desired poses (VE-Transformations (i)) of the contact links as reference ...
-        fk_ref_pose.veT_llnk = clink_conf.des_pose.veT_llnk;
-        fk_ref_pose.veT_rlnk = clink_conf.des_pose.veT_rlnk;
+        fk_ref_pose.veT_llnk = clnk_conf.des_pose.veT_llnk;
+        fk_ref_pose.veT_rlnk = clnk_conf.des_pose.veT_rlnk;
 
         % get the new VQ-transformations (link frames) of the contact links ...
         fk_new_pose = poseTransformationsCL(clink_l, clink_r, varargin{:});
@@ -119,11 +119,11 @@ function perror_cl = poseErrorCLE(obj, clink_conf, varargin) % via Euler-angles
         perror_cl = vertcat(delta_ll, delta_rl);
     elseif ctc_l
         % only the left link is in contact with the ground/object:
-        clink_l = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_l};
+        clink_l = obj.mwbm_config.ccstr_link_names{1,clnk_conf.lnk_idx_l};
 
         % set the desired pose transformation as reference and
         % compute the new pose transformation:
-        fk_ref_pose.veT_llnk = clink_conf.des_pose.veT_llnk;
+        fk_ref_pose.veT_llnk = clnk_conf.des_pose.veT_llnk;
         fk_new_pose = poseTransformationLeftCL(clink_l, varargin{:});
         % convert to VE-transformation ...
         [p_ll, eul_ll] = WBM.utilities.tfms.frame2posEul(fk_new_pose.vqT_llnk);
@@ -136,11 +136,11 @@ function perror_cl = poseErrorCLE(obj, clink_conf, varargin) % via Euler-angles
         perror_cl = vX_ll*(fk_new_pose.veT_llnk - fk_ref_pose.veT_llnk);
     elseif ctc_r
         % only the right link is in contact with the ground/object:
-        clink_r = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_r};
+        clink_r = obj.mwbm_config.ccstr_link_names{1,clnk_conf.lnk_idx_r};
 
         % set the desired pose transformation as reference and
         % compute the new pose transformation:
-        fk_ref_pose.veT_rlnk = clink_conf.des_pose.veT_rlnk;
+        fk_ref_pose.veT_rlnk = clnk_conf.des_pose.veT_rlnk;
         fk_new_pose = poseTransformationRightCL(clink_r, varargin{:});
 
         [p_rl, eul_rl] = WBM.utilities.tfms.frame2posEul(fk_new_pose.vqT_rlnk);
@@ -160,20 +160,20 @@ end
 % (i) veT: Position vector with Euler angles (in this case it represents a
 %     joint motion m(t) = (p(t), e(t))^T, where p(t) in R^3 and e(t) in S^3).
 
-function perror_cl = poseErrorCLQ(obj, clink_conf, varargin) % via quaternions
-    ctc_l = clink_conf.contact.left;
-    ctc_r = clink_conf.contact.right;
+function perror_cl = poseErrorCLQ(obj, clnk_conf, varargin) % via quaternions
+    ctc_l = clnk_conf.contact.left;
+    ctc_r = clnk_conf.contact.right;
 
     % check which link is in contact with the ground or object and calculate the corresponding
     % error between the reference (desired) and the new link transformations:
     if (ctc_l && ctc_r)
         % both links are in contact with the ground/object:
-        clink_l = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_l};
-        clink_r = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_r};
+        clink_l = obj.mwbm_config.ccstr_link_names{1,clnk_conf.lnk_idx_l};
+        clink_r = obj.mwbm_config.ccstr_link_names{1,clnk_conf.lnk_idx_r};
 
         % set the desired poses (VQ-Transformations (ii)) of the contact links as reference ...
-        fk_ref_pose.vqT_llnk = clink_conf.des_pose.vqT_llnk;
-        fk_ref_pose.vqT_rlnk = clink_conf.des_pose.vqT_rlnk;
+        fk_ref_pose.vqT_llnk = clnk_conf.des_pose.vqT_llnk;
+        fk_ref_pose.vqT_rlnk = clnk_conf.des_pose.vqT_rlnk;
 
         % get the new VQ-transformations (link frames) and the corresponding
         % orientations of the contact links ...
@@ -197,11 +197,11 @@ function perror_cl = poseErrorCLQ(obj, clink_conf, varargin) % via quaternions
         perror_cl = vertcat(delta_ll, delta_rl);
     elseif ctc_l
         % only the left link is in contact with the ground/object:
-        clink_l = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_l};
+        clink_l = obj.mwbm_config.ccstr_link_names{1,clnk_conf.lnk_idx_l};
 
         % set the desired pose transformation as reference and compute
         % the new pose transformation with the corresponding orientation:
-        fk_ref_pose.vqT_llnk = clink_conf.des_pose.vqT_llnk;
+        fk_ref_pose.vqT_llnk = clnk_conf.des_pose.vqT_llnk;
         fk_new_pose = poseTransformationLeftCL(clink_l, varargin{:});
         quat_ll = fk_new_pose.vqT_llnk(4:7,1);
 
@@ -212,11 +212,11 @@ function perror_cl = poseErrorCLQ(obj, clink_conf, varargin) % via quaternions
         perror_cl = vX_ll*(fk_new_pose.vqT_llnk - fk_ref_pose.vqT_llnk);
     elseif ctc_r
         % only the right link is in contact with the ground/object:
-        clink_r = obj.mwbm_config.ccstr_link_names{1,clink_conf.lnk_idx_r};
+        clink_r = obj.mwbm_config.ccstr_link_names{1,clnk_conf.lnk_idx_r};
 
         % set the desired pose transformation as reference and compute
         % the new pose transformation with the corresponding orientation:
-        fk_ref_pose.vqT_rlnk = clink_conf.des_pose.vqT_rlnk;
+        fk_ref_pose.vqT_rlnk = clnk_conf.des_pose.vqT_rlnk;
         fk_new_pose = poseTransformationRightCL(clink_r, varargin{:});
         quat_rl = fk_new_pose.vqT_rlnk(4:7,1);
 

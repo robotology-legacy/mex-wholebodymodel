@@ -5,7 +5,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     H          ...  homogeneous transformation (matrix)
     Mx         ...  Cartesian mass matrix (spatial mass matrix)
     R          ...  rotation (matrix)
-    T, TF      ...  transformation (vector/matrix)
+    TF, T      ...  transformation (vector/matrix)
     X          ...  adjoint transformation (matrix)
     ac         ...  contact acceleration(s)
     acc        ...  acceleration(s)
@@ -18,13 +18,13 @@ Legend of abbreviations and acronyms which are used for the variable names:
     bf         ...  base frame
     bgn        ...  begin
     bkgrd      ...  background
-    c          ...  Cartesian OR contact OR constraint
+    c          ...  Cartesian OR contact OR constraint (**)
     c...       ...  cell array (begin of variable name)
     cX         ...  co-adjoint transformation (matrix)
     cap        ...  capture
     ccstr      ...  contact constraint
     cent       ...  centroidal
-    centf      ...  centrifugal OR centrifugal force(s)
+    centf      ...  centrifugal OR centrifugal force(s) (**)
     cfrict     ...  Coulomb friction
     chkfun     ...  check functions
     chn        ...  chain
@@ -45,26 +45,27 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ctrl, ctr  ...  control
     cvec       ...  column vector
     d...       ...  derivative (dot) of a variable (begin of variable name), like dv of v (= v_dot), etc.
-    df, dflt   ...  default
+    dflt, df   ...  default
     dim        ...  dimension
     dp         ...  data point
     dpts       ...  data points
     ds         ...  dimensions
     dstv       ...  derivative of state vector
+    elb, el    ...  elbow
     elms       ...  elements
     ept, ep    ...  endpoint
     et         ...  elapsed time
-    ex, exc    ...  exception
+    exc, ex    ...  exception
     fb         ...  floating base
     fcn        ...  function
     ffun       ...  fast functions
-    fh...      ...  function handle OR file handle (begin of variable name)
+    fh...      ...  function handle OR file handle (begin of variable name) (**)
     fix        ...  fixed
     fk         ...  forward kinematic(s)
     fld        ...  field
     flnk       ...  fixed link
-    flt, fltg  ...  floating
     fltb       ...  floating base
+    fltg, flt  ...  floating
     fps        ...  frames per second
     frict      ...  friction
     frm        ...  frame
@@ -72,17 +73,21 @@ Legend of abbreviations and acronyms which are used for the variable names:
     fwd        ...  forward
     fwnd       ...  figure window
     g          ...  gravity acceleration (vector)
+    gbl        ...  global
+    gbl_...    ...  global variable (begin of variable name), e.g. "gbl_state", etc.
     gen        ...  generalized
-    gp         ...  grid point(s)
+    gp         ...  grid point(s) OR goal point (**)
+    gr         ...  gripper
     grnd, grd  ...  ground
     grp        ...  group
-    h...       ...  "handle" to an object (begin of variable name), e.g. hFig = handle to the figure object
+    h...       ...  "handle" to an object (begin of variable name), e.g. hFig (handle to a figure object)
     ..._h      ...  "hat" (end of variable name), 'h' declares that this variable is an unit vector of length 1, e.g. "f1_h", "fcp_h", etc.
     h_c        ...  centroidal momentum (vector)
     hf         ...  half
     hgt        ...  height
     id         ...  identity
     idx        ...  index(es)
+    ip         ...  index position
     jlim, jl   ...  joint limit(s)
     jnt        ...  joint
     jpos       ...  joint position(s)
@@ -92,7 +97,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     len        ...  length
     lgd        ...  legend
     lgt, lt    ...  light
-    ll         ...  lower limit(s) OR left link
+    ll         ...  lower limit(s) OR left link (**)
     llnk       ...  left link
     lmts       ...  limits
     ln         ...  line
@@ -110,7 +115,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     mult       ...  multiplier(s)
     ndof       ...  number degrees of freedom
     nflds      ...  number of fields
-    noi        ...  number of iterations OR number of integrations
+    noi        ...  number of iterations OR number of integrations (**)
     nw         ...  new world
     o          ...  orthogonal
     ofs        ...  offset(s)
@@ -120,12 +125,12 @@ Legend of abbreviations and acronyms which are used for the variable names:
     or         ...  orientation
     orig       ...  origin
     ow         ...  old world
-    p          ...  position OR translation (vector)
+    p          ...  position OR translation (vector) (**)
     p...       ...  pointer to an object/variable/array (begin of variable name, only in C++)
     param, prm ...  parameter
     params     ...  parameters
     pcstr...   ...  pointer to a constant null-terminated string (begin of variable name, C++)
-    pl, pld    ...  payload
+    pld, pl    ...  payload
     plds       ...  payloads
     pload      ...  payload
     pos        ...  position(s)
@@ -134,26 +139,30 @@ Legend of abbreviations and acronyms which are used for the variable names:
     prop       ...  propert(y/ies)
     pstr...    ...  pointer to a null-terminated string (begin of variable name, C++)
     pt         ...  point
-    q_j        ...  joint angle(s)
-    qt, q      ...  quaternion
+    q_j/qj, q  ...  joint angle(s) (**)
+    qt, q      ...  quaternion (**)
     quat       ...  quaternion
-    r          ...  root (link) OR rotation (orientation)
+    r          ...  root (link) OR rotation (orientation) (**)
     rX         ...  (mixed) rate transformation (matrix)
     rax        ...  rotation axis
     rb         ...  rigid body
+    rchd       ...  reached
     ref        ...  reference
     resv       ...  result vector (boolean)
     rev        ...  revolute
     ridx       ...  row index(es)
     rl         ...  right link
-    rlnk       ...  root link OR reference link OR right link
+    rlnk       ...  root link OR reference link OR right link (**)
     rmo        ...  row major order
     rotm       ...  rotation matrix
     rpts       ...  repeats
     rtype      ...  representation type
     rvec       ...  row vector
-    sc         ...  scalar OR scaled
+    sc         ...  scalar OR scaled (**)
     scn        ...  scene
+    secs       ...  sections
+    sect       ...  section
+    set        ...  setting(s) OR set (**)
     sf         ...  scale factor(s)
     shf, sh    ...  shift
     shp        ...  shape
@@ -169,9 +178,13 @@ Legend of abbreviations and acronyms which are used for the variable names:
     ..._t      ...  "transposed" (end of variable name), "_t" declares that a matrix or vector is transposed, e.g. "M_t", "v_t", etc.
     tfms       ...  transformations
     tform, tfm ...  transformation matrix
+    tgts       ...  targets
+    tidx       ...  time index OR task index (**)
     tl         ...  trajectory line
-    tr         ...  translation(s) OR trace
+    tpos       ...  target position(s)
+    tr         ...  translation(s) OR trace (**)
     trans      ...  translation(s)
+    trgt, trg  ...  target
     trq        ...  torque
     trqs       ...  torques
     tt         ...  tool-tip
@@ -201,4 +214,5 @@ Legend of abbreviations and acronyms which are used for the variable names:
 
 
 
-(*) ... Without scale factor S. This is the same as if scale S = 1.
+ (*) ... Without scale factor S. This is the same as if scale S = 1.
+(**) ... Depends on the context.

@@ -1,8 +1,8 @@
-function [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin)
+function [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin)
     switch nargin
         case 13
             % get the mixed acceleration of the hands at the contact links ...
-            [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, varargin{1:7});
+            [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, varargin{1:7});
 
             if iscolumn(varargin{1,4})
                 % normal mode:
@@ -25,8 +25,8 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, 
             end
             nu = varargin{1,7};
         case 12
-            ac_f = zeroCtcAcc(obj, feet_conf);
-            [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, ac_f, varargin{1:6});
+            ac_f = zeroCtcAcc(obj, foot_conf);
+            [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, ac_f, varargin{1:6});
 
             if iscolumn(varargin{1,3})
                 % normal mode:
@@ -52,15 +52,15 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, 
             dq_j = varargin{1,2};
             nu   = varargin{1,4};
 
-            [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, varargin{1:4});
+            [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, varargin{1:4});
             [M, c_qv, Jc_f] = getWBDynFeet(obj, a_prms);
         case 9
             % v_b = varargin{2}
             dq_j = varargin{1,1};
             nu   = varargin{1,3};
 
-            ac_f = zeroCtcAcc(obj, feet_conf);
-            [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, ac_f, varargin{1:3});
+            ac_f = zeroCtcAcc(obj, foot_conf);
+            [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, ac_f, varargin{1:3});
             [M, c_qv, Jc_f] = getWBDynFeet(obj, a_prms);
         otherwise
             error('WBM::jointAccelerationsFHPCPL: %s', WBM.wbmErrorMsg.WRONG_NARGIN);

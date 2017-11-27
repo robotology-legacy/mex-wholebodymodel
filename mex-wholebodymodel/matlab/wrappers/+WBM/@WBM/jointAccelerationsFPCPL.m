@@ -1,9 +1,9 @@
-function [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, feet_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin)
+function [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin)
     switch nargin
         case 13
-            % with given feet contact acceleration:
+            % with given foot contact acceleration:
             % get the mixed acceleration of the hands at the contact links (with FPC) ...
-            [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, varargin{1:7});
+            [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, varargin{1:7});
 
             if iscolumn(varargin{1,4})
                 % normal mode:
@@ -27,9 +27,9 @@ function [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, feet_conf, hand_conf, t
                 dq_j = varargin{1,6};
             end
         case 12
-            % with zero feet contact acceleration:
-            ac_f = zeroCtcAcc(obj, feet_conf);
-            [ac_h, a_prms] = handAccelerations(obj, feet_conf, hand_conf, tau, ac_f, varargin{1:6}); % with FPC
+            % with zero foot contact acceleration:
+            ac_f = zeroCtcAcc(obj, foot_conf);
+            [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, ac_f, varargin{1:6}); % with FPC
 
             if iscolumn(varargin{1,3})
                 % normal mode:
@@ -51,22 +51,22 @@ function [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, feet_conf, hand_conf, t
                 dq_j = varargin{1,5};
             end
         case 10 % optimized modes:
-            % with feet contact acceleration:
+            % with foot contact acceleration:
             % v_b = varargin{3}
             % nu  = varargin{4}
             ac_f = varargin{1,1};
             dq_j = varargin{1,2};
 
-            [ac_h, a_prms]  = handAccelerations(obj, feet_conf, hand_conf, tau, varargin{1:4}); % with FPC
+            [ac_h, a_prms]  = handAccelerations(obj, foot_conf, hand_conf, tau, varargin{1:4}); % with FPC
             [M, c_qv, Jc_f] = getWBDynFeet(obj, a_prms);
         case 9
-            % zero feet contact acceleration:
+            % zero foot contact acceleration:
             % v_b = varargin{2}
             % nu  = varargin{3}
             dq_j = varargin{1,1};
 
-            ac_f = zeroCtcAcc(obj, feet_conf);
-            [ac_h, a_prms]  = handAccelerations(obj, feet_conf, hand_conf, tau, ac_f, varargin{1:3}); % with FPC
+            ac_f = zeroCtcAcc(obj, foot_conf);
+            [ac_h, a_prms]  = handAccelerations(obj, foot_conf, hand_conf, tau, ac_f, varargin{1:3}); % with FPC
             [M, c_qv, Jc_f] = getWBDynFeet(obj, a_prms);
         otherwise
             error('WBM::jointAccelerationsFPCPL: %s', WBM.wbmErrorMsg.WRONG_NARGIN);

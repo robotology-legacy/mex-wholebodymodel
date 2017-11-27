@@ -24,16 +24,16 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                     % pc_type = varargin{6}
                     if isstruct(varargin{1,1})
                         % simple forward dynamics with external forces:
-                        % feet_conf  = varargin{1}
-                        % clink_conf = varargin{2}
-                        % fe_c       = varargin{3} ... external forces affecting at the contact links
-                        % ac         = varargin{4} ... mixed generalized accelerations of the contact points
-                        % ac_f       = varargin{5} (must be either zero or constant)
+                        % foot_conf = varargin{1}
+                        % clnk_conf = varargin{2}
+                        % fe_c      = varargin{3} ... external forces affecting at the contact links
+                        % ac        = varargin{4} ... mixed generalized accelerations of the contact points
+                        % ac_f      = varargin{5} (must be either zero or constant)
                         vis_data = getVisDataEF(obj, stmChi, fhTrqControl, varargin{1:5}, noi);
                     else
                         % simple forward dynamics with payload at the hands:
                         % fhTotCWrench = varargin{1}
-                        % feet_conf    = varargin{2}
+                        % foot_conf    = varargin{2}
                         % hand_conf    = varargin{3}
                         % f_cp         = varargin{4} ... applied forces at the contact points pc_i
                         % ac_f         = varargin{5} ... mixed generalized accelerations of the foot contact points
@@ -47,38 +47,38 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                     error('WBM::getFDynVisData: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
         case 'fpc'
-            % only feet pose correction:
+            % only foot pose correction:
             switch narg
                 case 9
                     % pc_type = varargin{6}
                     if isstruct(varargin{1,1})
-                        % extended forward dynamics with feet pose correction
+                        % extended forward dynamics with foot pose correction
                         % and external forces at the given contact links:
-                        % feet_conf  = varargin{1}
-                        % clink_conf = varargin{2}
-                        % fe_c       = varargin{3}
-                        % ac         = varargin{4}
-                        % ac_f       = varargin{5} (must be either zero or constant)
+                        % foot_conf = varargin{1}
+                        % clnk_conf = varargin{2}
+                        % fe_c      = varargin{3}
+                        % ac        = varargin{4}
+                        % ac_f      = varargin{5} (must be either zero or constant)
                         vis_data = getVisDataFPCEF(obj, stmChi, fhTrqControl, varargin{1:5}, noi);
                     else
-                        % extended forward dynamics with feet pose correction
+                        % extended forward dynamics with foot pose correction
                         % and payload at the hands:
                         % fhTotCWrench = varargin{1}
-                        % feet_conf    = varargin{2}
+                        % foot_conf    = varargin{2}
                         % hand_conf    = varargin{3}
                         % f_cp         = varargin{4}
                         % ac_f         = varargin{5}
                         vis_data = getVisDataFPCPL(obj, stmChi, fhTrqControl, varargin{1:5}, noi);
                     end
                 case 6
-                    % extended forward dynamics with only feet pose correction:
+                    % extended forward dynamics with only foot pose correction:
                     % pc_type = varargin{3}
                     % ---------------------
                     % ac_f    = varargin{2}
-                    feet_conf = varargin{1,1};
+                    foot_conf = varargin{1,1};
 
-                    fe_0 = zeroExtForces(obj, feet_conf);
-                    vis_data = getVisDataCLPCEF(obj, stmChi, fhTrqControl, feet_conf, fe_0, varargin{1,2}, noi);
+                    fe_0 = zeroExtForces(obj, foot_conf);
+                    vis_data = getVisDataCLPCEF(obj, stmChi, fhTrqControl, foot_conf, fe_0, varargin{1,2}, noi);
                 otherwise
                     error('WBM::getFDynVisData: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
@@ -96,15 +96,15 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
             % ac_h      = varargin{3} ... mixed generalized accelerations of the hand contact points
             vis_data = getVisDataCLPCEF(obj, stmChi, fhTrqControl, varargin{1:3}, noi);
         case 'fhpc'
-            % feet and hand pose corrections:
+            % foot and hand pose corrections:
             if (narg ~= 9)
                 error('WBM::getFDynVisData: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
             % pc_type = varargin{6}
             if isstruct(varargin{1,1})
-                % extended forward dynamics with feet and hand pose correction
+                % extended forward dynamics with foot and hand pose correction
                 % and external forces at the hands:
-                % feet_conf = varargin{1}
+                % foot_conf = varargin{1}
                 % hand_conf = varargin{2}
                 % fe_h      = varargin{3}
                 % ac_h      = varargin{4}
@@ -113,7 +113,7 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
             else
                 % extended function with payload at the hands:
                 % fhTotCWrench = varargin{1}
-                % feet_conf    = varargin{2}
+                % foot_conf    = varargin{2}
                 % hand_conf    = varargin{3}
                 % f_cp         = varargin{4}
                 % ac_f         = varargin{5}
@@ -168,7 +168,7 @@ function fd_prms = getFDynParams(obj, t, stvChi, fhTrqControl)
     fd_prms.ctrl_prms = ctrl_prms;
 end
 
-function fd_prms = getFDynParamsEF(obj, t, stvChi, fhTrqControl, feet_conf, clink_conf, fe_c, ac)
+function fd_prms = getFDynParamsEF(obj, t, stvChi, fhTrqControl, foot_conf, clnk_conf, fe_c, ac)
     % get the current state parameters ...
     stp = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
     v_b = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
@@ -180,13 +180,13 @@ function fd_prms = getFDynParamsEF(obj, t, stvChi, fhTrqControl, feet_conf, clin
     % visualization data structure from the controller:
     [tau, ctrl_prms] = fhTrqControl(t);
     % get the the fdyn-parameters from the joint acceleration computation:
-    [~,fd_prms] = jointAccelerationsEF(obj, tau, stp.dq_j, feet_conf, clink_conf, fe_c, ac); % optimized mode
+    [~,fd_prms] = jointAccelerationsEF(obj, tau, stp.dq_j, foot_conf, clnk_conf, fe_c, ac); % optimized mode
 
     % add the controller data to the data structure ...
     fd_prms.ctrl_prms = ctrl_prms;
 end
 
-function fd_prms = getFDynParamsPL(obj, t, stvChi, fhTrqControl, feet_conf, hand_conf, f_cp, ac_f)
+function fd_prms = getFDynParamsPL(obj, t, stvChi, fhTrqControl, foot_conf, hand_conf, f_cp, ac_f)
     % get the current state parameters ...
     stp = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
     v_b = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
@@ -198,13 +198,13 @@ function fd_prms = getFDynParamsPL(obj, t, stvChi, fhTrqControl, feet_conf, hand
     % visualization data structure from the controller:
     [tau, ctrl_prms] = fhTrqControl(t);
     % get the the fdyn-parameters from the joint acceleration computation:
-    [~,fd_prms] = jointAccelerationsPL(obj, tau, stp.dq_j, feet_conf, hand_conf, f_cp, ac_f); % optimized mode
+    [~,fd_prms] = jointAccelerationsPL(obj, tau, stp.dq_j, foot_conf, hand_conf, f_cp, ac_f); % optimized mode
 
     % add the controller data to the data structure ...
     fd_prms.ctrl_prms = ctrl_prms;
 end
 
-function fd_prms = getFDynParamsCLPCEF(obj, t, stvChi, fhTrqControl, clink_conf, fe_c, ac)
+function fd_prms = getFDynParamsCLPCEF(obj, t, stvChi, fhTrqControl, clnk_conf, fe_c, ac)
     % get the state parameters ...
     stp  = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
     v_b  = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
@@ -213,18 +213,18 @@ function fd_prms = getFDynParamsCLPCEF(obj, t, stvChi, fhTrqControl, clink_conf,
     % update state ...
     setState(obj, stp.q_j, stp.dq_j, v_b);
 
-    [M, c_qv, Jc_lnk, djcdq_lnk] = wholeBodyDynamicsCS(obj, clink_conf); % optimized mode
+    [M, c_qv, Jc_lnk, djcdq_lnk] = wholeBodyDynamicsCS(obj, clnk_conf); % optimized mode
 
     % get the torque forces and the controller parameters:
-    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_lnk, djcdq_lnk, clink_conf);
+    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_lnk, djcdq_lnk, clnk_conf);
     % get the fdyn-parameters from the acceleration computation (optimized mode):
-    [~,fd_prms] = jointAccelerationsCLPCEF(obj, clink_conf, tau, fe_c, ac, Jc_lnk, djcdq_lnk, ...
+    [~,fd_prms] = jointAccelerationsCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc_lnk, djcdq_lnk, ...
                                            M, c_qv, stp.dq_j, nu_s);
     % add the controller data to the fdyn-data ...
     fd_prms.ctrl_prms = ctrl_prms;
 end
 
-function fd_prms = getFDynParamsFPCEF(obj, t, stvChi, fhTrqControl, feet_conf, clink_conf, fe_c, ac, ac_f)
+function fd_prms = getFDynParamsFPCEF(obj, t, stvChi, fhTrqControl, foot_conf, clnk_conf, fe_c, ac, ac_f)
     % get the state parameters ...
     stp  = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
     v_b  = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
@@ -233,18 +233,18 @@ function fd_prms = getFDynParamsFPCEF(obj, t, stvChi, fhTrqControl, feet_conf, c
     % update state ...
     setState(obj, stp.q_j, stp.dq_j, v_b);
 
-    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, feet_conf); % optimized mode
+    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, foot_conf); % optimized mode
 
     % get the torque forces and the controller parameters:
-    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_f, djcdq_f, feet_conf);
+    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_f, djcdq_f, foot_conf);
     % get the fdyn-parameters of the joint accelerations (optimized mode):
-    [~,fd_prms] = jointAccelerationsFPCEF(obj, feet_conf, clink_conf, tau, fe_c, ac, ac_f, ...
+    [~,fd_prms] = jointAccelerationsFPCEF(obj, foot_conf, clnk_conf, tau, fe_c, ac, ac_f, ...
                                           Jc_f, djcdq_f, M, c_qv, stp.dq_j, nu_s);
     % add the controller data to the fdyn-data ...
     fd_prms.ctrl_prms = ctrl_prms;
 end
 
-function fd_prms = getFDynParamsFPCPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, f_cp, ac_f)
+function fd_prms = getFDynParamsFPCPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f)
     % get the state parameters ...
     stp  = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
     v_b  = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
@@ -253,18 +253,18 @@ function fd_prms = getFDynParamsFPCPL(obj, t, stvChi, fhTrqControl, fhTotCWrench
     % update state ...
     setState(obj, stp.q_j, stp.dq_j, v_b);
 
-    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, feet_conf); % optimized mode
+    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, foot_conf); % optimized mode
 
     % get the torque forces and the controller parameters:
-    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_f, djcdq_f, feet_conf);
+    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_f, djcdq_f, foot_conf);
     % get the fdyn-parameters of the joint accelerations (optimized mode):
-    [~,fd_prms] = jointAccelerationsFPCPL(obj, feet_conf, hand_conf, tau, fhTotCWrench, f_cp, ...
+    [~,fd_prms] = jointAccelerationsFPCPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, ...
                                           ac_f, Jc_f, djcdq_f, M, c_qv, stp.dq_j, nu_s);
     % add the controller data to the fdyn-data ...
     fd_prms.ctrl_prms = ctrl_prms;
 end
 
-function fd_prms = getFDynParamsFHPCEF(obj, t, stvChi, fhTrqControl, feet_conf, hand_conf, fe_h, ac_h, ac_f)
+function fd_prms = getFDynParamsFHPCEF(obj, t, stvChi, fhTrqControl, foot_conf, hand_conf, fe_h, ac_h, ac_f)
     % get the state parameters ...
     stp  = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
     v_b  = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
@@ -273,18 +273,18 @@ function fd_prms = getFDynParamsFHPCEF(obj, t, stvChi, fhTrqControl, feet_conf, 
     % update state ...
     setState(obj, stp.q_j, stp.dq_j, v_b);
 
-    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, feet_conf); % optimized mode
+    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, foot_conf); % optimized mode
 
     % get the torque forces and the controller parameters:
-    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_f, djcdq_f, feet_conf);
+    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_f, djcdq_f, foot_conf);
     % get the fdyn-parameters of the joint accelerations (optimized mode):
-    [~,fd_prms] = jointAccelerationsFHPCEF(obj, feet_conf, hand_conf, tau, fe_h, ac_h, ...
+    [~,fd_prms] = jointAccelerationsFHPCEF(obj, foot_conf, hand_conf, tau, fe_h, ac_h, ...
                                            ac_f, Jc_f, djcdq_f, M, c_qv, stp.dq_j, nu_s);
     % add the controller data to the fdyn-data ...
     fd_prms.ctrl_prms = ctrl_prms;
 end
 
-function fd_prms = getFDynParamsFHPCPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, f_cp, ac_f)
+function fd_prms = getFDynParamsFHPCPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f)
     % get the state parameters ...
     stp  = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
     v_b  = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
@@ -293,12 +293,12 @@ function fd_prms = getFDynParamsFHPCPL(obj, t, stvChi, fhTrqControl, fhTotCWrenc
     % update state ...
     setState(obj, stp.q_j, stp.dq_j, v_b);
 
-    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, feet_conf); % optimized mode
+    [M, c_qv, Jc_f, djcdq_f] = wholeBodyDynamicsCS(obj, foot_conf); % optimized mode
 
     % get the torque forces and the controller parameters:
-    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_f, djcdq_f, feet_conf);
+    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp, nu_s, Jc_f, djcdq_f, foot_conf);
     % get the fdyn-parameters of the joint accelerations (optimized mode):
-    [~,fd_prms] = jointAccelerationsFHPCPL(obj, feet_conf, hand_conf, tau, fhTotCWrench, f_cp, ...
+    [~,fd_prms] = jointAccelerationsFHPCPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, ...
                                            ac_f, Jc_f, djcdq_f, M, c_qv, stp.dq_j, nu_s);
     % add the controller data to the fdyn-data ...
     fd_prms.ctrl_prms = ctrl_prms;
@@ -403,7 +403,7 @@ function vis_data = getVisData(obj, stmChi, fhTrqControl, noi)
     end
 end
 
-function vis_data = getVisDataEF(obj, stmChi, fhTrqControl, feet_conf, clink_conf, fe_c, ac, noi)
+function vis_data = getVisDataEF(obj, stmChi, fhTrqControl, foot_conf, clnk_conf, fe_c, ac, noi)
     len = obj.mwbm_config.stvLen;
 
     % read the first data-structure s.t. the complete dynamic structure can be
@@ -411,7 +411,7 @@ function vis_data = getVisDataEF(obj, stmChi, fhTrqControl, feet_conf, clink_con
     [fe_1, fe_len, fe_const] = getFirstVector(fe_c, noi);
     [ac_1, ac_len, ac_const] = getFirstVector(ac, noi);
     stvChi  = stmChi(1,1:len).';
-    fd_prms = getFDynParamsEF(obj, 1, stvChi, fhTrqControl, feet_conf, clink_conf, fe_1, ac_1);
+    fd_prms = getFDynParamsEF(obj, 1, stvChi, fhTrqControl, foot_conf, clnk_conf, fe_1, ac_1);
     % create and initialize the fields for the visualization data container ...
     [vis_data, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl] = initVisDataStruct(fd_prms, noi);
 
@@ -420,7 +420,7 @@ function vis_data = getVisDataEF(obj, stmChi, fhTrqControl, feet_conf, clink_con
         % ext. forces and foot contact accelerations are constant:
         for i = 1:noi
             stvChi   = stmChi(i,1:len).';
-            fd_prms  = getFDynParamsEF(obj, i, stvChi, fhTrqControl, feet_conf, clink_conf, fe_1, ac_1);
+            fd_prms  = getFDynParamsEF(obj, i, stvChi, fhTrqControl, foot_conf, clnk_conf, fe_1, ac_1);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif fe_const
@@ -429,7 +429,7 @@ function vis_data = getVisDataEF(obj, stmChi, fhTrqControl, feet_conf, clink_con
             stvChi = stmChi(i,1:len).';
             a_c    = ac(i,1:ac_len).';
 
-            fd_prms  = getFDynParamsEF(obj, i, stvChi, fhTrqControl, feet_conf, clink_conf, fe_1, a_c);
+            fd_prms  = getFDynParamsEF(obj, i, stvChi, fhTrqControl, foot_conf, clnk_conf, fe_1, a_c);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif ac_const
@@ -438,7 +438,7 @@ function vis_data = getVisDataEF(obj, stmChi, fhTrqControl, feet_conf, clink_con
             stvChi = stmChi(i,1:len).';
             fe     = fe_c(i,1:fe_len).';
 
-            fd_prms  = getFDynParamsEF(obj, i, stvChi, fhTrqControl, feet_conf, clink_conf, fe, ac_1);
+            fd_prms  = getFDynParamsEF(obj, i, stvChi, fhTrqControl, foot_conf, clnk_conf, fe, ac_1);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     else
@@ -448,13 +448,13 @@ function vis_data = getVisDataEF(obj, stmChi, fhTrqControl, feet_conf, clink_con
             fe     = fe_c(i,1:feh_len).';
             a_c    = ac(i,1:acf_len).';
 
-            fd_prms  = getFDynParamsEF(obj, i, stvChi, fhTrqControl, feet_conf, clink_conf, fe, a_c);
+            fd_prms  = getFDynParamsEF(obj, i, stvChi, fhTrqControl, foot_conf, clnk_conf, fe, a_c);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     end
 end
 
-function vis_data = getVisDataPL(obj, stmChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, f_cp, ac_f, noi)
+function vis_data = getVisDataPL(obj, stmChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f, noi)
     len = obj.mwbm_config.stvLen;
 
     % initialization:
@@ -462,7 +462,7 @@ function vis_data = getVisDataPL(obj, stmChi, fhTrqControl, fhTotCWrench, feet_c
     [acf_1, acf_len, acf_const] = getFirstVector(ac_f, noi);
 
     stvChi  = stmChi(1,1:len).';
-    fd_prms = getFDynParamsPL(obj, 1, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp_1, acf_1);
+    fd_prms = getFDynParamsPL(obj, 1, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp_1, acf_1);
     [vis_data, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl] = initVisDataStruct(fd_prms, noi);
 
     % put all data into the data container:
@@ -470,7 +470,7 @@ function vis_data = getVisDataPL(obj, stmChi, fhTrqControl, fhTotCWrench, feet_c
         % payload forces and foot contact accelerations are constant:
         for i = 1:noi
             stvChi   = stmChi(i,1:len).';
-            fd_prms  = getFDynParamsPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp_1, acf_1);
+            fd_prms  = getFDynParamsPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp_1, acf_1);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif fcp_const
@@ -479,7 +479,7 @@ function vis_data = getVisDataPL(obj, stmChi, fhTrqControl, fhTotCWrench, feet_c
             stvChi = stmChi(i,1:len).';
             acf    = ac_f(i,1:acf_len).';
 
-            fd_prms  = getFDynParamsPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp_1, acf);
+            fd_prms  = getFDynParamsPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp_1, acf);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif acf_const
@@ -488,7 +488,7 @@ function vis_data = getVisDataPL(obj, stmChi, fhTrqControl, fhTotCWrench, feet_c
             stvChi = stmChi(i,1:len).';
             fcp    = f_cp(i,1:fcp_len).';
 
-            fd_prms  = getFDynParamsPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp, acf_1);
+            fd_prms  = getFDynParamsPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp, acf_1);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     else
@@ -498,13 +498,13 @@ function vis_data = getVisDataPL(obj, stmChi, fhTrqControl, fhTotCWrench, feet_c
             fcp    = f_cp(i,1:fcp_len).';
             acf    = ac_f(i,1:acf_len).';
 
-            fd_prms  = getFDynParamsPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp, acf);
+            fd_prms  = getFDynParamsPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp, acf);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     end
 end
 
-function vis_data = getVisDataCLPCEF(obj, stmChi, fhTrqControl, clink_conf, fe_c, ac, noi)
+function vis_data = getVisDataCLPCEF(obj, stmChi, fhTrqControl, clnk_conf, fe_c, ac, noi)
     len = obj.mwbm_config.stvLen;
 
     % initialization:
@@ -512,7 +512,7 @@ function vis_data = getVisDataCLPCEF(obj, stmChi, fhTrqControl, clink_conf, fe_c
     [ac_1, ac_len, ac_const] = getFirstVector(ac, noi);
 
     stvChi  = stmChi(1,1:len).';
-    fd_prms = getFDynParamsCLPCEF(obj, 1, stvChi, fhTrqControl, clink_conf, fe_1, ac_1);
+    fd_prms = getFDynParamsCLPCEF(obj, 1, stvChi, fhTrqControl, clnk_conf, fe_1, ac_1);
     [vis_data, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl] = initVisDataStruct(fd_prms, noi);
 
     % put all data into the data container:
@@ -520,7 +520,7 @@ function vis_data = getVisDataCLPCEF(obj, stmChi, fhTrqControl, clink_conf, fe_c
         % ext. forces and contact accelerations are constant:
         for i = 1:noi
             stvChi   = stmChi(i,1:len).';
-            fd_prms  = getFDynParamsCLPCEF(obj, i, stvChi, fhTrqControl, clink_conf, fe_1, ac_1);
+            fd_prms  = getFDynParamsCLPCEF(obj, i, stvChi, fhTrqControl, clnk_conf, fe_1, ac_1);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif fe_const
@@ -529,7 +529,7 @@ function vis_data = getVisDataCLPCEF(obj, stmChi, fhTrqControl, clink_conf, fe_c
             stvChi = stmChi(i,1:len).';
             a_c    = ac(i,1:ac_len).';
 
-            fd_prms  = getFDynParamsCLPCEF(obj, i, stvChi, fhTrqControl, clink_conf, fe_1, a_c);
+            fd_prms  = getFDynParamsCLPCEF(obj, i, stvChi, fhTrqControl, clnk_conf, fe_1, a_c);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif ac_const
@@ -538,7 +538,7 @@ function vis_data = getVisDataCLPCEF(obj, stmChi, fhTrqControl, clink_conf, fe_c
             stvChi = stmChi(i,1:len).';
             fe     = fe_c(i,1:fe_len).';
 
-            fd_prms  = getFDynParamsCLPCEF(obj, i, stvChi, fhTrqControl, clink_conf, fe, ac_1);
+            fd_prms  = getFDynParamsCLPCEF(obj, i, stvChi, fhTrqControl, clnk_conf, fe, ac_1);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     else
@@ -548,13 +548,13 @@ function vis_data = getVisDataCLPCEF(obj, stmChi, fhTrqControl, clink_conf, fe_c
             fe     = fe_c(i,1:fe_len).';
             a_c    = ac(i,1:ac_len).';
 
-            fd_prms  = getFDynParamsCLPCEF(obj, i, stvChi, fhTrqControl, clink_conf, fe, a_c);
+            fd_prms  = getFDynParamsCLPCEF(obj, i, stvChi, fhTrqControl, clnk_conf, fe, a_c);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     end
 end
 
-function vis_data = getVisDataFPCEF(obj, stmChi, fhTrqControl, feet_conf, clink_conf, fe_c, ac, ac_f, noi)
+function vis_data = getVisDataFPCEF(obj, stmChi, fhTrqControl, foot_conf, clnk_conf, fe_c, ac, ac_f, noi)
     if ~iscolumn(ac_f)
         error('getVisDataFPCEF: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
@@ -565,15 +565,15 @@ function vis_data = getVisDataFPCEF(obj, stmChi, fhTrqControl, feet_conf, clink_
     [ac_1, ac_len, ac_const] = getFirstVector(ac, noi);
 
     stvChi  = stmChi(1,1:len).';
-    fd_prms = getFDynParamsFPCEF(obj, 1, stvChi, fhTrqControl, feet_conf, clink_conf, fe_1, ac_1, ac_f);
+    fd_prms = getFDynParamsFPCEF(obj, 1, stvChi, fhTrqControl, foot_conf, clnk_conf, fe_1, ac_1, ac_f);
     [vis_data, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl] = initVisDataStruct(fd_prms, noi);
 
     % put all data into the data container:
     if (fe_const && ac_const)
-        % ext. forces and feet contact accelerations are constant:
+        % ext. forces and foot contact accelerations are constant:
         for i = 1:noi
             stvChi   = stmChi(i,1:len).';
-            fd_prms  = getFDynParamsFPCEF(obj, i, stvChi, fhTrqControl, feet_conf, clink_conf, fe_1, ac_1, ac_f);
+            fd_prms  = getFDynParamsFPCEF(obj, i, stvChi, fhTrqControl, foot_conf, clnk_conf, fe_1, ac_1, ac_f);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif feh_const
@@ -582,7 +582,7 @@ function vis_data = getVisDataFPCEF(obj, stmChi, fhTrqControl, feet_conf, clink_
             stvChi = stmChi(i,1:len).';
             a_c    = ac(i,1:ac_len).';
 
-            fd_prms  = getFDynParamsFPCEF(obj, i, stvChi, fhTrqControl, feet_conf, clink_conf, fe_1, a_c, ac_f);
+            fd_prms  = getFDynParamsFPCEF(obj, i, stvChi, fhTrqControl, foot_conf, clnk_conf, fe_1, a_c, ac_f);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif acf_const
@@ -591,7 +591,7 @@ function vis_data = getVisDataFPCEF(obj, stmChi, fhTrqControl, feet_conf, clink_
             stvChi = stmChi(i,1:len).';
             fe    = fe_c(i,1:fe_len).';
 
-            fd_prms  = getFDynParamsFPCEF(obj, i, stvChi, fhTrqControl, feet_conf, clink_conf, fe, ac_1, ac_f);
+            fd_prms  = getFDynParamsFPCEF(obj, i, stvChi, fhTrqControl, foot_conf, clnk_conf, fe, ac_1, ac_f);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     else
@@ -601,13 +601,13 @@ function vis_data = getVisDataFPCEF(obj, stmChi, fhTrqControl, feet_conf, clink_
             fe    = fe_c(i,1:fe_len).';
             a_c   = ac(i,1:ac_len).';
 
-            fd_prms  = getFDynParamsFPCEF(obj, i, stvChi, fhTrqControl, feet_conf, clink_conf, fe, a_c, ac_f);
+            fd_prms  = getFDynParamsFPCEF(obj, i, stvChi, fhTrqControl, foot_conf, clnk_conf, fe, a_c, ac_f);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     end
 end
 
-function vis_data = getVisDataFPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, f_cp, ac_f, noi)
+function vis_data = getVisDataFPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f, noi)
     len = obj.mwbm_config.stvLen;
 
     % initialization:
@@ -615,7 +615,7 @@ function vis_data = getVisDataFPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, fee
     [acf_1, acf_len, acf_const] = getFirstVector(ac_f, noi);
 
     stvChi  = stmChi(1,1:len).';
-    fd_prms = getFDynParamsFPCPL(obj, 1, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp_1, acf_1);
+    fd_prms = getFDynParamsFPCPL(obj, 1, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp_1, acf_1);
     [vis_data, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl] = initVisDataStruct(fd_prms, noi);
 
     % put all data into the data container:
@@ -624,7 +624,7 @@ function vis_data = getVisDataFPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, fee
         for i = 1:noi
             stvChi = stmChi(i,1:len).';
 
-            fd_prms  = getFDynParamsFPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp_1, acf_1);
+            fd_prms  = getFDynParamsFPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp_1, acf_1);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif fcp_const
@@ -633,7 +633,7 @@ function vis_data = getVisDataFPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, fee
             stvChi = stmChi(i,1:len).';
             acf    = ac_f(i,1:acf_len).';
 
-            fd_prms  = getFDynParamsFPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp_1, acf);
+            fd_prms  = getFDynParamsFPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp_1, acf);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif acf_const
@@ -642,7 +642,7 @@ function vis_data = getVisDataFPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, fee
             stvChi = stmChi(i,1:len).';
             fcp    = f_cp(i,1:fcp_len).';
 
-            fd_prms  = getFDynParamsFPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp, acf_1);
+            fd_prms  = getFDynParamsFPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp, acf_1);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     else
@@ -652,13 +652,13 @@ function vis_data = getVisDataFPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, fee
             fcp    = f_cp(i,1:fcp_len).';
             acf    = ac_f(i,1:acf_len).';
 
-            fd_prms  = getFDynParamsFPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp, acf);
+            fd_prms  = getFDynParamsFPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp, acf);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     end
 end
 
-function vis_data = getVisDataFHPCEF(obj, stmChi, fhTrqControl, feet_conf, hand_conf, fe_h, ac_h, ac_f, noi)
+function vis_data = getVisDataFHPCEF(obj, stmChi, fhTrqControl, foot_conf, hand_conf, fe_h, ac_h, ac_f, noi)
     if ~iscolumn(ac_f)
         error('getVisDataFHPCEF: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
@@ -669,15 +669,15 @@ function vis_data = getVisDataFHPCEF(obj, stmChi, fhTrqControl, feet_conf, hand_
     [ach_1, ach_len, ach_const] = getFirstVector(ac_h, noi);
 
     stvChi  = stmChi(1,1:len).';
-    fd_prms = getFDynParamsFHPCEF(obj, 1, stvChi, fhTrqControl, feet_conf, hand_conf, feh_1, ach_1, ac_f);
+    fd_prms = getFDynParamsFHPCEF(obj, 1, stvChi, fhTrqControl, foot_conf, hand_conf, feh_1, ach_1, ac_f);
     [vis_data, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl] = initVisDataStruct(fd_prms, noi);
 
     % put all data into the data container:
     if (feh_const && ach_const)
-        % ext. forces (hands) and feet contact accelerations are constant:
+        % ext. forces (hands) and foot contact accelerations are constant:
         for i = 1:noi
             stvChi   = stmChi(i,1:len).';
-            fd_prms  = getFDynParamsFHPCEF(obj, i, stvChi, fhTrqControl, feet_conf, hand_conf, feh_1, ach_1, ac_f);
+            fd_prms  = getFDynParamsFHPCEF(obj, i, stvChi, fhTrqControl, foot_conf, hand_conf, feh_1, ach_1, ac_f);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif feh_const
@@ -686,7 +686,7 @@ function vis_data = getVisDataFHPCEF(obj, stmChi, fhTrqControl, feet_conf, hand_
             stvChi = stmChi(i,1:len).';
             ach    = ac_h(i,1:ach_len).';
 
-            fd_prms  = getFDynParamsFHPCEF(obj, i, stvChi, fhTrqControl, feet_conf, hand_conf, feh_1, ach, ac_f);
+            fd_prms  = getFDynParamsFHPCEF(obj, i, stvChi, fhTrqControl, foot_conf, hand_conf, feh_1, ach, ac_f);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif acf_const
@@ -695,7 +695,7 @@ function vis_data = getVisDataFHPCEF(obj, stmChi, fhTrqControl, feet_conf, hand_
             stvChi = stmChi(i,1:len).';
             feh    = fe_h(i,1:feh_len).';
 
-            fd_prms  = getFDynParamsFHPCEF(obj, i, stvChi, fhTrqControl, feet_conf, hand_conf, feh, ach_1, ac_f);
+            fd_prms  = getFDynParamsFHPCEF(obj, i, stvChi, fhTrqControl, foot_conf, hand_conf, feh, ach_1, ac_f);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     else
@@ -705,13 +705,13 @@ function vis_data = getVisDataFHPCEF(obj, stmChi, fhTrqControl, feet_conf, hand_
             feh    = fe_h(i,1:feh_len).';
             ach    = ac_h(i,1:ach_len).';
 
-            fd_prms  = getFDynParamsFHPCEF(obj, i, stvChi, fhTrqControl, feet_conf, hand_conf, feh, ach, ac_f);
+            fd_prms  = getFDynParamsFHPCEF(obj, i, stvChi, fhTrqControl, foot_conf, hand_conf, feh, ach, ac_f);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     end
 end
 
-function vis_data = getVisDataFHPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, f_cp, ac_f, noi)
+function vis_data = getVisDataFHPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f, noi)
     len = obj.mwbm_config.stvLen;
 
     % initialization:
@@ -719,7 +719,7 @@ function vis_data = getVisDataFHPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, fe
     [acf_1, acf_len, acf_const] = getFirstVector(ac_f, noi);
 
     stvChi  = stmChi(1,1:len).';
-    fd_prms = getFDynParamsFHPCPL(obj, 1, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp_1, acf_1);
+    fd_prms = getFDynParamsFHPCPL(obj, 1, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp_1, acf_1);
     [vis_data, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl] = initVisDataStruct(fd_prms, noi);
 
     % put all data into the data container:
@@ -728,7 +728,7 @@ function vis_data = getVisDataFHPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, fe
         for i = 1:noi
             stvChi = stmChi(i,1:len).';
 
-            fd_prms  = getFDynParamsFHPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp_1, acf_1);
+            fd_prms  = getFDynParamsFHPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp_1, acf_1);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif fcp_const
@@ -737,7 +737,7 @@ function vis_data = getVisDataFHPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, fe
             stvChi = stmChi(i,1:len).';
             acf    = ac_f(i,1:acf_len).';
 
-            fd_prms  = getFDynParamsFHPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp_1, acf);
+            fd_prms  = getFDynParamsFHPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp_1, acf);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     elseif acf_const
@@ -746,7 +746,7 @@ function vis_data = getVisDataFHPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, fe
             stvChi = stmChi(i,1:len).';
             fcp    = f_cp(i,1:fcp_len).';
 
-            fd_prms  = getFDynParamsFHPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp, acf_1);
+            fd_prms  = getFDynParamsFHPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp, acf_1);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     else
@@ -756,7 +756,7 @@ function vis_data = getVisDataFHPCPL(obj, stmChi, fhTrqControl, fhTotCWrench, fe
             fcp    = f_cp(i,1:fcp_len).';
             acf    = ac_f(i,1:acf_len).';
 
-            fd_prms  = getFDynParamsFHPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, feet_conf, hand_conf, fcp, acf);
+            fd_prms  = getFDynParamsFHPCPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp, acf);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     end

@@ -322,7 +322,7 @@ classdef vbCylinder < WBM.vbObject
 
                     obj.dimension = horzcat(ri, ro, h);
 
-                    [obj.mcyl_vtx_s.xx, obj.mcyl_vtx_s.yy, zz] = WBM.utilities.solidRing(ri, ro, obj.mcyl_nfcs, 'rect');
+                    [obj.mcyl_vtx_s.xx, obj.mcyl_vtx_s.yy, zz] = WBM.utilities.vb.solidRing(ri, ro, obj.mcyl_nfcs, 'rect');
                     obj.mcyl_vtx_s.zz = zz * h;
 
                     if obj.issolid
@@ -339,7 +339,7 @@ classdef vbCylinder < WBM.vbObject
 
                     obj.dimension = horzcat(0, r, h);
 
-                    [obj.mcyl_vtx_s.xx, obj.mcyl_vtx_s.yy, zz] = WBM.utilities.solidCylinder(r, obj.mcyl_nfcs);
+                    [obj.mcyl_vtx_s.xx, obj.mcyl_vtx_s.yy, zz] = WBM.utilities.vb.solidCylinder(r, obj.mcyl_nfcs);
                     obj.mcyl_vtx_s.zz = zz * h;
 
                     if obj.issolid

@@ -1,4 +1,4 @@
-function [ddq_j, fd_prms] = jointAccelerationsPL(obj, feet_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin)
+function [ddq_j, fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin)
     switch nargin
         case 12 % normal modes (without pose correction):
             % wf_R_b = varargin{2}
@@ -9,7 +9,7 @@ function [ddq_j, fd_prms] = jointAccelerationsPL(obj, feet_conf, hand_conf, tau,
             dq_j = varargin{1,5};
 
             % get the mixed acceleration of the hands at the contact links ...
-            [ac_h, a_prms]  = handAccelerations(obj, feet_conf, hand_conf, tau, ac_f, ...
+            [ac_h, a_prms]  = handAccelerations(obj, foot_conf, hand_conf, tau, ac_f, ...
                                                 varargin{2:4}, dq_j, varargin{1,6});
             [M, c_qv, Jc_f] = getWBDynFeet(obj, a_prms);
         case 11
@@ -19,21 +19,21 @@ function [ddq_j, fd_prms] = jointAccelerationsPL(obj, feet_conf, hand_conf, tau,
             % v_b    = varargin{5}
             dq_j = varargin{1,4};
 
-            ac_f = zeroCtcAcc(obj, feet_conf);
-            [ac_h, a_prms]  = handAccelerations(obj, feet_conf, hand_conf, tau, ac_f, ...
+            ac_f = zeroCtcAcc(obj, foot_conf);
+            [ac_h, a_prms]  = handAccelerations(obj, foot_conf, hand_conf, tau, ac_f, ...
                                                 varargin{1:3}, dq_j, varargin{1,5});
             [M, c_qv, Jc_f] = getWBDynFeet(obj, a_prms);
         case 8 % optimized modes (without pose correction):
             ac_f = varargin{1,1};
             dq_j = varargin{1,2};
 
-            [ac_h, a_prms]  = handAccelerations(obj, feet_conf, hand_conf, tau, varargin{1:2});
+            [ac_h, a_prms]  = handAccelerations(obj, foot_conf, hand_conf, tau, varargin{1:2});
             [M, c_qv, Jc_f] = getWBDynFeet(obj, a_prms);
         case 7
             dq_j = varargin{1,1};
 
-            ac_f = zeroCtcAcc(obj, feet_conf);
-            [ac_h, a_prms]  = handAccelerations(obj, feet_conf, hand_conf, tau, ac_f, dq_j); % with friction
+            ac_f = zeroCtcAcc(obj, foot_conf);
+            [ac_h, a_prms]  = handAccelerations(obj, foot_conf, hand_conf, tau, ac_f, dq_j); % with friction
             [M, c_qv, Jc_f] = getWBDynFeet(obj, a_prms);
         otherwise
             error('WBM::jointAccelerationsPL: %s', WBM.wbmErrorMsg.WRONG_NARGIN);

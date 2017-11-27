@@ -65,7 +65,7 @@ function sim_config = initSimConfigICub_atf(urdf_file_name, scn_mode)
     % It generates the joint-link name list, the joint-pair index list for creating
     % the connectivity graph (skeleton), the complete shape-size list for the
     % robot hull and it returns a joint-index pair for placing the feet on the
-    % right position.
+    % right positions.
     %
     sf = 0.03; % default scale factor for the shape sizes of the links.
     %sf = 0.25;
@@ -128,10 +128,10 @@ function sim_config = initSimConfigICub_atf(urdf_file_name, scn_mode)
             sim_body.draw_prop.shape.edge_color = WBM.wbmColor.steelblue;
             sim_body.draw_prop.shape.face_color = WBM.wbmColor.steelblue;
 
-            env_settings.background_color_opt = 'black';
-            env_settings.ground_color         = WBM.wbmColor.snow;
-            env_settings.ground_edge_color    = 'none';
-            env_settings.origin_pt_color      = WBM.wbmColor.violetred;
+            env_settings.bkgrd_color_opt = 'black';
+            env_settings.grnd_color      = WBM.wbmColor.snow;
+            env_settings.grnd_edge_color = 'none';
+            env_settings.orig_pt_color   = WBM.wbmColor.violetred;
         otherwise
             error('initSimConfigICub: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
     end

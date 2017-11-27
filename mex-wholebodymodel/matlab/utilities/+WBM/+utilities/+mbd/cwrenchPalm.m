@@ -1,7 +1,19 @@
 function wc_tot = cwrenchPalm(f_cp, a_R_c, a_p_c, varargin)
-    %% Total contact wrench of the palm of the robot hand.
-    %  This simple method is useful if a rigid body with a point
-    %  mass will be grasped only by the palms of the robot hands.
+    % CWRENCHPALM computes the total contact wrench of the palm
+    % of the robot hand. This simple method is useful if a rigid
+    % body with a point mass will be grasped only by the palms of
+    % the robot hands.
+    %
+    %   INPUT ARGUMENTS:
+    %       f_cp    -- force applied to the object at contact point a_p_c (must be a column-vector or a scalar)
+    %       a_R_c   -- (3 x 3) rotation matrix from contact frame {C} to frame {A} with origin at a_p_c
+    %       a_p_c   -- (3 x 1) contact point vector from contact frame {C} to frame {A}
+    %       mu_s    -- static friction coefficient for surfaces (optional)
+    %       gamma_s -- static torsional friction coefficient for surfaces (optional)
+    %
+    %   OUTPUT ARGUMENTS:
+    %       wc_tot -- (6 x 1) total contact wrench vector.
+    %
     switch nargin
         case 5
             % soft-finger contact:

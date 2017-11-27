@@ -65,7 +65,7 @@ function sim_config = initSimConfigICub_32dof(urdf_file_name, scn_mode)
     % It generates the joint-link name list, the joint-pair index list for creating
     % the connectivity graph (skeleton), the complete shape-size list for the
     % robot hull and it returns a joint-index pair for placing the feet on the
-    % right position.
+    % right positions.
     %
     sf = 0.03; % default scale factor for the shape sizes of the links.
     %sf = 0.25;
