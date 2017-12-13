@@ -6,8 +6,8 @@ classdef genericSimConfig < WBM.wbmSimConfig
     end
 
     properties(Constant)
-        DF_WND_POS@double       vector = [50  400]; % x (left), y (bottom)
-        DF_WND_SIZE@double      vector = [600 650]; % width, height
+        DF_WND_POS@double       vector = [50  400]; % [x (left), y (bottom)]
+        DF_WND_SIZE@double      vector = [600 650]; % [width, height]
         DF_AXES_NBR@uint8       scalar = 4; % number of axes to divide the figure into an m-by-n grid.
         % position of the new axes in the figure, specified as a four-element vector
         % [x (left), y (bottom), wid (width), hgt (height)]:
@@ -47,6 +47,7 @@ classdef genericSimConfig < WBM.wbmSimConfig
         robot_body@WBM.wbmSimBody
         environment@WBM.wbmSimEnvironment
         trajectories@WBM.wbmLinkTrajectory vector = WBM.wbmLinkTrajectory.empty;
+        target_pts@WBM.wbmTargetPoint      vector = WBM.wbmTargetPoint.empty;
 
         hWndFigure@matlab.ui.Figure
         wnd_title@char             = '';
@@ -173,14 +174,14 @@ classdef genericSimConfig < WBM.wbmSimConfig
             if ( ~isreal(axes_idx) || ~isreal(shift_vec) )
                 error('genericSimConfig::shiftAxes: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
-            [m,n] = size(shift_vec);
+            [m, n] = size(shift_vec);
             if (m ~= size(axes_idx,1))
                 error('genericSimConfig::shiftAxes: %s', WBM.wbmErrorMsg.DIM_MISMATCH);
             end
             if (n ~= 3)
                 error('genericSimConfig::shiftAxes: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
-            if ( (max(axes_idx) > obj.nAxes) || (min(axes_idx) < 1) )
+            if ( (max(axes_idx) > obj.nAxes) || (min(axes_idx) < 1) )54
                 error('genericSimConfig::shiftAxes: %s', WBM.wbmErrorMsg.VAL_OUT_OF_BOUNDS);
             end
             if (m > 1)

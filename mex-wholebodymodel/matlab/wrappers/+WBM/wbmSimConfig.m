@@ -22,6 +22,7 @@ classdef (Abstract) wbmSimConfig < handle
         robot_body@WBM.wbmSimBody
         environment@WBM.wbmSimEnvironment
         trajectories@WBM.wbmLinkTrajectory vector
+        target_pts@WBM.wbmTargetPoint      vector
 
         hWndFigure@matlab.ui.Figure
         wnd_title@char
@@ -108,6 +109,9 @@ classdef (Abstract) wbmSimConfig < handle
             len = size(obj.pl_stack,1);
             if ( (obj_idx < 1) || (obj_idx > len) )
                 error('wbmSimConfig::setPayloadUtilTime: %s', WBM.wbmErrorMsg.VAL_OUT_OF_BOUNDS);
+            end
+            if (~start_idx || ~end_idx)
+                error('wbmSimConfig::setPayloadUtilTime: %s', WBM.wbmErrorMsg.VALUE_LTE_ZERO);
             end
             obj.pl_time_idx(obj_idx,1) = start_idx;
             obj.pl_time_idx(obj_idx,2) = end_idx;

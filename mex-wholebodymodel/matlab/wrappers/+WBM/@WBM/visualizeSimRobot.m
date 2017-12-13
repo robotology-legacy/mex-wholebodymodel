@@ -93,6 +93,10 @@ function [vqT_vb, vb_idx, nVBds] = getPayloadFrames(obj, vqT_b, q_j, sim_config,
         % get the utilization time indices:
         ti_s = sim_config.pl_time_idx(j,1); % start
         ti_e = sim_config.pl_time_idx(j,2); % end
+        if (~ti_s && ~ti_e)
+            warning('getPayloadFrames: The start and end indices are not set.');
+            break;
+        end
 
         i  = i + 7;
         ci = i:7*j; % column indices
@@ -707,6 +711,10 @@ function vidfrms = makeSimRobotVideoPL(fkin_jnts, vqT_vb, vb_idx, nVBds, sim_con
 end
 
 function gobj_arr = updatePayloadObj(gobj_arr, t, nRGObj, vb_objects, vqT_vb, vb_idx, nVBds)
+    if WBM.utilities.isZero(vqT_vb)
+        warning('updatePayloadObj: The VQ-transformations are undefined.');
+        return
+    end
     i = -6;
     for j = 1:nVBds
         i  = i + 7;
@@ -760,8 +768,8 @@ function [vhdp_j, vpos_j] = plotFKinJointPositions(vpos_j, vqT_j, nJnts, jnt_plo
     vhdp_j = gobjects(2,1); % initialize array for graphic objects (data points)
 
     % draw the data points (nodes) of the joints of the robot's skeleton:
-    vhdp_j(1,1) = plot3(vpos_j(1,1), vpos_j(1,2), vpos_j(1,3), 'LineStyle', 'none', 'Marker', jnt_plot_prop.marker, ...
-                        'MarkerSize', jnt_plot_prop.marker_sz, 'MarkerEdgeColor', jnt_plot_prop.color);
+    vhdp_j(1,1) = plot3(vpos_j(1,1), vpos_j(1,2), vpos_j(1,3), 'LineStyle', 'none', 'LineWidth', jnt_plot_prop.line_width, ...
+                        'Marker', jnt_plot_prop.marker, 'MarkerSize', jnt_plot_prop.marker_sz, 'MarkerEdgeColor', jnt_plot_prop.color);
     set(vhdp_j(1,1), 'XData', vpos_j(2:k,1), 'YData', vpos_j(2:k,2), 'ZData', vpos_j(2:k,3));
 
     % draw the position of the center of mass (CoM):

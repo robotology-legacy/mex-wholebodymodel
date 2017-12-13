@@ -61,7 +61,7 @@ function sim_config = initSimEnvironment(obj, sim_config)
     gfx_ground(2,1) = fill3(sim_config.environment.grnd_shape(1,1:4), sim_config.environment.grnd_shape(2,1:4), ...
                             sim_config.environment.grnd_shape(3,1:4), sim_config.environment.grnd_color, ...
                             'EdgeColor', sim_config.environment.grnd_edge_color);
-    gfx_ground(1,1) = plot3(0, 0, 0, 'Marker', '.', 'MarkerSize', sim_config.environment.orig_pt_size, ...
+    gfx_ground(1,1) = plot3(0, 0, 0, 'LineStyle', 'none', 'Marker', '.', 'MarkerSize', sim_config.environment.orig_pt_size, ...
                             'MarkerEdgeColor', sim_config.environment.orig_pt_color);
     sim_config.gfx_objects{1,1} = gfx_ground;
 
@@ -72,18 +72,31 @@ function sim_config = initSimEnvironment(obj, sim_config)
         sim_config.gfx_objects{1,1} = vertcat(sim_config.gfx_objects{1,1}, hlt);
     end
 
-    % if some link trajectories are given, draw them in the environment and
-    % add them to the graphics array:
-    trajects = sim_config.trajectories;
-    if ~isempty(trajects)
-        nTraj    = size(trajects,1);
+    % if some target points are given, draw them in the
+    % environment and add them to the graphics array:
+    trg_pts = sim_config.target_pts;
+    if ~isempty(trg_pts)
+        nTrg    = size(trg_pts,1);
+        gfx_trg = gobjects(nTrg,1);
+
+        for i = 1:nTrg
+            gfx_trg(i,1) = getGObj(trg_pts(i,1));
+        end
+        sim_config.gfx_objects{1,1} = vertcat(gfx_trg, sim_config.gfx_objects{1,1});
+    end
+
+    % if some link trajectories are given, draw them in the
+    % environment and add them to the graphics array:
+    traj = sim_config.trajectories;
+    if ~isempty(traj)
+        nTraj    = size(traj,1);
         len      = 2*nTraj;
         gfx_traj = gobjects(len,1);
 
         j = -1;
         for i = 1:nTraj
             j = j + 2;
-            gobj = getGObj(trajects(i,1));
+            gobj = getGObj(traj(i,1));
 
             gfx_traj(j,1)   = gobj(1,1);
             gfx_traj(j+1,1) = gobj(2,1);
@@ -91,7 +104,7 @@ function sim_config = initSimEnvironment(obj, sim_config)
         sim_config.gfx_objects{1,1} = vertcat(gfx_traj, sim_config.gfx_objects{1,1});
 
         if sim_config.show_legend
-            showTrajLegend(sim_config, trajects, gfx_traj, nTraj, obj.mwbm_model.yarp_robot_type);
+            showTrajLegend(sim_config, traj, gfx_traj, nTraj, obj.mwbm_model.yarp_robot_type);
         end
     end
 
@@ -130,19 +143,19 @@ function hlt = setPointLight(lpos, srender)
     material dull;
 end
 
-function showTrajLegend(sim_config, trajects, gfx_traj, nTraj, robot_type)
+function showTrajLegend(sim_config, traj, gfx_traj, nTraj, robot_type)
     labels = cell(1,nTraj);
     htl    = gobjects(1,nTraj);
     j = -1;
     for i = 1:nTraj
         j = j + 2;
-        if ( ~isempty(trajects(i,1).jnt_annot_pos) && ...
+        if ( ~isempty(traj(i,1).jnt_annot_pos) && ...
               strncmp(robot_type, 'iCub', 4) ) % type string starts with "iCub"
-            grp_name = trajects(i,1).jnt_annot_pos{1,1};
-            idx      = trajects(i,1).jnt_annot_pos{1,2};
+            grp_name = traj(i,1).jnt_annot_pos{1,1};
+            idx      = traj(i,1).jnt_annot_pos{1,2};
             labels{1,i} = WBM.utilities.getJointAnnotationICub(grp_name, idx);
         else
-            labels{1,i} = trajects(i,1).urdf_link_name;
+            labels{1,i} = traj(i,1).urdf_link_name;
         end
         htl(1,i) = gfx_traj(j,1);
     end

@@ -275,8 +275,16 @@ classdef WBM < WBM.WBMBase
 
         [ddq_j, fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin) % PL ... PayLoad at the hands (no pose corrections)
 
+        [ddq_j, fd_prms] = jointAccelerationsNFB(obj, tau, varargin) % NFB ... No Floating Base (no pose corrections)
+
+        [ddq_j, fd_prms] = jointAccelerationsNFBEF(obj, clnk_conf, tau, fe_c, ac, varargin) % NFBEF ... No Floating Base, with External Forces at the contact links
+                                                                                            %           (no pose corrections)
+
+        [ddq_j, fd_prms] = jointAccelerationsNFBPL(obj, hand_conf, tau, fhTotCWrench, f_cp, varargin) % NFBPL ... No Floating Base, with PayLoad at the hands
+                                                                                                      %           (no pose corrections)
+
         [ddq_j, fd_prms] = jointAccelerationsCLPCEF(obj, clnk_conf, tau, fe_c, ac, varargin) % CLPCEF ... Contact Link Pose Corrections with External Forces
-                                                                                              %            (at the contact links)
+                                                                                             %            (at the contact links)
 
         function [ddq_j, fd_prms] = jointAccelerationsFPC(obj, foot_conf, tau, ac_f, varargin) % FPC ... Foot Pose Corrections (no external forces)
             fe_0 = zeroExtForces(obj, foot_conf);
@@ -314,6 +322,12 @@ classdef WBM < WBM.WBMBase
         dstvChi = forwardDynamicsEF(obj, t, stvChi, fhTrqControl, foot_conf, clnk_conf, fe_c, ac, ac_f)
 
         dstvChi = forwardDynamicsPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f)
+
+        dstvChi = forwardDynamicsNFB(obj, t, stvChi, fhTrqControl)
+
+        dstvChi = forwardDynamicsNFBEF(obj, t, stvChi, fhTrqControl, clnk_conf, fe_c, ac)
+
+        dstvChi = forwardDynamicsNFBPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, hand_conf, f_cp)
 
         dstvChi = forwardDynamicsFPC(obj, t, stvChi, fhTrqControl, foot_conf, ac_f)
 
@@ -390,7 +404,7 @@ classdef WBM < WBM.WBMBase
             end
         end
 
-        lnk_trajects = setTrajectoriesData(obj, lnk_trajects, stmPos, start_idx, end_idx)
+        lnk_traj = setTrajectoriesData(obj, lnk_traj, stmPos, start_idx, end_idx)
 
         function plotCoMTrajectory(obj, stmPos, prop)
             if ~exist('prop', 'var')
@@ -421,8 +435,8 @@ classdef WBM < WBM.WBMBase
             plot3(x_b(1:m,1), x_b(1:m,2), x_b(1:m,3), 'Color', prop.line_color);
             hold on;
             % mark the start point ...
-            hsp = plot3(x_b(1,1), x_b(1,2), x_b(1,3), 'Marker', prop.spt_marker, 'MarkerEdgeColor', prop.spt_color);
-
+            hsp = plot3(x_b(1,1), x_b(1,2), x_b(1,3), 'LineStyle', 'none', ...
+                        'Marker', prop.spt_marker, 'MarkerEdgeColor', prop.spt_color);
             axis square;
             grid on;
 
@@ -1367,21 +1381,21 @@ classdef WBM < WBM.WBMBase
             obj.mwbm_config.payload_links(1,pl_idx).urdf_link_name = pl_lnk.name;
             obj.mwbm_config.payload_links(1,pl_idx).lnk_p_cm       = pl_lnk.lnk_p_cm;
 
-            if isfield(pl_lnk, 't_idx')
+            if isfield(pl_lnk, 't_idx') % tool index:
                 obj.mwbm_config.payload_links(1,pl_idx).t_idx = pl_lnk.t_idx;
             else
                 % the payload is not a tool ...
                 obj.mwbm_config.payload_links(1,pl_idx).t_idx = 0;
             end
 
-            if isfield(pl_lnk, 'vb_idx')
+            if isfield(pl_lnk, 'vb_idx') % volume body index:
                 obj.mwbm_config.payload_links(1,pl_idx).vb_idx = pl_lnk.vb_idx;
             else
                 % the payload is not linked with a volume body object ...
                 obj.mwbm_config.payload_links(1,pl_idx).vb_idx = 0;
             end
 
-            if isfield(pl_lnk, 'm_rb')
+            if isfield(pl_lnk, 'm_rb') % mass of rigid body:
                 obj.mwbm_config.payload_links(1,pl_idx).m_rb = pl_lnk.m_rb;
                 obj.mwbm_config.payload_links(1,pl_idx).I_cm = pl_lnk.I_cm;
             else

@@ -139,7 +139,7 @@ function [v_1, vlen, is_const] = getFirstVector(vlist, noi)
         is_const = true;
     elseif ismatrix(vlist)
         % get the first vector ...
-        [m,n] = size(vlist);
+        [m, n] = size(vlist);
         if (m ~= noi)
             error('getFirstVector: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
         end
@@ -335,9 +335,9 @@ end
 
 function data_flds = initVisDataFields(data_flds, param_flds, fnames, nflds, noi)
     for i = 1:nflds
-        fname = fnames{i,1};
-        fld   = param_flds.(fname);
-        [m,n] = size(fld); % field dimension
+        fname  = fnames{i,1};
+        fld    = param_flds.(fname);
+        [m, n] = size(fld); % field dimension
 
         if isstruct(fld)
             data_flds.(fname) = struct();
@@ -367,9 +367,9 @@ end
 function data_flds = addData2Fields(idx, data_flds, param_flds, fnames, nflds)
     % add the data to the specified data fields:
     for i = 1:nflds
-        fname = fnames{i,1};
-        fld   = param_flds.(fname);
-        [m,n] = size(fld);
+        fname  = fnames{i,1};
+        fld    = param_flds.(fname);
+        [m, n] = size(fld);
 
         if isstruct(fld)
             data_flds.(fname) = fld;

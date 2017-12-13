@@ -2,14 +2,17 @@ function [f_c, tau_gen] = contactForcesEF(obj, tau, fe_c, ac, Jc, djcdq, M, c_qv
     switch nargin
         case 9
             % generalized forces with friction:
-            tau_fr  = frictionForces(obj, dq_j);         % friction torques (negated torque values)
-            tau_gen = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S_j*(tau + (-tau_fr)),
-                                                         % S_j = [0_(6xn); I_(nxn)] ... joint selection matrix.
+            tau_fr  = frictionForces(obj, dq_j); % friction torques (negated torque values)
+            tau_gen = tau + tau_fr;              % generalized forces tau_gen = S_j*(tau + (-tau_fr)),
+                                                 % S_j = [0_(6xn); I_(nxn)] ... joint selection matrix.
         case 8
             % general case:
-            tau_gen = vertcat(zeros(6,1), tau);
+            tau_gen = tau;
         otherwise
             error('WBM::contactForcesEF: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+    end
+    if (size(tau,1) < size(c_qv,1))
+        tau_gen = vertcat(zeros(6,1), tau_gen);
     end
     % Calculation of the contact (constraint) force vector:
     % For further details about the formula see,

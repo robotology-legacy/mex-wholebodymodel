@@ -10,9 +10,9 @@ function [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc,
             dq_j = varargin{1,4};
             nu   = varargin{1,5}; % mixed generalized velocity
 
-            tau_fr  = frictionForces(obj, dq_j);         % friction torques (negated torque values)
-            tau_gen = vertcat(zeros(6,1), tau + tau_fr); % generalized forces tau_gen = S_j*(tau + (-tau_fr)),
-                                                         % S_j = [0_(6xn); I_(nxn)] ... joint selection matrix
+            tau_fr  = frictionForces(obj, dq_j); % friction torques (negated torque values)
+            tau_gen = tau + tau_fr;              % generalized forces tau_gen = S_j*(tau + (-tau_fr)),
+                                                 % S_j = [0_(6xn); I_(nxn)] ... joint selection matrix
             perror_cl = poseErrorCL(obj, clnk_conf, varargin{1:3});
         case 13
             % without friction:
@@ -21,7 +21,7 @@ function [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc,
             % q_j        = varargin{3}
             nu = varargin{1,4};
 
-            tau_gen   = vertcat(zeros(6,1), tau);
+            tau_gen   = tau;
             perror_cl = poseErrorCL(obj, clnk_conf, varargin{1:3});
         case 11 % optimized modes:
             % with friction:
@@ -29,16 +29,19 @@ function [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc,
             nu   = varargin{1,2};
 
             tau_fr    = frictionForces(obj, dq_j);
-            tau_gen   = vertcat(zeros(6,1), tau + tau_fr);
+            tau_gen   = tau + tau_fr;
             perror_cl = poseErrorCL(obj, clnk_conf);
         case 10
             % without friction:
             nu = varargin{1,1};
 
-            tau_gen   = vertcat(zeros(6,1), tau);
+            tau_gen   = tau;
             perror_cl = poseErrorCL(obj, clnk_conf);
         otherwise
             error('WBM::contactForcesCLPCEF: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+    end
+    if (size(tau,1) < size(c_qv,1))
+        tau_gen = vertcat(zeros(6,1), tau_gen);
     end
     if ( isscalar(perror_cl) && ~perror_cl )
         % both contact links have no contact to the ground/object ...

@@ -12,8 +12,8 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPCEF(obj, foot_conf, hand_conf, 
                 ac_f = varargin{1,1};
                 dq_j = varargin{1,5};
 
-                % compute the whole body dynamics and the Jacobians
-                % and the derivative Jacobians of the hands ...
+                % compute the whole body dynamics, the Jacobians
+                % and the derivative Jacobians of the feet and hands ...
                 [M, c_qv, Jc_f, djcdq_f, Jc_h, djcdq_h] = fullWholeBodyDynCS(obj, foot_conf, hand_conf, ...
                                                                              varargin{2:4}, dq_j, varargin{1,6});
             else

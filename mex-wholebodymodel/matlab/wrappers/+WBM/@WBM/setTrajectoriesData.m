@@ -1,8 +1,8 @@
-function lnk_trajects = setTrajectoriesData(obj, lnk_trajects, stmPos, start_idx, end_idx)
-    if ~isa(lnk_trajects, 'WBM.wbmLinkTrajectory')
+function lnk_traj = setTrajectoriesData(obj, lnk_traj, stmPos, start_idx, end_idx)
+    if ~isa(lnk_traj, 'WBM.wbmLinkTrajectory')
         error('WBM::setTrajectoriesData: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
-    if ~iscolumn(lnk_trajects)
+    if ~iscolumn(lnk_traj)
         error('WBM::setTrajectoriesData: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
     end
     ndof = obj.mwbm_model.ndof;
@@ -12,7 +12,7 @@ function lnk_trajects = setTrajectoriesData(obj, lnk_trajects, stmPos, start_idx
     if (len ~= vlen)
         error('WBM::setTrajectoriesData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
     end
-    nTraj = size(lnk_trajects,1);
+    nTraj = size(lnk_traj,1);
 
     % get the positions, orientations and the joint positions from the output vector
     % "stmPos" of the integration part of the forward dynamics function:
@@ -35,7 +35,7 @@ function lnk_trajects = setTrajectoriesData(obj, lnk_trajects, stmPos, start_idx
                 q_j   = q_j.';
 
                 nSteps = ie - is + 1; % = size(vqT_b,1)
-                lnk_trajects(i,1) = setTrajectoryDPts(obj, lnk_trajects(i,1), vqT_b, q_j, nSteps);
+                lnk_traj(i,1) = setTrajectoryDPts(obj, lnk_traj(i,1), vqT_b, q_j, nSteps);
             end
         case 3
             vqT_b = stmPos(1:noi,1:7);
@@ -45,7 +45,7 @@ function lnk_trajects = setTrajectoriesData(obj, lnk_trajects, stmPos, start_idx
             % calculate and set the data points of each link trajectory
             % for all iteration steps (noi):
             for i = 1:nTraj
-                lnk_trajects(i,1) = setTrajectoryDPts(obj, lnk_trajects(i,1), vqT_b, q_j, noi);
+                lnk_traj(i,1) = setTrajectoryDPts(obj, lnk_traj(i,1), vqT_b, q_j, noi);
             end
         otherwise
             error('WBM::setTrajectoriesData: %s', WBM.wbmErrorMsg.WRONG_NARGIN);

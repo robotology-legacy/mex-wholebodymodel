@@ -2,6 +2,7 @@ classdef wbmErrorMsg
     properties(Constant)
         DIM_MISMATCH      = 'Mismatching dimensions!';
         EMPTY_ARRAY       = 'The array is empty!';
+        EMPTY_DATA_PTS    = 'The set of data points is empty!';
         EMPTY_DATA_TYPE   = 'Empty data type!';
         EMPTY_STRING      = 'Empty string!';
         EMPTY_VECTOR      = 'Empty vector(s)!';
@@ -18,6 +19,8 @@ classdef wbmErrorMsg
         OBJ_NOT_OBSTACLE  = 'The object is not defined as an obstacle!';
         SINGULAR_MAT      = 'Singular matrix!';
         STRING_MISMATCH   = 'String mismatch!';
+        UDEF_QUAT_VEC     = 'The quaternion is undefined!';
+        UDEF_ROT_MAT      = 'The rotation matrix is undefined!';
         UNKNOWN_AXIS_SEQ  = 'Unknown axis sequence!';
         UNKNOWN_CTC_MODEL = 'Unknown contact model!';
         UNKNOWN_EXC       = 'Unknown exception!';

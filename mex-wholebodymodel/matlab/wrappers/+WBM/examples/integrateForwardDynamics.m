@@ -5,7 +5,7 @@ import WBM.utilities.tfms.*
 import WBM.RobotModel.iCub.*
 
 
-%% Initialization of the WBM for the iCub-Robot:
+%% Initialization of the WBM for the iCub robot:
 wf2fixlnk   = true; % set the world frame to a fixed link
 wbm_icub    = initRobotICub(wf2fixlnk);
 icub_model  = wbm_icub.robot_model;
@@ -97,9 +97,11 @@ pl_lnk_l.vb_idx   = 1;
 %pl_lnk_l.I_cm     = sim_config.environment.vb_objects(1,1).I_cm;
 
 wbm_icub.setPayloadLinks(pl_lnk_l);
-% link the index of the volume body object with the left hand (left manipulator)
-% and set the utilization time indices (start, end) of the object:
+
+% setup the payload stack to be processed:
+% (link the index of the volume body object to the left hand (manipulator))
 sim_config.setPayloadStack(pl_lnk_l.vb_idx, 'lh');
+% set the utilization time indices (start, end) of the object:
 sim_config.setPayloadUtilTime(1, 1, 35);
 % optional:
 %pl_lnk_r.name     = 'r_gripper'; % --> r_hand_dh_frame --> r_hand
@@ -111,7 +113,9 @@ sim_config.setPayloadUtilTime(1, 1, 35);
 %pl_lnk_data = {pl_lnk_l, pl_lnk_r};
 %wbm_icub.setPayloadLinks(pl_lnk_data);
 
+% link each vb-index of the objects to one hand (manipulator) ...
 %sim_config.setPayloadStack([pl_lnk_l.vb_idx, pl_lnk_r.vb_idx], {'lh', 'rh'});
+% utilization time indices of the payloads ...
 %sim_config.setPayloadUtilTime(1, 1, 35);
 %sim_config.setPayloadUtilTime(2, 1, 33);
 
@@ -119,23 +123,23 @@ sim_config.setPayloadUtilTime(1, 1, 35);
 x_out = wbm_icub.getPositionsData(chi);
 
 % show the trajectory curves of some specified links:
-lnk_trajects = repmat(WBM.wbmLinkTrajectory, 3, 1);
-lnk_trajects(1,1).urdf_link_name = 'l_gripper';
-lnk_trajects(2,1).urdf_link_name = 'r_gripper';
-lnk_trajects(3,1).urdf_link_name = 'r_lower_leg';
+lnk_traj = repmat(WBM.wbmLinkTrajectory, 3, 1);
+lnk_traj(1,1).urdf_link_name = 'l_gripper';
+lnk_traj(2,1).urdf_link_name = 'r_gripper';
+lnk_traj(3,1).urdf_link_name = 'r_lower_leg';
 
-lnk_trajects(1,1).jnt_annot_pos = {'left_arm', 7};
-lnk_trajects(2,1).jnt_annot_pos = {'right_arm', 7};
-lnk_trajects(3,1).jnt_annot_pos = {'right_leg', 4};
+lnk_traj(1,1).jnt_annot_pos = {'left_arm', 7};
+lnk_traj(2,1).jnt_annot_pos = {'right_arm', 7};
+lnk_traj(3,1).jnt_annot_pos = {'right_leg', 4};
 
-lnk_trajects(1,1).line_color = WBM.wbmColor.forestgreen;
-lnk_trajects(1,1).ept_color  = WBM.wbmColor.forestgreen;
-lnk_trajects(2,1).line_color = WBM.wbmColor.tomato;
-lnk_trajects(2,1).ept_color  = WBM.wbmColor.tomato;
-lnk_trajects(3,1).line_color = 'magenta';
-lnk_trajects(3,1).ept_color  = 'magenta';
+lnk_traj(1,1).line_color = WBM.wbmColor.forestgreen;
+lnk_traj(1,1).ept_color  = WBM.wbmColor.forestgreen;
+lnk_traj(2,1).line_color = WBM.wbmColor.tomato;
+lnk_traj(2,1).ept_color  = WBM.wbmColor.tomato;
+lnk_traj(3,1).line_color = 'magenta';
+lnk_traj(3,1).ept_color  = 'magenta';
 
-sim_config.trajectories = wbm_icub.setTrajectoriesData(lnk_trajects, x_out, [1; 1; 1], [35; 35; 40]);
+sim_config.trajectories = wbm_icub.setTrajectoriesData(lnk_traj, x_out, [1; 1; 1], [35; 35; 40]);
 sim_config.show_legend  = true;
 
 % zoom and shift some specified axes (optional):

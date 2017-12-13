@@ -59,8 +59,9 @@ classdef wbmSimBody < handle
             end
             % else, use the default draw values ...
             obj.draw_prop = WBM.wbmRobotDrawProp;
+            obj.draw_prop.joints.line_width = 0.5;
             obj.draw_prop.joints.marker     = '.';
-            obj.draw_prop.joints.marker_sz  = 9;
+            obj.draw_prop.joints.marker_sz  = 10;
             obj.draw_prop.joints.color      = 'blue';
 
             obj.draw_prop.links.line_width  = 1.6;

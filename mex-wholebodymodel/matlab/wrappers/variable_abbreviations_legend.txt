@@ -77,6 +77,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     gbl_...    ...  global variable (begin of variable name), e.g. "gbl_state", etc.
     gen        ...  generalized
     gp         ...  grid point(s) OR goal point (**)
+    gpos       ...  goal position(s)
     gr         ...  gripper
     grnd, grd  ...  ground
     grp        ...  group
@@ -88,6 +89,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     id         ...  identity
     idx        ...  index(es)
     ip         ...  index position
+    itrg       ...  intermediate target
     jlim, jl   ...  joint limit(s)
     jnt        ...  joint
     jpos       ...  joint position(s)
@@ -187,6 +189,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     trgt, trg  ...  target
     trq        ...  torque
     trqs       ...  torques
+    tsk        ...  task(s)
     tt         ...  tool-tip
     ul         ...  upper limit(s)
     upr        ...  upper

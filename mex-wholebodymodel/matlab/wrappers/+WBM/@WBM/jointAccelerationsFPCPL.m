@@ -2,7 +2,7 @@ function [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, foot_conf, hand_conf, t
     switch nargin
         case 13
             % with given foot contact acceleration:
-            % get the mixed acceleration of the hands at the contact links (with FPC) ...
+            % get the mixed accelerations of the hands (with FPC) ...
             [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, varargin{1:7});
 
             if iscolumn(varargin{1,4})
@@ -79,6 +79,7 @@ function [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, foot_conf, hand_conf, t
 
     % compute the contact forces of the hands (without pose corrections):
     [fc_h,~] = contactForcesEF(obj, tau, f_pl, ac_h, a_prms.Jc_h, a_prms.djcdq_h, M, c_qv, dq_j); % optimized mode
+
     % calculate the total joint acceleration vector ddq_j in
     % dependency of the contact forces of the feet and hands:
     J_c  = vertcat(Jc_f, a_prms.Jc_h);

@@ -76,7 +76,7 @@ function [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, vara
     Jcf_t = Jc_f.';
     ddqj_f = M \ (tau_gen + Jcf_t*fc_f - c_qv);
 
-    % calculate the mixed acceleration of the hand(s) at the contact link(s):
+    % calculate the mixed accelerations of the hands at the contact links:
     ac_h = Jc_h*ddqj_f + djcdq_h;
 
     if (nargout == 2)

@@ -32,7 +32,7 @@ classdef iCubWBM < WBM.Interfaces.IWBM
         % Constructor:
         function obj = iCubWBM(robot_model, robot_config, wf2fixlnk)
             switch nargin
-                % initialize the mex-WholeBodyModel for the iCub-Robot:
+                % initialize the mex-WholeBodyModel for the iCub robot:
                 case 3
                     obj.mwbm_icub = WBM.WBM(robot_model, robot_config, wf2fixlnk);
                 case 2

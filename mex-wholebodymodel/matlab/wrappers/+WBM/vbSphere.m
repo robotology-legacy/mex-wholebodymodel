@@ -7,13 +7,13 @@ classdef vbSphere < WBM.vbObject
     end
 
     properties
-        %                          default values:
+                                   % default values:
+        description@char         = '';  % annotation of the sphere
+        ismovable@logical scalar = false;
         line_width@double scalar = 0.4;
         edge_color               = 'black';
         face_color               = WBM.wbmColor.lightsteelblue;
         face_alpha@double scalar = 0.2; % transparency of the fill area
-        description@char         = '';  % annotation for the sphere
-        ismovable@logical scalar = false;
     end
 
     properties(SetAccess = private, GetAccess = public)
@@ -105,11 +105,19 @@ classdef vbSphere < WBM.vbObject
                     p = varargin{1,1};
                     R = varargin{1,2};
 
+                    if WBM.utilities.isZero(R)
+                        error('vbSphere::setInitFrame: %s', WBM.wbmErrorMsg.UDEF_ROT_MAT);
+                    end
+
                     obj.init_frame = WBM.utilities.tfms.posRotm2frame(p, R);
                     obj.msph_orig  = p;
                     obj.msph_rotm  = R;
                 case 2
                     vqT = varargin{1,1};
+
+                    if WBM.utilities.isZero(vqT(4:7))
+                        error('vbSphere::setInitFrame: %s', WBM.wbmErrorMsg.UDEF_QUAT_VEC);
+                    end
 
                     [obj.msph_orig, obj.msph_rotm] = WBM.utilities.tfms.frame2posRotm(vqT);
                     obj.init_frame = vqT;
@@ -167,7 +175,7 @@ classdef vbSphere < WBM.vbObject
                 % check if the point position is below the surface of the sphere:
                 result = sqrt(d_x*d_x + d_y*d_y + d_z*d_z) < r;
             elseif ismatrix(pt_pos)
-                [m,n] = size(pt_pos);
+                [m, n] = size(pt_pos);
                 if (n ~= 3)
                     error('vbSphere::ptInObj: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
                 end
@@ -208,6 +216,9 @@ classdef vbSphere < WBM.vbObject
 
         function set.rotm(obj, rotm)
             WBM.utilities.chkfun.checkMatDim(rotm, 3, 3, 'vbSphere::set.rotm');
+            if WBM.utilities.isZero(rotm)
+                error('vbSphere::set.rotm: %s', WBM.wbmErrorMsg.UDEF_ROT_MAT);
+            end
             obj.msph_rotm = rotm;
             setSphereAtPosRotm(obj);
         end
@@ -219,7 +230,12 @@ classdef vbSphere < WBM.vbObject
         end
 
         function set.tform(obj, tform)
-            [obj.msph_orig, obj.msph_rotm] = WBM.utilities.tfms.tform2posRotm(tform);
+            [obj.msph_orig, R] = WBM.utilities.tfms.tform2posRotm(tform);
+
+            if WBM.utilities.isZero(R)
+                error('vbSphere::set.tform: %s', WBM.wbmErrorMsg.UDEF_ROT_MAT);
+            end
+            obj.msph_rotm = R;
             setSphereAtPosRotm(obj);
         end
 
@@ -230,6 +246,9 @@ classdef vbSphere < WBM.vbObject
         end
 
         function set.frame(obj, vqT)
+            if WBM.utilities.isZero(vqT(4:7))
+                error('vbSphere::set.frame: %s', WBM.wbmErrorMsg.UDEF_QUAT_VEC);
+            end
             [obj.msph_orig, obj.msph_rotm] = WBM.utilities.tfms.frame2posRotm(vqT);
             setSphereAtPosRotm(obj);
         end
@@ -238,6 +257,9 @@ classdef vbSphere < WBM.vbObject
 
     methods(Access = private)
         function setObjData(obj, orig, rotm, obj_prop)
+            if WBM.utilities.isZero(rotm)
+                error('vbSphere::setObjData: %s', WBM.wbmErrorMsg.UDEF_ROT_MAT);
+            end
             obj.init_frame = WBM.utilities.tfms.posRotm2frame(orig, rotm);
             obj.msph_orig  = orig;
             obj.msph_rotm  = rotm;

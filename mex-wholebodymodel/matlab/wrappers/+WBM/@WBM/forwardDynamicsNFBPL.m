@@ -1,4 +1,4 @@
-function dstvChi = forwardDynamicsPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f)
+function dstvChi = forwardDynamicsNFBPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, hand_conf, f_cp)
     % get the state parameters from the current state vector "stvChi" ...
     stp = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
 
@@ -9,13 +9,15 @@ function dstvChi = forwardDynamicsPL(obj, t, stvChi, fhTrqControl, fhTotCWrench,
     % (else the procedure computes nonsense) ...
     setState(obj, stp.q_j, stp.dq_j, v_b);
 
+    [M, c_qv] = wholeBodyDyn(obj); % optimized mode
+
     % get the current control torques ...
-    tau = fhTrqControl(t);
+    tau = fhTrqControl(t, M, c_qv, stp);
 
     % new mixed generalized velocity vector ...
     nu  = fdynNewMixedVelocities(obj, stp.qt_b, stp.dx_b, wf_omega_b, stp.dq_j);
-    % joint acceleration dnu = ddq_j:
-    dnu = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, ac_f, stp.dq_j); % optimized mode
+    % joint acceleration dnu = ddq_j (optimized mode):
+    dnu = jointAccelerationsNFBPL(obj, hand_conf, tau, fhTotCWrench, f_cp, M, c_qv, stp.dq_j);
 
     dstvChi = vertcat(nu, dnu);
 end

@@ -1,5 +1,5 @@
 function [m_rb, I_cm] = massInertiaGObj(obj_type, rho, varargin)
-    %% Returns the mass and the corresponding inertia tensor of a geometrical object with
+    %% Returns the mass and the corresponding inertia tensor of a geometric object with
     %  the origin of the coordinate system at the object body's center of mass (CoM):
     %
     %  Sources:

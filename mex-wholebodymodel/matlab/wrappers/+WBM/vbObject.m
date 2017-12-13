@@ -1,4 +1,4 @@
-classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous
+classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGObj (class incompatible)
     properties(Abstract, Dependent)
         origin@double vector % position of the origin (x,y,z) of the object
         rotm@double   matrix % rotation matrix (x,y,z) of the object
@@ -11,12 +11,12 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous
     end
 
     properties(Abstract)
+        description@char          % annotation of the object
+        ismovable@logical  scalar
         line_width@double  scalar
         edge_color
         face_color
         face_alpha@double  scalar % transparency of the fill area
-        description@char          % annotation for the object
-        ismovable@logical  scalar
     end
 
     properties(Abstract, SetAccess = private, GetAccess = public)
@@ -35,8 +35,8 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous
 
     methods(Abstract)
         setInitFrame(obj, varargin)
-        hgo    = getGObj(obj)
-        hgo    = updGObj(obj, hgo)
+        hgo    = getGObj(obj)      % get the graphic object handle
+        hgo    = updGObj(obj, hgo) % update the graphic object handle
         hmg    = drawMGrid(obj, pt_color)
         result = ptInObj(obj, pt_pos)
     end

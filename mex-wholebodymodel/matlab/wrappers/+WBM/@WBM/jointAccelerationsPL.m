@@ -1,6 +1,6 @@
 function [ddq_j, fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin)
     switch nargin
-        case 12 % normal modes (without pose corrections):
+        case 12 % normal modes:
             % wf_R_b = varargin{2}
             % wf_p_b = varargin{3}
             % q_j    = varargin{4}
@@ -8,7 +8,7 @@ function [ddq_j, fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau,
             ac_f = varargin{1,1};
             dq_j = varargin{1,5};
 
-            % get the mixed acceleration of the hands at the contact links ...
+            % get the mixed accelerations of the hands ...
             [ac_h, a_prms]  = handAccelerations(obj, foot_conf, hand_conf, tau, ac_f, ...
                                                 varargin{2:4}, dq_j, varargin{1,6});
             [M, c_qv, Jc_f] = getWBDynFeet(obj, a_prms);
@@ -23,7 +23,7 @@ function [ddq_j, fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau,
             [ac_h, a_prms]  = handAccelerations(obj, foot_conf, hand_conf, tau, ac_f, ...
                                                 varargin{1:3}, dq_j, varargin{1,5});
             [M, c_qv, Jc_f] = getWBDynFeet(obj, a_prms);
-        case 8 % optimized modes (without pose corrections):
+        case 8 % optimized modes:
             ac_f = varargin{1,1};
             dq_j = varargin{1,2};
 
@@ -44,8 +44,9 @@ function [ddq_j, fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau,
     % calculate the payload forces of the hands:
     f_pl = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp, v_pl, a_pl);
 
-    % compute the contact forces of the hands -- (optimized mode):
+    % compute the contact forces of the hands (with friction):
     [fc_h,~] = contactForcesEF(obj, tau, f_pl, ac_h, a_prms.Jc_h, a_prms.djcdq_h, M, c_qv, dq_j);
+
     % calculate the total joint acceleration vector ddq_j in
     % dependency of the contact forces of the feet and hands:
     J_c  = vertcat(Jc_f, a_prms.Jc_h);

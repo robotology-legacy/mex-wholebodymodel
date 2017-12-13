@@ -1,7 +1,7 @@
 function [ddq_j, fd_prms] = jointAccelerationsFHPCPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, varargin)
     switch nargin
         case 13
-            % get the mixed acceleration of the hands at the contact links ...
+            % get the mixed accelerations of the hands ...
             [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, varargin{1:7});
 
             if iscolumn(varargin{1,4})

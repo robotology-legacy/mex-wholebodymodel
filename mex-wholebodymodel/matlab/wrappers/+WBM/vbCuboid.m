@@ -7,13 +7,13 @@ classdef vbCuboid < WBM.vbObject
     end
 
     properties
-        %                          default values:
+                                   % default values:
+        description@char         = '';  % annotation of the cuboid
+        ismovable@logical scalar = false;
         line_width@double scalar = 0.4;
         edge_color               = 'black';
         face_color               = WBM.wbmColor.lightsteelblue;
         face_alpha@double scalar = 0.2; % transparency of the fill area
-        description@char         = '';  % annotation for the cuboid
-        ismovable@logical scalar = false;
     end
 
     properties(SetAccess = private, GetAccess = public)
@@ -128,11 +128,19 @@ classdef vbCuboid < WBM.vbObject
                     p = varargin{1,1};
                     R = varargin{1,2};
 
+                    if WBM.utilities.isZero(R)
+                        error('vbCuboid::setInitFrame: %s', WBM.wbmErrorMsg.UDEF_ROT_MAT);
+                    end
+
                     obj.init_frame = WBM.utilities.tfms.posRotm2frame(p, R);
                     obj.mcub_orig  = p;
                     obj.mcub_rotm  = R;
                 case 2
                     vqT = varargin{1,1};
+
+                    if WBM.utilities.isZero(vqT(4:7))
+                        error('vbCuboid::setInitFrame: %s', WBM.wbmErrorMsg.UDEF_QUAT_VEC);
+                    end
 
                     [obj.mcub_orig, obj.mcub_rotm] = WBM.utilities.tfms.frame2posRotm(vqT);
                     obj.init_frame = vqT;
@@ -198,7 +206,7 @@ classdef vbCuboid < WBM.vbObject
 
                 result = (res_x && res_y && res_z);
             elseif ismatrix(pt_pos)
-                [m,n] = size(pt_pos);
+                [m, n] = size(pt_pos);
                 if (n ~= 3)
                     error('vbCuboid::ptInObj: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
                 end
@@ -245,6 +253,9 @@ classdef vbCuboid < WBM.vbObject
 
         function set.rotm(obj, rotm)
             WBM.utilities.chkfun.checkMatDim(rotm, 3, 3, 'vbCuboid::set.rotm');
+            if WBM.utilities.isZero(rotm)
+                error('vbCuboid::set.rotm: %s', WBM.wbmErrorMsg.UDEF_ROT_MAT);
+            end
             obj.mcub_rotm = rotm;
             setCuboidAtPosRotm(obj);
         end
@@ -256,7 +267,12 @@ classdef vbCuboid < WBM.vbObject
         end
 
         function set.tform(obj, tform)
-            [obj.mcub_orig, obj.mcub_rotm] = WBM.utilities.tfms.tform2posRotm(tform);
+            [obj.mcub_orig, R] = WBM.utilities.tfms.tform2posRotm(tform);
+
+            if WBM.utilities.isZero(R)
+                error('vbCuboid::set.tform: %s', WBM.wbmErrorMsg.UDEF_ROT_MAT);
+            end
+            obj.mcub_rotm = R;
             setCuboidAtPosRotm(obj);
         end
 
@@ -267,6 +283,9 @@ classdef vbCuboid < WBM.vbObject
         end
 
         function set.frame(obj, vqT)
+            if WBM.utilities.isZero(vqT(4:7))
+                error('vbCuboid::set.frame: %s', WBM.wbmErrorMsg.UDEF_QUAT_VEC);
+            end
             [obj.mcub_orig, obj.mcub_rotm] = WBM.utilities.tfms.frame2posRotm(vqT);
             setCuboidAtPosRotm(obj);
         end
@@ -275,6 +294,9 @@ classdef vbCuboid < WBM.vbObject
 
     methods(Access = private)
         function setObjData(obj, orig, rotm, obj_prop)
+            if WBM.utilities.isZero(rotm)
+                error('vbCuboid::setObjData: %s', WBM.wbmErrorMsg.UDEF_ROT_MAT);
+            end
             obj.init_frame = WBM.utilities.tfms.posRotm2frame(orig, rotm);
             obj.mcub_orig  = orig;
             obj.mcub_rotm  = rotm;
@@ -349,7 +371,7 @@ classdef vbCuboid < WBM.vbObject
 
                     if obj.issolid
                         if (obj.rho > 0)
-                            [obj.m_rb, obj.I_cm] = WBM.utilities.rb.massbInertiaGObj('scub', obj.rho, l);
+                            [obj.m_rb, obj.I_cm] = WBM.utilities.rb.massInertiaGObj('scub', obj.rho, l);
                         end
                     end
                 otherwise

@@ -77,6 +77,7 @@ function sim_config = initAxes(sim_config, nAxes)
     for i = 1:nAxes
         sim_config.hAxes(1,i) = createAxes(sim_config, i);
         set(gca, 'SortMethod', 'childorder');
+        % set(gca, 'SortMethod', 'depth');
     end
 end
 

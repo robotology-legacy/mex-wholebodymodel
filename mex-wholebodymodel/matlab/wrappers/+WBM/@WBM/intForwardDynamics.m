@@ -58,6 +58,42 @@ function [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, od
                 otherwise
                     error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
+        case 'nfb'
+            % no floating base and no pose corrections:
+            switch narg
+                case 9
+                    % pc_type = varargin{4}
+                    if isstruct(varargin{1,1})
+                        % function with payload at the hands:
+                        % f_cp = varargin{3}
+                        fhTotCWrench = varargin{1,1};
+                        hand_conf    = varargin{1,2};
+
+                        if ~isa(fhTotCWrench, 'function_handle')
+                            error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
+                        end
+                        WBM.utilities.chkfun.checkCLinkConfig(hand_conf, 'WBM::intForwardDynamics');
+
+                        fhFwdDyn = @(t, chi)forwardDynamicsNFBPL(obj, t, chi, fhTrqControl, fhTotCWrench, ...
+                                                                 hand_conf, varargin{1,3});
+                    else
+                        % function with external forces:
+                        % fe_c = varargin{2}
+                        % ac   = varargin{3}
+                        clnk_conf = varargin{1,1};
+
+                        WBM.utilities.chkfun.checkCLinkConfig(clnk_conf, 'WBM::intForwardDynamics');
+
+                        fhFwdDyn = @(t, chi)forwardDynamicsNFBEF(obj, t, chi, fhTrqControl, clnk_conf, ...
+                                                                 varargin{1,2}, varargin{1,3});
+                    end
+                case 6
+                    % function without any pose corrections:
+                    % nargin = 6: pc_type = varargin{1}
+                    fhFwdDyn = @(t, chi)forwardDynamicsNFB(obj, t, chi, fhTrqControl);
+                otherwise
+                    error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+            end
         case 'fpc'
             % only foot pose corrections:
             switch narg
@@ -156,9 +192,9 @@ end
 
 %% INPUT VERIFICATION:
 
-function checkInputTypes(fhTotCWrench, foot_conf, hand_conf)
-    if ~isa(fhTotCWrench, 'function_handle')
+function checkInputTypes(fh, clink_conf1, clink_conf2)
+    if ~isa(fh, 'function_handle')
         error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
-    WBM.utilities.chkfun.checkCLinkConfigs(foot_conf, hand_conf, 'WBM::intForwardDynamics');
+    WBM.utilities.chkfun.checkCLinkConfigs(clink_conf1, clink_conf2, 'WBM::intForwardDynamics');
 end

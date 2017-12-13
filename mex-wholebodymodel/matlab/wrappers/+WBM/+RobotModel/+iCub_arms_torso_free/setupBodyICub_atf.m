@@ -1,8 +1,8 @@
 function [icub_body, jnt_names] = setupBodyICub_atf()
-    %% Define the effectors and the chains for the body of the iCub-Robot:
+    %% Define the effectors and the chains for the body of the iCub robot:
     % Sources:
     %   [1] Yarp-WholeBodyInterface: <https://github.com/robotology/yarp-wholebodyinterface/blob/master/app/robots/icubGazeboSim/yarpWholeBodyInterface.ini>
-    %   [2] iCub Model Naming Convention: <http://wiki.icub.org/wiki/ICub_Model_naming_conventions>
+    %   [2] iCub Model Naming Conventions: <http://wiki.icub.org/wiki/ICub_Model_naming_conventions>
 
     % Effectors (list of all chain names):
     chn_names = {'ROBOT_TORSO'; 'ROBOT_LEFT_ARM'; 'ROBOT_RIGHT_ARM'; 'ROBOT_LEFT_LEG'; 'ROBOT_RIGHT_LEG'};

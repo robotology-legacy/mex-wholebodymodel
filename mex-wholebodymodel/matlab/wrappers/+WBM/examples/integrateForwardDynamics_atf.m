@@ -4,7 +4,7 @@ import WBM.utilities.tfms.*
 import WBM.RobotModel.iCub_arms_torso_free.*
 
 
-%% Initialization of the WBM for the iCub-Robot:
+%% Initialization of the WBM for the iCub robot:
 wf2fixlnk        = true; % set the world frame to a fixed link
 [wbm_icub, ndof] = initRobotICub_atf(wf2fixlnk);
 wbm_icub.ndof    = ndof;

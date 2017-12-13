@@ -39,14 +39,14 @@ function sim_config = initSimConfigICub(varargin)
     end
 
     % List of link and frame names that are deduced from their 'parent joints' or
-    % 'parent links' of the iCub-Robot model. The only exceptions are the first
+    % 'parent links' of the iCub robot model. The only exceptions are the first
     % and the last link, the 'root_link' and the 'com', they don't have any parent
     % joints or parent links.
     % The link names 'r_gripper' and 'l_gripper' are aliases for the link frames
     % 'r_hand_dh_frame' and 'l_hand_dh_frame', where their origins are placed on
     % the axis of their parent joints. In general, the link names are describing
     % the "virtual joints" that are used to construct the dynamic model of the
-    % iCub-Robot in the visualizer.
+    % iCub robot in the visualizer.
     %
     % Further details about the definitions of the joint, link and frame names are
     % available in the iCub Model Naming Conventions under,

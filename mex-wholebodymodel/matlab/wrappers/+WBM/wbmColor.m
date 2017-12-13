@@ -16,6 +16,7 @@ classdef wbmColor
         darkgray             = [169 169 169] ./ 255; % 80
         darkgreen            = [0   100   0] ./ 255; % 81
         darkmagenta          = [139 0   139] ./ 255; % 84
+        deeppink             = [255 20  147] ./ 255; % 116
         deepskyblue          = [0   191 255] ./ 255; % 121
         dimgray              = [105 105 105] ./ 255; % 126
         dodgerblue           = [30  144 255] ./ 255; % 128
@@ -23,9 +24,11 @@ classdef wbmColor
         firebrick            = [178 34   34] ./ 255; % 133
         floralwhite          = [255 250 240] ./ 255; % 138
         forestgreen          = [34  139  34] ./ 255; % 139
+        gold                 = [255 215   0] ./ 255; % 142
         gray                 = [190 190 190] ./ 255; % 152
         greenyellow          = [173 255  47] ./ 255; % 259
-        khaki                = [240 230  14] ./ 255; % 382
+        indianred1           = [255 106 106] ./ 255; % 373
+        khaki                = [240 230 140] ./ 255; % 382
         lavender             = [230 230 250] ./ 255; % 387
         lightgoldenrod       = [238 221 130] ./ 255; % 410
         lightgoldenrodyellow = [250 250 210] ./ 255; % 415
@@ -46,6 +49,7 @@ classdef wbmColor
         mintcream            = [245 255 250] ./ 255; % 478
         mistyrose            = [255 228 225] ./ 255; % 479
         moccasin             = [255 228 181] ./ 255; % 484
+        navajowhite          = [255 222 173] ./ 255; % 485
         navyblue             = [0   0   128] ./ 255; % 491
         olivedrab            = [107 142  35] ./ 255; % 493
         olivedrab1           = [192 255  62] ./ 255; % 494
@@ -76,6 +80,8 @@ classdef wbmColor
         tan1                 = [255 165  79] ./ 255; % 621
         thistle              = [216 191 216] ./ 255; % 625
         tomato               = [255 99   71] ./ 255; % 630
+        turquoise            = [64  224 208] ./ 255; % 635
+        turquoise1           = [0   245 255] ./ 255; % 636
         violetred            = [208 32  144] ./ 255; % 641
         violetred4           = [139 34   82] ./ 255; % 645
         wheat                = [245 222 179] ./ 255; % 646
