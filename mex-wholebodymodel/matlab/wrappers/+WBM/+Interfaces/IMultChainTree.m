@@ -24,7 +24,7 @@ classdef (Abstract) IMultChainTree < handle
 
         [q_j, dq_j, wf_H_b, v_b] = getstate(bot)
 
-        setcontact(bot, ctc_mode, varargin) % for closed-loop & non-closed loop contacts
+        setcontact(bot, cmode, varargin) % for closed-loop & non-closed loop contacts
 
         ddq_j = accel(bot, q_j, dq_j, tau)
 

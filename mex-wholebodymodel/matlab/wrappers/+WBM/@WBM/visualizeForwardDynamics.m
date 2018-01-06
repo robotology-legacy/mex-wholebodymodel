@@ -76,6 +76,9 @@ function sim_config = initSimEnvironment(obj, sim_config)
     % environment and add them to the graphics array:
     trg_pts = sim_config.target_pts;
     if ~isempty(trg_pts)
+        if ~iscolumn(trg_pts)
+            error('initSimEnvironment: %s', WBM.wbmErrorMsg.WRONG_ARR_DIM);
+        end
         nTrg    = size(trg_pts,1);
         gfx_trg = gobjects(nTrg,1);
 
@@ -89,6 +92,9 @@ function sim_config = initSimEnvironment(obj, sim_config)
     % environment and add them to the graphics array:
     traj = sim_config.trajectories;
     if ~isempty(traj)
+        if ~iscolumn(traj)
+            error('initSimEnvironment: %s', WBM.wbmErrorMsg.WRONG_ARR_DIM);
+        end
         nTraj    = size(traj,1);
         len      = 2*nTraj;
         gfx_traj = gobjects(len,1);
@@ -113,7 +119,7 @@ function sim_config = initSimEnvironment(obj, sim_config)
     vb_objects = sim_config.environment.vb_objects;
     if ~isempty(vb_objects)
         if ~iscolumn(vb_objects)
-            error('initSimEnvironment: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+            error('initSimEnvironment: %s', WBM.wbmErrorMsg.WRONG_ARR_DIM);
         end
         nObj    = size(vb_objects,1);
         gfx_vbo = gobjects(nObj,1);

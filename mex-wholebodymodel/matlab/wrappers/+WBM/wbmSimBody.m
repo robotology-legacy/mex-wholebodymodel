@@ -42,7 +42,7 @@ classdef wbmSimBody < handle
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
             end
             if ~iscolumn(jnt_lnk_names)
-                error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
+                error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_ARR_DIM);
             end
 
             obj.jnt_lnk_names = jnt_lnk_names;

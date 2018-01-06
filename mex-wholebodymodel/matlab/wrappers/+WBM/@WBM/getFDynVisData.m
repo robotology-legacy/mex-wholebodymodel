@@ -31,7 +31,7 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                         % ac_f      = varargin{5} (must be either zero or constant)
                         vis_data = getVisDataEF(obj, stmChi, fhTrqControl, varargin{1:5}, noi);
                     else
-                        % simple forward dynamics with payload at the hands:
+                        % simple forward dynamics with payloads at the hands:
                         % fhTotCWrench = varargin{1}
                         % foot_conf    = varargin{2}
                         % hand_conf    = varargin{3}
@@ -43,6 +43,31 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                     % simple forward dynamics without any pose corrections:
                     % pc_type = varargin{1}
                     vis_data = getVisData(obj, stmChi, fhTrqControl, noi);
+                otherwise
+                    error('WBM::getFDynVisData: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
+            end
+        case 'nfb'
+            % no floating base (without pose corrections):
+            switch narg
+                case 7
+                    % pc_type = varargin{4}
+                    if isstruct(varargin{1,1})
+                        % forward dynamics with external forces:
+                        % clnk_conf = varargin{1}
+                        % fe_c      = varargin{2}
+                        % ac        = varargin{3}
+                        vis_data = getVisDataNFBEF(obj, stmChi, fhTrqControl, varargin{1:3}, noi);
+                    else
+                        % forward dynamics with payloads at the hands:
+                        % fhTotCWrench = varargin{1}
+                        % hand_conf    = varargin{2}
+                        % f_cp         = varargin{3}
+                        vis_data = getVisDataNFBPL(obj, stmChi, fhTrqControl, varargin{1:3}, noi);
+                    end
+                case 4
+                    % forward dynamics without any pose corrections:
+                    % pc_type = varargin{1}
+                    vis_data = getVisDataNFB(obj, stmChi, fhTrqControl, noi);
                 otherwise
                     error('WBM::getFDynVisData: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
@@ -62,7 +87,7 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                         vis_data = getVisDataFPCEF(obj, stmChi, fhTrqControl, varargin{1:5}, noi);
                     else
                         % extended forward dynamics with foot pose corrections
-                        % and payload at the hands:
+                        % and payloads at the hands:
                         % fhTotCWrench = varargin{1}
                         % foot_conf    = varargin{2}
                         % hand_conf    = varargin{3}
@@ -111,7 +136,7 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                 % ac_f      = varargin{5} (must be either zero or constant)
                 vis_data = getVisDataFHPCEF(obj, stmChi, fhTrqControl, varargin{1:5}, noi);
             else
-                % extended function with payload at the hands:
+                % extended function with payloads at the hands:
                 % fhTotCWrench = varargin{1}
                 % foot_conf    = varargin{2}
                 % hand_conf    = varargin{3}
@@ -180,13 +205,13 @@ function fd_prms = getFDynParamsEF(obj, t, stvChi, fhTrqControl, foot_conf, clnk
     % visualization data structure from the controller:
     [tau, ctrl_prms] = fhTrqControl(t);
     % get the the fdyn-parameters from the joint acceleration computation:
-    [~,fd_prms] = jointAccelerationsEF(obj, tau, stp.dq_j, foot_conf, clnk_conf, fe_c, ac); % optimized mode
+    [~,fd_prms] = jointAccelerationsEF(obj, foot_conf, clnk_conf, tau, fe_c, ac, stp.dq_j); % optimized mode
 
     % add the controller data to the data structure ...
     fd_prms.ctrl_prms = ctrl_prms;
 end
 
-function fd_prms = getFDynParamsPL(obj, t, stvChi, fhTrqControl, foot_conf, hand_conf, f_cp, ac_f)
+function fd_prms = getFDynParamsPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f)
     % get the current state parameters ...
     stp = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
     v_b = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
@@ -197,9 +222,69 @@ function fd_prms = getFDynParamsPL(obj, t, stvChi, fhTrqControl, foot_conf, hand
     % get the current torque forces and the corresponding
     % visualization data structure from the controller:
     [tau, ctrl_prms] = fhTrqControl(t);
-    % get the the fdyn-parameters from the joint acceleration computation:
-    [~,fd_prms] = jointAccelerationsPL(obj, tau, stp.dq_j, foot_conf, hand_conf, f_cp, ac_f); % optimized mode
+    % get the the fdyn-parameters from the joint acceleration computation (optimized mode):
+    [~,fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, ac_f, stp.dq_j);
 
+    % add the controller data to the data structure ...
+    fd_prms.ctrl_prms = ctrl_prms;
+end
+
+function fd_prms = getFDynParamsNFB(obj, t, stvChi, fhTrqControl)
+    % get the current state parameters ...
+    stp = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
+    v_b = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
+
+    % update the state for the optimized mode ...
+    setState(obj, stp.q_j, stp.dq_j, v_b);
+
+    [M, c_qv] = wholeBodyDyn(obj); % optimized mode
+
+    % get the current torque forces and the corresponding
+    % visualization data structure from the controller:
+    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp);
+    % get the the fdyn-parameters from the joint acceleration computation:
+    [~,fd_prms] = jointAccelerationsNFB(obj, tau, M, c_qv, stp.dq_j); % optimized mode
+
+    % add the controller data to the data structure ...
+    fd_prms.ctrl_prms = ctrl_prms;
+end
+
+function fd_prms = getFDynParamsNFBEF(obj, t, stvChi, fhTrqControl, clnk_conf, fe_c, ac)
+    % get the current state parameters ...
+    stp = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
+    v_b = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
+
+    % update the state for the optimized mode ...
+    setState(obj, stp.q_j, stp.dq_j, v_b);
+
+    [M, c_qv] = wholeBodyDyn(obj); % optimized mode
+
+    % get the current torque forces and the corresponding
+    % visualization data structure from the controller:
+    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp);
+    % get the the fdyn-parameters from the joint acceleration computation (optimized mode):
+    [~,fd_prms] = jointAccelerationsNFBEF(obj, clnk_conf, tau, fe_c, ac, M, c_qv, stp.dq_j);
+
+    % add the controller data to the data structure ...
+    fd_prms.ctrl_prms = ctrl_prms;
+end
+
+function fd_prms = getFDynParamsNFBPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, hand_conf, f_cp)
+    % get the current state parameters ...
+    stp = WBM.utilities.ffun.fastGetStateParams(stvChi, obj.mwbm_config.stvLen, obj.mwbm_model.ndof);
+    v_b = vertcat(stp.dx_b, stp.omega_b); % generalized base velocity
+
+    % update the state for the optimized mode ...
+    setState(obj, stp.q_j, stp.dq_j, v_b);
+
+    [M, c_qv] = wholeBodyDyn(obj); % optimized mode
+
+    % get the current torque forces and the corresponding
+    % visualization data structure from the controller:
+    [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp);
+    % get the the fdyn-parameters from the joint acceleration computation (optimized mode):
+    [~,fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, ...
+                                       ac_f, M, c_qv, stp.dq_j);
     % add the controller data to the data structure ...
     fd_prms.ctrl_prms = ctrl_prms;
 end
@@ -499,6 +584,101 @@ function vis_data = getVisDataPL(obj, stmChi, fhTrqControl, fhTotCWrench, foot_c
             acf    = ac_f(i,1:acf_len).';
 
             fd_prms  = getFDynParamsPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp, acf);
+            vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
+        end
+    end
+end
+
+function vis_data = getVisDataNFB(obj, stmChi, fhTrqControl, noi)
+    len = obj.mwbm_config.stvLen;
+
+    % create and initialize the visualization data container:
+    stvChi  = stmChi(1,1:len).'; % first element
+    fd_prms = getFDynParamsNFB(obj, 1, stvChi, fhTrqControl);
+    [vis_data, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl] = initVisDataStruct(fd_prms, noi);
+
+    % put all data into the data container:
+    for i = 1:noi
+        stvChi   = stmChi(i,1:len).';
+        fd_prms  = getFDynParamsNFB(obj, i, stvChi, fhTrqControl);
+        vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
+    end
+end
+
+function vis_data = getVisDataNFBEF(obj, stmChi, fhTrqControl, clnk_conf, fe_c, ac, noi)
+    len = obj.mwbm_config.stvLen;
+
+    % initialization:
+    [fe_1, fe_len, fe_const] = getFirstVector(fe_c, noi);
+    [ac_1, ac_len, ac_const] = getFirstVector(ac, noi);
+
+    stvChi  = stmChi(1,1:len).';
+    fd_prms = getFDynParamsNFBEF(obj, 1, stvChi, fhTrqControl, clnk_conf, fe_1, ac_1);
+    [vis_data, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl] = initVisDataStruct(fd_prms, noi);
+
+    % put all data into the data container:
+    if (fe_const && ac_const)
+        % ext. forces and contact accelerations are constant:
+        for i = 1:noi
+            stvChi   = stmChi(i,1:len).';
+            fd_prms  = getFDynParamsNFBEF(obj, i, stvChi, fhTrqControl, clnk_conf, fe_1, ac_1);
+            vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
+        end
+    elseif fe_const
+        % only the ext. forces are constant:
+        for i = 1:noi
+            stvChi = stmChi(i,1:len).';
+            a_c    = ac(i,1:ac_len).';
+
+            fd_prms  = getFDynParamsNFBEF(obj, i, stvChi, fhTrqControl, clnk_conf, fe_1, a_c);
+            vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
+        end
+    elseif ac_const
+        % only the contact accelerations are constant:
+        for i = 1:noi
+            stvChi = stmChi(i,1:len).';
+            fe     = fe_c(i,1:fe_len).';
+
+            fd_prms  = getFDynParamsNFBEF(obj, i, stvChi, fhTrqControl, clnk_conf, fe, ac_1);
+            vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
+        end
+    else
+        % both vectors are row vector lists (matrices):
+        for i = 1:noi
+            stvChi = stmChi(i,1:len).';
+            fe     = fe_c(i,1:feh_len).';
+            a_c    = ac(i,1:acf_len).';
+
+            fd_prms  = getFDynParamsNFBEF(obj, i, stvChi, fhTrqControl, clnk_conf, fe, a_c);
+            vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
+        end
+    end
+end
+
+function vis_data = getVisDataNFBPL(obj, stmChi, fhTrqControl, fhTotCWrench, hand_conf, f_cp, noi)
+    len = obj.mwbm_config.stvLen;
+
+    % initialization:
+    [fcp_1, fcp_len, fcp_const] = getFirstVector(f_cp, noi);
+    stvChi  = stmChi(1,1:len).';
+    fd_prms = getFDynParamsNFBPL(obj, 1, stvChi, fhTrqControl, fhTotCWrench, hand_conf, fcp_1);
+    [vis_data, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl] = initVisDataStruct(fd_prms, noi);
+
+    % put all data into the data container:
+    if fcp_const
+        % the payload forces are constant:
+        for i = 1:noi
+            stvChi   = stmChi(i,1:len).';
+            fd_prms  = getFDynParamsNFBPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, fcp_1);
+            vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
+        end
+    else
+        % the payload force is a row vector list (matrix):
+        for i = 1:noi
+            stvChi = stmChi(i,1:len).';
+            fcp    = f_cp(i,1:fcp_len).';
+
+            fd_prms  = getFDynParamsNFBPL(obj, i, stvChi, fhTrqControl, fhTotCWrench, hand_conf, fcp);
             vis_data = setVisData(i, vis_data, fd_prms, fnames_base, nflds_base, fnames_ctrl, nflds_ctrl);
         end
     end

@@ -30,7 +30,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     chn        ...  chain
     chnt       ...  chain tree
     cl         ...  contact link(s)
-    clink/clnk ...  contact link
+    clink/clnk ...  contact link OR constraint link (**)
     clp        ...  contact link pose
     cm         ...  center of mass
     cmo        ...  column major order
@@ -58,6 +58,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     exc, ex    ...  exception
     fb         ...  floating base
     fcn        ...  function
+    fd         ...  forward dynamics OR fixed distance (**)
     ffun       ...  fast functions
     fh...      ...  function handle OR file handle (begin of variable name) (**)
     fix        ...  fixed
@@ -183,6 +184,7 @@ Legend of abbreviations and acronyms which are used for the variable names:
     tgts       ...  targets
     tidx       ...  time index OR task index (**)
     tl         ...  trajectory line
+    tp         ...  target point(s)
     tpos       ...  target position(s)
     tr         ...  translation(s) OR trace (**)
     trans      ...  translation(s)

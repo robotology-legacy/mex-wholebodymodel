@@ -1,87 +1,59 @@
-function [f_pl, pl_prms] = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp, v_pl, a_pl)
+function f_pl = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp, wf_v_lnk, wf_a_lnk)
     ctc_l = hand_conf.contact.left;
     ctc_r = hand_conf.contact.right;
+    lnk_R_cm = eye(3,3);
 
     % check which link (hand) has contact with the object(s):
     if (ctc_l && ctc_r)
         % both hands:
-        % accelerations ...
-        ap_l = a_pl(1:6,1);
-        ap_r = a_pl(7:12,1);
-        % velocities ...
-        vp_l = v_pl(1:6,1);
-        vp_r = v_pl(7:12,1);
+        wf_a_lnk_l = wf_a_lnk(1:6,1);  % accelerations
+        wf_a_lnk_r = wf_a_lnk(7:12,1);
+        wf_v_lnk_l = wf_v_lnk(1:6,1);  % velocities
+        wf_v_lnk_r = wf_v_lnk(7:12,1);
 
-        % calculate the generalized inertia for each hand:
-        wf_H_ee = cell(1,2);
-        M_p     = wf_H_ee;
-        for i = 1:2
-            [M_p{1,i}, frms] = generalizedInertiaPL(obj, i); % optimized mode
-            wf_H_ee{1,i} = frms.wf_H_lnk;
-        end
-
-        % calculate the total contact wrench for each hand:
-        n  = size(f_cp,1);
-        if mod(n,2), error('handPayloadForces: The vector length is not even!'); end
+        n = length(f_cp);
+        if (mod(n,2) ~= 0), error('handPayloadForces: The vector length is not even!'); end
         sp = n*0.5; % split position
-        fcp_l = f_cp(1:sp,1);
-        fcp_r = f_cp((sp+1):n,1);
+        fcp_l = f_cp(1:sp);
+        fcp_r = f_cp((sp+1):n);
 
-        % get the positions & orientations from the contact frame {c_i}
-        % (at contact point pc_i) to the world frame {wf}:
-        [wf_R_cl, wf_p_cl] = WBM.utilities.tfms.tform2posRotm(wf_H_ee{1,1});
-        [wf_R_cr, wf_p_cr] = WBM.utilities.tfms.tform2posRotm(wf_H_ee{1,2});
+        % compute the (negated) total contact wrenches of
+        % each hand in contact frame {c_i} = {lnk_i}:
+        lnk_p_cm_l = obj.mwbm_config.payload_links(1,1).lnk_p_cm;
+        lnk_p_cm_r = obj.mwbm_config.payload_links(1,2).lnk_p_cm;
 
-        wc_tot_l = fhTotCWrench(fcp_l, wf_R_cl, wf_p_cl);
-        wc_tot_r = fhTotCWrench(fcp_r, wf_R_cr, wf_p_cr);
+        wc_tot_l = fhTotCWrench(fcp_l, lnk_R_cm, lnk_p_cm_l);
+        wc_tot_r = fhTotCWrench(fcp_r, lnk_R_cm, lnk_p_cm_r);
 
-        % payload forces of both hands:
-        fp_l = payloadForce(obj, M_p{1,1}, vp_l, ap_l, wc_tot_l);
-        fp_r = payloadForce(obj, M_p{1,2}, vp_r, ap_r, wc_tot_r);
-        f_pl = vertcat(fp_l, fp_r);
-
-        if (nargout == 2)
-            wc_tot = vertcat(wc_tot_l, wc_tot_r);
-            M_pl   = vertcat(M_p{1,1}, M_p{1,2});
-            pl_prms = struct('wc_tot', wc_tot, 'M_pl', M_pl);
-        end
+        % payload forces f_pl of both hands (in contact frames {lnk_1} & {lnk_2})
+        % with applied wrenches/forces of the robot to the object at each
+        % contact point pc_i:
+        % (the calculation is not really correct, but a good approximation)
+        fp_l = dynPayloadForce(obj, 1, wf_v_lnk_l, wf_a_lnk_l) * 0.5;
+        fp_r = dynPayloadForce(obj, 2, wf_v_lnk_r, wf_a_lnk_r) * 0.5;
+        f_pl = vertcat(fp_l + wc_tot_l, fp_r + wc_tot_r);
     elseif ctc_l
         % only left hand:
-        % compute the generalized inertia for the left hand:
-        [M_pl, frms] = generalizedInertiaPL(obj, 1); % optimized mode
-        wf_H_eel = frms.wf_H_lnk;
+        lnk_p_cm = obj.mwbm_config.payload_links(1,1).lnk_p_cm;
 
-        % positions & orientations of the left contact point ...
-        [wf_R_cl, wf_p_cl] = WBM.utilities.tfms.tform2posRotm(wf_H_eel);
-        % calculate the total contact wrench of the left hand ...
-        wc_tot_l = fhTotCWrench(f_cp, wf_R_cl, wf_p_cl);
+        % total contact wrench of the left hand (at {c_1} = {lnk_1}):
+        wc_tot_l = fhTotCWrench(f_cp, lnk_R_cm, lnk_p_cm);
         % get the payload force of the left hand:
-        f_pl = payloadForce(obj, M_pl, v_pl, a_pl, wc_tot_l);
-
-        if (nargout == 2)
-            pl_prms = struct('wc_tot', wc_tot_l, 'M_pl', M_pl);
-        end
+        f_pl = dynPayloadForce(obj, 1, wf_v_lnk, wf_a_lnk, wc_tot_l);
     elseif ctc_r
         % only right hand:
-        % compute the generalized inertia for the right hand:
-        [M_pl, frms] = generalizedInertiaPL(obj, 2); % optimized mode
-        wf_H_eer = frms.wf_H_lnk;
+        lnk_p_cm_r = obj.mwbm_config.payload_links(1,2).lnk_p_cm;
 
-        % positions & orientations of the right contact point ...
-        [wf_R_cr, wf_p_cr] = WBM.utilities.tfms.tform2posRotm(wf_H_eer);
-        % calculate the total contact wrench of the right hand ...
-        wc_tot_r = fhTotCWrench(f_cp, wf_R_cr, wf_p_cr);
+        % total contact wrench of the right hand (at {c_2} = {lnk_2}):
+        wc_tot_r = fhTotCWrench(f_cp, lnk_R_cm, lnk_p_cm_r);
         % get the payload force of the right hand:
-        f_pl = payloadForce(obj, M_pl, v_pl, a_pl, wc_tot_r);
-
-        if (nargout == 2)
-            pl_prms = struct('wc_tot', wc_tot_r, 'M_pl', M_pl);
-        end
+        f_pl = dynPayloadForce(obj, 2, wf_v_lnk, wf_a_lnk, wc_tot_r);
     else
         % no contact:
         f_pl = obj.ZERO_CVEC_12;
-        if (nargout == 2)
-            pl_prms = struct('wc_tot', obj.ZERO_CVEC_12, 'M_pl', zeros(12,6));
-        end
+        return
     end
+    % normalize the payload forces ...
+    n = sqrt(f_pl.'*f_pl);
+    f_pl = f_pl / n;
 end

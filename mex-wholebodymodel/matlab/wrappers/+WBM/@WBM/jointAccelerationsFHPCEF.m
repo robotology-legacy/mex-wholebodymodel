@@ -76,9 +76,9 @@ function [ddq_j, fd_prms] = jointAccelerationsFHPCEF(obj, foot_conf, hand_conf, 
 
     % calculate the total joint acceleration vector ddq_j in
     % dependency of the contact forces of the contact constraints:
-    J_c  = vertcat(Jc_f, Jc_h);
-    f_c  = vertcat(fc_f, fc_h);
-    Jc_t = J_c.';
+    J_c   = vertcat(Jc_f, Jc_h);
+    f_c   = vertcat(fc_f, fc_h);
+    Jc_t  = J_c.';
     ddq_j = M \ (tau_gen + Jc_t*f_c - c_qv);
 
     if (nargout == 2)

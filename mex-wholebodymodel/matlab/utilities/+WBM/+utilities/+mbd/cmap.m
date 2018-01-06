@@ -13,36 +13,36 @@ function G_c = cmap(varargin)
     switch nargin
         case 3
             % general case:
-            a_R_c = varargin{1,1};
-            a_p_c = varargin{1,2};
+            o_R_c = varargin{1,1};
+            o_p_c = varargin{1,2};
             % ctc_type = varargin{3}
 
-            WBM.utilities.chkfun.checkMatDim(a_R_c, 3, 3, 'cmap');
-            WBM.utilities.chkfun.checkCVecDim(a_p_c, 3, 'cmap');
+            WBM.utilities.chkfun.checkMatDim(o_R_c, 3, 3, 'cmap');
+            WBM.utilities.chkfun.checkCVecDim(o_p_c, 3, 'cmap');
 
-            a_cX_c = WBM.utilities.tfms.coadjoint(a_R_c, a_p_c);
+            o_cX_c = WBM.utilities.tfms.coadjoint(o_R_c, o_p_c);
             B_c    = WBM.utilities.mbd.wbasis(varargin{1,3});
-            G_c    = a_cX_c * B_c;
+            G_c    = o_cX_c * B_c;
         case 2
             % special case:
-            % The rotation matrix a_R_c (from contact frame {C} to frame {A})
-            % is an identity matrix and a_p_c is not zero.
-            a_p_c    = varargin{1,1};
+            % The rotation matrix o_R_c (from the contact frame {C} to the origin frame {O}
+            % at the CoM of the object) is an identity matrix and o_p_c is not zero.
+            o_p_c    = varargin{1,1};
             ctc_type = varargin{1,2};
 
-            WBM.utilities.chkfun.checkCVecDim(a_p_c, 3, 'cmap');
+            WBM.utilities.chkfun.checkCVecDim(o_p_c, 3, 'cmap');
 
             switch ctc_type
                 case 'pcwf'
                     % point contact with friction:
                     G_c = zeros(6,3);
                     G_c(1:3,1:3) = eye(3,3);
-                    G_c(4:6,1:3) = WBM.utilities.tfms.skewm(a_p_c);
+                    G_c(4:6,1:3) = WBM.utilities.tfms.skewm(o_p_c);
                 case 'sfc'
                     % soft-finger contact (with friction):
                     G_c = zeros(6,4);
                     G_c(1:3,1:3) = eye(3,3);
-                    G_c(4:6,1:3) = WBM.utilities.tfms.skewm(a_p_c);
+                    G_c(4:6,1:3) = WBM.utilities.tfms.skewm(o_p_c);
                     G_c(6,4)     = 1;
                 case 'fpc'
                     % frictionless point contact:
@@ -50,8 +50,8 @@ function G_c = cmap(varargin)
                     % negligibly low or unknown)
                     G_c = zeros(6,1);
                     G_c(3,1) =  1;
-                    G_c(4,1) =  a_p_c(2,1);
-                    G_c(5,1) = -a_p_c(1,1);
+                    G_c(4,1) =  o_p_c(2,1);
+                    G_c(5,1) = -o_p_c(1,1);
                 otherwise
                     error('cmap: %s', WBM.wbmErrorMsg.UNKNOWN_CTC_MODEL);
             end

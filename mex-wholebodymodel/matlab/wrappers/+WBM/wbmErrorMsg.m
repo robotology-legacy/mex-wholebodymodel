@@ -30,6 +30,7 @@ classdef wbmErrorMsg
         VALUE_LTE_ZERO    = 'The value must be greater than zero!';
         VALUE_LT_ZERO     = 'The value must be positive!';
         VAL_OUT_OF_BOUNDS = 'Value(s) out of bounds!';
+        WRONG_ARR_DIM     = 'Wrong array dimension!';
         WRONG_ARR_SIZE    = 'Wrong array size!';
         WRONG_DATA_TYPE   = 'Wrong data type!';
         WRONG_MAT_DIM     = 'Wrong matrix dimension!';

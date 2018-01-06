@@ -13,6 +13,9 @@ classdef WBM < WBM.WBMBase
     properties(Constant)
         DF_STIFFNESS  = 2.5; % default control gain for the position correction.
         MAX_NUM_TOOLS = 2;
+        MAX_JNT_SPEED = 250; % max. joint speed in [ksps] (kilosample(s) per second).
+        MAX_JNT_ACC   = 1e6; % max. joint acceleration with 1 [Ms/s^2] (Megasample(s) per second squared).
+        MAX_JNT_TRQ   = 1e5; % max. joint torque in [ksps] (kilosample(s) per second).
         % zero-vectors for contact accelerations/velocities
         % and for external force vectors:
         ZERO_CVEC_12 = zeros(12,1);
@@ -371,8 +374,20 @@ classdef WBM < WBM.WBMBase
             foot_conf = createConfigStateCL(obj, cstate, 'l_sole', 'r_sole', varargin{:});
         end
 
-        function hand_conf = handConfigState(obj, cstate, varargin)
-            hand_conf = createConfigStateCL(obj, cstate, 'l_hand', 'r_hand', varargin{:});
+        function hand_conf = handConfigState(obj, cstate, cmode, varargin)
+            switch cmode
+                case 'hand'
+                    % hand palms (hand link frame):
+                    clnk_l = 'l_hand';
+                    clnk_r = 'r_hand';
+                case 'gripper'
+                    % finger tips (hand_dh_frame):
+                    clnk_l = 'l_gripper';
+                    clnk_r = 'r_gripper';
+                otherwise
+                    error('WBM::handConfigState: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+            end
+            hand_conf = createConfigStateCL(obj, cstate, clnk_l, clnk_r, varargin{:});
         end
 
         vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
@@ -587,62 +602,56 @@ classdef WBM < WBM.WBMBase
             wf_H_cm = wf_H_lnk * lnk_H_cm; % payload transformation matrix
         end
 
-        function f_pl = payloadForce(~, M_pl, v_pl, a_pl, wc_tot)
-            % spatial cross operator of the mixed payload velocity in R^6 ...
-            SCPv = WBM.utilities.tfms.mixvelcp(v_pl);
+        f_pl = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp, wf_v_lnk, wf_a_lnk)
 
-            % apply the Newton-Euler equation to calculate the payload force in
-            % dependency of the total contact wrench wc of the payload object:
-            f_pl = M_pl * a_pl + SCPv * M_pl * v_pl + wc_tot;
+        function f_pl = dynPayloadForce(obj, pl_idx, wf_v_lnk, wf_a_lnk, w_e)
+            if (nargin == 4)
+                w_e = zeros(6,1);
+            end
+            pl_lnk_name = obj.mwbm_config.payload_links(1,pl_idx).urdf_link_name;
+            WBM.utilities.chkfun.checkLinkName(pl_lnk_name, 'WBM::dynPayloadForce');
+
+            wf_H_lnk     = transformationMatrix(obj, pl_lnk_name); % optimized mode
+            [~,wf_R_lnk] = WBM.utilities.tfms.tform2posRotm(wf_H_lnk);
+
+            % mixed velocity transformation:
+            lnk_R_wf = wf_R_lnk.';
+            lnk_X_wf = WBM.utilities.tfms.mixveltfm(lnk_R_wf, lnk_R_wf);
+
+            % get the payload's acceleration & velocity from the link frame:
+            a_pl = lnk_X_wf * wf_a_lnk; % = a_lnk = I_6 * cm_a_lnk
+            v_pl = lnk_X_wf * wf_v_lnk; % = v_lnk = I_6 * cm_v_lnk
+
+            % calculate the affecting force of the payload object
+            % at the current contact point p_c:
+            M_pl = generalizedInertiaPL(obj, pl_idx); % = lnk_M_cm
+            f_pl = WBM.utilities.mbd.payloadWrenchRB(M_pl, v_pl, a_pl, w_e); % = f_lnk
         end
 
-        [f_pl, pl_prms] = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp, v_pl, a_pl)
-
-        function [M_pl, frms] = generalizedInertiaPL(obj, pl_idx, varargin)
-            pl_lnk_name = obj.mwbm_config.payload_links(1,pl_idx).urdf_link_name;
-            WBM.utilities.chkfun.checkLinkName(pl_lnk_name, 'WBM::generalizedInertiaPL');
-
-            switch nargin
-                case 5
-                    % normal mode:
-                    % wf_R_b = varargin{1}
-                    % wf_p_b = varargin{2}
-                    % q_j    = varargin{3}
-                    wf_H_lnk = transformationMatrix(obj, varargin{1,1}, varargin{1,2}, ...
-                                                    varargin{1,3}, pl_lnk_name);
-                case 2
-                     % optimized mode:
-                    wf_H_lnk = transformationMatrix(obj, pl_lnk_name);
-                otherwise
-                    error('WBM::generalizedInertiaPL: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
-            end
-            % Apply a simplified position/orientation estimation for the payload's CoM with
-            %
-            %       wf_R_cm = wf_R_lnk * lnk_R_c * c_R_cm   and
-            %       wf_p_cm = wf_p_c + (wf_R_c * c_p_cm),
-            %
-            % where wf_R_c = wf_R_lnk * lnk_R_c, lnk_R_c = c_R_cm = I_3 (identity matrix),
-            % wf_p_c = wf_p_lnk and c_p_cm = lnk_p_cm.
-            % I.e. the contact frame {c_i} and the frame {pl}, centered at CoM of the payload,
-            % have the same orientation as the link frame {lnk_i} and the contact point pc_i
-            % is at the origin o_i of {lnk_i}.
-            lnk_p_cm = obj.mwbm_config.payload_links(1,pl_idx).lnk_p_cm;
+        function M_pl = generalizedInertiaPL(obj, pl_idx)
             m_rb     = obj.mwbm_config.payload_links(1,pl_idx).m_rb;
+            lnk_p_cm = obj.mwbm_config.payload_links(1,pl_idx).lnk_p_cm;
 
-            lnk_H_cm = eye(4,4);
-            lnk_H_cm(1:3,4) = lnk_p_cm; % position from the payload's CoM to {lnk_i}.
-            wf_H_cm = wf_H_lnk * lnk_H_cm; % payload transformation matrix
-            [wf_p_cm, wf_R_cm] = WBM.utilities.tfms.tform2posRotm(wf_H_cm);
-
+            % Apply a simplified position/orientation estimation for the payload's CoM:
+            %
+            %       lnk_R_cm = lnk_R_c * c_R_cm   and
+            %       lnk_p_cm = lnk_R_c * c_p_cm,
+            %
+            % where lnk_R_c = c_R_cm = I_3 (identity matrix) and lnk_p_cm = c_p_cm.
+            % The contact frame {c} and the payload frame {cm} (centered at CoM)
+            % have the same orientation as the reference link frame {lnk} of the
+            % given end-effector (hand). The contact point p_c is set at the
+            % origin o_lnk of the link frame {lnk}.
+            %
+            % Note: The given position for the object's CoM must be from the
+            %       same reference frame {lnk}.
             if (m_rb == 0)
                 M_pl = zeros(6,6);
             else
+                % generalized inertia lnk_M_cm of the payload object at
+                % the contact point p_c = lnk_p_cm with lnk_R_cm = I_3:
                 I_cm = obj.mwbm_config.payload_links(1,pl_idx).I_cm;
-                M_pl = WBM.utilities.rb.generalizedInertia(m_rb, I_cm, wf_R_cm, wf_p_cm);
-            end
-
-            if (nargout == 2)
-                frms = struct('wf_H_lnk', wf_H_lnk, 'wf_H_cm', wf_H_cm);
+                M_pl = WBM.utilities.rb.generalizedInertia(m_rb, I_cm, lnk_p_cm);
             end
         end
 

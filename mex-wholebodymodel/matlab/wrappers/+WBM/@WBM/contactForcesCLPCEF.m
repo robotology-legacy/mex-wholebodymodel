@@ -1,6 +1,6 @@
 function [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc, djcdq, M, c_qv, varargin)
     switch nargin
-        % fe_c ... external forces affecting on the contact links
+        % fe_c ... external forces affecting on the contact links (in joint space)
         % ac   ... mixed generalized contact accelerations
         case 14 % normal modes:
             % generalized forces with friction:

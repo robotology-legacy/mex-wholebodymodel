@@ -58,6 +58,11 @@ function sim_config = setupSimulation(~, sim_config, rot3d)
     sim_config = initAxes(sim_config, nAxes);
     % set the current axes handle of the main figure to the first subplot ...
     set(sim_config.hWndFigure, 'CurrentAxes', sim_config.hAxes(1,1));
+
+    if (~sim_config.show_wnd || sim_config.mkvideo)
+        % don't show the window on the screen (i.e. for making videos) ...
+        set(sim_config.hWndFigure, 'Visible', 'off');
+    end
 end
 %% END of setupSimulation.
 
@@ -77,7 +82,6 @@ function sim_config = initAxes(sim_config, nAxes)
     for i = 1:nAxes
         sim_config.hAxes(1,i) = createAxes(sim_config, i);
         set(gca, 'SortMethod', 'childorder');
-        % set(gca, 'SortMethod', 'depth');
     end
 end
 

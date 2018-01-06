@@ -1,8 +1,9 @@
 classdef genericSimConfig < WBM.wbmSimConfig
     properties(Dependent)
         % public properties for fast get/set methods:
-        custom_view@double vector % custom viewpoint for a perspective view.
-        axes_vwpts@cell    matrix % viewpoint positions of the axes.
+        custom_view@double  vector % custom viewpoint for a perspective view.
+        axes_vwpts@cell     matrix % viewpoint positions of the axes.
+        wnd_visible@logical scalar % enable/disable the figure window.
     end
 
     properties(Constant)
@@ -53,6 +54,7 @@ classdef genericSimConfig < WBM.wbmSimConfig
         wnd_title@char             = '';
         wnd_pos@double      vector = WBM.genericSimConfig.DF_WND_POS;
         wnd_size@double     vector = WBM.genericSimConfig.DF_WND_SIZE;
+        show_wnd@logical    scalar = true;
 
         nAxes@uint8         scalar = WBM.genericSimConfig.DF_AXES_NBR;
         hAxes@double        vector = [];
@@ -181,7 +183,7 @@ classdef genericSimConfig < WBM.wbmSimConfig
             if (n ~= 3)
                 error('genericSimConfig::shiftAxes: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
             end
-            if ( (max(axes_idx) > obj.nAxes) || (min(axes_idx) < 1) )54
+            if ( (max(axes_idx) > obj.nAxes) || (min(axes_idx) < 1) )
                 error('genericSimConfig::shiftAxes: %s', WBM.wbmErrorMsg.VAL_OUT_OF_BOUNDS);
             end
             if (m > 1)
@@ -207,6 +209,65 @@ classdef genericSimConfig < WBM.wbmSimConfig
             obj.maxes_vwpts{idx,2} = vp;
         end
 
+        function createVideo(obj, varargin)
+            filename = WBM.genericSimConfig.DF_VID_FILENAME;
+            fps      = WBM.genericSimConfig.DF_VID_FPS;
+            rmode    = 'r_fast';
+
+            if (nargin > 1)
+                switch nargin
+                    case 2
+                        filename = varargin{1,1};
+                    case 3
+                        filename = varargin{1,1};
+                        if ischar(varargin{1,2})
+                            rmode = varargin{1,2};
+                        else
+                            fps = varargin{1,2};
+                        end
+                    case 4
+                        filename = varargin{1,1};
+                        rmode    = varargin{1,2};
+                        fps      = varargin{1,3};
+                end
+            end
+            renderMode(obj, rmode, 'off');
+
+            obj.mkvideo      = true;
+            obj.vid_filename = filename;
+            obj.vid_fps      = fps;
+        end
+
+        function renderMode(obj, rmode, vis)
+            if isempty(obj.hWndFigure)
+                error('genericSimConfig::renderMode: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
+            end
+            if (nargin == 2)
+                % show the figure on the screen (default)
+                vis = 'on';
+            end
+            set(obj.hWndFigure, 'Visible', vis);
+
+            if ~verLessThan('matlab', '8.4.0')
+                switch rmode
+                    case 'r_fast'
+                        sort_meth = 'childorder';
+                    case 'r_depth'
+                        sort_meth = 'depth';
+                    otherwise
+                        error('genericSimConfig::renderMode: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
+                end
+
+                for i = 1:obj.nAxes
+                    set(obj.hWndFigure, 'CurrentAxes', obj.hAxes(1,i));
+                    set(gca, 'SortMethod', sort_meth);
+                end
+                return
+            end
+            % else ...
+            warning('genericSimConfig::renderMode: Matlab R2014b or higher is required.');
+        end
+
         function vp = get.custom_view(obj)
             idx = find(strcmp(obj.maxes_vwpts(1:end,1), 'custom'));
             if isempty(idx)
@@ -228,6 +289,15 @@ classdef genericSimConfig < WBM.wbmSimConfig
 
         function axes_vp = get.axes_vwpts(obj)
             axes_vp = obj.maxes_vwpts;
+        end
+
+        function set.wnd_visible(obj, vis)
+            if ~vis
+                set(obj.hWndFigure, 'Visible', 'off');
+            else
+                set(obj.hWndFigure, 'Visible', 'on');
+            end
+            obj.show_wnd = vis;
         end
 
     end

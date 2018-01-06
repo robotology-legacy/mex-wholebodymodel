@@ -78,8 +78,10 @@ function [vqT_vb, vb_idx, nVBds] = getPayloadFrames(obj, vqT_b, q_j, sim_config,
 
     i = -6;
     for j = 1:nVBds
-        vb_idx(j,1) = sim_config.pl_stack{j,1};
-        manip       = sim_config.pl_stack{j,2};
+        i_vb  = sim_config.pl_stack{j,1};
+        manip = sim_config.pl_stack{j,2};
+        vb_idx(j,1) = i_vb;
+
         switch manip
             case {'lh', 'bh'}
                 % left hand or both hands:
@@ -105,7 +107,7 @@ function [vqT_vb, vb_idx, nVBds] = getPayloadFrames(obj, vqT_b, q_j, sim_config,
         if (idx1 >= 1)
             % set the initial frame of the object's CoM before the obj. is grabbed
             % (i.e. time indices where the initial CoM doesn't move):
-            vqT_init = sim_config.environment.vb_objects(j,1).frame;
+            vqT_init = sim_config.environment.vb_objects(i_vb,1).frame;
             vqT_vb(ci,1:idx1) = repmat(vqT_init, 1, idx1);
         end
 

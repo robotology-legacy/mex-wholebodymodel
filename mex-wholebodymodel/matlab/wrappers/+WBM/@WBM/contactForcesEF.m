@@ -1,5 +1,7 @@
 function [f_c, tau_gen] = contactForcesEF(obj, tau, fe_c, ac, Jc, djcdq, M, c_qv, dq_j)
     switch nargin
+        % fe_c ... external forces affecting on the contact links (in contact space)
+        % ac   ... mixed generalized contact accelerations
         case 9
             % generalized forces with friction:
             tau_fr  = frictionForces(obj, dq_j); % friction torques (negated torque values)

@@ -28,6 +28,7 @@ classdef (Abstract) wbmSimConfig < handle
         wnd_title@char
         wnd_pos@double      vector
         wnd_size@double     vector
+        show_wnd@logical    scalar
 
         nAxes@uint8         scalar
         hAxes@double        vector

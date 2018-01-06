@@ -95,12 +95,12 @@ classdef MultChainTree < WBM.Interfaces.IMultChainTree
             end
         end
 
-        function setcontact(bot, ctc_mode, varargin) % for closed-loop & non-closed loop contacts
-            switch ctc_mode
+        function setcontact(bot, cmode, varargin) % for closed-loop & non-closed loop contacts
+            switch cmode
                 case 'foot'
                     bot.mwbm.foot_conf = footConfig(bot.mwbm, varargin{:});
-                case 'hand'
-                    bot.mwbm.hand_conf = handConfig(bot.mwbm, varargin{:});
+                case {'hand', 'gripper'}
+                    bot.mwbm.hand_conf = handConfig(bot.mwbm, cmode, varargin{:});
                 otherwise
                     error('MultChainTree::setcontact: %s', WBM.wbmErrorMsg.STRING_MISMATCH);
             end

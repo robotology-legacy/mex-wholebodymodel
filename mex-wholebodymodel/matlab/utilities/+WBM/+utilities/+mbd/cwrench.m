@@ -1,7 +1,10 @@
 function [w_c, wc_prms] = cwrench(f_cp, varargin)
-    vlen = size(f_cp,1); % f_cp (force applied to the object at contact point a_p_c)
-                         % must be a column-vector or a scalar.
-    %% Contact wrench:
+    f_cp = f_cp(:); % f_cp ... force applied to the object at contact point o_p_c in contact frame {C}
+                    %          (must be a vector or a scalar).
+                    %          Note: The z-axis of the contact frame {C} points in the direction
+                    %                of the inward surface normal at the point of contact o_p_c.
+    vlen = size(f_cp,1);
+    %% Contact wrench (in contact space):
     %  Sources:
     %   [1]  GraspIt!: A Versatile Simulator for Robotic Grasping, Andrew T. Miller, PhD, Columbia University, 2001, pp. 44-50, eq. (4.1)-(4.5) & (4.10).
     %   [2]  Planning Optimal Grasps, C. Ferrari & J. Canny, IEEE International Conference on Robotics and Automation (ICRA), 1992,
@@ -35,8 +38,8 @@ function [w_c, wc_prms] = cwrench(f_cp, varargin)
     switch nargin
         case 5 % contact models with friction:
             % soft-finger contact (general case):
-            % a_R_c = varargin{1}, from contact frame {C} to frame {A}.
-            % a_p_c = varargin{2}
+            % o_R_c = varargin{1} (from the contact frame {C} to the origin frame {O} at the CoM of the object)
+            % o_p_c = varargin{2}
             mu_s    = varargin{1,3};
             gamma_s = varargin{1,4};
 
@@ -45,14 +48,14 @@ function [w_c, wc_prms] = cwrench(f_cp, varargin)
             switch vlen
                 case 4
                     % soft-finger contact (special case):
-                    % a_p_c = varargin{1}
+                    % o_p_c = varargin{1}
                     mu_s    = varargin{1,2};
                     gamma_s = varargin{1,3};
                     G_c = WBM.utilities.mbd.cmap(varargin{1,1}, 'sfc');
                 case 3
                     % point contact w. friction (general case):
-                    % a_R_c = varargin{1}
-                    % a_p_c = varargin{2}
+                    % o_R_c = varargin{1}
+                    % o_p_c = varargin{2}
                     mu_s = varargin{1,3};
                     G_c = WBM.utilities.mbd.cmap(varargin{1,1}, varargin{1,2}, 'pcwf');
                 otherwise
@@ -62,13 +65,13 @@ function [w_c, wc_prms] = cwrench(f_cp, varargin)
             switch vlen
                 case 3
                     % point contact w. friction (special case):
-                    % a_p_c = varargin{1}
+                    % o_p_c = varargin{1}
                     mu_s = varargin{1,2};
                     G_c = WBM.utilities.mbd.cmap(varargin{1,1}, 'pcwf');
                 case 1 % f_cp is a scalar (not a vector) ...
                     % frictionless contact model (general case):
-                    % a_R_c = varargin{1}
-                    % a_p_c = varargin{2}
+                    % o_R_c = varargin{1}
+                    % o_p_c = varargin{2}
                     WBM.utilities.chkfun.checkValLTZero(f_cp, 'cwrench');
 
                     G_c = WBM.utilities.mbd.cmap(varargin{1,1}, varargin{1,2}, 'fpc');
@@ -84,7 +87,7 @@ function [w_c, wc_prms] = cwrench(f_cp, varargin)
             end
         case 2
             % frictionless contact model (special case):
-            % a_p_c = varargin{1}
+            % o_p_c = varargin{1}
             if (vlen ~= 1)
                 % f_cp is not a scalar ...
                 error('cwrench: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
@@ -101,23 +104,25 @@ function [w_c, wc_prms] = cwrench(f_cp, varargin)
         otherwise
             error('cwrench: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
-    % Based on the frictional contact models, calculate the contact wrench w_c and
-    % the corresponding friction cone FC of the contact point a_p_c:
+    % Based on the frictional contact models, calculate the contact wrench w_c
+    % and the corresponding friction cone FC of the contact point o_p_c:
 
-    % split the force vector f_cp in its components ...
-    f_x = f_cp(1,1); % tangential forces
-    f_y = f_cp(2,1);
-    f_n = f_cp(3,1); % normal force (direction inward toward the object surface)
+    % get the force components of each axis at contact point o_p_c in {C} = {x,y,z}:
+    % tangential forces (in the surface plane):
+    f_s = f_cp(1,1); % f_x
+    f_t = f_cp(2,1); % f_y
+    % normal force (points inward the surface):
+    f_n = f_cp(3,1); % f_z
 
-    if ( (f_x == 0) && (f_y == 0) )
+    if ( (f_s == 0) && (f_t == 0) )
         error('cwrench: Contact point force f_cp must have at least one tangential force!');
     end
 
-    % check the friction cone constraints:
-    WBM.utilities.chkfun.checkValLTZero(f_n, 'cwrench');
+    % Check the friction cone constraints:
+    if (f_n < 0), f_n = abs(f_n); end
 
-    f_t = sqrt(f_x*f_x + f_y*f_y); % magnitude of the tangential contact forces.
-    if (f_t > mu_s*f_n) % max. magnitude (radius) of the friction cone.
+    f_s = sqrt(f_s*f_s + f_t*f_t); % magnitude of the tangential contact forces.
+    if (f_s > mu_s*f_n) % max. magnitude (radius) of the friction cone.
         error('cwrench: Contact point force f_cp has left the friction cone!');
     end
     if (vlen == 4)
@@ -128,22 +133,22 @@ function [w_c, wc_prms] = cwrench(f_cp, varargin)
         end
     end
     % Define the unit vectors for the approximation of the friction cone FC:
-    fcp_h = f_cp./f_n; % normalize f_cp with the magnitude of f_n
-                       % ("_h" ... symbol for "hat").
+    fcp_h = f_cp./f_n; % normalize the components of f_cp with the
+                       % magnitude of f_n ("_h" ... symbol for "hat").
     %fcp_h = f_cp/sqrt(f_cp.'*f_cp); % normalization with magnitude of f_cp.
     Fcp_h = eye(3,3) .* fcp_h(1:3,1);
-    % unit vectors:
+    % unit vectors (along the axis):
     f1_h = Fcp_h(1:3,1);
     f2_h = Fcp_h(1:3,2);
     f3_h = Fcp_h(1:3,3);
 
     % Compute the primitive force vectors f_e(j) along
     % the edges of the m-sided polyhedron:
-    if (f_x == 0) % planar cases:
+    if (f_s == 0) % planar cases:
         % f1_h = 0:
         m = 2;
         f_e = computePrimForcesPCone(f2_h, f3_h, mu_s);
-    elseif (f_y == 0)
+    elseif (f_t == 0)
         % f2_h = 0:
         m = 2;
         f_e = computePrimForcesPCone(f1_h, f3_h, mu_s);
@@ -157,7 +162,7 @@ function [w_c, wc_prms] = cwrench(f_cp, varargin)
     %alpha_s = 1/m; % scale factor (w. magnitude of f_cp)
 
     % Calculate the primitive wrenches w_p(j) for the set of primitive contact wrenches W_p
-    % and the corresponding contact wrench w_c of the contact point a_p_c:
+    % and the corresponding contact wrench w_c of the contact point o_p_c:
     if (vlen == 4)
         % append the normalized mz_h to the primitive force vectors ...
         f_e = vertcat(f_e, repmat(fcp_h(4,1), 1, m));

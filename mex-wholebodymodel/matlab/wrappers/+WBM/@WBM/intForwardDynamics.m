@@ -27,18 +27,6 @@ function [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, od
                 case 11
                     % pc_type = varargin{6}
                     if isstruct(varargin{1,1})
-                        % simple function with payload at the hands:
-                        % f_cp = varargin{4}
-                        % ac_f = varargin{5}
-                        fhTotCWrench = varargin{1,1};
-                        foot_conf    = varargin{1,2};
-                        hand_conf    = varargin{1,3};
-
-                        checkInputTypes(fhTotCWrench, foot_conf, hand_conf);
-
-                        fhFwdDyn = @(t, chi)forwardDynamicsPL(obj, t, chi, fhTrqControl, fhTotCWrench, ...
-                                                              foot_conf, hand_conf, varargin{1,4}, varargin{1,5});
-                    else
                         % simple function with external forces:
                         % fe_c = varargin{3}
                         % ac   = varargin{4}
@@ -50,6 +38,18 @@ function [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, od
 
                         fhFwdDyn = @(t, chi)forwardDynamicsEF(obj, t, chi, fhTrqControl, foot_conf, ...
                                                               clnk_conf, varargin{3:5});
+                    else
+                        % simple function with payloads at the hands:
+                        % f_cp = varargin{4}
+                        % ac_f = varargin{5}
+                        fhTotCWrench = varargin{1,1};
+                        foot_conf    = varargin{1,2};
+                        hand_conf    = varargin{1,3};
+
+                        checkInputTypes(fhTotCWrench, foot_conf, hand_conf);
+
+                        fhFwdDyn = @(t, chi)forwardDynamicsPL(obj, t, chi, fhTrqControl, fhTotCWrench, ...
+                                                              foot_conf, hand_conf, varargin{1,4}, varargin{1,5});
                     end
                 case 6
                     % simple function without any pose corrections:
@@ -64,7 +64,17 @@ function [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, od
                 case 9
                     % pc_type = varargin{4}
                     if isstruct(varargin{1,1})
-                        % function with payload at the hands:
+                        % function with external forces:
+                        % fe_c = varargin{2}
+                        % ac   = varargin{3}
+                        clnk_conf = varargin{1,1};
+
+                        WBM.utilities.chkfun.checkCLinkConfig(clnk_conf, 'WBM::intForwardDynamics');
+
+                        fhFwdDyn = @(t, chi)forwardDynamicsNFBEF(obj, t, chi, fhTrqControl, clnk_conf, ...
+                                                                 varargin{1,2}, varargin{1,3});
+                    else
+                        % function with payloads at the hands:
                         % f_cp = varargin{3}
                         fhTotCWrench = varargin{1,1};
                         hand_conf    = varargin{1,2};
@@ -76,16 +86,6 @@ function [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, od
 
                         fhFwdDyn = @(t, chi)forwardDynamicsNFBPL(obj, t, chi, fhTrqControl, fhTotCWrench, ...
                                                                  hand_conf, varargin{1,3});
-                    else
-                        % function with external forces:
-                        % fe_c = varargin{2}
-                        % ac   = varargin{3}
-                        clnk_conf = varargin{1,1};
-
-                        WBM.utilities.chkfun.checkCLinkConfig(clnk_conf, 'WBM::intForwardDynamics');
-
-                        fhFwdDyn = @(t, chi)forwardDynamicsNFBEF(obj, t, chi, fhTrqControl, clnk_conf, ...
-                                                                 varargin{1,2}, varargin{1,3});
                     end
                 case 6
                     % function without any pose corrections:
@@ -112,7 +112,7 @@ function [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, od
                         fhFwdDyn = @(t, chi)forwardDynamicsFPCEF(obj, t, chi, fhTrqControl, foot_conf, ...
                                                                  clnk_conf, varargin{3:5});
                     else
-                        % extended function with payload at the hands:
+                        % extended function with payloads at the hands:
                         % f_cp = varargin{4}
                         % ac_f = varargin{5}
                         fhTotCWrench = varargin{1,1};
@@ -169,7 +169,7 @@ function [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, od
                 fhFwdDyn = @(t, chi)forwardDynamicsFHPCEF(obj, t, chi, fhTrqControl, foot_conf, ...
                                                           hand_conf, varargin{3:5});
             else
-                % extended function with payload at the hands:
+                % extended function with payloads at the hands:
                 % f_cp = varargin{4}
                 % ac_f = varargin{5}
                 fhTotCWrench = varargin{1,1};
