@@ -6,7 +6,7 @@ function v = satVel(v, varargin)
             % default velocity saturation value
             % for the iCub humanoid robot:
             % Source: <http://wiki.icub.org/brain/velControlThread_8cpp.html>
-            max_v = 250; % in [ksps] (kilosample(s) per second)
+            max_v = WBM.WBM.MAX_JNT_SPEED; % in [ksps] (kilosample(s) per second)
         case 2
             max_v = varargin{1,1};
         case 3

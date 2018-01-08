@@ -5,7 +5,7 @@ function tau = satTrq(tau, varargin)
         case 1
             % default torque saturation value
             % for the iCub humanoid robot:
-            max_t = 1e5; % in [ksps] (kilosample(s) per second)
+            max_t = WBM.WBM.MAX_JNT_TRQ; % in [ksps] (kilosample(s) per second)
         case 2
             max_t = varargin{1,1};
         case 3

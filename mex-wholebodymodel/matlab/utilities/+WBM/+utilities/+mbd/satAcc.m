@@ -6,7 +6,7 @@ function a = satAcc(a, varargin)
             % default acceleration saturation value
             % for the iCub humanoid robot:
             % Source: <http://wiki.icub.org/brain/velControlThread_8cpp.html>
-            max_a = 1e6; % 1 [Ms/s^2] (Megasample(s) per second squared)
+            max_a = WBM.WBM.MAX_JNT_ACC; % in [Ms/s^2] (Megasample(s) per second squared)
         case 2
             max_a = varargin{1,1};
         case 3

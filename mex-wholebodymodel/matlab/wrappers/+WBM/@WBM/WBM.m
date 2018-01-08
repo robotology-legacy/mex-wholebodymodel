@@ -13,9 +13,12 @@ classdef WBM < WBM.WBMBase
     properties(Constant)
         DF_STIFFNESS  = 2.5; % default control gain for the position correction.
         MAX_NUM_TOOLS = 2;
-        MAX_JNT_SPEED = 250; % max. joint speed in [ksps] (kilosample(s) per second).
-        MAX_JNT_ACC   = 1e6; % max. joint acceleration with 1 [Ms/s^2] (Megasample(s) per second squared).
+
+        MAX_JNT_SPEED = 250; % max. joint speed in [ksps] (kilosample(s) per second). (*)
+        MAX_JNT_ACC   = 1e6; % max. joint acceleration with 1 [Ms/s^2] (Megasample(s) per second squared). (*)
         MAX_JNT_TRQ   = 1e5; % max. joint torque in [ksps] (kilosample(s) per second).
+        % (*) Source: <http://wiki.icub.org/brain/velControlThread_8cpp.html>
+
         % zero-vectors for contact accelerations/velocities
         % and for external force vectors:
         ZERO_CVEC_12 = zeros(12,1);
