@@ -52,7 +52,7 @@ function sim_config = initSimConfigICub(varargin)
     % available in the iCub Model Naming Conventions under,
     %    <http://wiki.icub.org/wiki/ICub_Model_naming_conventions>.
     %
-    % Link names which are related to a specific parent joint of the robot model:
+    % Link names which are related to specific parent joints of the robot model:
     %                                                                  idx:        | parent joints:
     jnt_lnk_names = {'root_link'; ...                                %  1,         | --,
                      'r_hip_1'; 'r_lower_leg'; 'r_sole'; ...         %  2,  3,  4, | r_hip_pitch, r_knee, r_foot* --> r_foot_ft_sensor,
@@ -64,12 +64,12 @@ function sim_config = initSimConfigICub(varargin)
                                                                      %             |
                                                                      %             | (* ... link; ** ... link frame)
 
-    % Set of joint-pair indexes to describe the configuration of the iCub-robot's
+    % Set of joint pair indexes to describe the configuration of the iCub-robot's
     % skeleton (connectivity graph). Each pair of joints is connected with a rigid
-    % link (edge) to form a kinematic chain of the robot. The index-pairs denotes
-    % the index-position of the given joint names in the above joint name list.
-    % The index-set is used to create a set of position parameters that describes
-    % the full configuration of the robot system.
+    % link (edge) to form a kinematic chain of the robot. The index pairs denotes
+    % the index positions of the given joint names in the above joint name list.
+    % The index set is used to create a set of position parameters that describes
+    % the skeleton configuration of the robot.
     %
     % Joint pair indexes for the x, y and z-positions (translations) in the 3D-space:
     %                     x1 x2   y1 y2   z1 z2
@@ -87,8 +87,8 @@ function sim_config = initSimConfigICub(varargin)
                           12 13   12 13   12 13;
                           13 14   13 14   13 14]);
 
-    % List with constant scale factors to define the sizes of the shapes (patches) for
-    % the links (edges) of the robot's skeleton. They form the shape of the robot's body:
+    % List with constant scale factors to define the shape sizes of the body parts (patches)
+    % for the links (edges) of the robot's skeleton. They form the body shape of the robot:
     %                       x:     y:    jnt-idx:
     %                      wid    hgt
     shape_geom.size_sf = [0.07   0.03;  %  1
@@ -105,8 +105,9 @@ function sim_config = initSimConfigICub(varargin)
                           0.025  0.02;  % 12
                           0.02   0.02]; % 13
 
-    % Connection matrix to define which vertices are to connect for creating the shapes
-    % of the links or the shapes of the feet. Each row represents one polygon (rectangle):
+    % Vertex connection matrix to define which vertices are to connect for the polygons
+    % (patches), to create the body parts of the links and the shape of the feet. Each
+    % row represents one polygon (rectangle or trapezoid):
     shape_geom.faces = uint8([1 2 3 4;
                               1 4 8 5;
                               2 6 5 1;

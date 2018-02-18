@@ -17,7 +17,7 @@ function f_pl = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp, wf_v_lnk, 
         fcp_l = f_cp(1:sp);
         fcp_r = f_cp((sp+1):n);
 
-        % compute the (negated) total contact wrenches of
+        % compute the (external) total contact wrenches of
         % each hand in contact frame {c_i} = {lnk_i}:
         lnk_p_cm_l = obj.mwbm_config.payload_links(1,1).lnk_p_cm;
         lnk_p_cm_r = obj.mwbm_config.payload_links(1,2).lnk_p_cm;
@@ -26,12 +26,12 @@ function f_pl = handPayloadForces(obj, hand_conf, fhTotCWrench, f_cp, wf_v_lnk, 
         wc_tot_r = fhTotCWrench(fcp_r, lnk_R_cm, lnk_p_cm_r);
 
         % payload forces f_pl of both hands (in contact frames {lnk_1} & {lnk_2})
-        % with applied wrenches/forces of the robot to the object at each
-        % contact point pc_i:
-        % (the calculation is not really correct, but a good approximation)
+        % minus the applied (external) wrenches/forces of the robot to the object
+        % at each contact point pc_i:
+        % note: the calculation is not really correct, but a good approximation.
         fp_l = dynPayloadForce(obj, 1, wf_v_lnk_l, wf_a_lnk_l) * 0.5;
         fp_r = dynPayloadForce(obj, 2, wf_v_lnk_r, wf_a_lnk_r) * 0.5;
-        f_pl = vertcat(fp_l + wc_tot_l, fp_r + wc_tot_r);
+        f_pl = vertcat(fp_l - wc_tot_l, fp_r - wc_tot_r);
     elseif ctc_l
         % only left hand:
         lnk_p_cm = obj.mwbm_config.payload_links(1,1).lnk_p_cm;

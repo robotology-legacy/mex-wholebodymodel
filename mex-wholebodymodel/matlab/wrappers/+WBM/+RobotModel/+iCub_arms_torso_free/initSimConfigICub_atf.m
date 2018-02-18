@@ -13,10 +13,10 @@ function sim_config = initSimConfigICub_atf(urdf_file_name, scn_mode)
     % the "virtual joints" that are used to construct the dynamic model of the
     % iCub robot in the visualizer.
     %
-    % Additionally each link in the list has a vector with scale factors. The scale
-    % factors are defining the sizes of the shapes (patches) for the corresponding
-    % links (edges) of the robot's connectivity graph. They form the shape of the
-    % robot's body.
+    % Additionally each link in the list has a vector with constant scale factors.
+    % The scale factors are defining the shape sizes of the body parts (patches)
+    % for the corresponding links (edges) of the robot's connectivity graph. They
+    % form the body shape of the robot.
     %
     % Further details about the definitions of the joint, link and frame names are
     % available in the iCub Model Naming Conventions under,
@@ -62,17 +62,18 @@ function sim_config = initSimConfigICub_atf(urdf_file_name, scn_mode)
                        'neck_2',        [0.02  0.02]};
 
     % This function reads out all necessary data from the given URDF-file.
-    % It generates the joint-link name list, the joint-pair index list for creating
-    % the connectivity graph (skeleton), the complete shape-size list for the
-    % robot hull and it returns a joint-index pair for placing the feet on the
+    % It generates the joint-link name list, the joint pair index list for creating
+    % the connectivity graph (skeleton), the complete shape size list for the
+    % robot hull and it returns a joint index pair for placing the feet on the
     % right positions.
     %
     sf = 0.03; % default scale factor for the shape sizes of the links.
     %sf = 0.25;
     [jnt_lnk_names,~, jnt_pair_idx,~, shape_geom.size_sf, foot_geom.joints] = WBM.utilities.getSimConfigFromURDF(urdf_file_name, lnk_shape_sizes, sf);
 
-    % Connection matrix to define which vertices are to connect for creating the shapes
-    % of the links or the shapes of the feet. Each row represents one polygon (rectangle):
+    % Vertex connection matrix to define which vertices are to connect for the polygons
+    % (patches), to create the body parts of the links and the shape of the feet. Each
+    % row represents one polygon (rectangle or trapezoid):
     shape_geom.faces = uint8([1 2 3 4;
                               1 4 8 5;
                               2 6 5 1;

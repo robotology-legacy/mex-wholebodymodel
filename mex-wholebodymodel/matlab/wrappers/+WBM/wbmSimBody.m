@@ -1,4 +1,124 @@
+% Copyright (C) 2015-2018, by Martin Neururer
+% Author: Martin Neururer
+% E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
+% Date:   January, 2018
+%
+% Departments:
+%   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
+%   Automation and Control Institute - TU Wien.
+%
+% This file is part of the Whole-Body Model Library for Matlab (WBML).
+%
+% The development of the WBM-Library was made in the context of the master
+% thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
+% for the Matlab MEX whole-body model interface, which was supported by the
+% FP7 EU project CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and
+% Robotics (b)), <http://www.codyco.eu>.
+%
+% Permission is granted to copy, distribute, and/or modify the WBM-Library
+% under the terms of the GNU Lesser General Public License, Version 2.1
+% or any later version published by the Free Software Foundation.
+%
+% The WBM-Library is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU General Public License for more details.
+%
+% A copy of the GNU Lesser General Public License can be found along
+% with the WBML. If not, see <http://www.gnu.org/licenses/>.
+
 classdef wbmSimBody < handle
+    % :class:`!wbmSimBody` is a *data type* (class) that defines the *body model*,
+    % i.e. the geometric shape, of the simulated robot.
+    %
+    % Attributes:
+    %   shape_geom             (struct): Data structure to define the shape and
+    %                                    the size of all *body parts* (patches)
+    %                                    for the links and the feet of the robot's
+    %                                    skeleton.
+    %
+    %                                    **Note:** The structure has two data fields,
+    %                                    ``size_sf`` and ``faces``. The field ``size_sf``
+    %                                    represents a (*nLnks* x 2) data matrix with
+    %                                    *constant scale factors* of the form
+    %                                    :math:`[sf_{width}, sf_{height}]`, to define
+    %                                    the shape sizes for the body parts of all
+    %                                    links of the robot. The row index of the
+    %                                    matrix is equal to the joint index number of
+    %                                    the robot. The second field ``faces`` denotes
+    %                                    a (6 x 4) *vertex connection matrix* to define
+    %                                    which vertices are to connect for the polygons
+    %                                    of the patches. The patches are defining the
+    %                                    body parts of the robot.
+    %   shape_size_sf  (double, matrix): (*nLnks* x 2) matrix to set only the *scale
+    %                                    factors* :math:`[sf_{width}, sf_{height}]`
+    %                                    for the shape sizes of the body parts of
+    %                                    the robot (see :attr:`shape_geom`).
+    %   shape_faces     (uint8, matrix): (6 x 4) vertex connection matrix to set
+    %                                    only the *vertex connections* for the
+    %                                    polygons of the patches that are forming
+    %                                    the body parts for the robot (see
+    %                                    :attr:`shape_geom`).
+    %   foot_geom              (struct): Data structure to define the *geometric
+    %                                    form* of each foot of the robot.
+    %
+    %                                    **Note:** The data structure is a nested
+    %                                    structure and contains following fields:
+    %
+    %                                       - ``joints`` (uint8, vector): (2 x 1) vector to specify the
+    %                                                                     joint indices where the left
+    %                                                                     and right foot is connected.
+    %                                       - ``base_sz`` (struct): Structure with the fields ``width``
+    %                                                               and ``height``, to specify the *base
+    %                                                               size values* (double) for the feet
+    %                                                               of the robot. Optional, instead of
+    %                                                               the structure, a row-vector of the
+    %                                                               form :math:`[width, height]` can
+    %                                                               also be used to set the size values.
+    %                                       - ``shape_ds`` (double, matrix): (n x 3) matrix with *size values* of
+    %                                                                        the form :math:`[length, width, height]`
+    %                                                                        to define the *foot dimensions* in the
+    %                                                                        x, y and z directions.
+    %
+    %   foot_joints      (uint, vector): (2 x 1) vector to set the joint indices
+    %                                    for the left and the right foot (see
+    %                                    :attr:`foot_geom`).
+    %   foot_base_sz (struct or vector): Data structure, or optional a vector, to
+    %                                    set the *base size values*, i.e. the
+    %                                    ``width`` and the ``height``, for the
+    %                                    feet of the robot (see :attr:`foot_geom`).
+    %   foot_shape_ds  (double, matrix): (n x 3) matrix with size values of the
+    %                                    form :math:`[length, width, height]`
+    %                                    to set the *dimensions* for the feet
+    %                                    (see :attr:`foot_geom`).
+    %
+    %   draw_prop (:class:`~WBM.wbmRobotDrawProp`): Data object to control the draw properties
+    %                                               for the body of the simulated robot.
+    %
+    %   jnt_lnk_names  (cell, vector): Column-array of *link* and *frame names* that are
+    %                                  related to specific parent joints or parent links
+    %                                  of the robot model [#f1]_.
+    %   jnt_pair_idx  (uint8, matrix): (:math:`n` x 6) matrix of *joint pair indices* for the
+    %                                  x, y and z-positions to describe the configuration, i.e.
+    %                                  the *connectivity graph*, of the robot's skeleton in
+    %                                  3D-space. In general :math:`n = nJnts`, but if the given
+    %                                  robot also has a *root link* and/or a *com link* that
+    %                                  have no parent joint, then either :math:`n = nJnts - 1`
+    %                                  or :math:`n = nJnts - 2`.
+    %
+    %                                  **Note:** Each joint pair is connected with a rigid
+    %                                  link to form a kinematic chain of the robot. The
+    %                                  joint index pairs in the matrix denoting the index
+    %                                  positions of the given joint names in
+    %                                  :attr:`jnt_lnk_names`. The index pairs are specified
+    %                                  in the matrix as row-vectors of the form
+    %                                  :math:`[x_1, x_2, y_1, y_2, z_1, z_2]`.
+    %                                  The matrix will be used to create a set of position
+    %                                  parameters that describes the skeleton configuration
+    %                                  of the robot.
+    %   nJnts         (uint8, scalar): Number of joints of the robot model [#f2]_.
+    %   nLnks         (uint8, scalar): Number of links of the robot model [#f2]_.
+    %   nFeet         (uint8, scalar): Number of feet of the robot model [#f2]_.
     properties(Dependent)
         % public properties for fast get/set methods:
         shape_geom@struct
@@ -24,9 +144,13 @@ classdef wbmSimBody < handle
     end
 
     properties(Access = private)
+        % internal structure to store the shapes and
+        % sizes of all body parts of the robot:
         mshape_geom = struct( 'size_sf',  [], ...
                               'faces',    [] );
 
+        % internal structure to store the geometric data
+        % for the feet of the robot:
         mfoot_geom  = struct( 'joints',   [], ...
                               'base_sz',  struct( 'width',  0, ...
                                                   'height', 0 ), ...
@@ -35,6 +159,22 @@ classdef wbmSimBody < handle
 
     methods
         function obj = wbmSimBody(jnt_lnk_names, jnt_pair_idx, draw_prop)
+            % Constructor.
+            %
+            % Args:
+            %   jnt_lnk_names (cellstr, vector): Column-array of *link* and *frame names*
+            %                                    that are deduced from their parent joints
+            %                                    or parent links of the robot model [#f1]_
+            %                                    (see :attr:`jnt_lnk_names`).
+            %   jnt_pair_idx    (uint8, matrix): (n x 6) matrix of *joint pair indices* of
+            %                                    the form :math:`[x_1, x_2, y_1, y_2, z_1, z_2]`,
+            %                                    to describe the configuration, i.e. the
+            %                                    *connectivity graph*, of the robot's
+            %                                    skeleton in 3D-space (see :attr:`jnt_pair_idx`).
+            %   draw_prop (:class:`~WBM.wbmRobotDrawProp`): The draw properties for the body of
+            %                                               the simulated robot.
+            % Returns:
+            %   obj: An instance of the simulation body object.
             if (nargin < 2)
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end

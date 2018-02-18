@@ -8,7 +8,7 @@ function [wf_p_b, wf_R_b] = wbm_getWorldFrameFromFixLnk(varargin)
     %
     % Note: The default fixed link (floating base link) of each YARP-based robot can be different and
     % the selection of the floating base link depends also from the situation. For example the default
-    % fixed link of the iCub-Humanoid-Robot is "l_sole".
+    % fixed link of the iCub humanoid robot is "l_sole".
     %
     %   INPUT ARGUMENTS:
     %       Optimized mode:

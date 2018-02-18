@@ -2,9 +2,8 @@ function lnk_traj = setTrajectoriesData(obj, lnk_traj, stmPos, start_idx, end_id
     if ~isa(lnk_traj, 'WBM.wbmLinkTrajectory')
         error('WBM::setTrajectoriesData: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
-    if ~iscolumn(lnk_traj)
-        error('WBM::setTrajectoriesData: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
-    end
+    lnk_traj = lnk_traj(:); % make sure that lnk_traj is a column vector ...
+
     ndof = obj.mwbm_model.ndof;
     vlen = ndof + 7;
 
@@ -18,6 +17,8 @@ function lnk_traj = setTrajectoriesData(obj, lnk_traj, stmPos, start_idx, end_id
     % "stmPos" of the integration part of the forward dynamics function:
     switch nargin
         case 5
+            start_idx = start_idx(:);
+            end_idx   = end_idx(:);
             WBM.utilities.chkfun.checkCVecDs(start_idx, end_idx, nTraj, nTraj, 'WBM::setTrajectoriesData');
             if ( ~isempty(find(start_idx( (start_idx < 1) | (start_idx > noi) | (start_idx > end_idx) ),1)) || ...
                  ~isempty(find(end_idx( (end_idx < 1) | (end_idx > noi) ),1)) )

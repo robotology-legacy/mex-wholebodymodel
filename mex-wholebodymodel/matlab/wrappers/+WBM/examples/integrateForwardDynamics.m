@@ -71,7 +71,7 @@ fprintf('Number of integrations: %d\n', noi);
 % Setup the window, the environment and the draw parameters for the WBM-simulator:
 
 % create some geometric volume bodies for the simulation environment ...
-rotm_r = eye(3,3); % rect. orientation
+rotm_r = eye(3,3); % rectangular orientation
 rotm_2 = [-0.9     0  -0.1;
            0    -0.9     0;
           -0.1     0   0.9];
@@ -139,7 +139,7 @@ lnk_traj(2,1).ept_color  = WBM.wbmColor.tomato;
 lnk_traj(3,1).line_color = 'magenta';
 lnk_traj(3,1).ept_color  = 'magenta';
 
-sim_config.trajectories = wbm_icub.setTrajectoriesData(lnk_traj, x_out, [1; 1; 1], [35; 35; 40]);
+sim_config.trajectories = wbm_icub.setTrajectoriesData(lnk_traj, x_out, [1  1  1], [35  35  40]);
 sim_config.show_legend  = true;
 
 % zoom and shift some specified axes (optional):

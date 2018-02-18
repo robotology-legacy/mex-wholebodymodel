@@ -25,7 +25,7 @@ function sim_config = setupSimulation(~, sim_config, rot3d)
     set(sim_config.hWndFigure, 'NumberTitle', 'off', 'MenuBar', 'none', 'BackingStore', 'off');
 
     if ~strcmp(sim_config.environment.bkgrd_color_opt, 'white')
-        % change the color options of the axis background, the axis lines and
+        % change the color options of the axis background, axis lines and
         % labels, and the figure background:
         colordef(sim_config.hWndFigure, sim_config.environment.bkgrd_color_opt);
     end % else, use the default system colors ...
