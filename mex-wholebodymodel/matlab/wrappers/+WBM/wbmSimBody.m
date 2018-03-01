@@ -80,10 +80,10 @@ classdef wbmSimBody < handle
     %                                                                        to define the *foot dimensions* in the
     %                                                                        x, y and z directions.
     %
-    %   foot_joints      (uint, vector): (2 x 1) vector to set the joint indices
+    %   foot_joints     (uint8, vector): (2 x 1) vector to set the joint indices
     %                                    for the left and the right foot (see
     %                                    :attr:`foot_geom`).
-    %   foot_base_sz (struct or vector): Data structure, or optional a vector, to
+    %   foot_base_sz    (struct/vector): Data structure, or optional a vector, to
     %                                    set the *base size values*, i.e. the
     %                                    ``width`` and the ``height``, for the
     %                                    feet of the robot (see :attr:`foot_geom`).
@@ -161,7 +161,7 @@ classdef wbmSimBody < handle
         function obj = wbmSimBody(jnt_lnk_names, jnt_pair_idx, draw_prop)
             % Constructor.
             %
-            % Args:
+            % Arguments:
             %   jnt_lnk_names (cellstr, vector): Column-array of *link* and *frame names*
             %                                    that are deduced from their parent joints
             %                                    or parent links of the robot model [#f1]_
@@ -174,7 +174,7 @@ classdef wbmSimBody < handle
             %   draw_prop (:class:`~WBM.wbmRobotDrawProp`): The draw properties for the body of
             %                                               the simulated robot.
             % Returns:
-            %   obj: An instance of the simulation body object.
+            %   obj: An instance of the :class:`!wbmSimBody` data type.
             if (nargin < 2)
                 error('wbmSimBody::wbmSimBody: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end

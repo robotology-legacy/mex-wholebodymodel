@@ -37,11 +37,11 @@ classdef (Abstract) wbmGObj
     %   line_width (double, scalar): Line width of the graphics object, specified
     %                                as a positive value in points.
     % Methods:
-    %   getGObj(obj): *abstract* -- Creates the graphics object and returns a
-    %                               handle to it.
+    %   getGObj(obj): *abstract* -- Creates and draws the graphics object and
+    %                               returns a handle to it.
     %
-    %                               **Note:** The graphics object can consist of
-    %                               several sub-graphics objects.
+    %                               **Note:** The graphics object can consist
+    %                               of several sub-graphics objects.
     %   updGObj(obj, hgo): *abstract* -- Updates the data parameters of the
     %                                    graphics object.
     properties(Abstract)

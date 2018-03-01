@@ -33,11 +33,11 @@ classdef wbmColor
     % robot with some nice colors.
     %
     % The color list is based on the color map of *R for Statistical Computing*
-    % (https://www.r-project.org).
+    % (`<https://www.r-project.org>`_).
     %
     % Further details about the R colors are available in the technical note of
     % the *Stowers Institute for Medical Research*:
-    % http://research.stowers.org/mcm/efg/R/Color/Chart/index.htm.
+    % `<http://research.stowers.org/mcm/efg/R/Color/Chart/index.htm>`_.
     properties(Constant)
         % R colors:
         % Source: <http://research.stowers.org/mcm/efg/R/Color/Chart/ColorChart.pdf>
@@ -65,6 +65,7 @@ classdef wbmColor
         forestgreen          = [34  139  34] ./ 255; % 139
         gold                 = [255 215   0] ./ 255; % 142
         gray                 = [190 190 190] ./ 255; % 152
+        gray80               = [204 204 204] ./ 255; % 233
         greenyellow          = [173 255  47] ./ 255; % 259
         indianred1           = [255 106 106] ./ 255; % 373
         khaki                = [240 230 140] ./ 255; % 382

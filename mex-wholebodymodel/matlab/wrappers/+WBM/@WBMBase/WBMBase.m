@@ -28,6 +28,61 @@
 % with the WBML. If not, see <http://www.gnu.org/licenses/>.
 
 classdef WBMBase < handle
+    % :class:`!WBMBase` is the *base class* of the *whole-body model* (WBM) for
+    % YARP-based *floating base robots*, such as the iCub humanoid robot. It is
+    % a *wrapper class* for the fast *C++ MEX Whole-Body Model Interface* for
+    % Matlab (`mex-wholeBodyModel`_) and provides all necessary basic methods of
+    % the `yarpWholeBodyInterface`_ for the state estimations, kinematic/dynamic
+    % models and actuators.
+    %
+    % Attributes:
+    %   fixed_link    (char, vector): String matching URDF name of the default
+    %                                 *fixed reference link frame* (floating
+    %                                 base link).
+    %
+    %                                 **Note:** The default fixed link (floating
+    %                                 base link) may be different for each robot,
+    %                                 and the selection of the floating base link
+    %                                 also depends from the given situation. The
+    %                                 specified fixed link (reference link) can
+    %                                 also be a *contact constraint link*.
+    %   init_wf_R_b (double, matrix): (3 x 3) rotation matrix as *initial orientation*
+    %                                 from base frame *b* to the world frame *wf*
+    %                                 (default orientation: *identity matrix*).
+    %   init_wf_p_b (double, vector): (3 x 1) vector to specify the *initial position*
+    %                                 from the base frame *b* to the world frame *wf*
+    %                                 (default position: :math:`[0, 0, 0]^T`).
+    %   g_wf        (double, vector): (3 x 1) Cartesian gravity vector in the world
+    %                                 frame *wf*. If the gravity is not defined, then
+    %                                 the gravity vector is by default a 0-vector.
+    %   ndof        (uint16, scalar): Number of degrees of freedom of the given robot.
+    %   frict_coeff         (struct): Data structure for the friction coefficients of
+    %                                 the joints of the given robot model (*read only*).
+    %
+    %                                 The structure contains following field variables:
+    %
+    %                                    - ``v``: (*ndof* x 1) coefficient vector for the *viscous friction*.
+    %                                    - ``c``: (*ndof* x 1) coefficient vector for the *Coulomb friction*.
+    %
+    %   joint_limits        (struct): Data structure for the *joint positions limits*
+    %                                 of the given robot model (*read only*).
+    %
+    %                                 The structure consists of two limits fields:
+    %
+    %                                    - ``lwr``: (*ndof* x 1) vector for the *lower* joint limits.
+    %                                    - ``upr``: (*ndof* x 1) vector for the *upper* joint limits.
+    %
+    %   robot_model (:class:`~WBM.wbmRobotModel`): Model object with the model parameters of
+    %                                              the given floating base robot (*read only*).
+    %
+    %   DF_ROBOT_MODEL (char, vector): Default *URDF robot model* for the whole-body interface:
+    %                                  ``'icubGazeboSim'`` (*constant*).
+    %
+    %                                  **Note:** The URDF-file of robot model *icubGazeboSim* is
+    %                                  located in the directory of the `yarpWholeBodyInterface`_
+    %                                  library.
+    %   MAX_NUM_JOINTS  (int, scalar): Maximum number of joints that a robot model can have:
+    %                                  35 (*constant*).
     properties(Dependent)
         % public properties for fast get/set methods:
         fixed_link@char

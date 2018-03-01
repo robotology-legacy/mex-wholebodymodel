@@ -28,11 +28,128 @@
 % with the WBML. If not, see <http://www.gnu.org/licenses/>.
 
 classdef vbSphere < WBM.vbObject
+    % :class:`!vbSphere` is a class to specify *sphere objects* for the
+    % environment scenario of the robot simulation.
+    %
+    % Attributes:
+    %   origin (double, vector): (3 x 1) Cartesian position of the origin of the
+    %                            sphere. Default origin: :math:`[0, 0, 0]^T`.
+    %   rotm   (double, matrix): (3 x 3) rotation matrix of the sphere. If
+    %                            undefined, the default orientation is the
+    %                            *identity matrix*.
+    %   tform  (double, matrix): (4 x 4) Transformation matrix of the sphere.
+    %                            If :attr:`origin` and :attr:`rotm` are undefined,
+    %                            then by default, the transformation matrix is an
+    %                            *identity matrix*.
+    %   frame  (double, vector): (7 x 1) VQ-transformation vector (position and
+    %                            orientation) of the sphere. If :attr:`origin`
+    %                            and :attr:`rotm` are undefined, then the frame
+    %                            vector uses the default transformation vector
+    %                            :attr:`~WBM.vbObject.DF_FRAME`.
+    %
+    %   description       (char, vector): Short description string about the
+    %                                     sphere object (default: *empty*).
+    %   ismovable      (logical, scalar): Boolean flag to indicate if the sphere
+    %                                     object is movable (default: *false*).
+    %   line_width      (double, scalar): Line width of the edges of the sphere,
+    %                                     specified as a positive value in points
+    %                                     (default width: 0.4).
+    %   edge_color (double/char, vector): Edge color of the sphere, specified
+    %                                     by a RGB-triplet or a color name
+    %                                     (default color: *'black'*).
+    %   face_color (double/char, vector): Face color of the sphere, specified
+    %                                     by a RGB-triplet or a color name
+    %                                     (default color: :attr:`!wbmColor.lightsteelblue`).
+    %   face_alpha      (double, scalar): Face transparency of the sphere, specified
+    %                                     by a scalar in range :math:`[0,1]`
+    %                                     (default alpha: 0.2).
+    %
+    %   obj_type      (char, vector): Type of the object (*read only*), specified by
+    %                                 one of these values:
+    %
+    %                                    - ``'obs'``: The sphere defines an *obstacle* (for the robot).
+    %                                    - ``'bdy'``: The sphere is only an arbitrary *volume body* in
+    %                                      the environment and not a specific obstacle.
+    %
+    %                                 The default object type is ``'bdy'``.
+    %   isobstacle (logical, scalar): Boolean flag to indicate if the sphere object
+    %                                 is also defined as an obstacle (*read only*).
+    %
+    %                                 **Note:** The value will be set to *true*, if
+    %                                 and only if :attr:`obj_type` is defined as an
+    %                                 obstacle (*'obs'*), *false* otherwise (default).
+    %   issolid    (logical, scalar): Boolean flag to indicate if the sphere is
+    %                                 a *solid* object (*read only*). Default: *false*.
+    %
+    %                                 **Note:** If a volumetric mass density is given,
+    %                                 then the sphere object is automatically defined
+    %                                 as a *solid volume body*, i.e. the variable
+    %                                 :attr:`!issolid` will be set to *true*.
+    %   istool     (logical, scalar): Boolean flag to indicate if the sphere defines
+    %                                 also a tool to be used by the robot (*read only*).
+    %                                 Default: *false*.
+    %   init_frame  (double, vector): (7 x 1) initial frame vector (VQ-transformation)
+    %                                 of the sphere, in dependency of the given origin
+    %                                 position and orientation (*read only*).
+    %
+    %                                 **Note:** If the attributes :attr:`origin` and
+    %                                 :attr:`rotm` are not defined, then the initial
+    %                                 frame uses the default transformation vector
+    %                                 :attr:`~WBM.vbObject.DF_FRAME`.
+    %   dimension   (double, vector): (1 x 2) vector of the form :math:`[\textrm{radius_{inner}, radius_{outer}}]`,
+    %                                 which defines the dimensions of the sphere (*read only*).
+    %
+    %                                 **Note:** If the dimensions of the sphere are undefined,
+    %                                 then the vector is by default a *0-vector*.
+    %   vertices            (struct): Data structure for the *vertex coordinates* of the sphere
+    %                                 at the given origin frame (*read only*).
+    %
+    %                                 **Note:** Since the sphere object is *approximated* by
+    %                                 a (n x n) *spherical polyhedron*, the data structure
+    %                                 consists of the fields ``X``, ``Y`` and ``Z`` which
+    %                                 representing the x, y and z-coordinate vectors of each
+    %                                 vertex of the given spherical polyhedron.
+    %   com   (double, vector): (3 x 1) Cartesian position of the center of mass
+    %                           (CoM) of the sphere relative to the given origin
+    %                           (*read only*).
+    %
+    %                           **Note:** By default, the CoM of the sphere is
+    %                           placed at the origin.
+    %   rho   (double, scalar): Volumetric mass density of the sphere, specified as a
+    %                           positive value in :math:`[\si{\kg/\m^3}]` (*read only*).
+    %
+    %                           **Note:** The sphere is defined as a *solid volume body*
+    %                           if and only if the density value :math:`\rho > 0`. If the
+    %                           density of the sphere is undefined, then the default
+    %                           value is 0.
+    %   m_rb  (double, scalar): Mass of the sphere object (rigid body *rb*) in
+    %                           :math:`[\si{\kg}]` (*read only*).
+    %
+    %                           **Note:** If :attr:`rho` is not defined, then by
+    %                           default the mass value is 0.
+    %   I_cm  (double, matrix): (3 x 3) inertia matrix of the sphere at the
+    %                           center of mass *cm* (*read only*).
+    %
+    %                           **Note:** If :attr:`rho` is not defined, then the
+    %                           inertia of the sphere is by default the *identity
+    %                           matrix*.
+    %   mgrid         (struct): Data structure for the *grid point coordinates* of
+    %                           the internal 3D-meshgrid of the sphere (*read only*).
+    %
+    %                           The 3D-meshgrid will be used in the robot simulation
+    %                           to simulate the sphere object as a solid obstacle.
+    %
+    %                           **Note:** The data structure consists of the fields
+    %                           ``X``, ``Y`` and ``Z`` that are representing the x, y
+    %                           and z-coordinates over a grid, specified as 3D-arrays
+    %                           (with three inputs each). The meshgrid for the sphere
+    %                           object can be created only if the object is defined as
+    %                           an *obstacle*.
     properties(Dependent)
-        origin@double vector % position of the origin (x,y,z) of the sphere
-        rotm@double   matrix % orientation (rotation matrix) of the sphere
-        tform@double  matrix % transformation matrix of the sphere
-        frame@double  vector % VQ-transformation (pos. & orientation) of the sphere
+        origin@double vector
+        rotm@double   matrix
+        tform@double  matrix
+        frame@double  vector
     end
 
     properties
@@ -46,41 +163,88 @@ classdef vbSphere < WBM.vbObject
     end
 
     properties(SetAccess = private, GetAccess = public)
-        obj_type@char             = 'bdy';      % type of object: obstacle (obs) or volume body (bdy) (default: bdy)
-        isobstacle@logical scalar = false;      % defines if the sphere is an obstacle (default: false)
-        issolid@logical    scalar = false;      % defines if the sphere is solid (default: false)
-        istool@logical     scalar = false;      % defines if the sphere is a tool (default: false)
-        init_frame@double  vector = WBM.vbSphere.DF_FRAME; % initial frame (pos. & orientation) of the sphere
-        dimension@double   vector = zeros(1,2); % dimension (inner/outer radius) of the sphere
-        vertices@struct           = struct('X', [], 'Y', [], 'Z', []); % vertex positions of the sphere at the given origin and orientation
-        com@double         vector = zeros(3,1); % position of the center of mass (CoM)
-        rho@double         scalar = 0;          % volumetric mass density of the sphere
-        m_rb@double        scalar = 0;          % mass of the sphere
-        I_cm@double        matrix = zeros(3,3); % inertia of the sphere at CoM (default: identity matrix)
-        mgrid@struct              = struct('X', [], 'Y', [], 'Z', []); % internal 3D-meshgrid of the sphere (only for obstacles)
+        obj_type@char             = 'bdy';
+        isobstacle@logical scalar = false;
+        issolid@logical    scalar = false;
+        istool@logical     scalar = false;
+        init_frame@double  vector = WBM.vbSphere.DF_FRAME;
+        dimension@double   vector = zeros(1,2);
+        vertices@struct           = struct('X', [], 'Y', [], 'Z', []);
+        com@double         vector = zeros(3,1);
+        rho@double         scalar = 0;
+        m_rb@double        scalar = 0;
+        I_cm@double        matrix = eye(3,3);
+        mgrid@struct              = struct('X', [], 'Y', [], 'Z', []);
     end
 
     properties(Access = private)
-        msph_orig@double   vector = zeros(3,1); % initial position of the origin (x,y,z)
-        msph_rotm@double   matrix = eye(3,3);   % initial rotation matrix (x,y,z)
+        msph_orig@double   vector = zeros(3,1); % initial Cartesian position of the origin [x,y,z]
+        msph_rotm@double   matrix = eye(3,3);   % initial rotation matrix (orientation)
         msph_vtx_s@struct         = struct('xx', [], 'yy', [], 'zz', []); % vertex positions scaled to the sphere radius
         msph_vtx_sr@struct        = struct('xx', [], 'yy', [], 'zz', []); % vertex positions scaled and set to the given orientation
-        msph_vtxC_s@double matrix = [];         % vertex coordinates matrix (x,y,z) of the scaled sphere
+        msph_vtxC_s@double matrix = [];         % vertex coordinates matrix of the scaled sphere
         msph_nfcs@double   scalar = 20;         % number of horizontal and vertical faces to generate a n-by-n sphere (default: 20)
-        msph_mg_s@struct          = struct('xx', [], 'yy', [], 'zz', []); % 3D-coordinates arrays of the scaled sphere
-        msph_mg_sr@struct         = struct('xx', [], 'yy', [], 'zz', []); % 3D-coordinates arrays of the scaled and rotated sphere
-        msph_mgC_s@double  matrix = [];         % 3D-meshgrid coordinates matrix (x,y,z) of the scaled sphere
-        msph_msz@double    scalar = 0.01;       % mesh size of the internal 3D-grid (default: 0.01)
+        msph_mg_s@struct          = struct('xx', [], 'yy', [], 'zz', []); % 3D-coordinates arrays of the scaled sphere (s)
+        msph_mg_sr@struct         = struct('xx', [], 'yy', [], 'zz', []); % 3D-coordinates arrays of the scaled and rotated sphere (sr)
+        msph_mgC_s@double  matrix = [];         % 3D-meshgrid coordinates matrix of the scaled sphere
+        msph_msz@double    scalar = 0.01;       % mesh size (msz) of the internal 3D-grid (default: 0.01)
     end
 
     methods
         function obj = vbSphere(varargin)
+            % Constructor.
+            %
+            % The constructor of the :class:`!vbSphere` class can be called in
+            % two different ways, where the *keyword arguments* in the square
+            % brackets are optional:
+            %
+            %   - .. function:: vbSphere(ri, ro[, orig, rotm[, obj_prop]])
+            %   - .. function:: vbSphere(r[, orig, rotm[, obj_prop]])
+            %
+            % The first option specifies a *hollow sphere* (sphere shell) as
+            % volume body object and the second one a *solid sphere* (ball).
+            %
+            % Arguments:
+            %   varargin: Variable-length input argument list.
+            %
+            % Keyword Arguments:
+            %   ri   (double, scalar): Inner radius of the sphere shell.
+            %   ro   (double, scalar): Outer radius of the sphere shell.
+            %   r    (double, scalar): Radius of the solid sphere.
+            %   orig (double, vector): (3 x 1) origin position of the sphere.
+            %   rotm (double, matrix): (3 x 3) orientation matrix of the sphere.
+            %   obj_prop     (struct): Data structure for the *object properties*,
+            %                          specified by following fields:
+            %
+            %                                 - ``line_width``: Line width of the edges of the sphere.
+            %                                 - ``edge_color``: Edge color of the sphere (RGB-triplet
+            %                                   or color name).
+            %                                 - ``face_color``: Face color of the sphere (RGB-triplet
+            %                                   or color name).
+            %                                 - ``face_alpha``: Face transparency of the sphere in
+            %                                   range :math:`[0,1]`.
+            %
+            %                              optional fields:
+            %
+            %                                 - ``description``: Annotation string of the
+            %                                   sphere object.
+            %                                 - ``ismovable``: Boolean flag to indicate if
+            %                                   the sphere object is *movable* or *fixed*.
+            %                                 - ``istool``: Boolean flag to indicate if the
+            %                                   sphere object is also a *tool* or not.
+            %                                 - ``obj_type``: Object type, specified by the value
+            %                                   *'obs'* or *'bdy'* (see :attr:`~vbSphere.obj_type`).
+            %                                 - ``rho``: Volumetric mass density of the sphere
+            %                                   object in :math:`[\si{\kg/\m^3}]`.
+            %
+            % Returns:
+            %   obj: An instance of the :class:`!vbSphere` class.
             switch nargin
                 case 5 % spherical shell:
-                    % ri       = varargin{1} ... inner radius of the spherical shell
-                    % ro       = varargin{2} ... outer radius of the spherical shell
-                    % orig     = varargin{3} ... origin of the sphere
-                    % rotm     = varargin{4} ... orientation of the sphere
+                    % ri       = varargin{1}
+                    % ro       = varargin{2}
+                    % orig     = varargin{3}
+                    % rotm     = varargin{4}
                     % obj_prop = varargin{5}
 
                     setObjData(obj, varargin{1,3:5});
@@ -97,7 +261,7 @@ classdef vbSphere < WBM.vbObject
                         createSphere(obj, varargin{1,1:2});
                     else
                         % solid sphere:
-                        % r        = varargin{1} ... radius of the solid sphere
+                        % r        = varargin{1}
                         % orig     = varargin{2}
                         % rotm     = varargin{3}
                         % obj_prop = varargin{4}
@@ -128,7 +292,30 @@ classdef vbSphere < WBM.vbObject
         end
 
         function setInitFrame(obj, varargin)
-            % set the sphere to the given initial pos. and orientation:
+            % Sets the origin frame of the sphere to the given initial position
+            % and orientation.
+            %
+            % The method can be called in three different ways:
+            %
+            %   - .. function:: setInitFrame(p, R)
+            %   - .. function:: setInitFrame(vqT)
+            %   - .. function:: setInitFrame()
+            %
+            % If no parameters are given, then :meth:`!setInitFrame` uses for
+            % the initial origin frame of the sphere the current frame vector
+            % of the property :attr:`~vbSphere.init_frame`.
+            %
+            % Arguments:
+            %   varargin: Variable-length input argument list.
+            %
+            % Keyword Arguments:
+            %   p   (double, vector): (3 x 1) Cartesian position to specify the
+            %                         *origin* of the sphere.
+            %   R   (double, matrix): (3 x 3) rotation matrix to specify the
+            %                         *orientation* of the sphere.
+            %   vqT (double, vector): (7 x 1) VQ-transformation (position and
+            %                         orientation in quaternions) to specify
+            %                         the *origin frame* of the sphere.
             switch nargin
                 case 3
                     p = varargin{1,1};
@@ -160,17 +347,40 @@ classdef vbSphere < WBM.vbObject
         end
 
         function hgo = getGObj(obj)
+            % Creates and draws the sphere object and returns a handle to the
+            % created graphics object.
+            %
+            % Returns:
+            %   hgo: Handle to the chart surface graphics object of the created
+            %        sphere.
             hgo = surf(obj.vertices.X, obj.vertices.Y, obj.vertices.Z, 'LineWidth', obj.line_width, ...
                        'EdgeColor', obj.edge_color, 'FaceColor', obj.face_color, 'FaceAlpha', obj.face_alpha);
         end
 
         function hgo = updGObj(obj, hgo)
+            % Updates the vertex coordinates of the sphere.
+            %
+            % Arguments:
+            %   hgo: Handle to the chart surface graphics object with the
+            %        x, y and z-coordinate data of the sphere.
+            % Returns:
+            %   hgo: Handle to the chart surface graphics object with the
+            %        changed vertex coordinates of the sphere.
             hgo.XData = obj.vertices.X;
             hgo.YData = obj.vertices.Y;
             hgo.ZData = obj.vertices.Z;
         end
 
         function hmg = drawMGrid(obj, pt_color)
+            % Draws the meshgrid of the sphere and returns a graphics object
+            % handle to it.
+            %
+            % Arguments:
+            %   pt_color (double/char, vector): Color of the grid points, specified
+            %                                   by a RGB-triplet or a color name
+            %                                   (default color: *'green'*).
+            % Returns:
+            %   hmg: Handle to the scatter series object of the generated meshgrid.
             if ~obj.isobstacle
                 error('vbSphere::drawMGrid: %s', WBM.wbmErrorMsg.OBJ_NOT_OBSTACLE);
             end
@@ -189,6 +399,19 @@ classdef vbSphere < WBM.vbObject
         end
 
         function result = ptInObj(obj, pt_pos)
+            % Determines if some specified points are below the surface,
+            % i.e. inside, of the sphere.
+            %
+            % Arguments:
+            %   pt_pos (double, vector/matrix): A single position vector or a
+            %                                   (n x 3) matrix with positions
+            %                                   of some specified points.
+            % Returns:
+            %   result: (n x 1) vector with the logical results if the given
+            %           points are below the surface of the sphere. Each
+            %           value is *true* if the given point is below the
+            %           surface, *false* otherwise.
+
             r = obj.dimension(1,2); % outer radius
 
             if isvector(pt_pos)

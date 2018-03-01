@@ -32,48 +32,48 @@ classdef wbmLinkTrajectory < WBM.wbmGObj
     % trajectory curve of a specific link of the simulated robot.
     %
     % Attributes:
-    %   urdf_link_name       (char, vector): URDF-name of the link frame to be
-    %                                        tracked of the robot model (default
-    %                                        name: *'none'*).
-    %   jnt_annot_pos        (cell, vector): Cell array of the form :math:`\{\textrm{lnk_group_name}, idx\}`,
-    %                                        to specify the *index position* of the
-    %                                        annotation string for the parent joint
-    %                                        of the given link (default: *empty*).
+    %   urdf_link_name    (char, vector): URDF-name of the link frame to be
+    %                                     tracked of the robot model (default
+    %                                     name: *'none'*).
+    %   jnt_annot_pos     (cell, vector): Cell array of the form :math:`\{\textrm{lnk_group_name}, idx\}`,
+    %                                     to specify the *index position* of the
+    %                                     annotation string for the parent joint
+    %                                     of the given link (default: *empty*).
     %
-    %                                        **Note:** In :mod:`~WBM.utilities`, the
-    %                                        joint annotation function :func:`~utilities.getJointAnnotationICub`,
-    %                                        is only defined for the iCub humanoid
-    %                                        robot. For other YARP-based robots, a
-    %                                        custom annotation function must be used.
-    %   description          (char, vector): Short description about the trajectory
-    %                                        curve of the link (default: *empty*).
-    %   line_style           (char, vector): Line style of the link trajectory curve.
-    %                                        The options for the line style are the
-    %                                        same as specified in Matlab (default
-    %                                        line style: *':'*)
-    %   line_width         (double, scalar): Line width of the trajectory curve, specified as
-    %                                        a positive value in points (default width: 0.5).
-    %   line_color (double or char, vector): Color of the trajectory curve, specified by a
-    %                                        RGB-triplet or a color name (default color:
-    %                                        *'green'*).
-    %   ept_marker           (char, vector): Marker symbol for the end point of the
-    %                                        trajectory curve. The symbols for the
-    %                                        marker are the same as specified in
-    %                                        Matlab (default symbol: *'o'*).
-    %   ept_marker_sz      (double, scalar): Marker size of the trajectory end point,
-    %                                        specified as a positive value in points
-    %                                        (default size: 8).
-    %   ept_line_wid       (double, scalar): Line width of the trajectory end point,
-    %                                        specified as a positive value in points
-    %                                        (default width: 0.5).
-    %   ept_color  (double or char, vector): Color of the trajectory end point, specified
-    %                                        by a RGB-triplet or a color name (default
-    %                                        color: *'green'*).
-    %   lnk_pos            (double, matrix): (*n* x 3) data matrix with Cartesian positions
-    %                                        to specify in the simulation the trajectory
-    %                                        vertices of the given link frame of the robot.
-    %                                        The size *n* of the matrix represents the
-    %                                        *number of time steps* of the simulation.
+    %                                     **Note:** In :mod:`~WBM.utilities`, the
+    %                                     joint annotation function :func:`~utilities.getJointAnnotationICub`,
+    %                                     is only defined for the iCub humanoid
+    %                                     robot. For other YARP-based robots, a
+    %                                     custom annotation function must be used.
+    %   description       (char, vector): Short description about the trajectory
+    %                                     curve of the link (default: *empty*).
+    %   line_style        (char, vector): Line style of the link trajectory curve.
+    %                                     The options for the line style are the
+    %                                     same as specified in Matlab (default
+    %                                     line style: *':'*)
+    %   line_width      (double, scalar): Line width of the trajectory curve, specified as
+    %                                     a positive value in points (default width: 0.5).
+    %   line_color (double/char, vector): Color of the trajectory curve, specified by a
+    %                                     RGB-triplet or a color name (default color:
+    %                                     *'green'*).
+    %   ept_marker        (char, vector): Marker symbol for the end point of the
+    %                                     trajectory curve. The symbols for the
+    %                                     marker are the same as specified in
+    %                                     Matlab (default symbol: *'o'*).
+    %   ept_marker_sz   (double, scalar): Marker size of the trajectory end point,
+    %                                     specified as a positive value in points
+    %                                     (default size: 8).
+    %   ept_line_wid    (double, scalar): Line width of the trajectory end point,
+    %                                     specified as a positive value in points
+    %                                     (default width: 0.5).
+    %   ept_color  (double/char, vector): Color of the trajectory end point, specified
+    %                                     by a RGB-triplet or a color name (default
+    %                                     color: *'green'*).
+    %   lnk_pos         (double, matrix): (*n* x 3) data matrix with Cartesian positions
+    %                                     to specify in the simulation the trajectory
+    %                                     vertices of the given link frame of the robot.
+    %                                     The size *n* of the matrix represents the
+    %                                     *number of time steps* of the simulation.
     properties
         urdf_link_name@char   = 'none';
         jnt_annot_pos@cell    vector = {}; % {lnk_group_name, idx}
@@ -95,7 +95,7 @@ classdef wbmLinkTrajectory < WBM.wbmGObj
         function obj = wbmLinkTrajectory(lnk_name, lnk_pos)
             % Constructor.
             %
-            % Args:
+            % Arguments:
             %   lnk_name  (char, vector): String matching URDF-name of the link
             %                             frame to be tracked of the robot model.
             %   lnk_pos (double, matrix): (*n* x 3) data matrix with Cartesian positions
@@ -104,7 +104,7 @@ classdef wbmLinkTrajectory < WBM.wbmGObj
             %                             the robot. The size *n* of the matrix represents
             %                             the *number of time steps* of the simulation.
             % Returns:
-            %   obj: An instance of the link trajectory object.
+            %   obj: An instance of the :class:`!wbmLinkTrajectory` data type.
             switch nargin
                 case 0
                     return
@@ -122,9 +122,6 @@ classdef wbmLinkTrajectory < WBM.wbmGObj
         function hgo = getGObj(obj)
             % Creates and draws the trajectory curve of the specified link of
             % the simulated robot.
-            %
-            % Args:
-            %   obj: Link trajectory object.
             %
             % Returns:
             %   hgo (gobjects, vector): Column-array of graphics object handles
@@ -148,8 +145,7 @@ classdef wbmLinkTrajectory < WBM.wbmGObj
         function hgo = updGObj(obj, hgo)
             % Updates the the vertex coordinates of the link trajectory curve.
             %
-            % Args:
-            %   obj: Link trajectory object.
+            % Arguments:
             %   hgo (gobjects, vector): Column-array of graphics object handles
             %                           of the link trajectory curve.
             % Returns:
@@ -180,8 +176,7 @@ classdef wbmLinkTrajectory < WBM.wbmGObj
             % Sets the URDF-name of the link frame to be tracked of the
             % robot model.
             %
-            % Args:
-            %   obj: Link trajectory object.
+            % Arguments:
             %   lnk_name (char, vector): String matching URDF-name of the link
             %                            frame.
             % Returns:
@@ -194,8 +189,7 @@ classdef wbmLinkTrajectory < WBM.wbmGObj
             % Sets the index position for the joint annotation string of the
             % specified link frame.
             %
-            % Args:
-            %   obj: Link trajectory object.
+            % Arguments:
             %   annot_pos (cell, vector): Array with the specified *annotation
             %                             index position* of the form
             %                             :math:`\{\textrm{lnk_group_name}, idx\}`.

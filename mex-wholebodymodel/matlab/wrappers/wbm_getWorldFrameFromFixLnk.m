@@ -6,9 +6,9 @@ function [wf_p_b, wf_R_b] = wbm_getWorldFrameFromFixLnk(varargin)
     % The returned floating base position and orientation is obtained from the forward kinematics
     % w.r.t. the specified fixed link frame (reference frame).
     %
-    % Note: The default fixed link (floating base link) of each YARP-based robot can be different and
-    % the selection of the floating base link depends also from the situation. For example the default
-    % fixed link of the iCub humanoid robot is "l_sole".
+    % Note: The default fixed link (floating base link) may be different for each YARP-based robot,
+    % and the selection of the floating base link also depends from the given situation. For example
+    % the default fixed link of the iCub humanoid robot is "l_sole".
     %
     %   INPUT ARGUMENTS:
     %       Optimized mode:

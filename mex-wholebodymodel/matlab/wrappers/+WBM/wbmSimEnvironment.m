@@ -41,14 +41,14 @@ classdef wbmSimEnvironment < handle
     %                                   as a polygon. The vertical X, Y and Z triplets,
     %                                   combined into a matrix, specify the vertices of
     %                                   the polygon.
-    %   grnd_color      (double or char, vector): Color of the ground, specified by a
-    %                                             RGB-triplet or a color name.
-    %   grnd_edge_color (double or char, vector): Edge color of the ground, specified
-    %                                             by a RGB-triplet or a color name.
-    %   orig_pt_color   (double or char, vector): Color of the origin point on the
-    %                                             floor (RGB-triplet or color name).
-    %   orig_pt_size            (double, scalar): Size of the origin point, specified
-    %                                             as a positive value in points.
+    %   grnd_color      (double/char, vector): Color of the ground, specified by a
+    %                                          RGB-triplet or a color name.
+    %   grnd_edge_color (double/char, vector): Edge color of the ground, specified
+    %                                          by a RGB-triplet or a color name.
+    %   orig_pt_color   (double/char, vector): Color of the origin point on the
+    %                                          floor (RGB-triplet or color name).
+    %   orig_pt_size         (double, scalar): Size of the origin point, specified
+    %                                          as a positive value in points.
     %   vb_objects (:class:`~WBM.vbObject`, vector): Column-vector of *volume body objects*
     %                                                that representing an environment
     %                                                scenario for the simulation.

@@ -32,10 +32,10 @@ classdef wbmRobotParams < handle
     % configuration parameters of a given floating base robot between interfaces.
     %
     % Attributes:
-    %   model   (:class:`~WBM.wbmRobotModel`): Model object of the given floating
-    %                                          base robot.
-    %   config (:class:`~WBM.wbmRobotConfig`): Configuration object of the given
-    %                                          floating base robot.
+    %   model   (:class:`~WBM.wbmRobotModel`): Model object with the model parameters
+    %                                          of the given floating base robot.
+    %   config (:class:`~WBM.wbmRobotConfig`): Configuration object with the configuration
+    %                                          settings of the given floating base robot.
     %   wf2fixlnk (logical, scalar): Boolean flag to indicate if the world frame
     %                                (wf) is set to a fixed reference link frame.
     properties
@@ -47,9 +47,6 @@ classdef wbmRobotParams < handle
     methods(Sealed)
         function newObj = copy(obj)
             % Copy function to create deep object copies.
-            %
-            % Args:
-            %   obj: Robot parameters object.
             %
             % Returns:
             %   newObj: A full copy of the robot parameters.

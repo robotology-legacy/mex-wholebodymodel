@@ -1,6 +1,6 @@
 function wbm_setWorldFrame(varargin)
     % WBM_SETWORLDFRAME sets the world frame (WF) at a given position and orientation (transformation)
-    % form a specified fixed link frame (reference frame). The specified fixed link (reference link)
+    % from a specified fixed link frame (reference frame). The specified fixed link (reference link)
     % can also be a contact constraint link.
     %
     % The set base-to-world transformation wf_H_b supports, w.r.t. a given joint configuration q_j,

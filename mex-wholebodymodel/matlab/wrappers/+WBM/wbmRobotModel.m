@@ -55,16 +55,20 @@ classdef wbmRobotModel < handle
     %                                     the base frame *b* to the world frame *wf*. The default
     %                                     position is :math:`[0, 0, 0]^T`.
     %   g_wf            (double, vector): (3 x 1) Cartesian gravity vector in the world frame *wf*.
-    %                                     If the gravity is not defined, then the gravity is by
-    %                                     default a 0-vector.
-    %   frict_coeff             (struct): Data structure for the friction coefficients
-    %                                     of the joints of the robot model:
-    %                                       - ``v``: (*ndof* x 1) coefficient vector for the *viscous friction*.
-    %                                       - ``c``: (*ndof* x 1) coefficient vector for the *Coulomb friction*.
-    %   jlmts                   (struct): Data structure for the limits of the joint
-    %                                     positions of the robot model:
-    %                                       - ``lwr``: (*ndof* x 1) vector for the *lower* joint limits.
-    %                                       - ``upr``: (*ndof* x 1) vector for the *upper* joint limits.
+    %                                     If the gravity is not defined, then the gravity vector is
+    %                                     by default a 0-vector.
+    %   frict_coeff             (struct): Data structure for the friction coefficients of
+    %                                     of the joints of the given robot model, specified
+    %                                     by the field variables:
+    %
+    %                                        - ``v``: (*ndof* x 1) coefficient vector for the *viscous friction*.
+    %                                        - ``c``: (*ndof* x 1) coefficient vector for the *Coulomb friction*.
+    %
+    %   jlmts                   (struct): Data structure for the *joint positions limits* of the
+    %                                     given robot model, specified by the field variables:
+    %
+    %                                        - ``lwr``: (*ndof* x 1) vector for the *lower* joint limits.
+    %                                        - ``upr``: (*ndof* x 1) vector for the *upper* joint limits.
     properties
         yarp_robot_type@char      = 'iCub';
         urdf_robot_name@char

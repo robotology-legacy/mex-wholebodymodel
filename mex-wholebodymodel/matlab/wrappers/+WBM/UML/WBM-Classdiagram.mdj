@@ -25711,7 +25711,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+shiftAxes(obj, axes_idx: vector, shift_vec: matrix)",
+											"text": "+shiftAxes(obj, axes_idx: vector, shift_pos: matrix)",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -89412,7 +89412,6 @@
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
-									"type": "",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,
@@ -89440,7 +89439,7 @@
 									"_parent": {
 										"$ref": "AAAAAAFfd04zuP8RNiE="
 									},
-									"name": "shift_vec",
+									"name": "shift_pos",
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,

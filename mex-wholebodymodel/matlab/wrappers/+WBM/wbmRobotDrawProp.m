@@ -28,48 +28,50 @@
 % with the WBML. If not, see <http://www.gnu.org/licenses/>.
 
 classdef wbmRobotDrawProp < handle
-    % :class:`!wbmRobotDrawProp` is a *data type* (class) to control the
-    % draw properties for the body of the simulated robot.
+    % :class:`!wbmRobotDrawProp` is a *data type* (class) to control the draw
+    % properties for the body of the simulated robot.
     %
     % Attributes:
     %   joints (struct): Structure to control the appearance of the joint nodes,
     %                    specified by following fields:
-    %                      - ``line_width`` (double, scalar): Line width of the marker, specified as a
-    %                                                         positive value in points.
-    %                      - ``marker``       (char, vector): Marker symbol for the joint nodes. The symbols
-    %                                                         for the marker are the same as specified in
-    %                                                         Matlab.
-    %                      - ``marker_sz``  (double, scalar): Marker size, specified as a positive value
-    %                                                         in points.
-    %                      - ``color`` (double or char, vector): Color of the joint nodes, specified by a
-    %                                                            RGB-triplet or a color name.
+    %                      - ``line_width`` (double, scalar): Line width of the marker, specified as
+    %                                                         a positive value in points.
+    %                      - ``marker``       (char, vector): Marker symbol for the joint nodes. The
+    %                                                         symbols for the marker are the same as
+    %                                                         specified in Matlab.
+    %                      - ``marker_sz``  (double, scalar): Marker size, specified as a positive
+    %                                                         value in points.
+    %                      - ``color`` (double/char, vector): Color of the joint nodes, specified by
+    %                                                         a RGB-triplet or a color name.
     %   links  (struct): Structure to control the appearance of the links (edges)
     %                    of the robot's skeleton:
-    %                      - ``line_width``    (double, scalar): Line width of the links, specified as a
-    %                                                            positive value in points.
-    %                      - ``color`` (double or char, vector): Link color, specified by a RGB-triplet
-    %                                                            or a color name.
-    %   com    (struct): Structure to control the appearance of the center of mass node:
-    %                      - ``marker``      (char, vector): Marker symbol for the node of the center of
-    %                                                        mass. The symbols for the marker are the
-    %                                                        same as specified in Matlab.
-    %                      - ``marker_sz`` (double, scalar): Marker size, specified as a positive value
-    %                                                        in points.
-    %                      - ``color`` (double or char, vector): Node color of the center of mass,
-    %                                                            specified by a RGB-triplet or a
-    %                                                            color name.
-    %   shape  (struct): Structure to control the appearance of the body shape of the robot:
-    %                      - ``line_width`` (double, scalar): Line width of the polygons (edges) for
-    %                                                         the body parts of the robot, specified
-    %                                                         as a positive value in points.
-    %                      - ``edge_color`` (double or char, vector): Edge color for the body parts of
-    %                                                                 the robot, specified by a RGB-triplet
-    %                                                                 or a color name.
-    %                      - ``face_color`` (double or char, vector): Face color for the body parts of
-    %                                                                 the robot, specified by a RGB-triplet
-    %                                                                 or a color name.
-    %                      - ``face_alpha`` (double, scalar): Face transparency of the body parts, specified
-    %                                                         by a scalar in range :math:`[0,1]`.
+    %                      - ``line_width`` (double, scalar): Line width of the links, specified as a
+    %                                                         positive value in points.
+    %                      - ``color`` (double/char, vector): Link color, specified by a RGB-triplet or
+    %                                                         a color name.
+    %   com    (struct): Structure to control the appearance of the center of
+    %                    mass node:
+    %                      - ``marker``       (char, vector): Marker symbol for the node of the center of
+    %                                                         mass. The symbols for the marker are the
+    %                                                         same as specified in Matlab.
+    %                      - ``marker_sz``  (double, scalar): Marker size, specified as a positive value
+    %                                                         in points.
+    %                      - ``color`` (double/char, vector): Node color of the center of mass, specified
+    %                                                         by a RGB-triplet or a color name.
+    %   shape  (struct): Structure to control the appearance of the body shape
+    %                    of the robot:
+    %                      - ``line_width``      (double, scalar): Line width of the polygons (edges) for
+    %                                                              the body parts of the robot, specified
+    %                                                              as a positive value in points.
+    %                      - ``edge_color`` (double/char, vector): Edge color for the body parts of the
+    %                                                              robot, specified by a RGB-triplet or
+    %                                                              a color name.
+    %                      - ``face_color`` (double/char, vector): Face color for the body parts of the
+    %                                                              robot, specified by a RGB-triplet or
+    %                                                              a color name.
+    %                      - ``face_alpha``      (double, scalar): Face transparency of the body parts,
+    %                                                              specified by a scalar in range
+    %                                                              :math:`[0,1]`.
     properties
         joints = struct( 'line_width', 0, ...
                          'marker',     '', ...

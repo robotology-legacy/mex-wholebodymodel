@@ -45,9 +45,9 @@ classdef wbmTargetPoint < WBM.wbmGObj
     %                                Matlab (default symbol: *'o'*).
     %   mkr_size   (double, scalar): Marker size, specified as a positive value
     %                                in points (default size: 8).
-    %   mkr_color (double or char, vector): Marker outline color, specified by a
-    %                                       RGB-triplet or a color name (default
-    %                                       color: *'yellow'*).
+    %   mkr_color (double/char, vector): Marker outline color, specified by a
+    %                                    RGB-triplet or a color name (default
+    %                                    color: *'yellow'*).
     % Note:
     %   The specified target points will be shown in the robot simulation, if in
     %   the given *simulation configuration structure*, an array of initialized
@@ -66,11 +66,11 @@ classdef wbmTargetPoint < WBM.wbmGObj
         function obj = wbmTargetPoint(p)
             % Constructor.
             %
-            % Args:
+            % Arguments:
             %   p (double, vector): (3 x 1) Cartesian position for the target
             %                       point in world frame (wf).
             % Returns:
-            %   obj: An instance of the target point object.
+            %   obj: An instance of the target point data type.
             switch nargin
                 case 0
                     return
@@ -86,9 +86,6 @@ classdef wbmTargetPoint < WBM.wbmGObj
             % Plots a 3D data point at the specified target position and returns
             % the graphics object handle of the created data point.
             %
-            % Args:
-            %   obj: Target point object.
-            %
             % Returns:
             %   hgo: Handle of the created graphics object (chart line object).
 
@@ -102,8 +99,7 @@ classdef wbmTargetPoint < WBM.wbmGObj
         function hgo = updGObj(obj, hgo)
             % Updates the position of the 3D data point.
             %
-            % Args:
-            %   obj: Target point object.
+            % Arguments:
             %   hgo: Graphics object handle of the 3D data point.
             %
             % Returns:
@@ -119,8 +115,7 @@ classdef wbmTargetPoint < WBM.wbmGObj
         function obj = set.pos(obj, p)
             % Sets a new position for the target point.
             %
-            % Args:
-            %   obj: Target point object.
+            % Arguments:
             %   p (double, vector): New (3 x 1) Cartesian position for the
             %                       target point in world frame (wf).
             % Returns:

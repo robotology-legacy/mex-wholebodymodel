@@ -51,37 +51,36 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGO
     %                              the form :math:`[0, 0, 0, 1, 0, 0, 0]^T`
     %                              (*constant*).
     %
-    %   description          (char, vector): Short description string about the
-    %                                        volume body object (default: *empty*).
-    %   ismovable         (logical, scalar): Boolean flag to indicate if the volume
-    %                                        body object can be moved (default: *false*).
-    %   line_width         (double, scalar): Line width of the edges of the (geometric)
-    %                                        volume body, specified as a positive value
-    %                                        in points.
-    %   edge_color (double or char, vector): Edge color of the (geometric) volume body,
-    %                                        specified by a RGB-triplet or a color name.
-    %   face_color (double or char, vector): Face color of the volume body, specified
-    %                                        by a RGB-triplet or a color name.
-    %   face_alpha         (double, scalar): Face transparency of the volume body,
-    %                                        specified by a scalar in range :math:`[0,1]`.
+    %   description       (char, vector): Short description string about the
+    %                                     volume body object (default: *empty*).
+    %   ismovable      (logical, scalar): Boolean flag to indicate if the volume
+    %                                     body object is movable (default: *false*).
+    %   line_width      (double, scalar): Line width of the edges of the (geometric)
+    %                                     volume body, specified as a positive value
+    %                                     in points.
+    %   edge_color (double/char, vector): Edge color of the (geometric) volume body,
+    %                                     specified by a RGB-triplet or a color name.
+    %   face_color (double/char, vector): Face color of the volume body, specified
+    %                                     by a RGB-triplet or a color name.
+    %   face_alpha      (double, scalar): Face transparency of the volume body,
+    %                                     specified by a scalar in range :math:`[0,1]`.
     %
     %   obj_type      (char, vector): Type of the object (*read only*), specified by
     %                                 one of these values:
     %
     %                                    - ``'obs'``: The object defines an *obstacle* (for the robot).
     %                                    - ``'bdy'``: The object is only an arbitrary *volume body* in
-    %                                                 the environment and not a specific obstacle.
+    %                                      the environment and not a specific obstacle.
     %
-    %                                 The default type of the object is ``'bdy'``.
+    %                                 The default object type is ``'bdy'``.
     %   isobstacle (logical, scalar): Boolean flag to indicate if the volume body object
     %                                 is also defined as an obstacle (*read only*).
     %
     %                                 **Note:** The value will be set to *true*, if
     %                                 and only if :attr:`obj_type` is defined as an
-    %                                 obstacle (*'obs'*), else *false*.
+    %                                 obstacle (*'obs'*), else *false* (default).
     %   issolid    (logical, scalar): Boolean flag to indicate if the volume body is
-    %                                 is a *solid* object (*read only*).
-    %                                 Default: *false*.
+    %                                 a *solid* object (*read only*). Default: *false*.
     %
     %                                 **Note:** If a volumetric mass density is given,
     %                                 then the object is automatically defined as a
@@ -111,19 +110,29 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGO
     %
     %                           **Note:** By default, the CoM of the object is
     %                           placed at the origin.
-    %   rho   (double, scalar): Volumetric mass density of the object, specified as
+    %   rho   (double, scalar): Volumetric mass density of the object, specified as a
     %                           positive value in :math:`[\si{\kg/\m^3}]` (*read only*).
     %
     %                           **Note:** The object is defined as a *solid volume body*
-    %                           if and only if the density value is :math:`> 0`. If the
+    %                           if and only if the density value :math:`\rho > 0`. If the
     %                           density of the object is undefined, then the default
     %                           value is 0.
-    %   m_rb  (double, scalar): Mass of the rigid body object *rb* (volume body)
-    %                           in :math:`[\si{\kg}]` (*read only*).
-    %   I_cm  (double, matrix): (3 x 3) inertia matrix of the object at the
-    %                           center of mass *cm* (*read only*).
+    %   m_rb  (double, scalar): Mass of the solid volume body object (rigid body
+    %                           *rb*) in :math:`[\si{\kg}]` (*read only*).
+    %
+    %                           **Note:** If :attr:`rho` is not defined, the by
+    %                           default the mass value is 0.
+    %   I_cm  (double, matrix): (3 x 3) inertia matrix of the solid volume body
+    %                           object at the center of mass *cm* (*read only*).
+    %
+    %                           **Note:** If :attr:`rho` is not defined, then the
+    %                           inertia of the object is by default the *identity
+    %                           matrix*.
     %   mgrid         (struct): Data structure for the *grid point coordinates* of
     %                           the internal 3D-meshgrid of the object (*read only*).
+    %
+    %                           The 3D-meshgrid will be used in the robot simulation
+    %                           to simulate the volume body as a solid obstacle.
     %
     %                           **Note:** The data structure consists of the fields
     %                           ``X``, ``Y`` and ``Z`` that are representing the x,
@@ -134,15 +143,15 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGO
     % Methods:
     %   setInitFrame(obj, varargin): *abstract* -- Sets the object to the given
     %                                              initial position and orientation.
-    %   getGObj(obj): *abstract* -- Creates the volume body object and returns a
-    %                               handle to the created graphics objects.
+    %   getGObj(obj): *abstract* -- Creates and draws the volume body object and returns
+    %                               a handle to the created graphics objects.
     %   updGObj(obj, hgo): *abstract* -- Updates the data parameters, i.e. the vertex
     %                                    coordinates, of the volume body object.
     %   drawMGrid(obj, pt_color): *abstract* -- Draws the meshgrid of the object and
     %                                           returns a graphics object handle to it.
-    %   ptInObj(obj, pt_pos): *abstract* -- Determines if some given points are
-    %                                       below the surface (i.e. inside) of
-    %                                       the volume body object.
+    %   ptInObj(obj, pt_pos): *abstract* -- Determines if some specified points
+    %                                       are below the surface (i.e. inside)
+    %                                       of the volume body object.
     properties(Abstract, Dependent)
         origin@double vector
         rotm@double   matrix
@@ -179,8 +188,8 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGO
 
     methods(Abstract)
         setInitFrame(obj, varargin)
-        hgo    = getGObj(obj)      % get the graphic object handle
-        hgo    = updGObj(obj, hgo) % update the graphic object handle
+        hgo    = getGObj(obj)      % get the graphics object handle
+        hgo    = updGObj(obj, hgo) % update the graphics object handle
         hmg    = drawMGrid(obj, pt_color)
         result = ptInObj(obj, pt_pos)
     end
@@ -191,8 +200,8 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGO
             % array operations.
             %
             % Returns:
-            %   default_object: An empty instance of :class:`~WBM.vbCuboid`
-            %                   to preallocate the memory.
+            %   default_object: An instance of :class:`~WBM.vbCuboid` with
+            %                   default values to preallocate the memory.
             default_object = WBM.vbCuboid;
         end
 
