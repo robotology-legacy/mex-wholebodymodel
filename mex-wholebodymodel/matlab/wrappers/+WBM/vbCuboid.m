@@ -217,9 +217,9 @@ classdef vbCuboid < WBM.vbObject
             % three different ways, where the *keyword arguments* in the square
             % brackets are optional:
             %
-            %   - .. function:: vbCuboid(l_x, l_y, l_z[, orig, rotm[, obj_prop]])
-            %   - .. function:: vbCuboid(l[, orig, rotm[, obj_prop]])
-            %   - .. function:: vbCuboid()
+            %   - .. py:method:: vbCuboid(l_x, l_y, l_z[, orig, rotm[, obj_prop]])
+            %   - .. py:method:: vbCuboid(l[, orig, rotm[, obj_prop]])
+            %   - .. py:method:: vbCuboid()
             %
             % The first two options specifying as volume body object either
             % a *rectangular cuboid* or a *cube*. The third option without
@@ -326,9 +326,9 @@ classdef vbCuboid < WBM.vbObject
             %
             % The method can be called in three different ways:
             %
-            %   - .. function:: setInitFrame(p, R)
-            %   - .. function:: setInitFrame(vqT)
-            %   - .. function:: setInitFrame()
+            %   - .. py:method:: setInitFrame(p, R)
+            %   - .. py:method:: setInitFrame(vqT)
+            %   - .. py:method:: setInitFrame()
             %
             % If no parameters are given, then :meth:`!setInitFrame` uses for
             % the initial origin frame of the cuboid the current frame vector

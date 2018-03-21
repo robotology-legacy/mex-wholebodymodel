@@ -29,7 +29,7 @@
 
 classdef wbmRobotModel < handle
     % :class:`!wbmRobotModel` is a *data type* (class) that specifies the model
-    % parameters of a given floating base robot.
+    % parameters of a given floating-base robot.
     %
     % Attributes:
     %   yarp_robot_type   (char, vector): String to specify the type of a YARP-based
@@ -41,11 +41,11 @@ classdef wbmRobotModel < handle
     %   urdf_fixed_link   (char, vector): String matching URDF name of the *fixed reference
     %                                     link frame* w.r.t. a world frame (wf). The given
     %                                     reference link of the robot will be used as the
-    %                                     *floating base link*.
+    %                                     *floating-base link*.
     %
-    %                                     **Note:** The default fixed link (floating base link)
+    %                                     **Note:** The default fixed link (floating-base link)
     %                                     of each YARP-based robot can be different and the
-    %                                     selection of the floating base link depends also from
+    %                                     selection of the floating-base link depends also from
     %                                     the situation. For example the default fixed link of
     %                                     the iCub humanoid robot is ``l_sole``.
     %   wf_R_b_init     (double, matrix): (3 x 3) rotation matrix as *initial orientation* from

@@ -29,13 +29,13 @@
 
 classdef wbmRobotParams < handle
     % :class:`!wbmRobotParams` is a *data type* (class) to export the model and
-    % configuration parameters of a given floating base robot between interfaces.
+    % configuration parameters of a given floating-base robot between interfaces.
     %
     % Attributes:
     %   model   (:class:`~WBM.wbmRobotModel`): Model object with the model parameters
-    %                                          of the given floating base robot.
+    %                                          of the given floating-base robot.
     %   config (:class:`~WBM.wbmRobotConfig`): Configuration object with the configuration
-    %                                          settings of the given floating base robot.
+    %                                          settings of the given floating-base robot.
     %   wf2fixlnk (logical, scalar): Boolean flag to indicate if the world frame
     %                                (wf) is set to a fixed reference link frame.
     properties

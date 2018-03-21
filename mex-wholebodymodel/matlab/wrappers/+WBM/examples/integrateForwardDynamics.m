@@ -13,11 +13,11 @@ icub_config = wbm_icub.robot_config;
 
 %% State variable:
 %  Create the initial condition of the state variable "chi" for the integration of the
-%  forward dynamics in state-space form. The state-space form reduces, through variable
-%  substitution, the inhomogeneous second-order ODE to a first-order ODE.
+%  forward dynamics in state-space form. The state-space form reduces (through variable
+%  substitution) the inhomogeneous second-order ODE to a first-order ODE.
 %  For further details see:
-%    [1] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008,
-%        Chapter 3, pp. 40-42, formula (3.8).
+%    [1] Featherstone, Roy: Rigid Body Dynamics Algorithms. Springer, 2008,
+%        Chapter 3, pp. 40-42, eq. (3.8).
 chi_init = wbm_icub.init_stvChi;
 
 %% Control torques:

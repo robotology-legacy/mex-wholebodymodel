@@ -29,7 +29,7 @@
 
 classdef wbmBody < handle
     % :class:`!wbmBody` is a *data type* (class) to define and configure the
-    % body components of a given floating base robot.
+    % body components of a given floating-base robot.
     %
     % Attributes:
     %   chains (cell, matrix): (*nChns* x 3) list of *chain names* (effectors) with

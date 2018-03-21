@@ -28,24 +28,23 @@
 % with the WBML. If not, see <http://www.gnu.org/licenses/>.
 
 classdef WBMBase < handle
-    % :class:`!WBMBase` is the *base class* of the *whole-body model* (WBM) for
-    % YARP-based *floating base robots*, such as the iCub humanoid robot. It is
-    % a *wrapper class* for the fast *C++ MEX Whole-Body Model Interface* for
-    % Matlab (`mex-wholeBodyModel`_) and provides all necessary basic methods of
-    % the `yarpWholeBodyInterface`_ for the state estimations, kinematic/dynamic
-    % models and actuators.
+    % The class :class:`!WBMBase` is the *base class* of the *whole-body model*
+    % (WBM) for YARP-based *floating-base robots*, such as the iCub humanoid
+    % robot. It is a *wrapper class* for the fast *C++ MEX Whole-Body Model
+    % Interface* for Matlab (`mex-wholeBodyModel`_) and provides all necessary
+    % basic methods of the `yarpWholeBodyInterface`_ for state estimations,
+    % kinematic/dynamic models and actuators.
     %
     % Attributes:
-    %   fixed_link    (char, vector): String matching URDF name of the default
-    %                                 *fixed reference link frame* (floating
-    %                                 base link).
+    %   fixed_link    (char, vector): String matching URDF name of the default *fixed
+    %                                 reference link frame* (floating-base link).
     %
-    %                                 **Note:** The default fixed link (floating
-    %                                 base link) may be different for each robot,
-    %                                 and the selection of the floating base link
-    %                                 also depends from the given situation. The
-    %                                 specified fixed link (reference link) can
-    %                                 also be a *contact constraint link*.
+    %                                 **Note:** The default fixed link (floating-base
+    %                                 link) may be different for each robot and the
+    %                                 selection of the floating base link depends also
+    %                                 from the given situation. Furthermore, the
+    %                                 specified fixed link (reference link) can also
+    %                                 be a *contact constraint link*.
     %   init_wf_R_b (double, matrix): (3 x 3) rotation matrix as *initial orientation*
     %                                 from base frame *b* to the world frame *wf*
     %                                 (default orientation: *identity matrix*).
@@ -73,7 +72,7 @@ classdef WBMBase < handle
     %                                    - ``upr``: (*ndof* x 1) vector for the *upper* joint limits.
     %
     %   robot_model (:class:`~WBM.wbmRobotModel`): Model object with the model parameters of
-    %                                              the given floating base robot (*read only*).
+    %                                              the given floating-base robot (*read only*).
     %
     %   DF_ROBOT_MODEL (char, vector): Default *URDF robot model* for the whole-body interface:
     %                                  ``'icubGazeboSim'`` (*constant*).
@@ -105,8 +104,18 @@ classdef WBMBase < handle
     end
 
     methods
-        % Constructor:
         function obj = WBMBase(robot_model)
+            % Constructor.
+            %
+            % The constructor initializes the given robot model and sets the
+            % world frame (wf) to the initial position and orientation with
+            % a specified gravitation.
+            %
+            % Arguments:
+            %   robot_model (:class:`~WBM.wbmRobotModel`): Model object with the model parameters
+            %                                              of the given floating-base robot.
+            % Returns:
+            %   obj: An instance of the :class:`!WBMBase` class.
             if ~exist('robot_model', 'var')
                 error('WBMBase::WBMBase: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
@@ -116,21 +125,42 @@ classdef WBMBase < handle
             setInitWorldFrame(obj, robot_model.wf_R_b_init, robot_model.wf_p_b_init, robot_model.g_wf);
         end
 
-        % Copy function:
         function newObj = copy(obj)
+            % Clones the current object.
+            %
+            % This copy method replaces the ``matlab.mixin.Copyable.copy()``
+            % method and creates a *deep copy* of the current object by using
+            % directly the memory.
+            %
+            % Returns:
+            %   newObj: An exact copy (clone) of the current :class:`!WBMBase` object.
             newObj = WBM.utilities.copyObj(obj);
         end
 
-        % Destructor:
         function delete(~)
-            % remove all class properties from workspace (free-up memory) ...
+            % Destructor.
+            %
+            % Removes all class properties from the workspace (free-up memory).
         end
 
         function initModel(obj, urdf_model_name)
+            % Initializes the whole-body model of the floating-base robot.
+            %
+            % The method can be called in two different modes:
+            %
+            % **Normal mode**
+            %
+            % Arguments:
+            %   urdf_model_name (char, vector): String matching *name* of an
+            %                                   existing robot model [#f1]_.
+            %
+            % **Optimized mode** -- *No arguments*.
+            %
+            %   The MEX whole-body interface loads the configuration files
+            %   of the *default robot model* that is specified in the system
+            %   environment variable ``YARP_ROBOT_NAME`` [#f1]_.
             if ~exist('urdf_model_name', 'var')
-                % Optimized mode: use the default (URDF) robot model of the
-                % yarpWholeBodyInterface which is defined in the environment
-                % variable YARP_ROBOT_NAME.
+                % optimized mode:
                 obj.mwbm_model.urdf_robot_name = getenv('YARP_ROBOT_NAME');
                 mexWholeBodyModel('model-initialize');
                 return
@@ -143,6 +173,13 @@ classdef WBMBase < handle
         end
 
         function initModelURDF(obj, urdf_file_name)
+            % Initializes the whole-body model of a YARP-based robot with a
+            % specific URDF-file.
+            %
+            % Arguments:
+            %   urdf_model_name (char, vector): String with the full path to the
+            %                                   URDF-file of the user defined
+            %                                   robot model to be read.
             if ~exist('urdf_file_name', 'var')
                 error('WBMBase::initModelURDF: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
@@ -155,6 +192,23 @@ classdef WBMBase < handle
         end
 
         function setWorldFrame(obj, wf_R_b, wf_p_b, g_wf)
+            % Sets the world frame (wf) at a given position and orientation,
+            % starting from a specified *fixed link frame* (reference frame).
+            %
+            % Arguments:
+            %   wf_R_b (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                            the base frame *b* to world frame *wf*.
+            %   wf_p_b (double, vector): (3 x 1) position vector from the the base
+            %                            frame *b* to the world frame *wf*.
+            %   g_wf   (double, vector): (3 x 1) Cartesian gravity vector in the
+            %                            world frame *wf* (*optional*).
+            %
+            %                            If the gravity is not given, then the
+            %                            default gravity vector :math:`[0, 0, -9.81]^T`
+            %                            will be used.
+            % Note:
+            %   The specified fixed link (reference link) can also be a *contact
+            %   constraint link*.
             if (nargin < 3)
                 error('WBMBase::setWorldFrame: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
@@ -168,7 +222,33 @@ classdef WBMBase < handle
         end
 
         function setInitWorldFrame(obj, wf_R_b, wf_p_b, g_wf)
-            % setup the world frame with the initial parameters or update it with the new parameters:
+            % Setup the world frame (wf) with the given *initial parameters* or
+            % update it with new parameters.
+            %
+            % The method can be called in two ways:
+            %
+            %   - .. py:method:: setInitWorldFrame(wf_R_b, wf_p_b[, g_wf])
+            %   - .. py:method:: setInitWorldFrame()
+            %
+            % Arguments:
+            %   wf_R_b (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                            the base frame *b* to world frame *wf*.
+            %   wf_p_b (double, vector): (3 x 1) position vector from the the base
+            %                            frame *b* to the world frame *wf*.
+            %   g_wf   (double, vector): (3 x 1) Cartesian gravity vector in the
+            %                            world frame *wf* (*optional*).
+            %
+            %                            If the gravity is not given, then the
+            %                            default gravity vector :math:`[0, 0, -9.81]^T`
+            %                            will be used.
+            % Note:
+            %   If no parameters are given, then ``setInitWorldFrame`` updates
+            %   the world frame *wf* with the new initial parameters that were
+            %   changed individually from outside.
+            %
+            % See Also:
+            %   :attr:`~WBM.WBMBase.init_wf_R_b`, :attr:`~WBM.WBMBase.init_wf_p_b`
+            %   and :attr:`~WBM.WBMBase.g_wf`.
             switch nargin
                 case 4
                     % replace all old initial parameters with the new values ...
@@ -185,22 +265,53 @@ classdef WBMBase < handle
                 case 2
                     error('WBMBase::setInitWorldFrame: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
-            % if nargin = 1:
-            % update the world frame with the new initial parameters that are individually changed from outside.
+            % if nargin = 1: update the world frame with new initial parameters
+            %                (changed individually from outside).
 
             % set the world frame with the (new) initial parameters:
             setWorldFrame(obj, obj.mwbm_model.wf_R_b_init, obj.mwbm_model.wf_p_b_init, obj.mwbm_model.g_wf);
         end
 
         function [wf_p_b, wf_R_b] = getWorldFrameFromFixLnk(obj, urdf_fixed_link, q_j)
-            % compute the position and orientation of the floating base w.r.t. a world frame (WF)
-            % that is fixed to a specified link frame (reference frame):
+            % Computes the position and orientation of the *floating base* w.r.t. a
+            % world frame (wf) that is intentionally set and fixed at a specified
+            % link frame (reference frame).
+            %
+            % The method can be called by one of the given modes:
+            %
+            % **Normal mode** -- Compute the base frame for a specific joint
+            % configuration:
+            %
+            %   .. py:method:: getWorldFrameFromFixLnk(urdf_fixed_link, q_j)
+            %
+            % **Optimized mode** -- Compute the base frame with the current
+            % joint configuration:
+            %
+            %   .. py:method:: getWorldFrameFromFixLnk(urdf_fixed_link)
+            %
+            % Arguments:
+            %   urdf_fixed_link (char, vector): String matching *URDF name* of the
+            %                                   fixed link as reference link (frame).
+            %   q_j           (double, vector): (:math:`n_{dof}` x 1) joint positions
+            %                                   vector in :math:`[\si{\radian}]`
+            %                                   (*optional*).
+            % Returns:
+            %   [wf_p_b, wf_R_b]: 2-element tuple containing:
+            %
+            %      - **wf_p_b** (*double, vector*) -- (3 x 1) position vector
+            %        from the the base frame *b* to the world frame *wf*.
+            %      - **wf_R_b** (*double, matrix*) -- (3 x 3) rotation matrix
+            %        (orientation) from the base frame *b* to the world frame *wf*.
+            %
+            % Note:
+            %   The specified fixed link (reference link) can also be a *contact
+            %   constraint link*.
             switch nargin
                 case 3
-                    % normal mode: compute the base frame for a specific joint configuration (joint positions)
+                    % normal mode:
                     [wf_p_b, wf_R_b] = computeNewWorld2Base(obj, urdf_fixed_link, q_j);
                 case 2
-                    % optimized mode: compute the base frame with the current joint configuration
+                    % optimized mode:
                     [wf_p_b, wf_R_b] = computeNewWorld2Base(obj, urdf_fixed_link);
                 otherwise
                     error('WBMBase::getWorldFrameFromFixLnk: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
@@ -208,8 +319,32 @@ classdef WBMBase < handle
         end
 
         function [wf_p_b, wf_R_b] = getWorldFrameFromDfltFixLnk(obj, q_j)
-            % compute the position and orientation of the floating base w.r.t. a world frame (WF)
-            % that is fixed to the default reference link frame:
+            % Computes the position and orientation of the *floating base* w.r.t.
+            % a world frame (wf) that is set and fixed to the *default reference
+            % link frame*.
+            %
+            % The method can be called by one of the given modes:
+            %
+            % **Normal mode** -- Compute the base frame for a specific joint
+            % configuration:
+            %
+            %   .. py:method:: getWorldFrameFromFixLnk(q_j)
+            %
+            % **Optimized mode** -- Compute the base frame with the current
+            % joint configuration:
+            %
+            %   .. py:method:: getWorldFrameFromFixLnk()
+            %
+            % Arguments:
+            %   q_j (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                         in :math:`[\si{\radian}]` (*optional*).
+            % Returns:
+            %   [wf_p_b, wf_R_b]: 2-element tuple containing:
+            %
+            %      - **wf_p_b** (*double, vector*) -- (3 x 1) position vector
+            %        from the base frame *b* to the world frame *wf*.
+            %      - **wf_R_b** (*double, matrix*) -- (3 x 3) rotation matrix
+            %        (orientation) from the base frame *b* to the world frame *wf*.
             if (nargin == 2)
                 % normal mode:
                 [wf_p_b, wf_R_b] = computeNewWorld2Base(obj, obj.mwbm_model.urdf_fixed_link, q_j);
@@ -220,6 +355,16 @@ classdef WBMBase < handle
         end
 
         function setState(~, q_j, dq_j, v_b)
+            % Updates or sets the *state* of the robot model, i.e. the *joint angles*,
+            % *joint velocities* and the *generalized base velocity* of the floating base.
+            %
+            % Arguments:
+            %   q_j  (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                          in :math:`[\si{\radian}]`.
+            %   dq_j (double, vector): (:math:`n_{dof}` x 1) joint velocities vector
+            %                          in :math:`[\si{\radian/s}]`.
+            %   v_b  (double, vector): (6 x 1) generalized base velocity vector (Cartesian
+            %                          and rotational velocity of the base).
             if (nargin ~= 4)
                 error('WBMBase::setState: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
@@ -227,10 +372,41 @@ classdef WBMBase < handle
         end
 
         function [vqT_b, q_j, v_b, dq_j] = getState(~)
+            % Obtains the currently stored state of the robot system, in
+            % particular
+            %
+            %    - the *base VQ-transformation*,
+            %    - the *joint angles* and *velocities*  and
+            %    - the *generalized base velocity*.
+            %
+            % Returns:
+            %   [vqT_b, q_j, v_b, dq_j]: 4-element tuple containing:
+            %
+            %      - **vqT_b** (*double, vector*) -- (7 x 1) VQ-transformation (frame)
+            %        relative from the base *b* to the world frame *wf* [#f2]_.
+            %      - **q_j**   (*double, vector*) -- (:math:`n_{dof}` x 1) joint angle
+            %        vector in :math:`[\si{\radian}]`.
+            %      - **v_b**   (*double, vector*) -- (6 x 1) generalized base velocity vector.
+            %      - **dq_j**  (*double, vector*) -- (:math:`n_{dof}` x 1) joint angle
+            %        velocity vector in :math:`[\si{\radian/s}]`.
             [vqT_b, q_j, v_b, dq_j] = mexWholeBodyModel('get-state');
         end
 
         function stFltb = getFloatingBaseState(~)
+            % Returns the current state, i.e. the position, orientation and
+            % velocity of the robot's floating base *b*.
+            %
+            % Returns:
+            %   stFltb (:class:`~WBM.wbmFltgBaseState`): Floating-base state object with
+            %                                            the current state parameters of
+            %                                            the robot's floating base *b*
+            %                                            related to the world frame *wf*.
+            % Note:
+            %   The values of the floating-base state are derived from the currently
+            %   stored state of the robot system.
+            %
+            % See Also:
+            %   :meth:`WBMBase.getState`.
             stFltb = WBM.wbmFltgBaseState;
             [R_b, p_b, v_b] = mexWholeBodyModel('get-base-state');
 
@@ -240,6 +416,37 @@ classdef WBMBase < handle
         end
 
         function wf_H_lnk = transformationMatrix(obj, varargin)
+            % Computes the the homogeneous transformation matrix :math:`H` of a
+            % specified link of the robot w.r.t. the current joint configuration
+            % :math:`q_j`.
+            %
+            % The method can be called by one of the given modes:
+            %
+            % **Normal mode** -- Compute the transformation matrix of the given
+            % link, specified by the base orientation and the positions:
+            %
+            %   .. py:method:: transformationMatrix(wf_R_b, wf_p_b, q_j[, urdf_link_name])
+            %
+            % **Optimized mode** -- Compute the transformation matrix of the
+            % given link at the current state of the robot system:
+            %
+            %   .. py:method:: transformationMatrix([urdf_link_name])
+            %
+            % Arguments:
+            %   wf_R_b       (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                                  the base frame *b* to world frame *wf*.
+            %   wf_p_b       (double, vector): (3 x 1) position vector from the the base
+            %                                  frame *b* to the world frame *wf*.
+            %   q_j          (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                                  in :math:`[\si{\radian}]`.
+            %   urdf_link_name (char, vector): String matching *URDF name* of the link (*optional*).
+            %
+            %                                  **Note:** If the link is not given, then the method
+            %                                  uses as default the *fixed link* of the robot.
+            % Returns:
+            %   wf_H_lnk (double, matrix): (4 x 4) homogeneous transformation matrix relative
+            %   from the link frame *lnk* to the world frame *wf*.
+
             % wf_R_b = varargin{1}
             % wf_p_b = varargin{2}
             % q_j    = varargin{3}
@@ -264,6 +471,28 @@ classdef WBMBase < handle
         end
 
         function M = massMatrix(~, wf_R_b, wf_p_b, q_j)
+            % Computes the generalized mass matrix :math:`M` of the floating-base
+            % robot w.r.t. the given joint configuration :math:`q_j`.
+            %
+            % The method can be called in two different modes:
+            %
+            % **Normal mode** -- Compute the mass matrix, specified by the
+            % base orientation and the positions:
+            %
+            % Arguments:
+            %   wf_R_b (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                            the base frame *b* to world frame *wf*.
+            %   wf_p_b (double, vector): (3 x 1) position vector from the the base
+            %                            frame *b* to the world frame *wf*.
+            %   q_j    (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                            in :math:`[\si{\radian}]`.
+            %
+            % **Optimized mode** -- *No arguments* (use the current state of the
+            % robot system).
+            %
+            % Returns:
+            %   M (double, matrix): (:math:`n` x :math:`n`) generalized mass matrix
+            %   of the robot, where :math:`n = n_{dof} + 6`.
             switch nargin
                 case 4
                     % normal mode:
@@ -278,21 +507,89 @@ classdef WBMBase < handle
         end
 
         function [jlmts_lwr, jlmts_upr] = getJointLimits(~)
+            % Obtains the lower and upper *joint position limits* of the given
+            % robot model.
+            %
+            % Returns:
+            %   [jlmts_lwr, jlmts_upr]: 2-element tuple containing:
+            %      - **jlmts_lwr** (*double, vector*) -- (:math:`n_{dof}` x 1) lower
+            %        joint limits vector.
+            %      - **jlmts_upr** (*double, vector*) -- (:math:`n_{dof}` x 1) upper
+            %        joint limits vector.
+
             % get the lower (min.) and upper (max.) joint limits ...
             [jlmts_lwr, jlmts_upr] = mexWholeBodyModel('joint-limits');
         end
 
         function resv = isJointLimit(obj, q_j)
+            % Verifies, if the given joint configuration exceeds the upper or
+            % lower joint limits of the given robot.
+            %
+            % Returns:
+            %   resv (logical, vector): (:math:`n_{dof}` x 1) vector with the
+            %   logical results to determine if the current joint configuration
+            %   is within the given limits of the robot. Each value is set to
+            %   *true* if the corresponding joint has exceeded its limit,
+            %   *false* otherwise.
             resv = ~((q_j > obj.mwbm_model.jlmts.lwr) & (q_j < obj.mwbm_model.jlmts.upr));
         end
 
         function dv_b = generalizedBaseAcc(obj, M, c_qv, ddq_j)
+            % Computes the the *generalized floating-base acceleration* for a
+            % *hybrid-dynamic system*.
+            %
+            % This method can be useful for example in inverse dynamics, when
+            % the base acceleration is unknown.
+            %
+            % Arguments:
+            %   M     (double, matrix): (:math:`n` x :math:`n`) generalized mass matrix
+            %                           with :math:`n = n_{dof} + 6`.
+            %   c_qv  (double, vector): (:math:`n` x 1) generalized bias force vector
+            %                           with :math:`n = n_{dof} + 6`.
+            %   ddq_j (double, vector): (:math:`n_{dof}` x 1) joint angle acceleration
+            %                           vector in :math:`[\si{\radian/{s^2}}]`
+            % Returns:
+            %   dv_b (double, vector): (6 x 1) generalized base acceleration vector
+            %   of the floating base *b*.
+            %
+            % See Also:
+            %   :func:`WBM.utilities.mbd.generalizedBaseAcc`.
             dv_b = WBM.utilities.mbd.generalizedBaseAcc(M, c_qv, ddq_j, obj.mwbm_model.ndof);
         end
 
         tau_j = inverseDynamics(obj, varargin)
 
         function wf_J_lnk = jacobian(obj, varargin)
+            % Computes the Jacobian of a specified link of the robot w.r.t. the
+            % current joint configuration :math:`q_j`.
+            %
+            % The method can be called by one of the given modes:
+            %
+            % **Normal mode** -- Compute the Jacobian matrix of the given link,
+            % specified by the base orientation and the positions:
+            %
+            %   .. py:method:: jacobian(wf_R_b, wf_p_b, q_j[, urdf_link_name])
+            %
+            % **Optimized mode** -- Compute the Jacobian matrix of the given
+            % link at the current state of the robot system:
+            %
+            %   .. py:method:: jacobian([urdf_link_name])
+            %
+            % Arguments:
+            %   wf_R_b       (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                                  the base frame *b* to world frame *wf*.
+            %   wf_p_b       (double, vector): (3 x 1) position vector from the the base
+            %                                  frame *b* to the world frame *wf*.
+            %   q_j          (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                                  in :math:`[\si{\radian}]`.
+            %   urdf_link_name (char, vector): String matching *URDF name* of the link (*optional*).
+            %
+            %                                  **Note:** If the link is not given, then the method
+            %                                  uses as default the *fixed link* of the robot.
+            % Returns:
+            %   wf_J_lnk (double, matrix): (6 x :math:`n`) Jacobian matrix relative from
+            %   the link frame *lnk* to the world frame *wf*, where :math:`n = n_{dof} + 6`.
+
             % wf_R_b = varargin{1}
             % wf_p_b = varargin{2}
             % q_j    = varargin{3}
@@ -317,6 +614,43 @@ classdef WBMBase < handle
         end
 
         function djdq_lnk = dJdq(obj, varargin)
+            % Computes the product (*bias acceleration*) of the time derivative
+            % of the Jacobian and the joint velocities w.r.t. the current state
+            % and the specified link of the robot.
+            %
+            % This method is useful for the *Operational Space Control* and for
+            % the calculation of the *external contact constraints*. It can be
+            % called by one of the given modes:
+            %
+            % **Normal mode** -- Compute the bias acceleration of the given link,
+            % specified by the base orientation, the positions and the velocities:
+            %
+            %   .. py:method:: dJdq(wf_R_b, wf_p_b, q_j, dq_j, v_b[, urdf_link_name])
+            %
+            % **Optimized mode** -- Compute the bias acceleration of the given
+            % link at the current state of the robot system:
+            %
+            %   .. py:method:: dJdq([urdf_link_name])
+            %
+            % Arguments:
+            %   wf_R_b       (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                                  the base frame *b* to world frame *wf*.
+            %   wf_p_b       (double, vector): (3 x 1) position vector from the the base
+            %                                  frame *b* to the world frame *wf*.
+            %   q_j          (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                                  in :math:`[\si{\radian}]`.
+            %   dq_j         (double, vector): (:math:`n_{dof}` x 1) joint angle velocity
+            %                                  vector in :math:`[\si{\radian/s}]`.
+            %   v_b          (double, vector): (6 x 1) generalized base velocity vector (Cartesian
+            %                                  and rotational velocity of the base).
+            %   urdf_link_name (char, vector): String matching *URDF name* of the link (*optional*).
+            %
+            %                                  **Note:** If the link is not given, then the method
+            %                                  uses as default the *fixed link* of the robot.
+            % Returns:
+            %   djdq_lnk (double, vector): (6 x 1) bias acceleration vector relative from
+            %   the link frame *lnk* to the world frame *wf* in operational space.
+
             % wf_R_b = varargin{1}
             % wf_p_b = varargin{2}
             % q_j    = varargin{3}
@@ -343,6 +677,34 @@ classdef WBMBase < handle
         end
 
         function h_c = centroidalMomentum(~, wf_R_b, wf_p_b, q_j, dq_j, v_b)
+            % Computes the centroidal momentum :math:`h_c` of a robot system.
+            %
+            % The centroidal momentum of a humanoid robot is the sum of all
+            % link moments projected to the center of mass (CoM) of the robot.
+            %
+            % The method is a function of the state variables :math:`q_j, \dot{q_j}`
+            % and the generalized base velocity :math:`v_b` and can be called by
+            % one of the given modes:
+            %
+            % **Normal mode** -- Compute the centroidal momentum specified by
+            % the base orientation, the positions and the velocities:
+            %
+            % Arguments:
+            %   wf_R_b (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                            the base frame *b* to world frame *wf*.
+            %   wf_p_b (double, vector): (3 x 1) position vector from the the base
+            %                            frame *b* to the world frame *wf*.
+            %   q_j    (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                            in :math:`[\si{\radian}]`.
+            %   dq_j   (double, vector): (:math:`n_{dof}` x 1) joint angle velocity
+            %                            vector in :math:`[\si{\radian/s}]`.
+            %   v_b    (double, vector): (6 x 1) generalized base velocity vector (Cartesian
+            %                            and rotational velocity of the base).
+            %
+            % **Optimized mode** -- *No arguments* (use the current state of the robot system).
+            %
+            % Returns:
+            %   h_c (double, vector): (6 x 1) centroidal moment vector of the robot.
             switch nargin
                 case 6
                     % normal mode:
@@ -357,6 +719,34 @@ classdef WBMBase < handle
         end
 
         function vqT_lnk = forwardKinematics(obj, varargin)
+            % Computes the forward kinematic transformation vector of a specific
+            % link w.r.t. the current joint configuration :math:`q_j`.
+            %
+            % The method can be called by one of the given modes:
+            %
+            % **Normal mode** -- Compute the forward kinematic transformation of
+            % the given link, specified by the base orientation and the positions:
+            %
+            %   .. py:method:: forwardKinematics(wf_R_b, wf_p_b, q_j[, urdf_link_name])
+            %
+            % **Optimized mode** -- Compute the forward kinematic transformation
+            % of the given link at the current state of the robot system:
+            %
+            %   .. py:method:: forwardKinematics([urdf_link_name])
+            %
+            % Arguments:
+            %   wf_R_b       (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                                  the base frame *b* to world frame *wf*.
+            %   wf_p_b       (double, vector): (3 x 1) position vector from the the base
+            %                                  frame *b* to the world frame *wf*.
+            %   q_j          (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                                  in :math:`[\si{\radian}]`.
+            %   urdf_link_name (char, vector): String matching *URDF name* of the link (*optional*).
+            %
+            % Returns:
+            %   vqT_lnk (double, vector): (7 x 1) VQ-transformation (frame) relative
+            %   from the link frame *lnk* to the world frame *wf* [#f2]_.
+
             % wf_R_b = varargin{1}
             % wf_p_b = varargin{2}
             % q_j    = varargin{3}
@@ -381,6 +771,39 @@ classdef WBMBase < handle
         end
 
         function c_qv = generalizedBiasForces(~, wf_R_b, wf_p_b, q_j, dq_j, v_b)
+            % Computes the generalized bias forces :math:`C(q_j,\dpt{q_j})` in
+            % the dynamics of rigid-body systems.
+            %
+            % It accounts the *Coriolis*, *centrifugal* and *gravity forces*
+            % that are depending on the joint angles :math:`q_j`, the joint
+            % velocities :math:`\dot{q_j}` and the generalized base velocity
+            % :math:`v_b` [Fea08]_.
+            %
+            % The method can be called in two different modes:
+            %
+            % **Normal mode** -- Compute the generalized bias forces, specified
+            % by the base orientation, the positions and the velocities:
+            %
+            % Arguments:
+            %   wf_R_b (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                            the base frame *b* to world frame *wf*.
+            %   wf_p_b (double, vector): (3 x 1) position vector from the the base
+            %                            frame *b* to the world frame *wf*.
+            %   q_j    (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                            in :math:`[\si{\radian}]`.
+            %   dq_j   (double, vector): (:math:`n_{dof}` x 1) joint angle velocity
+            %                            vector in :math:`[\si{\radian/s}]`.
+            %   v_b    (double, vector): (6 x 1) generalized base velocity vector (Cartesian
+            %                            and rotational velocity of the base).
+            %
+            % **Optimized mode** -- *No arguments* (use the current state of the robot system).
+            %
+            % Returns:
+            %   c_qv (double, vector): (:math:`n` x 1) generalized bias force vector of
+            %   the robot with :math:`n = n_{dof} + 6`.
+            %
+            % References:
+            %   .. [Fea08] Featherstone, Roy: Rigid Body Dynamics Algorithms. Springer, 2008, p. 40.
             switch nargin
                 case 6
                     % normal mode:
@@ -395,6 +818,55 @@ classdef WBMBase < handle
         end
 
         function tau_gen = generalizedForces(~, varargin)
+            % Computes the generalized forces :math:`\tau_{gen}` in dependency
+            % of some given external forces that are acting on the robot system,
+            % such that
+            %
+            %   .. math::
+            %       \tau_{gen} = C(q_j,\dot{q_j}) - J_{e}^{T}\cdot f_e\:,
+            %
+            % where :math:`C(q_j,\dot{q_j})` denotes the *generalized bias forces* and
+            % :math:`J_{e}^{T}\cdot f_e` the *external forces* in joint space [Fea08]_.
+            %
+            % The method can be called in two different modes:
+            %
+            % **Normal mode** -- Compute the generalized forces, specified by
+            % the base orientation, the positions, velocities and the *external
+            % forces* in joint space:
+            %
+            %   .. py:method:: generalizedForces(wf_R_b, wf_p_b, q_j, dq_j, v_b, Je_t, f_e)
+            %
+            % **Optimized mode** -- Compute the generalized forces at the current
+            % state of the robot system, in dependency of the given external force
+            % vector :math:`f_e` and the Jacobian :math:`J_{e}^{T}`:
+            %
+            %   .. py:method:: generalizedForces(Je_t, f_e)
+            %
+            % Arguments:
+            %   wf_R_b (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                            the base frame *b* to world frame *wf*.
+            %   wf_p_b (double, vector): (3 x 1) position vector from the the base
+            %                            frame *b* to the world frame *wf*.
+            %   q_j    (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                            in :math:`[\si{\radian}]`.
+            %   dq_j   (double, vector): (:math:`n_{dof}` x 1) joint angle velocity
+            %                            vector in :math:`[\si{\radian/s}]`.
+            %   v_b    (double, vector): (6 x 1) generalized base velocity vector.
+            %   Je_t   (double, matrix): (:math:`n` x 6) transposed Jacobian to
+            %                            transform the external forces into the
+            %                            joint space with :math:`n = n_{dof} + 6`.
+            %   f_e    (double, vector): (6 x 1) external force vector that is
+            %                            acting on the robot system.
+            % Returns:
+            %   tau_gen (double, vector): (:math:`n` x 1) generalized force vector of
+            %   the robot with :math:`n = n_{dof} + 6`.
+            %
+            % See Also:
+            %   :meth:`WBMBase.generalizedBiasForces`.
+            %
+            % References:
+            %   .. [Fea08] Featherstone, Roy: Rigid Body Dynamics Algorithms. Springer, 2008, p. 40.
+
             % wf_R_b = varargin{1}
             % wf_p_b = varargin{2}
             % q_j    = varargin{3}
@@ -419,6 +891,38 @@ classdef WBMBase < handle
         end
 
         function c_qv = coriolisBiasForces(~, wf_R_b, wf_p_b, q_j, dq_j, v_b)
+            % Computes the bias Coriolis and centrifugal forces :math:`C(q_j,\dot{q_j})`
+            % in the dynamics of rigid-body systems.
+            %
+            % The method can be called in two different modes:
+            %
+            % **Normal mode** -- Compute the bias Coriolis and centrifugal forces,
+            % specified by the base orientation, the positions and the velocities:
+            %
+            % Arguments:
+            %   wf_R_b (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                            the base frame *b* to world frame *wf*.
+            %   wf_p_b (double, vector): (3 x 1) position vector from the the base
+            %                            frame *b* to the world frame *wf*.
+            %   q_j    (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                            in :math:`[\si{\radian}]`.
+            %   dq_j   (double, vector): (:math:`n_{dof}` x 1) joint angle velocity
+            %                            vector in :math:`[\si{\radian/s}]`.
+            %   v_b    (double, vector): (6 x 1) generalized base velocity vector (Cartesian
+            %                            and rotational velocity of the base).
+            %
+            % **Optimized mode** -- *No arguments* (use the current state of the robot system).
+            %
+            % Returns:
+            %   c_qv (double, vector): (:math:`n` x 1) bias Coriolis and centrifugal force
+            %   vector of the robot with :math:`n = n_{dof} + 6`.
+            %
+            % Note:
+            %   This method is similar to the generalized bias force method and depends
+            %   on the same state parameter triplet :math:`[q_j, \dot{q_j}, v_b]`.
+            %
+            % See Also:
+            %   :meth:`WBMBase.generalizedBiasForces`.
             switch nargin
                 case 6
                     % normal mode:
@@ -433,6 +937,34 @@ classdef WBMBase < handle
         end
 
         function g_q = gravityBiasForces(~, wf_R_b, wf_p_b, q_j)
+            % Computes the gravity bias forces :math:`G(q_j)` in the dynamics of
+            % rigid-body systems.
+            %
+            % The method can be called in two different modes:
+            %
+            % **Normal mode** -- Compute the gravity bias forces, specified by
+            % the base orientation and the positions:
+            %
+            % Arguments:
+            %   wf_R_b (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                            the base frame *b* to world frame *wf*.
+            %   wf_p_b (double, vector): (3 x 1) position vector from the the base
+            %                            frame *b* to the world frame *wf*.
+            %   q_j    (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                            in :math:`[\si{\radian}]`.
+            %
+            % **Optimized mode** -- *No arguments* (use the current state of the robot system).
+            %
+            % Returns:
+            %   g_q (double, vector): (:math:`n` x 1) gravity bias force vector
+            %   of the robot with :math:`n = n_{dof} + 6`.
+            %
+            % Note:
+            %   This method is similar to the generalized bias force method, but
+            %   depends only on the given joint configuration :math:`q_j`.
+            %
+            % See Also:
+            %   :meth:`WBMBase.generalizedBiasForces`.
             switch nargin
                 case 4
                     % normal mode:
@@ -447,19 +979,45 @@ classdef WBMBase < handle
         end
 
         function tau_fr = frictionForces(obj, dq_j)
+            % Computes the frictional torque-forces :math:`F(\dot{q_j})` by
+            % using a simplified model.
+            %
+            % The method depends on the current *joint angle acceleration*
+            % :math:`\dot{q_j}` and on the given *friction coefficients* of
+            % the joints. It can be called in two different modes:
+            %
+            % **Normal mode** -- Compute the frictional torque-forces in
+            % dependency of the current joint velocities:
+            %
+            % Arguments:
+            %   dq_j (double, vector): (:math:`n_{dof}` x 1) joint angle velocity
+            %                          vector in :math:`[\si{\radian/s}]`.
+            %
+            % **Optimized mode** -- *No arguments* (use the current state of the robot system).
+            %
+            % Returns:
+            %   tau_fr (double, vector): (:math:`n_{dof}` x 1) frictional torque-force
+            %   vector with negated values.
+            %
+            % Note:
+            %   The friction coefficients of the joints must be predefined in
+            %   :attr:`wbmRobotModel.frict_coeff`, otherwise the whole-body model
+            %   assumes that the robot system is *frictionless*.
+            %
+            % References:
+            %   .. [SSVO08] Siciliano, B.; Sciavicco, L.; Villani, L.; Oriolo, G.:
+            %               Modelling and Control of Robot Manipulators.
+            %               2nd Edition, Springer, 2008, p. 133 & p. 141.
+            %   .. [Cra05] Craig, John J.: Introduction to Robotics: Mechanics and Control.
+            %              3rd Edition, Pearson/Prentice Hall, 2005,
+            %              pp. 188-189, eq. (6.110)-(6.112).
+            %   .. [Cor17] Corke, Peter I.: Robotics, Vision & Control: Fundamental Algorithms in Matlab.
+            %              2nd Edition, Springer, 2017, p. 252, eq. (9.1) & (9.2).
             if (nargin == 1)
                 [~,~,~,dq_j] = mexWholeBodyModel('get-state');
             end
             epsilon = 1e-12; % min. value to treat a number as zero ...
 
-            % Compute the friction forces (torques) F(dq_j) with a simplified model:
-            % Further details about the computation are available in:
-            %   [1] Modelling and Control of Robot Manipulators, L. Sciavicco & B. Siciliano, 2nd Edition, Springer, 2008,
-            %       p. 133 & p. 141.
-            %   [2] Introduction to Robotics: Mechanics and Control, John J. Craig, 3rd Edition, Pearson/Prentice Hall, 2005,
-            %       pp. 188-189, eq. (6.110)-(6.112).
-            %   [3] Robotics, Vision & Control: Fundamental Algorithms in Matlab, Peter I. Corke, Springer, 2011,
-            %       pp. 201-202, eq. (9.4) & (9.5).
             if (sum(dq_j ~= 0) <= epsilon) % if dq_j = 0
                 tau_fr = zeros(obj.mwbm_model.ndof,1);
                 return
@@ -470,6 +1028,43 @@ classdef WBMBase < handle
         end
 
         function [M, c_qv, h_c] = wholeBodyDynamics(~, wf_R_b, wf_p_b, q_j, dq_j, v_b)
+            % Obtains the main components for the whole-body dynamics of a robot
+            % system, in particular it computes w.r.t. the state parameter
+            % triplet :math:`[q_j, \dot{q_j}, v_b]`,
+            %
+            %   - the *generalized mass matrix*,
+            %   - the *generalized bias forces*  and
+            %   - the *centroidal momentum*
+            %
+            % of the given floating-base robot.
+            %
+            % The method can be called in two different modes:
+            %
+            % **Normal mode** -- Compute the whole-body dynamics components, specified
+            % by the base orientation, the positions and the velocities:
+            %
+            % Arguments:
+            %   wf_R_b (double, matrix): (3 x 3) rotation matrix (orientation) from
+            %                            the base frame *b* to world frame *wf*.
+            %   wf_p_b (double, vector): (3 x 1) position vector from the the base
+            %                            frame *b* to the world frame *wf*.
+            %   q_j    (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+            %                            in :math:`[\si{\radian}]`.
+            %   dq_j   (double, vector): (:math:`n_{dof}` x 1) joint angle velocity
+            %                            vector in :math:`[\si{\radian/s}]`.
+            %   v_b    (double, vector): (6 x 1) generalized base velocity vector (Cartesian
+            %                            and rotational velocity of the base).
+            %
+            % **Optimized mode** -- *No arguments* (use the current state of the robot system).
+            %
+            % Returns:
+            %   [M, c_qv, h_c]: 3-element tuple containing:
+            %
+            %      - **M**    (*double, matrix*) -- (:math:`n` x :math:`n`) generalized mass
+            %        matrix of the robot, where :math:`n = n_{dof} + 6`.
+            %      - **c_qv** (*double, vector*) -- ((:math:`n` x 1) generalized bias force
+            %        vector with :math:`n = n_{dof} + 6`.
+            %      - **h_c**  (*double, vector*) -- (6 x 1) centroidal moment vector of the robot.
             switch nargin
                 case 6
                     % normal mode:
@@ -569,6 +1164,12 @@ classdef WBMBase < handle
         end
 
         function dispModel(obj, prec)
+            % Displays the current model settings of the given floating-base robot.
+            %
+            % Arguments:
+            %   prec (int, scalar): Precision number to specify for the values
+            %                       the number of digits after the decimal point
+            %                       (*optional*). Default precision: 2.
             if ~exist('prec', 'var')
                 prec = 2;
             end
@@ -649,7 +1250,7 @@ classdef WBMBase < handle
                 end
             end
 
-            % Initialize the mex-WholeBodyModel for a floating base robot,
+            % Initialize the mex-WholeBodyModel for a floating-base robot,
             % using Unified Robot Description Format (URDF):
             if isempty(robot_model.urdf_robot_name)
                 % optimized mode:

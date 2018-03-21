@@ -417,8 +417,8 @@ classdef genericSimConfig < WBM.wbmSimConfig
             % called in two different ways, where the *keyword arguments* in
             % the square brackets are optional:
             %
-            %   - .. function:: genericSimConfig(wnd_title, rob_sim_body[, nax[, env_settings]])
-            %   - .. function:: genericSimConfig(wnd_title, rob_sim_body[, [nax|env_settings]])
+            %   - .. py:method:: genericSimConfig(wnd_title, rob_sim_body[, nax[, env_settings]])
+            %   - .. py:method:: genericSimConfig(wnd_title, rob_sim_body[, [nax|env_settings]])
             %
             % Arguments:
             %   wnd_title                (char, vector): String to specify the title
@@ -581,9 +581,9 @@ classdef genericSimConfig < WBM.wbmSimConfig
             %
             % The method can be called in three different ways:
             %
-            %   - .. function:: createVideo(filename[, [rmode, fps]])
-            %   - .. function:: createVideo(filename[, [rmode|fps]])
-            %   - .. function:: createVideo()
+            %   - .. py:method:: createVideo(filename[, [rmode, fps]])
+            %   - .. py:method:: createVideo(filename[, [rmode|fps]])
+            %   - .. py:method:: createVideo()
             %
             % If the parameters are not completely given, then the method uses
             % the default values for the video settings.

@@ -19552,12 +19552,12 @@
 							"showShadow": true,
 							"containerChangeable": false,
 							"containerExtending": false,
-							"left": 732,
+							"left": 754,
 							"top": 854,
-							"width": 197,
+							"width": 153,
 							"height": 38,
 							"autoResize": false,
-							"text": "Model parameters of a floating base robot.",
+							"text": "Model parameters of a floating-base robot.",
 							"wordWrap": true
 						},
 						{
@@ -29836,7 +29836,7 @@
 							"width": 213,
 							"height": 51,
 							"autoResize": false,
-							"text": "General configuration data for the environment and the robot in the simulaton.",
+							"text": "General configuration data for the simulation of the environment and the robot.",
 							"wordWrap": true
 						},
 						{
@@ -32577,12 +32577,12 @@
 							"showShadow": true,
 							"containerChangeable": false,
 							"containerExtending": false,
-							"left": 52,
-							"top": 1376,
+							"left": 50,
+							"top": 1374,
 							"width": 189,
 							"height": 66,
 							"autoResize": false,
-							"text": "\nModel and configuration parameters of a floating base robot. This data type is useful e.g. for interfaces.",
+							"text": "\nModel and configuration parameters of a floating-base robot. This data type is useful e.g. for interfaces.",
 							"wordWrap": true
 						},
 						{
@@ -32607,7 +32607,7 @@
 								"$ref": "AAAAAAFU4lbNqt7INs4="
 							},
 							"lineStyle": 2,
-							"points": "328:1460;328:1409;240:1409"
+							"points": "328:1460;328:1409;238:1409"
 						},
 						{
 							"_type": "UMLNoteLinkView",
@@ -89412,6 +89412,7 @@
 									"visibility": "public",
 									"isStatic": false,
 									"isLeaf": false,
+									"type": "",
 									"isReadOnly": false,
 									"isOrdered": false,
 									"isUnique": false,

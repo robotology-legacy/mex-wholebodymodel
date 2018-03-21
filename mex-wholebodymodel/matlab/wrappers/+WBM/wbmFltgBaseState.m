@@ -29,8 +29,8 @@
 
 classdef wbmFltgBaseState < handle
     % :class:`!wbmFltgBaseState` is a *data type* (class) to represent the
-    % actual state parameters of the robot floating base *b* related to the
-    % world frame *wf*.
+    % actual state parameters of the robot's floating base *b* related to
+    % the world frame *wf*.
     %
     % Attributes:
     %   wf_R_b (double, matrix): (3 x 3) orientation matrix of the base (in

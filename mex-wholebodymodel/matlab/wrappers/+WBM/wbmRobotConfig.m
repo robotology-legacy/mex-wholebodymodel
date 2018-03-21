@@ -29,7 +29,7 @@
 
 classdef wbmRobotConfig < handle
     % :class:`!wbmRobotConfig` is a *data type* (class) that specifies the
-    % configuration parameters of a given floating base robot.
+    % configuration parameters of a given floating-base robot.
     %
     % Attributes:
     %   nCstrs             (uint8, scalar): Number of contact constraints of those links,
@@ -62,20 +62,22 @@ classdef wbmRobotConfig < handle
     %                                       number is 0.
     %   tool_links (:class:`~WBM.wbmToolLink`, vector): (*n* x 1) array of *tool link objects*, where
     %                                                   each tool is assigned to a specific link of
-    %                                                   the robot. The length *n* of the array must
+    %                                                   the robot. The length *n* of the array can
     %                                                   not exceed the limit :attr:`WBM.MAX_NUM_TOOLS`.
     %                                                   By default, the initial array is *empty*.
     %
     %                                                   **Note:** The *default tool link* for the robot
     %                                                   is always the first element of the object list.
     %   init_state_params (:class:`~WBM.wbmStateParams`): Data object to define the initial state
-    %                                                     parameters of a given floating base robot.
-    %   stvLen            (uint16, scalar): Length of the state parameter vector, i.e. the length
-    %                                       of all state parameters concatenated in one vector. The
-    %                                       length can be either :math:`2 * n_{dof} + 13` (default),
-    %                                       :math:`2 * n_{dof} + 6` (without :attr:`~WBM.wbmStateParams.x_b`
-    %                                       and :attr:`~WBM.wbmStateParams.qt_b`) or 0
-    %                                       (if :attr:`init_state_params` is empty [#f1]_).
+    %                                                     parameters of a given floating-base robot.
+    %   stvLen            (uint16, scalar): Length of the state parameter vector, i.e. the
+    %                                       length of all state parameters concatenated in
+    %                                       one vector. The length can be either
+    %                                       :math:`2 * n_{dof} + 13` (default),
+    %                                       :math:`2 * n_{dof} + 6` (without
+    %                                       :attr:`~WBM.wbmStateParams.x_b` and
+    %                                       :attr:`~WBM.wbmStateParams.qt_b`) or 0 if
+    %                                       :attr:`init_state_params` is empty [#f1]_.
     %   body       (:class:`~WBM.wbmBody`): Data object to define and configure the
     %                                       body components of the given robot.
     properties

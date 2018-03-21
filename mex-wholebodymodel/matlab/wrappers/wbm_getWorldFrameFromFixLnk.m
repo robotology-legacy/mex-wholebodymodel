@@ -1,29 +1,51 @@
 function [wf_p_b, wf_R_b] = wbm_getWorldFrameFromFixLnk(varargin)
-    % WBM_GETWORLDFRAMEFROMFIXLNK returns the position and the orientation of the floating base w.r.t.
-    % a world frame (WF) that is intentionally set and fixed at a specified link frame. The specified
-    % fixed link (reference link) can also be a contact constraint link.
+    % WBM_GETWORLDFRAMEFROMFIXLNK computes the position and the orientation of the floating base
+    % w.r.t. a world frame (wf) that is intentionally set and fixed at a specified link frame
+    % (reference frame).
     %
     % The returned floating base position and orientation is obtained from the forward kinematics
     % w.r.t. the specified fixed link frame (reference frame).
     %
-    % Note: The default fixed link (floating base link) may be different for each YARP-based robot,
-    % and the selection of the floating base link also depends from the given situation. For example
-    % the default fixed link of the iCub humanoid robot is "l_sole".
+    % Note:
+    %   The default fixed link (floating base link) may be different for each YARP-based robot
+    %   and the selection of the floating base link depends also from the given situation. For
+    %   example the default fixed link of the iCub humanoid robot is "l_sole". Furthermore, the
+    %   specified fixed link (reference link) can also be a contact constraint link.
     %
-    %   INPUT ARGUMENTS:
-    %       Optimized mode:
-    %           urdf_fixed_link -- string matching URDF name of the fixed link frame
+    % Input Arguments:
     %
-    %       Normal mode:
-    %           urdf_fixed_link -- string matching URDF name of the fixed link frame
-    %                       q_j -- (nDoF x 1) joint angle vector in radian
+    %   Normal mode:
+    %       urdf_fixed_link -- String matching URDF name of the fixed link.
+    %       q_j             -- (n_dof x 1) joint angle vector in [rad].
     %
-    %   OUTPUT ARGUMENTS:
-    %       wf_p_b -- (3 x 1) position vector (from base to world frame)
-    %       wf_R_b -- (3 x 3) rotation matrix (from base to world frame)
+    %   Optimized mode:
+    %       urdf_fixed_link -- String matching URDF name of the fixed link.
     %
+    % Output Arguments:
+    %       wf_p_b -- (3 x 1) position vector from the base frame 'b' to the world frame 'wf'.
+    %       wf_R_b -- (3 x 3) rotation matrix (orientation) from the base frame 'b' to the
+    %                 world frame 'wf'.
+    %
+    % See also:
+    %   WBM_SETWORLDFRAME
+
+    % Copyright (C) 2014-2017 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
     % Author: Naveen Kuppuswamy (naveen.kuppuswamy@iit.it); Genova, Dec 2014
     % Modified by: Martin Neururer (martin.neururer@gmail.com); Genova, Jan 2017
+    %
+    % This function is part of the Whole-Body Model Library for Matlab (WBML).
+    %
+    % Permission is granted to copy, distribute, and/or modify the WBM-Library
+    % under the terms of the GNU Lesser General Public License, Version 2.1
+    % or any later version published by the Free Software Foundation.
+    %
+    % The WBM-Library is distributed in the hope that it will be useful,
+    % but WITHOUT ANY WARRANTY; without even the implied warranty of
+    % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    % GNU Lesser General Public License for more details.
+    %
+    % A copy of the GNU Lesser General Public License can be found along
+    % with the WBML. If not, see <http://www.gnu.org/licenses/>.
     switch nargin
         case 1
             [wf_p_b, wf_R_b] = computeNewWorld2Base(varargin{1,1});

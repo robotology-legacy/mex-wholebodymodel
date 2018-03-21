@@ -28,6 +28,80 @@
 % with the WBML. If not, see <http://www.gnu.org/licenses/>.
 
 classdef WBM < WBM.WBMBase
+    % The class :class:`!WBM` is the *main class* of the *whole-body model* (WBM)
+    % for YARP-based *floating-base robots*. It is a derived class from the class
+    % :class:~WBM.WBMBase` and offers additionally *higher-level methods* for the
+    % robot as extension, such as *visualization*, *forward dynamics*, *contact
+    % forces*, *payloads*, *tools*, etc.
+    %
+    % Attributes:
+    %   stvLen        (uint16, scalar): Length of the state parameter vector, i.e. the
+    %                                   length of all state parameters concatenated in
+    %                                   in one vector. The length can be either
+    %                                   :math:`2 * n_{dof} + 13` (default),
+    %                                   :math:`2 * n_{dof} + 6` (without
+    %                                   :attr:`~WBM.wbmStateParams.x_b` and
+    %                                   :attr:`~WBM.wbmStateParams.qt_b`) or 0
+    %                                   if :attr:`init_state` is empty [#f1]_
+    %                                   (*read only*).
+    %   vqT_base      (double, vector): Base VQ-transformation (of the floating
+    %                                   base) at the current state of the robot
+    %                                   system (*read only*).
+    %   init_vqT_base (double, vector): Initial VQ-transformation of the robot's
+    %                                   floating base (*read only*).
+    %   init_stvChi   (double, vector): Initial state vector :math:`\chi` of the
+    %                                   robot for the initial integration of the
+    %                                   forward dynamics in state-space form [#f2]_
+    %                                   (*read only*).
+    %
+    %                                   **Note:** The state variable :math:`\chi` is
+    %                                   a vector to express the forward dynamics in
+    %                                   *state-space form* [Fea08]_ and is defined as,
+    %                                   :math:`\chi = [x_b, qt_b, q_j, \dot{x_b}, \omega_b, \dot{q_j}]^T`
+    %                                   with:
+    %
+    %                                      - :math:`x_b` -- Cartesian position of the floating
+    %                                         base *b* in Euclidean space :math:`\mathbb{R}^3`.
+    %                                      - :math:`qt_b` -- Orientation of the base *b* in
+    %                                        *quaternions* (global parametrization of
+    %                                        :math:`\mathbf{SO}^3`).
+    %                                      - :math:`q_j` -- Joint positions (angles) of dimension
+    %                                        :math:`\mathbb{R}^{n_{dof}}` in :math:`[\si{\radian}]`.
+    %                                      - :math:`\dot{x_b}` -- Cartesian velocity of the base
+    %                                        *b* in Euclidean space :math:`\mathbb{R}^3`.
+    %                                      - :math:`\omega_b` -- Angular velocity describing the
+    %                                        *rotational velocity* of the base *b* in
+    %                                        :math:`\mathbf{SO}^3`.
+    %
+    %   init_state   (:class:`~WBM.wbmStateParams`): Data object to define the initial state
+    %                                                parameters of the given floating-base robot.
+    %   robot_body   (:class:`~WBM.wbmBody`): Data object that specifies the body components of
+    %                                         the given floating-base robot (*read only*).
+    %   robot_config (:class:`~WBM.wbmRobotConfig`): Configuration object with the configuration
+    %                                                settings of the given floating-base robot
+    %                                                (*read only*).
+    %   robot_params (:class:`~WBM.wbmRobotParams`): Data object with the current settings of the
+    %                                                model and configuration parameters of the
+    %                                                given floating-base robot (*read only*).
+    %
+    %                                                **Note:** This property is useful to exchange
+    %                                                the parameter settings of the robot between
+    %                                                interfaces.
+    %   DF_STIFFNESS  (int, scalar): Default stiffness control gain for the
+    %                                position correction: 2.5.
+    %   MAX_NUM_TOOLS (int, scalar): Maximum number of tools that a humanoid
+    %                                robot can use simultaneously: 2.
+    %   MAX_JNT_SPEED (int, scalar): Maximum joint speed for execution in :math:`[\mathrm{ksps}]`
+    %                                (kilosample(s) per second) [#f3]_: 250.
+    %   MAX_JNT_ACC   (int, scalar): Maximum joint acceleration with :math:`\SI{1}{\mathrm{Ms/{s^2}}]`
+    %                                (Megasample(s) per second squared) that any
+    %                                joint is allowed to attempt [#f3]_.
+    %   MAX_JNT_TRQ   (int, scalar): Maximum joint torque in :math:`[\mathrm{ksps}]`
+    %                                that any joint is allowed to attempt: :math:`\num{1e5}`.
+    %   ZERO_CVEC_12  (int, scalar): (12 x 1) column-vector of zeros (for velocities,
+    %                                accelerations, forces, etc.).
+    %   ZERO_CVEC_6   (int, scalar): (6 x 1) column-vector of zeros (for velocities,
+    %                                accelerations, etc.).
     properties(Dependent)
         stvLen@uint16        scalar
         vqT_base@double      vector
@@ -43,10 +117,10 @@ classdef WBM < WBM.WBMBase
         DF_STIFFNESS  = 2.5; % default control gain for the position correction.
         MAX_NUM_TOOLS = 2;
 
-        MAX_JNT_SPEED = 250; % max. joint speed in [ksps] (kilosample(s) per second). (*)
-        MAX_JNT_ACC   = 1e6; % max. joint acceleration with 1 [Ms/s^2] (Megasample(s) per second squared). (*)
+        MAX_JNT_SPEED = 250; % max. joint speed in [ksps] (kilosample(s) per second). [*]
+        MAX_JNT_ACC   = 1e6; % max. joint acceleration with 1 [Ms/s^2] (Megasample(s) per second squared). [*]
         MAX_JNT_TRQ   = 1e5; % max. joint torque in [ksps] (kilosample(s) per second).
-        % (*) Source: <http://wiki.icub.org/brain/velControlThread_8cpp.html>
+        % [*] Source: <http://wiki.icub.org/brain/velControlThread_8cpp.html>
 
         % zero-vectors for contact accelerations/velocities
         % and for external force vectors:

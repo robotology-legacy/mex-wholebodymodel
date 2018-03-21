@@ -29,7 +29,7 @@
 
 classdef wbmPayloadLink
     % :class:`!wbmPayloadLink` is a *data type* (class) to define a payload that
-    % is assigned to a specific link of a given floating base robot.
+    % is assigned to a specific link of a given floating-base robot.
     %
     % Attributes:
     %   urdf_link_name (char, vector): URDF-name of the specified *reference link frame*

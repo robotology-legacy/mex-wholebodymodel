@@ -198,8 +198,8 @@ classdef vbSphere < WBM.vbObject
             % two different ways, where the *keyword arguments* in the square
             % brackets are optional:
             %
-            %   - .. function:: vbSphere(ri, ro[, orig, rotm[, obj_prop]])
-            %   - .. function:: vbSphere(r[, orig, rotm[, obj_prop]])
+            %   - .. py:method:: vbSphere(ri, ro[, orig, rotm[, obj_prop]])
+            %   - .. py:method:: vbSphere(r[, orig, rotm[, obj_prop]])
             %
             % The first option specifies a *hollow sphere* (sphere shell) as
             % volume body object and the second one a *solid sphere* (ball).
@@ -297,9 +297,9 @@ classdef vbSphere < WBM.vbObject
             %
             % The method can be called in three different ways:
             %
-            %   - .. function:: setInitFrame(p, R)
-            %   - .. function:: setInitFrame(vqT)
-            %   - .. function:: setInitFrame()
+            %   - .. py:method:: setInitFrame(p, R)
+            %   - .. py:method:: setInitFrame(vqT)
+            %   - .. py:method:: setInitFrame()
             %
             % If no parameters are given, then :meth:`!setInitFrame` uses for
             % the initial origin frame of the sphere the current frame vector

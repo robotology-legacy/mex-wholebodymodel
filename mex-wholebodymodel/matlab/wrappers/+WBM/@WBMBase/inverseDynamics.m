@@ -28,6 +28,87 @@
 % with the WBML. If not, see <http://www.gnu.org/licenses/>.
 
 function tau_j = inverseDynamics(obj, varargin)
+    % Computes the inverse dynamics of a rigid-body system. It depends on the
+    % *state parameter triplet* :math:`[q_j, \dot{q_j}, v_b]`, the *joint angle
+    % accelerations* :math:`\ddot{q_j}` and the *generalized base accelerations*
+    % :math:`\dot{v_b}`.
+    %
+    % If the *generalized floating-base acceleration* :math:`\dot{v_b}` is
+    % unknown, then the inverse dynamics problem changes to a *hybrid-dynamics
+    % problem* [Fea08]_. In general the equation of motion is given as follows:
+    %
+    %   .. math::
+    %       \tau_j = M\cdot \ddot{q_j} + C(q_j,\dot{q_j}) + \tau_fr
+    %
+    % where :math:`C(q_j,\dot{q_j})` denotes the generalized bias force.
+    %
+    % In contrast to the fixed-based system, the *equation of motion* for a
+    % *floating-base system* is defined as follows [Fea08_, CFF11_, SSD12_]:
+    %
+    %   .. math::
+    %       :label: eq_of_motion
+    %
+    %       \begin{bmatrix} 0\\ \tau_j \end{bmatrix} =
+    %       \begin{bmatrix}
+    %           M_{00}   & M_{01}\\
+    %           M_{01}^T & M_{11}
+    %       \end{bmatrix}
+    %       \cdot
+    %       \begin{bmatrix} \dot{v_b}\\ \ddot{q_j} \end{bmatrix} +
+    %       \begin{bmatrix} h_0\\ h_1 \end{bmatrix} +
+    %       \begin{bmatrix} 0\\ \tau_{fr} \end{bmatrix}
+    %
+    % The matrix on the left side describes the (:math:`n` x :math:`n`) *mass matrix*
+    % :math:`\mathbf{M}` of the robot and the vector :math:`h = [h_0, h_1]^T` is a
+    % (:math:`n` x 1) vector representing the *generalized bias forces* (Coriolis,
+    % centrifugal and gravity forces), where :math:`n = n_{dof}+6`. The inverse
+    % dynamics model will be solved by using the first row of the above equation
+    % :eq:`eq_of_motion` to obtain the *generalized base acceleration* [Fea08_,
+    % CFF11_, SSD12_]:
+    %
+    %   .. math::
+    %       \dot{v_b} = -M_{00}^{-1}\cdot (M_{01}\cdot \ddot{q_j} + h_0)
+    %
+    % The method can be called by one of the given modes:
+    %
+    % **Normal mode** -- Compute the inverse dynamics of the robot, specified
+    % by the base orientation, the positions, the velocities and accelerations:
+    %
+    %   .. py:method:: inverseDynamics(wf_R_b, wf_p_b, q_j, dq_j, v_b, ddq_j[, dv_b])
+    %
+    % **Optimized mode** -- Compute the inverse dynamics of the robot at the
+    % current state of the robot system:
+    %
+    %   .. py:method:: inverseDynamics(dq_j, ddq_j[, dv_b])
+    %
+    % Arguments:
+    %   wf_R_b (double, matrix): (3 x 3) rotation matrix (orientation) from
+    %                            the base frame *b* to world frame *wf*.
+    %   wf_p_b (double, vector): (3 x 1) position vector from the the base
+    %                            frame *b* to the world frame *wf*.
+    %   q_j    (double, vector): (:math:`n_{dof}` x 1) joint positions vector
+    %                            in :math:`[\si{\radian}]`.
+    %   dq_j   (double, vector): (:math:`n_{dof}` x 1) joint angle velocity
+    %                            vector in :math:`[\si{\radian/s}]`.
+    %   v_b    (double, vector): (6 x 1) generalized base velocity vector (Cartesian
+    %                            and rotational velocity of the base).
+    %   ddq_j  (double, vector): (:math:`n_{dof}` x 1) joint angle acceleration
+    %                            vector in :math:`[\si{\radian/{s^2}}]`.
+    %   dv_b   (double, vector): (6 x 1) generalized base acceleration vector
+    %                            (*optional*).
+    % Returns:
+    %   tau_j (double, vector): (:math:`n` x 1) generalized force vector at the
+    %   joints and the base of the robot, where :math:`n = n_{dof} + 6`.
+    %
+    % References:
+    %   .. [Fea08] Featherstone, Roy: Rigid Body Dynamics Algorithms. Springer, 2008,
+    %              Chapter 9.3-9.5, pp. 180-184, eq. (9.13) & (9.24).
+    %   .. [CFF11] Cetto, J. A.; Ferrier, J. L.; Filipe, J.: Informatics in Control, Automation and Robotics.
+    %              In: Lecture Notes in Electrical Engineering, Volume 89, Springer, 2011, p. 14, eq. (36) & (37).
+    %   .. [SSD12] Shah, S. V.; Saha, S. K.; Dutt, J. K.: Dynamics of Tree-Type Robotic Systems.
+    %              In: Intelligent Systems, Control and Automation: Science and Engineering, Volume 62,
+    %              Springer, 2012, p. 119, eq. (7.1) & (7.2).
+
     % wf_R_b = varargin{1}
     % wf_p_b = varargin{2}
     % q_j    = varargin{3}
@@ -84,32 +165,17 @@ function tau_j = inverseDynamics(obj, varargin)
     tau_fr = frictionForces(obj, dq_j);
     tau_fr = vertcat(zeros(6,1), tau_fr);
 
-    %% Generalized floating base acceleration for a hybrid-dynamic system:
+    %% Generalized floating-base acceleration for a hybrid-dynamic system:
     %
-    %  In general the equation of motion is given as follows:
-    %
-    %       tau_j = M * ddq_j + C(q_j, dq_j) + tau_fr,
-    %
-    %  where C(q_j, dq_j) denotes the generalized bias force.
-    %  In contrast to the fixed-based system, the equation of motion for a
-    %  floating base system is given as follows:
+    %  Equation of motion for a floating-base system:
     %
     %       |   0   |   | M_00      M_01 |   | dv_b  |   | h_0 |   |   0    |
     %       |       | = |                | * |       | + |     | + |        |
     %       | tau_j |   | M_01^T    M_11 |   | ddq_j |   | h_1 |   | tau_fr |
     %
-    %  where M is the (n+6)x(n+6) mass matrix, h = (h_0, h_1)^T is a (n+6)x1 vector
-    %  representing the generalized bias forces (Coriolis, centrifugal and gravity forces)
-    %  and dv_b = -(M_00)^(-1) * (M_01 * ddq_j + h_0) denotes the base acceleration.
-    %
-    % Further details about the formulas are available at:
-    %   [1] Rigid Body Dynamics Algorithms, Roy Featherstone, Springer, 2008,
-    %       chapter 9.3-9.5, pp. 180-184, eq. (9.13) & (9.24).
-    %   [2] Informatics in Control, Automation and Robotics, J. A. Cetto & J. Ferrier & J. Filipe,
-    %       Lecture Notes in Electrical Engineering, Volume 89, Springer, 2011, p. 14, eq. (36) & (37).
-    %   [3] Dynamics of Tree-Type Robotic Systems, S. V. Shah & S. K. Saha & J. K. Dutt,
-    %       Intelligent Systems, Control and Automation: Science and Engineering, Volume 62, Springer, 2012,
-    %       p. 119, eq. (7.1) & (7.2).
+    %  where M is the (n+6)-by-(n+6) mass matrix, h = (h_0, h_1)^T a
+    %  (n+6)-by-1 vector representing the generalized bias forces and
+    %  dv_b = -(M_00)^(-1) * (M_01 * ddq_j + h_0) denotes the base acceleration.
     dv_b  = generalizedBaseAcc(obj, M, c_qv, ddq_j);
     ddq_j = vertcat(dv_b, ddq_j); % mixed generalized acceleration
 

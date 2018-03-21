@@ -292,7 +292,7 @@ end
 
 function [veT_cl, eul_cl] = calcDesiredRefPoseEul(obj, wf_R_b_arr, wf_p_b, q_j, clnk_idx)
     % calculate the desired (reference) pose for the contact link in dependency
-    % of the current floating base state:
+    % of the current floating-base state:
     clnk_name = obj.mwbm_config.ccstr_link_names{1,clnk_idx};
 
     % get the forward kinematic transformation (clink-to-world) of the contact link ...
@@ -306,7 +306,7 @@ end
 
 function [vqT_cl, quat_cl] = calcDesiredRefPoseQuat(obj, wf_R_b_arr, wf_p_b, q_j, clnk_idx)
     % calculate the desired (reference) pose for the contact link in dependency
-    % of the current floating base state:
+    % of the current floating-base state:
     clnk_name = obj.mwbm_config.ccstr_link_names{1,clnk_idx};
 
     % get the forward kinematic transformation (clink-to-world) of the contact link ...

@@ -198,8 +198,8 @@ classdef vbCylinder < WBM.vbObject
             % two different ways, where the *keyword arguments* in the square
             % brackets are optional:
             %
-            %   - .. function:: vbCylinder(ri, ro, h[, orig, rotm[, obj_prop]])
-            %   - .. function:: vbCylinder(r, h[, orig, rotm[, obj_prop]])
+            %   - .. py:method:: vbCylinder(ri, ro, h[, orig, rotm[, obj_prop]])
+            %   - .. py:method:: vbCylinder(r, h[, orig, rotm[, obj_prop]])
             %
             % The first option specifies a *circular hollow cylinder* (cylindrical
             % shell) as volume body object and the second one a *right circular
@@ -305,9 +305,9 @@ classdef vbCylinder < WBM.vbObject
             %
             % The method can be called in three different ways:
             %
-            %   - .. function:: setInitFrame(p, R)
-            %   - .. function:: setInitFrame(vqT)
-            %   - .. function:: setInitFrame()
+            %   - .. py:method:: setInitFrame(p, R)
+            %   - .. py:method:: setInitFrame(vqT)
+            %   - .. py:method:: setInitFrame()
             %
             % If no parameters are given, then :meth:`!setInitFrame` uses for
             % the initial origin frame of the cylinder the current frame vector
