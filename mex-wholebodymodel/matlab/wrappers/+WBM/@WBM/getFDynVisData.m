@@ -1,4 +1,116 @@
+% Copyright (C) 2015-2018, by Martin Neururer
+% Author: Martin Neururer
+% E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
+% Date:   January-May, 2018
+%
+% Departments:
+%   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
+%   Automation and Control Institute - TU Wien.
+%
+% This file is part of the Whole-Body Model Library for Matlab (WBML).
+%
+% The development of the WBM-Library was made in the context of the master
+% thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
+% for the Matlab MEX whole-body model interface, which was supported by the
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
+% Robotics (b)), <http://www.codyco.eu>.
+%
+% Permission is granted to copy, distribute, and/or modify the WBM-Library
+% under the terms of the GNU Lesser General Public License, Version 2.1
+% or any later version published by the Free Software Foundation.
+%
+% The WBM-Library is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU Lesser General Public License for more details.
+%
+% A copy of the GNU Lesser General Public License can be found along
+% with the WBML. If not, see <http://www.gnu.org/licenses/>.
+
 function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
+    % Returns the *visualization data parameters* from from the forward dynamics
+    % of the given robot model.
+    %
+    % The method returns a *dynamic data structure* with parameter fields of the
+    % computed *forward dynamics states* :math:`\mathcal{X}`, in dependency of
+    % the given forward dynamics method and the torque controller. The calculated
+    % parameter values of the controller and the forward dynamics can be used for
+    % the visualization of certain parameters in a plot or for further analysis
+    % purposes.
+    %
+    % Note:
+    %   To obtain the correct parameter values of the robot's forward dynamics,
+    %   the torque controller and the forward dynamics method must be the same,
+    %   as used in the computation of the integration output matrix
+    %   :math:`\mathcal{X}` (see ).
+    %
+    % Following *pose correction types* for the position-regulation system of
+    % the forward dynamics will be supported:
+    %
+    %   - ``none`` -- No pose corrections.
+    %   - ``nfb``  -- No floating base and without pose corrections.
+    %   - ``fpc``  -- Foot pose correction.
+    %   - ``hpc``  -- Hand pose correction.
+    %   - ``fhpc`` -- Foot and hand pose correction.
+    %
+    % In dependency of the specified *pose correction*, the method can be
+    % called as follows:
+    %
+    %   *none, nfb:*
+    %      .. py:method:: getFDynVisData(stmChi, fhTrqControl[, pc_type])
+    %
+    %   *none, fpc:*
+    %      .. py:method:: getFDynVisData(stmChi, fhTrqControl, foot_conf, clnk_conf, fe_c, ac, ac_f[, pc_type])
+    %
+    %   *none, fpc, fhpc:*
+    %      .. py:method:: getFDynVisData(stmChi, fhTrqControl, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f[, pc_type])
+    %
+    %   *nfb:*
+    %      .. py:method:: getFDynVisData(stmChi, fhTrqControl, clnk_conf, fe_c, ac[, pc_type])
+    %
+    %   *nfb:*
+    %      .. py:method:: getFDynVisData(stmChi, fhTrqControl, fhTotCWrench, hand_conf, f_cp[, pc_type])
+    %
+    %   *fpc:*
+    %      .. py:method:: getFDynVisData(stmChi, fhTrqControl, foot_conf, ac_f[, pc_type])
+    %
+    %   *hpc:*
+    %      .. py:method:: getFDynVisData(stmChi, fhTrqControl, hand_conf, fe_h, ac_h[, pc_type])
+    %
+    %   *fhpc:*
+    %      .. py:method:: getFDynVisData(stmChi, fhTrqControl, foot_conf, hand_conf, fe_h, ac_h, ac_f[, pc_type])
+    %
+    % Arguments:
+    %   stmChi        (double, matrix): Integration output matrix :math:`\mathcal{X}`
+    %                                   with the calculated *forward dynamics states*
+    %                                   (row-vectors) of the given robot model.
+    %   fhTrqControl (function_handle): Function handle to a specified time-dependent
+    %                                   *torque control function* that controls the
+    %                                   dynamics of the robot system.
+    %   varargin        (cell, vector): Variable-length input argument list to pass extra
+    %                                   parameters for the specified forward dynamics
+    %                                   function to be integrated by the ODE-solver
+    %                                   (*optional*).
+    %
+    %                                   The *extra parameters* to be passed are defined
+    %                                   in the respective forward dynamics function
+    %                                   (see :meth:`WBM.intForwardDynamics` -- *Other
+    %                                   Parameters*).
+    %   pc_type         (char, vector): String and last element of ``varargin`` to
+    %                                   indicate the *pose correction type* to be used
+    %                                   for the forward dynamics ODE-function, specified
+    %                                   by one of the given string values: ``'none'``,
+    %                                   ``'nfb'``, ``'fpc'``, ``'hpc'``, ``'fhpc'``.
+    %
+    %                                   The default string is ``'none'`` (*optional*).
+    % Returns:
+    %   vis_data (struct): Dynamic structure with parameter data of the torque
+    %   controller and the forward dynamics of the given robot model for
+    %   visualization and analysis purposes.
+    %
+    % See Also:
+    %   :meth:`WBM.getFDynVisDataSect`, :meth:`WBM.intForwardDynamics` and
+    %   :meth:`WBM.visualizeForwardDynamics`.
     [noi, len] = size(stmChi);
     if (len ~= obj.mwbm_config.stvLen)
         error('WBM::getFDynVisData: %s', WBM.wbmErrorMsg.WRONG_MAT_DIM);
@@ -26,8 +138,8 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                         % simple forward dynamics with external forces:
                         % foot_conf = varargin{1}
                         % clnk_conf = varargin{2}
-                        % fe_c      = varargin{3} ... external forces affecting at the contact links
-                        % ac        = varargin{4} ... mixed generalized accelerations of the contact points
+                        % fe_c      = varargin{3} ... external forces that are acting on the contact links
+                        % ac        = varargin{4} ... mixed accelerations of the contact points
                         % ac_f      = varargin{5} (must be either zero or constant)
                         vis_data = getVisDataEF(obj, stmChi, fhTrqControl, varargin{1:5}, noi);
                     else
@@ -36,7 +148,7 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
                         % foot_conf    = varargin{2}
                         % hand_conf    = varargin{3}
                         % f_cp         = varargin{4} ... applied forces at the contact points pc_i
-                        % ac_f         = varargin{5} ... mixed generalized accelerations of the foot contact points
+                        % ac_f         = varargin{5} ... mixed accelerations of the foot contact points
                         vis_data = getVisDataPL(obj, stmChi, fhTrqControl, varargin{1:5}, noi);
                     end
                 case 4
@@ -118,7 +230,7 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
             % -----------------------
             % hand_conf = varargin{1}
             % fe_h      = varargin{2} ... external forces at the hands
-            % ac_h      = varargin{3} ... mixed generalized accelerations of the hand contact points
+            % ac_h      = varargin{3} ... mixed accelerations of the hand contact points
             vis_data = getVisDataCLPCEF(obj, stmChi, fhTrqControl, varargin{1:3}, noi);
         case 'fhpc'
             % foot and hand pose corrections:
@@ -186,7 +298,7 @@ function fd_prms = getFDynParams(obj, t, stvChi, fhTrqControl)
     % get the current torque forces and the corresponding
     % visualization data structure from the controller:
     [tau, ctrl_prms] = fhTrqControl(t);
-    % get the the fdyn-parameters from the joint acceleration computation:
+    % get the fdyn-parameters from the joint acceleration computation:
     [~,fd_prms] = jointAccelerations(obj, tau, stp.dq_j); % optimized mode
 
     % add the controller data to the data structure ...
@@ -204,7 +316,7 @@ function fd_prms = getFDynParamsEF(obj, t, stvChi, fhTrqControl, foot_conf, clnk
     % get the current torque forces and the corresponding
     % visualization data structure from the controller:
     [tau, ctrl_prms] = fhTrqControl(t);
-    % get the the fdyn-parameters from the joint acceleration computation:
+    % get the fdyn-parameters from the joint acceleration computation:
     [~,fd_prms] = jointAccelerationsEF(obj, foot_conf, clnk_conf, tau, fe_c, ac, stp.dq_j); % optimized mode
 
     % add the controller data to the data structure ...
@@ -222,7 +334,7 @@ function fd_prms = getFDynParamsPL(obj, t, stvChi, fhTrqControl, fhTotCWrench, f
     % get the current torque forces and the corresponding
     % visualization data structure from the controller:
     [tau, ctrl_prms] = fhTrqControl(t);
-    % get the the fdyn-parameters from the joint acceleration computation (optimized mode):
+    % get the fdyn-parameters from the joint acceleration computation (optimized mode):
     [~,fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, ac_f, stp.dq_j);
 
     % add the controller data to the data structure ...
@@ -242,7 +354,7 @@ function fd_prms = getFDynParamsNFB(obj, t, stvChi, fhTrqControl)
     % get the current torque forces and the corresponding
     % visualization data structure from the controller:
     [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp);
-    % get the the fdyn-parameters from the joint acceleration computation:
+    % get the fdyn-parameters from the joint acceleration computation:
     [~,fd_prms] = jointAccelerationsNFB(obj, tau, M, c_qv, stp.dq_j); % optimized mode
 
     % add the controller data to the data structure ...
@@ -262,7 +374,7 @@ function fd_prms = getFDynParamsNFBEF(obj, t, stvChi, fhTrqControl, clnk_conf, f
     % get the current torque forces and the corresponding
     % visualization data structure from the controller:
     [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp);
-    % get the the fdyn-parameters from the joint acceleration computation (optimized mode):
+    % get the fdyn-parameters from the joint acceleration computation (optimized mode):
     [~,fd_prms] = jointAccelerationsNFBEF(obj, clnk_conf, tau, fe_c, ac, M, c_qv, stp.dq_j);
 
     % add the controller data to the data structure ...
@@ -282,7 +394,7 @@ function fd_prms = getFDynParamsNFBPL(obj, t, stvChi, fhTrqControl, fhTotCWrench
     % get the current torque forces and the corresponding
     % visualization data structure from the controller:
     [tau, ctrl_prms] = fhTrqControl(t, M, c_qv, stp);
-    % get the the fdyn-parameters from the joint acceleration computation (optimized mode):
+    % get the fdyn-parameters from the joint acceleration computation (optimized mode):
     [~,fd_prms] = jointAccelerationsPL(obj, foot_conf, hand_conf, tau, fhTotCWrench, f_cp, ...
                                        ac_f, M, c_qv, stp.dq_j);
     % add the controller data to the data structure ...

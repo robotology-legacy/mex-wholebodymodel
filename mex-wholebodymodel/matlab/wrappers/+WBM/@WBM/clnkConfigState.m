@@ -1,13 +1,101 @@
+% Copyright (C) 2015-2018, by Martin Neururer
+% Author: Martin Neururer
+% E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
+% Date:   January-May, 2018
+%
+% Departments:
+%   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
+%   Automation and Control Institute - TU Wien.
+%
+% This file is part of the Whole-Body Model Library for Matlab (WBML).
+%
+% The development of the WBM-Library was made in the context of the master
+% thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
+% for the Matlab MEX whole-body model interface, which was supported by the
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
+% Robotics (b)), <http://www.codyco.eu>.
+%
+% Permission is granted to copy, distribute, and/or modify the WBM-Library
+% under the terms of the GNU Lesser General Public License, Version 2.1
+% or any later version published by the Free Software Foundation.
+%
+% The WBM-Library is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU Lesser General Public License for more details.
+%
+% A copy of the GNU Lesser General Public License can be found along
+% with the WBML. If not, see <http://www.gnu.org/licenses/>.
+
 function clnk_conf = clnkConfigState(obj, varargin)
+    % Creates the *contact links configuration* in dependency of the given
+    % *contact state* of the contact links.
+    %
+    % The method creates a data structure that specifies which contact link of
+    % the robot is currently in "contact" with the environment. If required, the
+    % structure specifies also the *desired poses*, *angular velocities* and
+    % the corresponding *control gains* for the position-regulation system of
+    % the contact links.
+    %
+    % Note:
+    %   The *contact links* are **not** representing the "contact points" where
+    %   the robot is in contact with the environment. The contact links are
+    %   those links of the robot that are "behind" the contact points.
+    %
+    % The method can be called as follows:
+    %
+    %   - .. py:method:: clnkConfigState(cstate, clnk_idx, vqT_lnk, k_p, k_v[, rtype])
+    %   - .. py:method:: clnkConfigState(cstate, clnk_idx, veT_lnk, k_p, k_v[, rtype])
+    %   - .. py:method:: clnkConfigState(cstate, clnk_idx, q_j, k_p[, rtype])
+    %   - .. py:method:: clnkConfigState(cstate, clnk_idx, [, q_j[, rtype]])
+    %   - .. py:method:: clnkConfigState(clnk_idx)
+    %
+    % Arguments:
+    %   cstate (logical, vector): :math:`(1 \times 2)` boolean vector pair to
+    %                             indicate which contact link is in contact with
+    %                             the environment (ground, object or wall).
+    %
+    %                             First element:
+    %                                Contact state of the *left contact link*.
+    %
+    %                             Second element:
+    %                                Contact state of the *right contact link*.
+    %
+    %                             A contact link touches the ground if the
+    %                             corresponding value is set to *true*,
+    %                             otherwise *false*.
+    %   vqT_lnk (double, vector): :math:`(7 \times 1)` VQ-transformation frame
+    %                             (vector-quaternion frame) relative from the
+    %                             given link frame *lnk* to the world frame *wf*
+    %                             (*optional*).
+    %   veT_lnk (double, vector): :math:`(6 \times 1)` VE-transformation frame
+    %                             (vector-Euler frame) relative from the given
+    %                             link frame *lnk* to the world frame *wf*
+    %                             (*optional*).
+    %   k_p     (double, scalar): Stiffness control gain for the closed-loop system
+    %                             (*optional*).
+    %   k_v     (double, scalar): Damping control gain for the closed-loop system
+    %                             (*optional*).
+    %
+    %                             **Note:** If the control gain is not defined, then
+    %                             by default the method computes the gain value for
+    %                             *critical damping* with :math:`k_v = 2\cdot \sqrt{k_p}`.
+    %   rtype     (char, vector): Specifies the *rotation representation type* for the
+    %                             desired poses of the links as reference. The rotation
+    %                             can be represented either in quaternions ``quat`` or
+    %                             in Euler-angles ``eul`` (default type: ``eul``).
+    % Returns:
+    %   clnk_conf (struct): Configuration structure that specifies the current
+    %   *qualitative state* of the contact links.
     tf_data = false;
 
     switch nargin
         case 7
             cstate   = varargin{1,1};
             clnk_idx = varargin{1,2};
-            k_p      = varargin{1,4}; % gain k_p with the desired closed-loop stiffness (1)
-            k_v      = varargin{1,5}; % gain k_v with the desired closed-loop damping (2)
-            rtype    = varargin{1,6}; % rotation type
+            k_p      = varargin{1,4}; % stiffness gain k_p for the closed-loop system (1)
+            k_v      = varargin{1,5}; % damping gain k_v for the closed-loop system (2)
+            rtype    = varargin{1,6}; % rotation representation type
 
             ndof = obj.mwbm_model.ndof;
             v    = varargin{1,3};
@@ -57,8 +145,8 @@ function clnk_conf = clnkConfigState(obj, varargin)
             checkGainValue(k_p);
             checkCState(cstate);
             % set k_v for critical damping (3)
-            % Source: Introduction to Robotics: Mechanics and Control, John J. Craig, 3rd Edition,
-            %         Pearson/Prentice Hall, 2005, p. 274, eq. (9.47).
+            % Source: Craig, John J.: Introduction to Robotics: Mechanics and Control. 3rd Edition,
+            %         Pearson/Prentice Hall, 2005, pp. 271-274, eq. (9.47).
             k_v = 2*sqrt(k_p);
         case 5
             cstate   = varargin{1,1};
@@ -98,12 +186,10 @@ function clnk_conf = clnkConfigState(obj, varargin)
 
     %% Setup the configuration structure for the
     %  qualitative state of the contact links:
-    ctc_l = cstate(1,1);
-    ctc_r = cstate(1,2);
-    % define which link of the robot has
-    % surface contact with the ground/object ...
-    clnk_conf.contact.left  = ctc_l;
-    clnk_conf.contact.right = ctc_r;
+
+    % specify which link is in contact with the ground/object ...
+    clnk_conf.contact.left  = cstate(1,1);
+    clnk_conf.contact.right = cstate(1,2);
 
     % set the corresponding contact links to each contact ...
     clnk_conf = setContactLinks(clnk_conf, clnk_idx, nLnks);

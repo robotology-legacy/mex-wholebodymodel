@@ -31,7 +31,7 @@ function quat = rotm2quat(rotm)
             quat(2,1) = 0.5*sqrt(rotm(1,1) - rotm(2,2) - rotm(3,3) + 1);
             s_inv = 1/(quat(2,1)*4);
 
-            quat(1,1) = (rotm(3,2) + rotm(2,3))*s_inv;
+            quat(1,1) = (rotm(3,2) - rotm(2,3))*s_inv;
             quat(3,1) = (rotm(2,1) + rotm(1,2))*s_inv;
             quat(4,1) = (rotm(3,1) + rotm(1,3))*s_inv;
         elseif (rotm(2,2) > rotm(3,3))

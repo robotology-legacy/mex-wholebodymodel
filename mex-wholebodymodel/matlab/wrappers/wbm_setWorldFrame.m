@@ -1,7 +1,10 @@
 function wbm_setWorldFrame(varargin)
-    % WBM_SETWORLDFRAME sets the world frame (wf) at a given position and orientation, starting
-    % from a specified fixed link frame (reference frame). The specified fixed link (reference
-    % link) can also be a contact constraint link.
+    % WBM_SETWORLDFRAME sets the world frame (wf) at a given position and orientation relative from
+    % a specified fixed link frame (base reference frame).
+    %
+    % The base reference frame, also called floating-base frame, is attached to the fixed base
+    % reference link of the robot. The specified fixed link (base reference link) of the robot
+    % can also be a contact constraint link.
     %
     % Note:
     %   The internally specified base-to-world transformation matrix wf_H_b of the mexWholeBodyModel

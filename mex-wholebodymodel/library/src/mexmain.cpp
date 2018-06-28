@@ -7,8 +7,8 @@
  * E-mail:      martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
  * Date:        January, 2017
  *
- * The development of this software was supported by the FP7 EU project
- * CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and Robotics (b)),
+ * The development of this software was supported by the FP7 EU-project
+ * CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and Robotics (b)),
  * <http://www.codyco.eu>.
  *
  * Permission is granted to copy, distribute, and/or modify this program

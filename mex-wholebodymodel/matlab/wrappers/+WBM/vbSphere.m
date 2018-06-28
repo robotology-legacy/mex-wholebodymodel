@@ -1,7 +1,7 @@
 % Copyright (C) 2015-2018, by Martin Neururer
 % Author: Martin Neururer
 % E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
-% Date:   January, 2018
+% Date:   January-May, 2018
 %
 % Departments:
 %   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
@@ -12,7 +12,7 @@
 % The development of the WBM-Library was made in the context of the master
 % thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
 % for the Matlab MEX whole-body model interface, which was supported by the
-% FP7 EU project CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
 % Robotics (b)), <http://www.codyco.eu>.
 %
 % Permission is granted to copy, distribute, and/or modify the WBM-Library
@@ -32,20 +32,20 @@ classdef vbSphere < WBM.vbObject
     % environment scenario of the robot simulation.
     %
     % Attributes:
-    %   origin (double, vector): (3 x 1) Cartesian position of the origin of the
-    %                            sphere. Default origin: :math:`[0, 0, 0]^T`.
-    %   rotm   (double, matrix): (3 x 3) rotation matrix of the sphere. If
-    %                            undefined, the default orientation is the
-    %                            *identity matrix*.
-    %   tform  (double, matrix): (4 x 4) Transformation matrix of the sphere.
-    %                            If :attr:`origin` and :attr:`rotm` are undefined,
-    %                            then by default, the transformation matrix is an
-    %                            *identity matrix*.
-    %   frame  (double, vector): (7 x 1) VQ-transformation vector (position and
-    %                            orientation) of the sphere. If :attr:`origin`
-    %                            and :attr:`rotm` are undefined, then the frame
-    %                            vector uses the default transformation vector
-    %                            :attr:`~WBM.vbObject.DF_FRAME`.
+    %   origin (double, vector): :math:`(3 \times 1)` Cartesian position of the
+    %                            origin of the sphere. Default origin: :math:`[0, 0, 0]^T`.
+    %   rotm   (double, matrix): :math:`(3 \times 3)` rotation matrix of the
+    %                            sphere. If undefined, the default orientation
+    %                            is the *identity matrix*.
+    %   tform  (double, matrix): :math:`(4 \times 4)` transformation matrix of the
+    %                            sphere. If :attr:`origin` and :attr:`rotm` are
+    %                            undefined, then by default, the transformation
+    %                            matrix is an *identity matrix*.
+    %   frame  (double, vector): :math:`(7 \times 1)` VQ-transformation vector
+    %                            (position and orientation) of the sphere. If
+    %                            :attr:`origin` and :attr:`rotm` are undefined,
+    %                            then the frame vector uses the default
+    %                            transformation vector :attr:`~WBM.vbObject.DF_FRAME`.
     %
     %   description       (char, vector): Short description string about the
     %                                     sphere object (default: *empty*).
@@ -88,30 +88,34 @@ classdef vbSphere < WBM.vbObject
     %   istool     (logical, scalar): Boolean flag to indicate if the sphere defines
     %                                 also a tool to be used by the robot (*read only*).
     %                                 Default: *false*.
-    %   init_frame  (double, vector): (7 x 1) initial frame vector (VQ-transformation)
-    %                                 of the sphere, in dependency of the given origin
-    %                                 position and orientation (*read only*).
+    %   init_frame  (double, vector): :math:`(7 \times 1)` initial frame vector
+    %                                 (VQ-transformation) of the sphere, in
+    %                                 dependency of the given origin position
+    %                                 and orientation (*read only*).
     %
     %                                 **Note:** If the attributes :attr:`origin` and
     %                                 :attr:`rotm` are not defined, then the initial
     %                                 frame uses the default transformation vector
     %                                 :attr:`~WBM.vbObject.DF_FRAME`.
-    %   dimension   (double, vector): (1 x 2) vector of the form :math:`[\textrm{radius_{inner}, radius_{outer}}]`,
-    %                                 which defines the dimensions of the sphere (*read only*).
+    %   dimension   (double, vector): :math:`(1 \times 2)` vector of the form
+    %                                 :math:`[\mathit{radius_{inner}, radius_{outer}}]`,
+    %                                 which defines the dimensions of the sphere
+    %                                 (*read only*).
     %
-    %                                 **Note:** If the dimensions of the sphere are undefined,
-    %                                 then the vector is by default a *0-vector*.
-    %   vertices            (struct): Data structure for the *vertex coordinates* of the sphere
-    %                                 at the given origin frame (*read only*).
+    %                                 **Note:** If the dimensions of the sphere are
+    %                                 undefined, then the vector is by default a
+    %                                 *0-vector*.
+    %   vertices            (struct): Data structure for the *vertex coordinates* of
+    %                                 the sphere at the given origin frame (*read only*).
     %
     %                                 **Note:** Since the sphere object is *approximated* by
-    %                                 a (n x n) *spherical polyhedron*, the data structure
-    %                                 consists of the fields ``X``, ``Y`` and ``Z`` which
-    %                                 representing the x, y and z-coordinate vectors of each
-    %                                 vertex of the given spherical polyhedron.
-    %   com   (double, vector): (3 x 1) Cartesian position of the center of mass
-    %                           (CoM) of the sphere relative to the given origin
-    %                           (*read only*).
+    %                                 a :math:`(n \times n)` *spherical polyhedron*, the data
+    %                                 structure consists of the fields ``X``, ``Y`` and ``Z``
+    %                                 which representing the x, y and z-coordinate vectors of
+    %                                 each vertex of the given spherical polyhedron.
+    %   com   (double, vector): :math:`(3 \times 1)` Cartesian position of the
+    %                           center of mass (CoM) of the sphere relative to
+    %                           the given origin (*read only*).
     %
     %                           **Note:** By default, the CoM of the sphere is
     %                           placed at the origin.
@@ -127,8 +131,8 @@ classdef vbSphere < WBM.vbObject
     %
     %                           **Note:** If :attr:`rho` is not defined, then by
     %                           default the mass value is 0.
-    %   I_cm  (double, matrix): (3 x 3) inertia matrix of the sphere at the
-    %                           center of mass *cm* (*read only*).
+    %   I_cm  (double, matrix): :math:`(3 \times 3)` inertia matrix of the sphere
+    %                           at the center of mass *cm* (*read only*).
     %
     %                           **Note:** If :attr:`rho` is not defined, then the
     %                           inertia of the sphere is by default the *identity
@@ -211,31 +215,33 @@ classdef vbSphere < WBM.vbObject
             %   ri   (double, scalar): Inner radius of the sphere shell.
             %   ro   (double, scalar): Outer radius of the sphere shell.
             %   r    (double, scalar): Radius of the solid sphere.
-            %   orig (double, vector): (3 x 1) origin position of the sphere.
-            %   rotm (double, matrix): (3 x 3) orientation matrix of the sphere.
+            %   orig (double, vector): :math:`(3 \times 1)` origin position of
+            %                          the sphere.
+            %   rotm (double, matrix): :math:`(3 \times 3)` orientation matrix
+            %                          of the sphere.
             %   obj_prop     (struct): Data structure for the *object properties*,
             %                          specified by following fields:
             %
-            %                                 - ``line_width``: Line width of the edges of the sphere.
-            %                                 - ``edge_color``: Edge color of the sphere (RGB-triplet
-            %                                   or color name).
-            %                                 - ``face_color``: Face color of the sphere (RGB-triplet
-            %                                   or color name).
-            %                                 - ``face_alpha``: Face transparency of the sphere in
-            %                                   range :math:`[0,1]`.
+            %                            - ``line_width``: Line width of the edges of the sphere.
+            %                            - ``edge_color``: Edge color of the sphere (RGB-triplet
+            %                              or color name).
+            %                            - ``face_color``: Face color of the sphere (RGB-triplet
+            %                              or color name).
+            %                            - ``face_alpha``: Face transparency of the sphere in
+            %                              range :math:`[0,1]`.
             %
-            %                              optional fields:
+            %                          optional fields:
             %
-            %                                 - ``description``: Annotation string of the
-            %                                   sphere object.
-            %                                 - ``ismovable``: Boolean flag to indicate if
-            %                                   the sphere object is *movable* or *fixed*.
-            %                                 - ``istool``: Boolean flag to indicate if the
-            %                                   sphere object is also a *tool* or not.
-            %                                 - ``obj_type``: Object type, specified by the value
-            %                                   *'obs'* or *'bdy'* (see :attr:`~vbSphere.obj_type`).
-            %                                 - ``rho``: Volumetric mass density of the sphere
-            %                                   object in :math:`[\si{\kg/\m^3}]`.
+            %                            - ``description``: Annotation string of the
+            %                              sphere object.
+            %                            - ``ismovable``: Boolean flag to indicate if
+            %                              the sphere object is *movable* or *fixed*.
+            %                            - ``istool``: Boolean flag to indicate if the
+            %                              sphere object is also a *tool* or not.
+            %                            - ``obj_type``: Object type, specified by the value
+            %                              *'obs'* or *'bdy'* (see :attr:`~vbSphere.obj_type`).
+            %                            - ``rho``: Volumetric mass density of the sphere
+            %                              object in :math:`[\si{\kg/\m^3}]`.
             %
             % Returns:
             %   obj: An instance of the :class:`!vbSphere` class.
@@ -309,13 +315,13 @@ classdef vbSphere < WBM.vbObject
             %   varargin: Variable-length input argument list.
             %
             % Keyword Arguments:
-            %   p   (double, vector): (3 x 1) Cartesian position to specify the
-            %                         *origin* of the sphere.
-            %   R   (double, matrix): (3 x 3) rotation matrix to specify the
-            %                         *orientation* of the sphere.
-            %   vqT (double, vector): (7 x 1) VQ-transformation (position and
-            %                         orientation in quaternions) to specify
-            %                         the *origin frame* of the sphere.
+            %   p   (double, vector): :math:`(3 \times 1)` Cartesian position to
+            %                         specify the *origin* of the sphere.
+            %   R   (double, matrix): :math:`(3 \times 3)` rotation matrix to
+            %                         specify the *orientation* of the sphere.
+            %   vqT (double, vector): :math:`(7 \times 1)` VQ-transformation
+            %                         (position and orientation in quaternions)
+            %                         to specify the *origin frame* of the sphere.
             switch nargin
                 case 3
                     p = varargin{1,1};
@@ -352,7 +358,7 @@ classdef vbSphere < WBM.vbObject
             %
             % Returns:
             %   hgo: Handle to the chart surface graphics object of the created
-            %        sphere.
+            %   sphere.
             hgo = surf(obj.vertices.X, obj.vertices.Y, obj.vertices.Z, 'LineWidth', obj.line_width, ...
                        'EdgeColor', obj.edge_color, 'FaceColor', obj.face_color, 'FaceAlpha', obj.face_alpha);
         end
@@ -365,7 +371,7 @@ classdef vbSphere < WBM.vbObject
             %        x, y and z-coordinate data of the sphere.
             % Returns:
             %   hgo: Handle to the chart surface graphics object with the
-            %        changed vertex coordinates of the sphere.
+            %   changed vertex coordinates of the sphere.
             hgo.XData = obj.vertices.X;
             hgo.YData = obj.vertices.Y;
             hgo.ZData = obj.vertices.Z;
@@ -404,13 +410,12 @@ classdef vbSphere < WBM.vbObject
             %
             % Arguments:
             %   pt_pos (double, vector/matrix): A single position vector or a
-            %                                   (n x 3) matrix with positions
-            %                                   of some specified points.
+            %                                   :math:`(n \times 3)` matrix with
+            %                                   positions of some specified points.
             % Returns:
-            %   result: (n x 1) vector with the logical results if the given
-            %           points are below the surface of the sphere. Each
-            %           value is *true* if the given point is below the
-            %           surface, *false* otherwise.
+            %   result: :math:`(n \times 1)` vector with the logical results if the
+            %   given points are below the surface of the sphere. Each value is *true*
+            %   if the given point is below the surface, *false* otherwise.
 
             r = obj.dimension(1,2); % outer radius
 

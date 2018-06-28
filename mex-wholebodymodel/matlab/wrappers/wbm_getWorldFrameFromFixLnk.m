@@ -1,16 +1,19 @@
 function [wf_p_b, wf_R_b] = wbm_getWorldFrameFromFixLnk(varargin)
     % WBM_GETWORLDFRAMEFROMFIXLNK computes the position and the orientation of the floating base
-    % w.r.t. a world frame (wf) that is intentionally set and fixed at a specified link frame
-    % (reference frame).
+    % w.r.t. a world frame (wf) that is intentionally set at a specified fixed link frame (base
+    % reference frame).
     %
-    % The returned floating base position and orientation is obtained from the forward kinematics
-    % w.r.t. the specified fixed link frame (reference frame).
+    % The base reference frame, also called floating-base frame, is attached to the fixed reference
+    % link of the robot. Since the most humanoid robots and other legged robots are not physically
+    % attached to the world, the floating-base framework provides a more general representation for
+    % the robot control. The returned position and orientation of the floating base is obtained from
+    % the forward kinematics w.r.t. the specified fixed link frame.
     %
     % Note:
-    %   The default fixed link (floating base link) may be different for each YARP-based robot
-    %   and the selection of the floating base link depends also from the given situation. For
-    %   example the default fixed link of the iCub humanoid robot is "l_sole". Furthermore, the
-    %   specified fixed link (reference link) can also be a contact constraint link.
+    %   The default fixed link (floating-base link or base reference link) may be different for each
+    %   YARP-based robot and the selection of the floating-base link depends also from the given
+    %   situation. For example the default fixed link of the iCub humanoid robot is "l_sole".
+    %   Furthermore, the specified fixed link can also be a contact constraint link.
     %
     % Input Arguments:
     %

@@ -15,6 +15,7 @@ icub_config = wbm_icub.robot_config;
 %  Create the initial condition of the state variable "chi" for the integration of the
 %  forward dynamics in state-space form. The state-space form reduces (through variable
 %  substitution) the inhomogeneous second-order ODE to a first-order ODE.
+%
 %  For further details see:
 %    [1] Featherstone, Roy: Rigid Body Dynamics Algorithms. Springer, 2008,
 %        Chapter 3, pp. 40-42, eq. (3.8).
@@ -66,9 +67,8 @@ disp('Numerical integration finished.');
 noi = size(chi,1);
 fprintf('Number of integrations: %d\n', noi);
 
-%% iCub-Simulator:
-
-% Setup the window, the environment and the draw parameters for the WBM-simulator:
+%% iCub-Simulator -- Setup the window, the environment and the draw parameters for the
+%  WBM-simulator:
 
 % create some geometric volume bodies for the simulation environment ...
 rotm_r = eye(3,3); % rectangular orientation
@@ -86,8 +86,8 @@ sim_config = initSimConfigICub(vb_objects, show_light);             % shows the 
 %sim_config = initSimConfigICub(vb_objects, 'DarkScn', show_light); % optional, shows the simulation with a dark scene.
 sim_config = wbm_icub.setupSimulation(sim_config);
 
-% define some payload links and link each payload link to a specified volume body:
-% note: payload links are usually links of a manipulator (end-effector) or in
+% Define some payload links and link each payload link to a specified volume body:
+% Note: Payload links are usually links of a manipulator (end-effector) or in
 %       special cases, links on which additionally special payloads are mounted
 %       (e.g. battery pack or knapsack at torso, tools, etc.).
 pl_lnk_l.name     = 'l_gripper'; % --> l_hand_dh_frame --> l_hand

@@ -15,6 +15,7 @@ icub_config      = wbm_icub.robot_config;
 %  Create the initial condition of the state variable "chi" for the integration of the
 %  forward dynamics in state-space form. The state-space form reduces (through variable
 %  substitution) the inhomogeneous second-order ODE to a first-order ODE.
+%
 %  For further details see:
 %    [1] Featherstone, Roy: Rigid Body Dynamics Algorithms. Springer, 2008,
 %        Chapter 3, pp. 40-42, eq. (3.8).
@@ -24,7 +25,7 @@ chi_init = wbm_icub.init_stvChi;
 %  Setup the time-dependent function "fhTrqControl" which describes a forcing function
 %  on the ODEs to control the dynamics of the equation-system. It refers to the control
 %  torques of each time-step t and is needed to calculate the constraint (contact) forces
-%  which influences the outcome of each equation, the generalized acceleration dv (q_ddot).
+%  which influences the outcome of each equation, the generalized acceleration dv (ddot_q).
 [p_b, R_b] = frame2posRotm(wbm_icub.init_vqT_base);
 qj_init = icub_config.init_state_params.q_j;
 g_init  = wbm_icub.generalizedBiasForces(R_b, p_b, qj_init, zeros(icub_model.ndof,1), zeros(6,1));
@@ -36,7 +37,7 @@ len = size(g_init,1);
 %       a real controller function instead to avoid integration errors.
 fhTrqControl = @(t, M, c_qv, stp, nu, Jc, djcdq, foot_conf)zeroTrqsController(size(g_init(7:len,1)));
 
-% Configuration structure for the foot state:
+% Configuration structure to define the state of the feet:
 % Note: The state of the foot configurations is needed for the extended forward dynamics
 %       function with foot pose corrections (FPC). It defines the current foot poses and
 %       on which foot the legged robot is currently in contact with the ground.
@@ -69,9 +70,8 @@ disp('Numerical integration finished.');
 noi = size(chi,1);
 fprintf('Number of integrations: %d\n', noi);
 
-%% iCub-Simulator:
+%% iCub-Simulator -- Setup the window and draw parameters for the WBM-simulator:
 
-% setup the window and draw parameters for the WBM-simulator:
 sim_config = initSimConfigICub_atf(icub_model.urdf_robot_name);             % shows the simulation with a light scene as default.
 %sim_config = initSimConfigICub_atf(icub_model.urdf_robot_name, 'DarkScn'); % optional, shows the simulation with a dark scene.
 sim_config = wbm_icub.setupSimulation(sim_config);

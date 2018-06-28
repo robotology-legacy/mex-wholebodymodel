@@ -1,7 +1,7 @@
 % Copyright (C) 2015-2018, by Martin Neururer
 % Author: Martin Neururer
 % E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
-% Date:   January, 2018
+% Date:   January-May, 2018
 %
 % Departments:
 %   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
@@ -12,7 +12,7 @@
 % The development of the WBM-Library was made in the context of the master
 % thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
 % for the Matlab MEX whole-body model interface, which was supported by the
-% FP7 EU project CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
 % Robotics (b)), <http://www.codyco.eu>.
 %
 % Permission is granted to copy, distribute, and/or modify the WBM-Library
@@ -33,7 +33,7 @@ classdef wbmColor
     % robot with some nice colors.
     %
     % The color list is based on the color map of *R for Statistical Computing*
-    % (`<https://www.r-project.org>`_).
+    % (`www.r-project.org <https://www.r-project.org>`_).
     %
     % Further details about the R colors are available in the technical note of
     % the *Stowers Institute for Medical Research*:

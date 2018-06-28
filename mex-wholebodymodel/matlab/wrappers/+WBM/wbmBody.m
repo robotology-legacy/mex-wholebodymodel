@@ -1,7 +1,7 @@
 % Copyright (C) 2015-2018, by Martin Neururer
 % Author: Martin Neururer
 % E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
-% Date:   January, 2018
+% Date:   January-May, 2018
 %
 % Departments:
 %   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
@@ -12,7 +12,7 @@
 % The development of the WBM-Library was made in the context of the master
 % thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
 % for the Matlab MEX whole-body model interface, which was supported by the
-% FP7 EU project CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
 % Robotics (b)), <http://www.codyco.eu>.
 %
 % Permission is granted to copy, distribute, and/or modify the WBM-Library
@@ -32,9 +32,9 @@ classdef wbmBody < handle
     % body components of a given floating-base robot.
     %
     % Attributes:
-    %   chains (cell, matrix): (*nChns* x 3) list of *chain names* (effectors) with
-    %                          their corresponding *joint index pair numbers*,
-    %                          specified in the form
+    %   chains (cell, matrix): :math:`(n_{chns} \times 3)` list of *chain names*
+    %                          (effectors) with their corresponding *joint index
+    %                          pair numbers*, specified in the form
     %                          :math:`\{chain\_name, idx_{start}, idx_{end}\}`.
     %                          The joint index pairs are defining the start and
     %                          end positions of each chain in the joint name array.
@@ -47,8 +47,8 @@ classdef wbmBody < handle
     %                          file `yarpWholeBodyInterface.ini`_.
     %   nChns (uint8, scalar): Number of chains that are defining the full body
     %                          of the robot (default 0, if the robot is undefined).
-    %   joints (cell, matrix): (*nJnts* x 2) list of *joint names* with the
-    %                          corresponding *joint index number*, specified in
+    %   joints (cell, matrix): :math:`(n_{jnts} \times 2)` list of *joint names* with
+    %                          the corresponding *joint index number*, specified in
     %                          the form :math:`\{jnt\_name, jnt_idx \}`.
     %
     %                          **Note:** The order of the joint names must be set
@@ -70,19 +70,19 @@ classdef wbmBody < handle
             % Arguments:
             %   chn_names (cellstr, vector): Column-array with the *chain names* of
             %                                each chain element of the robot model.
-            %   chn_idx       (int, matrix): (*nChns* x 2) matrix of the form
-            %                                :math:`[idx_{start}, idx_{end}]`, with
-            %                                start and end positions of each chain
-            %                                of the robot.
+            %   chn_idx       (int, matrix): :math:`(n_{chns} \times 2)` matrix of
+            %                                the form :math:`[idx_{start}, idx_{end}]`,
+            %                                with start and end positions of each
+            %                                chain of the robot.
             %   jnt_names (cellstr, vector): Column-array with the *joint names*
             %                                of the robot model as specified in
             %                                the `iCub Model Naming Conventions`_.
-            %   jnt_idx       (int, vector): (*nJnts* x 1) vector of ascending
-            %                                index numbers for the joints of the
-            %                                robot.
+            %   jnt_idx       (int, vector): :math:`(nJnts \times 1)` vector with
+            %                                ascending index numbers for the joints
+            %                                of the robot.
             % Returns:
             %   obj: An instance of the :class:`!wbmBody` data type of the given
-            %        robot.
+            %   robot.
             if (nargin ~= 4)
                 error('wbmBody::wbmBody: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
             end
@@ -121,13 +121,13 @@ classdef wbmBody < handle
         end
 
         function jnt_idx = getChainIndices(obj, chn_name)
-            % Gets the index positions of all joint members of a given chain.
+            % Returns the index numbers of all joint members of a given chain.
             %
             % Arguments:
             %   chn_name (char, vector): String matching name of the chain
             %                            element of the robot.
             % Returns:
-            %   jnt_idx   (int, vector): Row vector with joint index positions.
+            %   jnt_idx   (int, vector): Row vector with the joint index numbers.
             pos = find(strcmp(obj.chains(1:obj.nChns,1), chn_name));
             if isempty(pos)
                 error('wbmBody::getChainIndices: %s', WBM.wbmErrorMsg.NAME_NOT_EXIST);
@@ -139,27 +139,26 @@ classdef wbmBody < handle
         end
 
         function jnt_idx = getJointIndex(obj, jnt_name)
-            % Gets the index position of a specific joint.
+            % Returns the index number of a specific joint.
             %
             % Arguments:
             %   jnt_name (char, vector): String matching name of a specific joint
             %                            of the robot.
             % Returns:
-            %   jnt_idx   (int, scalar): Index position of the given joint.
+            %   jnt_idx   (int, scalar): Index number of the given joint.
             jnt_idx = find(strcmp(obj.joints(1:obj.nJnts,1), jnt_name));
         end
 
         function jnt_names = getJointNames(obj, jnt_idx)
-            % Gets the joint names of a given list of index positions.
+            % Returns the joint names of a given list of joint index numbers.
             %
             % Arguments:
-            %   chn_idx       (int, vector): Row-vector with the index positions
+            %   chn_idx       (int, vector): Row-vector with the index numbers
             %                                of specific joints in ascending or
             %                                descending order.
             % Returns:
             %   jnt_names (cellstr, vector): Column-vector with the joint names
-            %                                that are corresponding to the index
-            %                                list.
+            %   that are corresponding to the index list.
 
             % check ranges ...
             if isscalar(jnt_idx)
@@ -185,20 +184,20 @@ classdef wbmBody < handle
         end
 
         function chn_tbl = getChainTable(obj)
-            % Gets the table of all chain elements of the robot body.
+            % Returns the table of all chain elements of the robot body.
             %
             % Returns:
-            %   chn_tbl (table): Table object with the variables *'chain_name'*,
-            %                    *'start_idx'* and *'end_idx'* as column names.
+            %   chn_tbl (table): Table object with the variables ``chain_name``,
+            %   ``start_idx`` and ``end_idx`` as column names.
             chn_tbl = cell2table(obj.chains, 'VariableNames', {'chain_name', 'start_idx', 'end_idx'});
         end
 
         function jnt_tbl = getJointTable(obj)
-            % Gets the table of all joints of the robot body.
+            % Returns the table of all joints of the robot body.
             %
             % Returns:
-            %   jnt_tbl (table): Table object with the variables *'joint_name'*
-            %                    and *'idx'* as column names.
+            %   jnt_tbl (table): Table object with the variables ``joint_name``
+            %   and ``idx`` as column names.
             jnt_tbl = cell2table(obj.joints, 'VariableNames', {'joint_name', 'idx'});
         end
 

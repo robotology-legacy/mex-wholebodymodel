@@ -1,7 +1,7 @@
 % Copyright (C) 2015-2018, by Martin Neururer
 % Author: Martin Neururer
 % E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
-% Date:   January, 2018
+% Date:   January-May, 2018
 %
 % Departments:
 %   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
@@ -12,7 +12,7 @@
 % The development of the WBM-Library was made in the context of the master
 % thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
 % for the Matlab MEX whole-body model interface, which was supported by the
-% FP7 EU project CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
 % Robotics (b)), <http://www.codyco.eu>.
 %
 % Permission is granted to copy, distribute, and/or modify the WBM-Library
@@ -32,20 +32,20 @@ classdef vbCuboid < WBM.vbObject
     % the environment scenario of the robot simulation.
     %
     % Attributes:
-    %   origin (double, vector): (3 x 1) Cartesian position of the origin of the
-    %                            cuboid. Default origin: :math:`[0, 0, 0]^T`.
-    %   rotm   (double, matrix): (3 x 3) rotation matrix of the cuboid. If
-    %                            undefined, the default orientation is the
-    %                            *identity matrix*.
-    %   tform  (double, matrix): (4 x 4) Transformation matrix of the cuboid. If
+    %   origin (double, vector): :math:`(3 \times 1)` Cartesian position of the
+    %                            origin of the cuboid. Default origin: :math:`[0, 0, 0]^T`.
+    %   rotm   (double, matrix): :math:`(3 \times 3)` rotation matrix of the
+    %                            cuboid. If undefined, the default orientation
+    %                            is the *identity matrix*.
+    %   tform  (double, matrix): :math:`(4 \times 4)` transformation matrix of the
+    %                            cuboid. If :attr:`origin` and :attr:`rotm` are
+    %                            undefined, then by default, the transformation
+    %                            matrix is an *identity matrix*.
+    %   frame  (double, vector): :math:`(7 \times 1)` VQ-transformation vector
+    %                            (position and orientation) of the cuboid. If
     %                            :attr:`origin` and :attr:`rotm` are undefined,
-    %                            then by default, the transformation matrix is an
-    %                            *identity matrix*.
-    %   frame  (double, vector): (7 x 1) VQ-transformation vector (position and
-    %                            orientation) of the cuboid. If :attr:`origin`
-    %                            and :attr:`rotm` are undefined, then the frame
-    %                            vector uses the default transformation vector
-    %                            :attr:`~WBM.vbObject.DF_FRAME`.
+    %                            then the frame vector uses the default
+    %                            transformation vector :attr:`~WBM.vbObject.DF_FRAME`.
     %
     %   description       (char, vector): Short description string about the
     %                                     cuboid object (default: *empty*).
@@ -56,7 +56,7 @@ classdef vbCuboid < WBM.vbObject
     %                                     (default width: 0.4).
     %   edge_color (double/char, vector): Edge color of the cuboid, specified
     %                                     by a RGB-triplet or a color name
-    %                                     (default color: *'black'*).
+    %                                     (default color: ``'black'``).
     %   face_color (double/char, vector): Face color of the cuboid, specified
     %                                     by a RGB-triplet or a color name
     %                                     (default color: :attr:`!wbmColor.lightsteelblue`).
@@ -77,7 +77,7 @@ classdef vbCuboid < WBM.vbObject
     %
     %                                 **Note:** The value will be set to *true*, if
     %                                 and only if :attr:`obj_type` is defined as an
-    %                                 obstacle (*'obs'*), *false* otherwise (default).
+    %                                 obstacle (``'obs'``), *false* otherwise (default).
     %   issolid    (logical, scalar): Boolean flag to indicate if the cuboid is a
     %                                 *solid* object (*read only*). Default: *false*.
     %
@@ -88,27 +88,31 @@ classdef vbCuboid < WBM.vbObject
     %   istool     (logical, scalar): Boolean flag to indicate if the cuboid defines
     %                                 also a tool to be used by the robot (*read only*).
     %                                 Default: *false*.
-    %   init_frame  (double, vector): (7 x 1) initial frame vector (VQ-transformation)
-    %                                 of the cuboid, in dependency of the given origin
-    %                                 position and orientation (*read only*).
+    %   init_frame  (double, vector): :math:`(7 \times 1)` initial frame vector
+    %                                 (VQ-transformation) of the cuboid, in
+    %                                 dependency of the given origin position
+    %                                 and orientation (*read only*).
     %
     %                                 **Note:** If the attributes :attr:`origin` and
     %                                 :attr:`rotm` are not defined, then the initial
     %                                 frame uses the default transformation vector
     %                                 :attr:`~WBM.vbObject.DF_FRAME`.
-    %   dimension   (double, vector): (1 x 3) vector of the form :math:`[\textrm{width, length, height}]`,
-    %                                 which defines the dimensions of the cuboid (*read only*).
+    %   dimension   (double, vector): :math:`(1 \times 3)` vector of the form
+    %                                 :math:`[\textrm{width, length, height}]`,
+    %                                 which defines the dimensions of the cuboid
+    %                                 (*read only*).
     %
-    %                                 **Note:** If the dimensions of the cuboid are undefined,
-    %                                 then the vector is by default a *0-vector*.
-    %   vertices    (double, matrix): (8 x 3) *vertex positions matrix* of the cuboid
-    %                                 at the given origin frame (*read only*).
+    %                                 **Note:** If the dimensions of the cuboid are
+    %                                 undefined, then the vector is by default a
+    %                                 *0-vector*.
+    %   vertices    (double, matrix): :math:`(8 \times 3)` *vertex positions matrix*
+    %                                 of the cuboid at the given origin frame (*read only*).
     %
     %                                 **Note:** If the dimensions of cuboid are not
     %                                 defined, then the matrix is by default a *0-matrix*.
-    %   com   (double, vector): (3 x 1) Cartesian position of the center of mass
-    %                           (CoM) of the cuboid relative to the given origin
-    %                           (*read only*).
+    %   com   (double, vector): :math:`(3 \times 1)` Cartesian position of the
+    %                           center of mass (CoM) of the cuboid relative to
+    %                           the given origin (*read only*).
     %
     %                           **Note:** By default, the CoM of the cuboid is
     %                           placed at the origin.
@@ -124,8 +128,8 @@ classdef vbCuboid < WBM.vbObject
     %
     %                           **Note:** If :attr:`rho` is not defined, then by
     %                           default the mass value is 0.
-    %   I_cm  (double, matrix): (3 x 3) inertia matrix of the cuboid at the
-    %                           center of mass *cm* (*read only*).
+    %   I_cm  (double, matrix): :math:`(3 \times 3)` inertia matrix of the cuboid
+    %                           at the center of mass *cm* (*read only*).
     %
     %                           **Note:** If :attr:`rho` is not defined, then the
     %                           inertia of the cuboid is by default the *identity
@@ -235,8 +239,10 @@ classdef vbCuboid < WBM.vbObject
             %   l_y  (double, scalar): Length along the y-direction (length).
             %   l_z  (double, scalar): Length along the z-direction (height).
             %   l    (double, scalar): Length of all sides of the cube.
-            %   orig     (double, vector): (3 x 1) origin position of the cuboid.
-            %   rotm     (double, matrix): (3 x 3) orientation matrix of the cuboid.
+            %   orig     (double, vector): :math:`(3 \times 1)` origin position
+            %                              of the cuboid.
+            %   rotm     (double, matrix): :math:`(3 \times 3)` orientation matrix
+            %                              of the cuboid.
             %   obj_prop         (struct): Data structure for the *object properties*,
             %                              specified by following fields:
             %
@@ -257,7 +263,7 @@ classdef vbCuboid < WBM.vbObject
             %                                 - ``istool``: Boolean flag to indicate if the
             %                                   cuboid object is also a *tool* or not.
             %                                 - ``obj_type``: Object type, specified by the value
-            %                                   *'obs'* or *'bdy'* (see :attr:`~vbCuboid.obj_type`).
+            %                                   ``'obs'`` or ``'bdy'`` (see :attr:`~vbCuboid.obj_type`).
             %                                 - ``rho``: Volumetric mass density of the cuboid
             %                                   object in :math:`[\si{\kg/\m^3}]`.
             % Returns:
@@ -338,13 +344,13 @@ classdef vbCuboid < WBM.vbObject
             %   varargin: Variable-length input argument list.
             %
             % Keyword Arguments:
-            %   p   (double, vector): (3 x 1) Cartesian position to specify the
-            %                         *origin* of the cuboid.
-            %   R   (double, matrix): (3 x 3) rotation matrix to specify the
-            %                         *orientation* of the cuboid.
-            %   vqT (double, vector): (7 x 1) VQ-transformation (position and
-            %                         orientation in quaternions) to specify
-            %                         the *origin frame* of the cuboid.
+            %   p   (double, vector): :math:`(3 \times 1)` Cartesian position to
+            %                         specify the *origin* of the cuboid.
+            %   R   (double, matrix): :math:`(3 \times 3)` rotation matrix to
+            %                         specify the *orientation* of the cuboid.
+            %   vqT (double, vector): :math:`(7 \times 1)` VQ-transformation
+            %                         (position and orientation in quaternions)
+            %                         to specify the *origin frame* of the cuboid.
             switch nargin
                 case 3
                     p = varargin{1,1};
@@ -381,7 +387,7 @@ classdef vbCuboid < WBM.vbObject
             %
             % Returns:
             %   hgo: Handle to the patch graphics object that contains the data
-            %        for all the polygons.
+            %   for all the polygons.
             hgo = patch('Vertices', obj.vertices, 'LineWidth', obj.line_width, 'EdgeColor', obj.edge_color, ...
                         'Faces', obj.mfaces, 'FaceColor', obj.face_color, 'FaceAlpha', obj.face_alpha);
         end
@@ -394,7 +400,7 @@ classdef vbCuboid < WBM.vbObject
             %        polygons of the cuboid.
             % Returns:
             %   hgo: Handle to the patch object with the changed vertex
-            %        coordinates of the polygons.
+            %   coordinates of the polygons.
             hgo.Vertices = obj.vertices;
         end
 
@@ -405,7 +411,7 @@ classdef vbCuboid < WBM.vbObject
             % Arguments:
             %   pt_color (double/char, vector): Color of the grid points, specified
             %                                   by a RGB-triplet or a color name
-            %                                   (default color: *'green'*).
+            %                                   (default color: ``'green'``).
             % Returns:
             %   hmg: Handle to the scatter series object of the generated meshgrid.
             if ~obj.isobstacle
@@ -431,13 +437,12 @@ classdef vbCuboid < WBM.vbObject
             %
             % Arguments:
             %   pt_pos (double, vector/matrix): A single position vector or a
-            %                                   (n x 3) matrix with positions
-            %                                   of some specified points.
+            %                                   :math:`(n \times 3)` matrix with
+            %                                   positions of some specified points.
             % Returns:
-            %   result: (n x 1) vector with the logical results if the given
-            %           points are below the surface of the cuboid. Each
-            %           value is *true* if the given point is below the
-            %           surface, *false* otherwise.
+            %   result: :math:`(n \times 1)` vector with the logical results if the
+            %   given points are below the surface of the cuboid. Each value is *true*
+            %   if the given point is below the surface, *false* otherwise.
 
             % half length of each side of the cuboid ...
             lx_h = obj.mcub_vtx_s(7,1);

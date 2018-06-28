@@ -480,8 +480,8 @@ classdef iCubWBM < WBM.Interfaces.IWBM
             [~,q_j,~,~] = getState(obj.mwbm_icub);
             % update the fixed link ...
             obj.mwbm_icub.fixed_link = rlnk_name;
-            % calculate the the position and orientation of the new base link
-            % (fixed link) to the world frame (WF) and set the WF at this new base:
+            % calculate the position and orientation of the new base link (fixed
+            % link) to the world frame (WF) and set the WF at this new base:
             [wf_p_b, wf_R_b] = getWorldFrameFromFixLnk(obj.mwbm_icub, rlnk_name, q_j);
             setWorldFrame(obj.mwbm_icub, wf_R_b, wf_p_b);
         end

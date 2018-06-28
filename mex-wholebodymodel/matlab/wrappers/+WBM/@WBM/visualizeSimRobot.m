@@ -1,3 +1,33 @@
+% Copyright (C) 2015-2018, by Martin Neururer
+% Author: Martin Neururer
+% E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
+% Date:   January-May, 2018
+%
+% Departments:
+%   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
+%   Automation and Control Institute - TU Wien.
+%
+% This file is part of the Whole-Body Model Library for Matlab (WBML).
+%
+% The development of the WBM-Library was made in the context of the master
+% thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
+% for the Matlab MEX whole-body model interface, which was supported by the
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
+% Robotics (b)), <http://www.codyco.eu>.
+%
+% Permission is granted to copy, distribute, and/or modify the WBM-Library
+% under the terms of the GNU Lesser General Public License, Version 2.1
+% or any later version published by the Free Software Foundation.
+%
+% The WBM-Library is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU Lesser General Public License for more details.
+%
+% A copy of the GNU Lesser General Public License can be found along
+% with the WBML. If not, see <http://www.gnu.org/licenses/>.
+
+% private method:
 function visualizeSimRobot(obj, stmPos, sim_config, sim_tstep, vis_ctrl)
     % check the dimension and get the number of instances of the simulation result ...
     ndof = obj.mwbm_model.ndof;
@@ -139,7 +169,7 @@ function [sim_config, hSimRobot, fkin_jnts, nRGObj, vidfrm] = createSimRobot(sim
     nFeet = sim_config.robot_body.nFeet; % number of feet of the robot's body
 
     % draw the joint nodes (data points) of the robot's skeleton and
-    % the position of the the center of mass (CoM):
+    % the position of the center of mass (CoM):
     [hJntNodes, fkin_jnts] = createJointNodes(fkin_jnts, sim_config, vis_ctrl);
 
     % create a position parameter matrix from the defined joint pairs (links) to describe a full
@@ -759,7 +789,7 @@ function [hJntNodes, fkin_jnts] = createJointNodes(fkin_jnts, sim_config, vis_ct
         com_plot_prop.color  = 'none';
     end
 
-    % draw the the joints and the CoM of the robot's skeleton:
+    % draw the joints and the CoM of the robot's skeleton:
     fk_vqT = squeeze(fkin_jnts.vqT(1,1:7,1:nJnts)).';
     [hJntNodes, fkin_jnts.pos(1:nJnts,1:3)] = plotFKinJointPositions(fkin_jnts.pos, fk_vqT, nJnts, jnt_plot_prop, com_plot_prop);
 end

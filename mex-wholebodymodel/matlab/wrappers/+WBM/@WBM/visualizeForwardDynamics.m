@@ -1,4 +1,83 @@
+% Copyright (C) 2015-2018, by Martin Neururer
+% Author: Martin Neururer
+% E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
+% Date:   January-May, 2018
+%
+% Departments:
+%   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
+%   Automation and Control Institute - TU Wien.
+%
+% This file is part of the Whole-Body Model Library for Matlab (WBML).
+%
+% The development of the WBM-Library was made in the context of the master
+% thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
+% for the Matlab MEX whole-body model interface, which was supported by the
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
+% Robotics (b)), <http://www.codyco.eu>.
+%
+% Permission is granted to copy, distribute, and/or modify the WBM-Library
+% under the terms of the GNU Lesser General Public License, Version 2.1
+% or any later version published by the Free Software Foundation.
+%
+% The WBM-Library is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU Lesser General Public License for more details.
+%
+% A copy of the GNU Lesser General Public License can be found along
+% with the WBML. If not, see <http://www.gnu.org/licenses/>.
+
 function visualizeForwardDynamics(obj, stmPos, sim_config, sim_tstep, vis_ctrl)
+    % Visualizes the computed *forward dynamics*, i.e. the motions, of a given
+    % robot model within a specified time interval :math:`[t_0, t_f]`.
+    %
+    % Arguments:
+    %   stmPos    (double, matrix): Position and orientation data from the *forward
+    %                               dynamics states* of the integration output matrix
+    %                               :math:`\mathcal{X}` of the given robot model.
+    %   sim_config (:class:`~WBM.wbmSimConfig`): Configuration object with the configuration
+    %                                            settings for the visualizer of the robot
+    %                                            simulation.
+    %   sim_tstep (double, scalar): Simulation time-step size to control the visualization
+    %                               speed of the robot simulation.
+    %
+    %                               In order to keep the simulation close to real time, the
+    %                               *simulation step size* :math:`t_{{step}_s}` is the same
+    %                               *step size* :math:`t_{step}` of the given time interval
+    %                               :math:`[t_0, t_f]` (see :meth:`WBM.intForwardDynamics`
+    %                               -- ``tspan``).
+    %
+    %                               To slow down the visualization speed of the robot
+    %                               simulation (slow motion), :math:`t_{{step}_s}` can
+    %                               be increased by a *factor* :math:`x > 1` such that
+    %                               :math:`t_{{step}_s} = x\cdot t_{step}`.
+    %   vis_ctrl          (struct): Data structure to control the graphic elements of
+    %                               the robot that should be drawn during the simulation
+    %                               (*optional*).
+    %
+    %                               The structure is specified by following data fields:
+    %
+    %                                  - ``drawJnts`` (*logical, scalar*): Draw the joint nodes
+    %                                    of the robot (default: *true*).
+    %                                  - ``drawCom``  (*logical, scalar*): Draw the node of the
+    %                                    center of mass (default: *true*).
+    %                                  - ``drawSkel`` (*logical, scalar*): Draw the skeleton of
+    %                                    the robot (default: *true*).
+    %                                  - ``drawBody`` (*logical, scalar*): Draw the body parts,
+    %                                    i.e. the hull, of the robot (default: *true*).
+    %                                  - ``vis_speed`` (*double, scalar*): Visualization speed
+    %                                    to keep the simulation close to real-time when the
+    %                                    simulation step size is changed (default: 1.0).
+    %
+    %                               **Note:** If the control structure is not defined, then by
+    %                               default all graphic elements of the robot are enabled and
+    %                               will be drawn in the simulation. In dependency of the
+    %                               complexity of the given robot model and the performance of
+    %                               the computer this may affect the visualization speed of the
+    %                               robot simulation.
+    % See Also:
+    %   :meth:`WBM.simulateForwardDynamics`, :meth:`WBM.intForwardDynamics` and
+    %   :meth:`WBM.getPositionsData`.
     switch nargin
         case 4
             % draw all graphic elements of the simulated robot ...
@@ -21,8 +100,8 @@ function visualizeForwardDynamics(obj, stmPos, sim_config, sim_tstep, vis_ctrl)
         otherwise
             error('WBM::visualizeForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end
-    if isempty(sim_config)
-        error('WBM::visualizeForwardDynamics: %s', WBM.wbmErrorMsg.EMPTY_DATA_TYPE);
+    if ~isa(sim_config, 'WBM.wbmSimConfig')
+        error('WBM::visualizeForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_DATA_TYPE);
     end
     % initial plot of the animation environment (reset all subplots in the
     % main figure and reinitialize them with a new ground floor) ...

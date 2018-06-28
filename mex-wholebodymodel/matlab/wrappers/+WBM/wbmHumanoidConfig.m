@@ -1,7 +1,7 @@
 % Copyright (C) 2015-2018, by Martin Neururer
 % Author: Martin Neururer
 % E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
-% Date:   January, 2018
+% Date:   January-May, 2018
 %
 % Departments:
 %   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
@@ -12,7 +12,7 @@
 % The development of the WBM-Library was made in the context of the master
 % thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
 % for the Matlab MEX whole-body model interface, which was supported by the
-% FP7 EU project CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
 % Robotics (b)), <http://www.codyco.eu>.
 %
 % Permission is granted to copy, distribute, and/or modify the WBM-Library
@@ -48,6 +48,9 @@ classdef wbmHumanoidConfig < WBM.wbmRobotConfig
     %   The given *joint positions vectors* for the initial body pose of the robot must
     %   be specified in the data type as *column-vectors* and the corresponding *angle
     %   positions* of the joints are defined in degrees (:math:`[\textrm{deg}]`).
+    %
+    % See Also:
+    %   :class:`~WBM.wbmRobotConfig`.
     properties
         jpos_head@double       vector
         jpos_torso@double      vector

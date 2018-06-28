@@ -1,7 +1,7 @@
 % Copyright (C) 2015-2018, by Martin Neururer
 % Author: Martin Neururer
 % E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
-% Date:   January, 2018
+% Date:   January-May, 2018
 %
 % Departments:
 %   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
@@ -12,7 +12,7 @@
 % The development of the WBM-Library was made in the context of the master
 % thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
 % for the Matlab MEX whole-body model interface, which was supported by the
-% FP7 EU project CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
 % Robotics (b)), <http://www.codyco.eu>.
 %
 % Permission is granted to copy, distribute, and/or modify the WBM-Library
@@ -53,16 +53,16 @@ classdef (Abstract) wbmSimConfig < handle
     %                                     specified as a vector of the form
     %                                     :math:`[width, height]` in *pixels*
     %                                     (*constant*).
-    %   DF_AXES_NBR      (uint8, scalar): Default number of axes graphics objects
-    %                                     in the figure window, to divide the
-    %                                     figure into a (m x n) grid (*constant*).
+    %   DF_AXES_NBR      (uint8, scalar): Default number of axes graphics objects in
+    %                                     the figure window, to divide the figure into
+    %                                     a :math:`(m \times n)` grid (*constant*).
     %   DF_AXES_POS     (double, matrix): Default positions of each axes graphics
     %                                     object in the figure window (*constant*).
     %
     %                                     **Note:** The axes positions must be
-    %                                     specified in a (n x 4) matrix, where
-    %                                     each row of the matrix represents an
-    %                                     axes position of the form
+    %                                     specified in a :math:`(n \times 4)`
+    %                                     matrix, where each row of the matrix
+    %                                     represents an axes position of the form
     %                                     :math:`[x\:\textrm{(left)}, y\:\textrm{(bottom)}, wid\:\textrm{(width)}, hgt\:\textrm{(height)}]`.
     %                                     The row number of the matrix must be
     %                                     the same as the number of axes.
@@ -71,12 +71,12 @@ classdef (Abstract) wbmSimConfig < handle
     %                                     labels (*constant*).
     %
     %                                     **Note:** The colors must be specified
-    %                                     in a (4 x 3) matrix with horizontal
-    %                                     RGB-triplets. The first triplet defines
-    %                                     the color for the axes back planes and
-    %                                     all other colors are for the axis lines
-    %                                     tick values and labels in the x, y and
-    %                                     z direction.
+    %                                     in a :math:`(4 \times 3)` matrix with
+    %                                     horizontal RGB-triplets. The first
+    %                                     triplet defines the color for the axes
+    %                                     back planes and all other colors are
+    %                                     for the axis lines tick values and
+    %                                     labels in the x, y and z direction.
     %   DF_AXES_VWPTS     (cell, matrix): List of default viewpoint positions to
     %                                     determine the orientation of each axes
     %                                     (*constant*).
@@ -90,13 +90,13 @@ classdef (Abstract) wbmSimConfig < handle
     %   DF_AXES_VIEWS     (cell, vector): Default row-array of string matching viewpoint
     %                                     names that shows the robot simulation at each
     %                                     axes with a different view (*constant*).
-    %   DF_AXIS_LIMITS  (double, vector): Default (6 x 1) vector of the form
+    %   DF_AXIS_LIMITS  (double, vector): Default :math:`(6 \times 1)` vector of the form
     %                                     :math:`[x_{min}, x_{max}, y_{min}, y_{max}, z_{min}, z_{max}]`,
     %                                     to specify the axis limits of every Cartesian
     %                                     axes in the figure window (*constant*).
-    %   DF_GROUND_SHAPE (double, matrix): Default (3 x n) polygon matrix consisting
-    %                                     of a set of vertical XYZ-triplets, which
-    %                                     form the shape of the ground floor plane
+    %   DF_GROUND_SHAPE (double, matrix): Default :math:`(3 \times n)` polygon matrix
+    %                                     consisting of a set of vertical XYZ-triplets,
+    %                                     which form the shape of the ground floor plane
     %                                     (*constant*).
     %   DF_GROUND_COLOR (double, vector): Default color of the ground, specified
     %                                     by a RGB-triplet (*constant*).
@@ -105,12 +105,12 @@ classdef (Abstract) wbmSimConfig < handle
     %                                                  for the body of the simulated robot.
     %   environment (:class:`~WBM.wbmSimEnvironment`): Data object to define the environment
     %                                                  settings for the robot simulation.
-    %   trajectories (:class:`~WBM.wbmLinkTrajectory`, vector): Array of trajectory objects to show the
-    %                                                           trajectory curves of specific links of
-    %                                                           the robot.
-    %   target_pts (:class:`~WBM.wbmTargetPoint`, vector): Array of target points that should reached
-    %                                                      in the simulation by specific links of the
-    %                                                      robot.
+    %   trajectories (:class:`~WBM.wbmLinkTrajectory`, *vector*): Array of trajectory objects to show the
+    %                                                             trajectory curves of specific links of
+    %                                                             the robot.
+    %   target_pts (:class:`~WBM.wbmTargetPoint`, *vector*): Array of target points that should reached
+    %                                                        in the simulation by specific links of the
+    %                                                        robot.
     %   hWndFigure (:class:`!matlab.ui.Figure`): Figure window for the visualization
     %                                            of the robot simulation.
     %   wnd_title                (char, vector): Title (name) of the figure window.
@@ -134,8 +134,8 @@ classdef (Abstract) wbmSimConfig < handle
     %   nAxes                   (uint8, scalar): Number of axes graphics objects in
     %                                            the figure window (default number:
     %                                            :attr:`DF_AXES_NBR`).
-    %   hAxes                  (double, vector): (1 x *nAxes*) array with handles
-    %                                            of the created axes objects.
+    %   hAxes                  (double, vector): :math:`(1 \times n_{axes})` array with
+    %                                            handles of the created axes objects.
     %   axes_pos               (double, matrix): Matrix with size and position of
     %                                            each axes within the figure window,
     %                                            specified as row-vectors of the form
@@ -150,18 +150,19 @@ classdef (Abstract) wbmSimConfig < handle
     %                                            names to define the robot simulation at each
     %                                            axes in a distinctive view (default views:
     %                                            :attr:`DF_AXES_VIEWS`).
-    %   axis_limits            (double, vector): (6 x 1) vector of the form
+    %   axis_limits            (double, vector): :math:`(6 \times 1)` vector of the form
     %                                            :math:`[x_{min}, x_{max}, y_{min}, y_{max}, z_{min}, z_{max}]`,
     %                                            to specify the axis limits of every
     %                                            Cartesian axes in the figure window
     %                                            (default limits: :attr:`DF_AXIS_LIMITS`).
     %   vwpts_annot              (cell, vector): Row-list with short annotation strings (or titles)
     %                                            for the given viewpoints in the figure window.
-    %   gfx_objects              (cell, vector): (1 x *nAxes*) array of *graphics object handles*
-    %                                            as data container for each axes in the figure
-    %                                            window to store, manipulate and visualize all
-    %                                            graphics objects (environment, robot body,
-    %                                            trajectories and target points) of the simulation.
+    %   gfx_objects              (cell, vector): :math:`(1 \times n_{axes})` array of *graphics
+    %                                            object handles* as data container for each
+    %                                            axes in the figure window to store, manipulate
+    %                                            and visualize all graphics objects (environment,
+    %                                            robot body, trajectories and target points) of
+    %                                            the simulation.
     %   show_light            (logical, scalar): Boolean flag to enable a point light in the
     %                                            simulation environment that radiates from a
     %                                            specified location in all directions
@@ -191,7 +192,7 @@ classdef (Abstract) wbmSimConfig < handle
     %                                            listed in the table of the *legend properties*
     %                                            of Matlab.
     %   lgd_orient               (char, vector): Orientation of the legend, specified by one of
-    %                                            these values: *'vertical'*, *'horizontal'*.
+    %                                            these values: ``'vertical'``, ``'horizontal'``.
     %   mkvideo               (logical, scalar): Boolean flag to create a video of the current
     %                                            robot simulation (default: *false*).
     %
@@ -258,7 +259,8 @@ classdef (Abstract) wbmSimConfig < handle
     %                                            :math:`zfac < 1`, the scene appears smaller
     %                                            (*zoom out*). If :math:`zfac = 1`, then the
     %                                            scene keeps its original size. The row number
-    %                                            of the matrix can grow at most *nAxes* long.
+    %                                            of the matrix can grow at most :math:`n_{axes}`
+    %                                            long.
     %   shift_axes               (cell, matrix): Shift index array to specify which axes of
     %                                            the figure window should be shifted in a
     %                                            particular direction within the axis limits
@@ -272,13 +274,14 @@ classdef (Abstract) wbmSimConfig < handle
     %                                            array represents a column-vector with
     %                                            reference indices to the axes graphics
     %                                            objects in the figure window. The second
-    %                                            element :math:`v_{sh}` describes a (n x 3)
-    %                                            matrix of Cartesian vectors of the form
-    %                                            :math:`[x, y, z]`. Each row-vector of the
-    %                                            matrix specifies the *shift direction* of
-    %                                            the scene of the current axes. The row
-    %                                            numbers of both array elements must be
-    %                                            equal and can grow at most *nAxes* long.
+    %                                            element :math:`v_{sh}` describes a
+    %                                            :math:`(n \times 3)` matrix of Cartesian
+    %                                            vectors of the form :math:`[x, y, z]`.
+    %                                            Each row-vector of the matrix specifies
+    %                                            the *shift direction* of the scene of the
+    %                                            current axes. The row numbers of both array
+    %                                            elements must be equal and can grow at most
+    %                                            :math:`n_{axes}` long.
     properties(Abstract, Dependent)
         % public properties for fast get/set methods:
         custom_view@double vector
@@ -356,9 +359,9 @@ classdef (Abstract) wbmSimConfig < handle
             % successive processing.
             %
             % Arguments:
-            %   vb_idx     (int, vector): (n x 1) vector of *reference indices*
-            %                             of the solid volume body objects that
-            %                             are defined as payloads.
+            %   vb_idx     (int, vector): :math:`(n \times 1)` vector of *reference
+            %                             indices* of the solid volume body objects
+            %                             that are defined as payloads.
             %   manip  (cellstr, vector): String array to assign each payload
             %                             object with a specific *manipulator*
             %                             (hand) of the robot, specified by one
@@ -411,10 +414,10 @@ classdef (Abstract) wbmSimConfig < handle
             %   obj_idx   (int, scalar): Index position of the payload object in
             %                            the stack.
             %   start_idx (int, scalar): Time index position of the integration
-            %                            output matrix :math:`\mathcal{X}`, where
+            %                            output matrix :math:`\mathcal{X}` when
             %                            the robot has grabbed the object.
             %   end_idx   (int, scalar): Time index position of the integration
-            %                            output matrix :math:`\mathcal{X}`, where
+            %                            output matrix :math:`\mathcal{X}` when
             %                            the robot has released the object.
             len = size(obj.pl_stack,1);
             if ( (obj_idx < 1) || (obj_idx > len) )

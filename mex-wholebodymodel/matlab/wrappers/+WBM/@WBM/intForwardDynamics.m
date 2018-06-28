@@ -1,4 +1,187 @@
+% Copyright (C) 2015-2018, by Martin Neururer
+% Author: Martin Neururer
+% E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
+% Date:   January-May, 2018
+%
+% Departments:
+%   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
+%   Automation and Control Institute - TU Wien.
+%
+% This file is part of the Whole-Body Model Library for Matlab (WBML).
+%
+% The development of the WBM-Library was made in the context of the master
+% thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
+% for the Matlab MEX whole-body model interface, which was supported by the
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
+% Robotics (b)), <http://www.codyco.eu>.
+%
+% Permission is granted to copy, distribute, and/or modify the WBM-Library
+% under the terms of the GNU Lesser General Public License, Version 2.1
+% or any later version published by the Free Software Foundation.
+%
+% The WBM-Library is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU Lesser General Public License for more details.
+%
+% A copy of the GNU Lesser General Public License can be found along
+% with the WBML. If not, see <http://www.gnu.org/licenses/>.
+
 function [t, stmChi] = intForwardDynamics(obj, tspan, stvChi_0, fhTrqControl, ode_opt, varargin)
+    % Setups and integrates the *forward dynamics differential equation* of the
+    % form :math:`\dot{\chi} = FD(t, \chi)` in dependency of the given interval
+    % of integration :math:`[t_0, t_f]` and the initial condition :math:`\chi_0`.
+    %
+    % The method uses for the specified ODE-function the Matlab ODE solver ``ode15s``
+    % for solving stiff differential equations and differential-algebraic systems
+    % :cite:`Shampine1997`.
+    %
+    % Following *pose correction types* for the position-regulation system of
+    % the forward dynamics will be supported:
+    %
+    %   - ``none`` -- No pose corrections.
+    %   - ``nfb``  -- No floating base and without pose corrections.
+    %   - ``fpc``  -- Foot pose correction.
+    %   - ``hpc``  -- Hand pose correction.
+    %   - ``fhpc`` -- Foot and hand pose correction.
+    %
+    % In dependency of the specified *pose correction*, the method can be
+    % called as follows:
+    %
+    %   *none, nfb:*
+    %      .. py:method:: intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt[, pc_type])
+    %
+    %   *none, fpc:*
+    %      .. py:method:: intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, foot_conf, clnk_conf, fe_c, ac, ac_f[, pc_type])
+    %
+    %   *none, fpc, fhpc:*
+    %      .. py:method:: intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, fhTotCWrench, foot_conf, hand_conf, f_cp, ac_f[, pc_type])
+    %
+    %   *nfb:*
+    %      .. py:method:: intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, clnk_conf, fe_c, ac[, pc_type])
+    %
+    %   *nfb:*
+    %      .. py:method:: intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, fhTotCWrench, hand_conf, f_cp[, pc_type])
+    %
+    %   *fpc:*
+    %      .. py:method:: intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, foot_conf, ac_f[, pc_type])
+    %
+    %   *hpc:*
+    %      .. py:method:: intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, hand_conf, fe_h, ac_h[, pc_type])
+    %
+    %   *fhpc:*
+    %      .. py:method:: intForwardDynamics(tspan, stvChi_0, fhTrqControl, ode_opt, foot_conf, hand_conf, fe_h, ac_h, ac_f[, pc_type])
+    %
+    % Arguments:
+    %   tspan         (double, vector): :math:(1 \times n) time interval of integration
+    %                                   vector with a minimum size of two elements
+    %                                   :math:`[t_0, t_f]`, specifying the initial and
+    %                                   final times.
+    %
+    %                                   The variable :math:`n` denotes the *number of
+    %                                   evaluation points* of the given interval vector
+    %                                   specified by a time step size :math:`t_{step}`,
+    %                                   such that :math:`t_f = t_0 + n\cdot t_{step}`.
+    %
+    %                                   **Note:** All elements of the interval vector
+    %                                   ``tspan`` must be *increasing* or *decreasing*.
+    %                                   If ``tspan`` has two elements, then the
+    %                                   ODE-solver returns a solution at each internal
+    %                                   time step within the interval. If ``tspan``
+    %                                   has more than two elements, then the solver
+    %                                   returns a solution at each given time point.
+    %   stvChi_0      (double, vector): :math:`((2 n_{dof} + 13) \times 1)` initial state
+    %                                   vector :math:`\chi_0` of the robot model to
+    %                                   specify the initial condition for the given
+    %                                   forward dynamics ODE-function.
+    %   fhTrqControl (function_handle): Function handle to a specified time-dependent
+    %                                   *torque control function* that controls the
+    %                                   dynamics of the robot system.
+    %   ode_opt               (struct): Option structure for fine-tuning, adjusting
+    %                                   error tolerances, or passing additional
+    %                                   information to the ODE-solver.
+    %
+    %                                   Use the ``odeset`` function of Matlab to
+    %                                   create or modify the options structure.
+    % Other Parameters:
+    %   fhTotCWrench (function_handle): Function handle to a specific *total contact
+    %                                   wrench function* in contact space
+    %                                   :math:`\mathrm{C_h = \{C_1,\ldots,C_n\}}`
+    %                                   of the hands that will be applied by the
+    %                                   robot model (*optional*).
+    %   foot_conf     (struct): Configuration structure to specify the *qualitative
+    %                           state* of the feet (*optional*).
+    %   hand_conf     (struct): Configuration structure to specify the *qualitative
+    %                           state* of the hands (*optional*).
+    %   clnk_conf     (struct): Configuration structure to specify the *qualitative
+    %                           state* of at most two *contact links* (*optional*).
+    %   fe_c  (double, vector): :math:`(k \times 1)` vector of external forces (in
+    %                           contact space) that are acting on the specified
+    %                           contact links (*optional*).
+    %   fe_h  (double, vector): :math:`(k \times 1)` vector of external forces (in
+    %                           contact space) that are acting on the specified
+    %                           *contact points* of the hands (*optional*).
+    %   f_cp  (double, vector): Force vector or scalar applied to a grasped object at
+    %                           the *contact points* :math:`{}^{\small O}p_{\small C_i}`
+    %                           from the contact frames :math:`\mathrm{\{C_1,\ldots,C_n\}}`
+    %                           of the hands to the origin frame :math:`\mathrm{O}` at
+    %                           the CoM of the object (*optional*).
+    %
+    %                           The vector length :math:`l` of the applied forces depends
+    %                           on the chosen *contact model* and if only one hand or both
+    %                           hands are involved in grasping an object, such that
+    %                           :math:`l = h\cdot s` with size :math:`s \in \{1,3,4\}` and
+    %                           the number of hands :math:`h \in \{1,2\}`.
+    %
+    %                           **Note:** The z-axis of a contact frame
+    %                           :math:`\mathrm{C_{i \in \{1,\ldots,n\}}}` points in the
+    %                           direction of the inward surface normal at the point of
+    %                           contact :math:`{}^{\small O}p_{\small C_i}`. If the
+    %                           chosen contact model is *frictionless*, then each applied
+    %                           force to the object is a scalar, otherwise a vector.
+    %   ac    (double, vector): :math:`(k \times 1)` mixed acceleration vector
+    %                           for the *contact points* of the specified
+    %                           contact links (*optional*).
+    %   ac_f  (double, vector): :math:`(k \times 1)` mixed acceleration vector
+    %                           for the *foot contact points* (*optional*).
+    %   ac_h  (double, vector): :math:`(k \times 1)` mixed acceleration vector
+    %                           for the *hand contact points* (*optional*).
+    %   pc_type (char, vector): Specifies the *pose correction type* for the robot model
+    %                           that will be applied by the position-regulation system of
+    %                           the given forward dynamics method.
+    %
+    % The variable :math:`k` indicates the *size* of the given *force* and *acceleration
+    % vectors* in dependency of the specified contact links, feet and hands:
+    %
+    %   - :math:`k = 6`  -- only one link/foot/hand is defined.
+    %   - :math:`k = 12` -- both links/feet/hands are defined.
+    %
+    % The specified *external forces* and *accelerations* are either *constant* or *zero*.
+    %
+    % Returns:
+    %   [t, stmChi]: 2-element tuple containing:
+    %
+    %      - **t** (*double, vector*) -- :math:`(n \times 1)` evaluation points vector
+    %        of the given time interval to perform the integration.
+    %      - **stmChi**    (*struct*) -- :math:`(n \times (2 n_{dof} + 13)` integration
+    %        output matrix :math:`\mathcal{X}` with the next *forward dynamics states*
+    %        (solutions) of the robot model. Each row in ``stmChi`` corresponds to a
+    %        solution at the value in the corresponding row of ``t``.
+    %
+    %   The variable :math:`n` denotes the *number of evaluation points* of the given
+    %   time interval.
+    %
+    % See Also:
+    %   :meth:`WBM.getFDynVisData`, :meth:`WBM.getFDynVisDataSect` and
+    %   :meth:`WBM.visualizeForwardDynamics`.
+    %
+    % References:
+    %   :cite:`Shampine1997`
+
+    % References:
+    %   [LR97] Shampine, L. F.; Reichelt, M. W.: The Matlab ODE Suite.
+    %          In: SIAM Journal on Scientific Computing, Volume 18, Issue 1, 1997,
+    %          URL: <https://www.mathworks.com/help/pdf_doc/otherdocs/ode_suite.pdf>.
     if (nargin < 5)
         error('WBM::intForwardDynamics: %s', WBM.wbmErrorMsg.WRONG_NARGIN);
     end

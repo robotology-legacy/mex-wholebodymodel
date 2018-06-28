@@ -1,7 +1,7 @@
 % Copyright (C) 2015-2018, by Martin Neururer
 % Author: Martin Neururer
 % E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
-% Date:   January, 2018
+% Date:   January-May, 2018
 %
 % Departments:
 %   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
@@ -12,7 +12,7 @@
 % The development of the WBM-Library was made in the context of the master
 % thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
 % for the Matlab MEX whole-body model interface, which was supported by the
-% FP7 EU project CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
 % Robotics (b)), <http://www.codyco.eu>.
 %
 % Permission is granted to copy, distribute, and/or modify the WBM-Library
@@ -32,20 +32,20 @@ classdef vbCylinder < WBM.vbObject
     % for the environment scenario of the robot simulation.
     %
     % Attributes:
-    %   origin (double, vector): (3 x 1) Cartesian position of the origin of the
-    %                            cylinder. Default origin: :math:`[0, 0, 0]^T`.
-    %   rotm   (double, matrix): (3 x 3) rotation matrix of the cylinder. If
-    %                            undefined, the default orientation is the
-    %                            *identity matrix*.
-    %   tform  (double, matrix): (4 x 4) Transformation matrix of the cylinder.
-    %                            If :attr:`origin` and :attr:`rotm` are undefined,
-    %                            then by default, the transformation matrix is an
-    %                            *identity matrix*.
-    %   frame  (double, vector): (7 x 1) VQ-transformation vector (position and
-    %                            orientation) of the cylinder. If :attr:`origin`
-    %                            and :attr:`rotm` are undefined, then the frame
-    %                            vector uses the default transformation vector
-    %                            :attr:`~WBM.vbObject.DF_FRAME`.
+    %   origin (double, vector): :math:`(3 \times 1)` Cartesian position of the
+    %                            origin of the cylinder. Default origin: :math:`[0, 0, 0]^T`.
+    %   rotm   (double, matrix): :math:`(3 \times 3)` rotation matrix of the
+    %                            cylinder. If undefined, the default orientation
+    %                            is the *identity matrix*.
+    %   tform  (double, matrix): :math:`(4 \times 4)` transformation matrix of
+    %                            the cylinder. If :attr:`origin` and :attr:`rotm`
+    %                            are undefined, then by default, the transformation
+    %                            matrix is an *identity matrix*.
+    %   frame  (double, vector): :math:`(7 \times 1)` VQ-transformation vector
+    %                            (position and orientation) of the cylinder. If
+    %                            :attr:`origin` and :attr:`rotm` are undefined,
+    %                            then the frame vector uses the default
+    %                            transformation vector :attr:`~WBM.vbObject.DF_FRAME`.
     %
     %   description       (char, vector): Short description string about the
     %                                     cylinder object (default: *empty*).
@@ -88,15 +88,17 @@ classdef vbCylinder < WBM.vbObject
     %   istool     (logical, scalar): Boolean flag to indicate if the cylinder defines
     %                                 also a tool to be used by the robot (*read only*).
     %                                 Default: *false*.
-    %   init_frame  (double, vector): (7 x 1) initial frame vector (VQ-transformation)
-    %                                 of the cylinder, in dependency of the given origin
-    %                                 position and orientation (*read only*).
+    %   init_frame  (double, vector): :math:`(7 \times 1)` initial frame vector
+    %                                 (VQ-transformation) of the cylinder, in
+    %                                 dependency of the given origin position
+    %                                 and orientation (*read only*).
     %
     %                                 **Note:** If the attributes :attr:`origin` and
     %                                 :attr:`rotm` are not defined, then the initial
     %                                 frame uses the default transformation vector
     %                                 :attr:`~WBM.vbObject.DF_FRAME`.
-    %   dimension   (double, vector): (1 x 3) vector of the form :math:`[\textrm{radius_{inner}, radius_{outer}, height}]`,
+    %   dimension   (double, vector): :math:`(1 \times 3)` vector of the form
+    %                                 :math:`[\mathit{radius_{inner}, radius_{outer}, height}]`,
     %                                 which defines the dimensions of the cylinder (*read only*).
     %
     %                                 **Note:** If the dimensions of the cylinder are undefined,
@@ -109,9 +111,9 @@ classdef vbCylinder < WBM.vbObject
     %                                 of the fields ``X``, ``Y`` and ``Z`` which representing
     %                                 the x, y and z-coordinate vectors of each vertex of the
     %                                 given polyhedron.
-    %   com   (double, vector): (3 x 1) Cartesian position of the center of mass
-    %                           (CoM) of the cylinder relative to the given origin
-    %                           (*read only*).
+    %   com   (double, vector): :math:`(3 \times 1)` Cartesian position of the
+    %                           center of mass (CoM) of the cylinder relative to
+    %                           the given origin (*read only*).
     %
     %                           **Note:** By default, the CoM of the cylinder is
     %                           placed at the origin.
@@ -127,8 +129,8 @@ classdef vbCylinder < WBM.vbObject
     %
     %                           **Note:** If :attr:`rho` is not defined, then by
     %                           default the mass value is 0.
-    %   I_cm  (double, matrix): (3 x 3) inertia matrix of the cylinder at the
-    %                           center of mass *cm* (*read only*).
+    %   I_cm  (double, matrix): :math:`(3 \times 3)` inertia matrix of the cylinder
+    %                           at the center of mass *cm* (*read only*).
     %
     %                           **Note:** If :attr:`rho` is not defined, then the
     %                           inertia of the cylinder is by default the *identity
@@ -213,31 +215,33 @@ classdef vbCylinder < WBM.vbObject
             %   ro   (double, scalar): Outer radius of the cylindrical shell.
             %   r    (double, scalar): Radius of the right circular cylinder.
             %   h    (double, scalar): Height of the cylinder along the z-direction.
-            %   orig (double, vector): (3 x 1) origin position of the cylinder.
-            %   rotm (double, matrix): (3 x 3) orientation matrix of the cylinder.
+            %   orig (double, vector): :math:`(3 \times 1)` origin position of
+            %                          the cylinder.
+            %   rotm (double, matrix): :math:`(3 \times 3)` orientation matrix
+            %                          of the cylinder.
             %   obj_prop     (struct): Data structure for the *object properties*,
             %                          specified by following fields:
             %
-            %                                 - ``line_width``: Line width of the edges of the cylinder.
-            %                                 - ``edge_color``: Edge color of the cylinder (RGB-triplet
-            %                                   or color name).
-            %                                 - ``face_color``: Face color of the cylinder (RGB-triplet
-            %                                   or color name).
-            %                                 - ``face_alpha``: Face transparency of the cylinder in
-            %                                   range :math:`[0,1]`.
+            %                            - ``line_width``: Line width of the edges of the cylinder.
+            %                            - ``edge_color``: Edge color of the cylinder (RGB-triplet
+            %                              or color name).
+            %                            - ``face_color``: Face color of the cylinder (RGB-triplet
+            %                              or color name).
+            %                            - ``face_alpha``: Face transparency of the cylinder in
+            %                              range :math:`[0,1]`.
             %
-            %                              optional fields:
+            %                          optional fields:
             %
-            %                                 - ``description``: Annotation string of the
-            %                                   cylinder object.
-            %                                 - ``ismovable``: Boolean flag to indicate if
-            %                                   the cylinder object is *movable* or *fixed*.
-            %                                 - ``istool``: Boolean flag to indicate if the
-            %                                   cylinder object is also a *tool* or not.
-            %                                 - ``obj_type``: Object type, specified by the value
-            %                                   *'obs'* or *'bdy'* (see :attr:`~vbCylinder.obj_type`).
-            %                                 - ``rho``: Volumetric mass density of the cylinder
-            %                                   object in :math:`[\si{\kg/\m^3}]`.
+            %                            - ``description``: Annotation string of the
+            %                              cylinder object.
+            %                            - ``ismovable``: Boolean flag to indicate if
+            %                              the cylinder object is *movable* or *fixed*.
+            %                            - ``istool``: Boolean flag to indicate if the
+            %                              cylinder object is also a *tool* or not.
+            %                            - ``obj_type``: Object type, specified by the value
+            %                              *'obs'* or *'bdy'* (see :attr:`~vbCylinder.obj_type`).
+            %                            - ``rho``: Volumetric mass density of the cylinder
+            %                              object in :math:`[\si{\kg/\m^3}]`.
             %
             % Returns:
             %   obj: An instance of the :class:`!vbCylinder` class.
@@ -317,13 +321,13 @@ classdef vbCylinder < WBM.vbObject
             %   varargin: Variable-length input argument list.
             %
             % Keyword Arguments:
-            %   p   (double, vector): (3 x 1) Cartesian position to specify the
-            %                         *origin* of the cylinder.
-            %   R   (double, matrix): (3 x 3) rotation matrix to specify the
-            %                         *orientation* of the cylinder.
-            %   vqT (double, vector): (7 x 1) VQ-transformation (position and
-            %                         orientation in quaternions) to specify
-            %                         the *origin frame* of the cylinder.
+            %   p   (double, vector): :math:`(3 \times 1)` Cartesian position to
+            %                         specify the *origin* of the cylinder.
+            %   R   (double, matrix): :math:`(3 \times 3)` rotation matrix to
+            %                         specify the *orientation* of the cylinder.
+            %   vqT (double, vector): :math:`(7 \times 1)` VQ-transformation
+            %                         (position and orientation in quaternions)
+            %                         to specify the *origin frame* of the cylinder.
             switch nargin
                 case 3
                     p = varargin{1,1};
@@ -360,7 +364,7 @@ classdef vbCylinder < WBM.vbObject
             %
             % Returns:
             %   hgo: Handle to the chart surface graphics object of the created
-            %        cylinder.
+            %   cylinder.
             hgo = surf(obj.vertices.X, obj.vertices.Y, obj.vertices.Z, 'LineWidth', obj.line_width, ...
                        'EdgeColor', obj.edge_color, 'FaceColor', obj.face_color, 'FaceAlpha', obj.face_alpha);
         end
@@ -373,7 +377,7 @@ classdef vbCylinder < WBM.vbObject
             %        x, y and z-coordinate data of the cylinder.
             % Returns:
             %   hgo: Handle to the chart surface graphics object with the
-            %        changed vertex coordinates of the cylinder.
+            %   changed vertex coordinates of the cylinder.
             hgo.XData = obj.vertices.X;
             hgo.YData = obj.vertices.Y;
             hgo.ZData = obj.vertices.Z;
@@ -408,17 +412,16 @@ classdef vbCylinder < WBM.vbObject
 
         function result = ptInObj(obj, pt_pos)
             % Determines if some specified points are below the surface,
-            % i.e. inside, of the cylinder [#f1]_.
+            % i.e. inside, of the cylinder [#f8]_.
             %
             % Arguments:
             %   pt_pos (double, vector/matrix): A single position vector or a
-            %                                   (n x 3) matrix with positions
-            %                                   of some specified points.
+            %                                   :math:`(n \times 3)` matrix with
+            %                                   positions of some specified points.
             % Returns:
-            %   result: (n x 1) vector with the logical results if the given
-            %           points are below the surface of the cylinder. Each
-            %           value is *true* if the given point is below the
-            %           surface, *false* otherwise.
+            %   result: :math:`(n \times 1)` vector with the logical results if the
+            %   given points are below the surface of the cylinder. Each value is
+            %   *true* if the given point is below the surface, *false* otherwise.
 
             % calculation approach is taken and adapted from:
             % <https://stackoverflow.com/questions/19899612/cylinder-with-filled-top-and-bottom-in-matlab> and

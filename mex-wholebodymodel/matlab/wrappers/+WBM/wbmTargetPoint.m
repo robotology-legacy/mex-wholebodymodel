@@ -1,7 +1,7 @@
 % Copyright (C) 2015-2018, by Martin Neururer
 % Author: Martin Neururer
 % E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
-% Date:   January, 2018
+% Date:   January-May, 2018
 %
 % Departments:
 %   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
@@ -12,7 +12,7 @@
 % The development of the WBM-Library was made in the context of the master
 % thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
 % for the Matlab MEX whole-body model interface, which was supported by the
-% FP7 EU project CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
 % Robotics (b)), <http://www.codyco.eu>.
 %
 % Permission is granted to copy, distribute, and/or modify the WBM-Library
@@ -33,21 +33,21 @@ classdef wbmTargetPoint < WBM.wbmGObj
     % of the simulated robot.
     %
     % Attributes:
-    %   pos        (double, vector): (3 x 1) Cartesian position of the target point
-    %                                in the world frame (wf). Default position:
-    %                                :math:`[0, 0, 0]^T`.
+    %   pos        (double, vector): :math:`(3 \times 1)` Cartesian position vector
+    %                                of the target point in the world frame (wf).
+    %                                Default position: :math:`[0, 0, 0]^T`.
     %   description  (char, vector): Short description string (annotation) about
     %                                the target point (default: *empty*).
     %   line_width (double, scalar): Line width of the marker, specified as a
     %                                positive value in points (default width: 0.5).
     %   marker       (char, vector): Marker symbol for the data point. The symbols
     %                                for the marker are the same as specified in
-    %                                Matlab (default symbol: *'o'*).
+    %                                Matlab (default symbol: ``'o'``).
     %   mkr_size   (double, scalar): Marker size, specified as a positive value
     %                                in points (default size: 8).
     %   mkr_color (double/char, vector): Marker outline color, specified by a
     %                                    RGB-triplet or a color name (default
-    %                                    color: *'yellow'*).
+    %                                    color: ``'yellow'``).
     % Note:
     %   The specified target points will be shown in the robot simulation, if in
     %   the given *simulation configuration structure*, an array of initialized
@@ -67,8 +67,8 @@ classdef wbmTargetPoint < WBM.wbmGObj
             % Constructor.
             %
             % Arguments:
-            %   p (double, vector): (3 x 1) Cartesian position for the target
-            %                       point in world frame (wf).
+            %   p (double, vector): :math:`(3 \times 1)` Cartesian position for
+            %                       the target point in world frame (wf).
             % Returns:
             %   obj: An instance of the target point data type.
             switch nargin
@@ -104,7 +104,7 @@ classdef wbmTargetPoint < WBM.wbmGObj
             %
             % Returns:
             %   hgo: Graphics object handle (chart line object) with
-            %        the new position.
+            %   the new position.
 
             % update the target point:
             hgo.XData = obj.pos(1,1);
@@ -116,8 +116,8 @@ classdef wbmTargetPoint < WBM.wbmGObj
             % Sets a new position for the target point.
             %
             % Arguments:
-            %   p (double, vector): New (3 x 1) Cartesian position for the
-            %                       target point in world frame (wf).
+            %   p (double, vector): New :math:`(3 \times 1)` Cartesian position vector
+            %                       for the target point in the world frame (wf).
             % Returns:
             %   obj: Target point object with the new position.
             WBM.utilities.chkfun.checkCVecDim(p, 3, 'wbmTargetPoint::set.pos');

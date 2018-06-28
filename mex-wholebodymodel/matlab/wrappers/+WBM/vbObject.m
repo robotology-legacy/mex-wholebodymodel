@@ -1,7 +1,7 @@
 % Copyright (C) 2015-2018, by Martin Neururer
 % Author: Martin Neururer
 % E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
-% Date:   January, 2018
+% Date:   January-May, 2018
 %
 % Departments:
 %   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
@@ -12,7 +12,7 @@
 % The development of the WBM-Library was made in the context of the master
 % thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
 % for the Matlab MEX whole-body model interface, which was supported by the
-% FP7 EU project CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
 % Robotics (b)), <http://www.codyco.eu>.
 %
 % Permission is granted to copy, distribute, and/or modify the WBM-Library
@@ -27,25 +27,26 @@
 % A copy of the GNU Lesser General Public License can be found along
 % with the WBML. If not, see <http://www.gnu.org/licenses/>.
 
-classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGObj (class incompatible)
+                                                                   % & WBM.wbmGObj (class incompatible)
+classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous
     % :class:`!vbObject` is an *abstract class* to specify *geometric volume body
     % objects* for the environment scenario of the robot simulation.
     %
     % Attributes:
-    %   origin (double, vector): (3 x 1) Cartesian position of the origin of the
-    %                            object. Default origin: :math:`[0, 0, 0]^T`.
-    %   rotm   (double, matrix): (3 x 3) rotation matrix of the object. If
-    %                            undefined, the default orientation is the
+    %   origin (double, vector): :math:`(3 \times 1)` Cartesian position of the
+    %                            origin of the object. Default origin: :math:`[0, 0, 0]^T`.
+    %   rotm   (double, matrix): :math:`(3 \times 3)` rotation matrix of the object.
+    %                            If undefined, the default orientation is the
     %                            *identity matrix*.
-    %   tform  (double, matrix): (4 x 4) Transformation matrix of the object. If
+    %   tform  (double, matrix): :math:`(4 \times 4)` transformation matrix of the
+    %                            object. If :attr:`origin` and :attr:`rotm` are
+    %                            undefined, then by default, the transformation
+    %                            matrix is an *identity matrix*.
+    %   frame  (double, vector): :math:`(7 \times 1)` VQ-transformation vector
+    %                            (position and orientation) of the object. If
     %                            :attr:`origin` and :attr:`rotm` are undefined,
-    %                            then by default, the transformation matrix is an
-    %                            *identity matrix*.
-    %   frame  (double, vector): (7 x 1) VQ-transformation vector (position and
-    %                            orientation) of the object. If :attr:`origin`
-    %                            and :attr:`rotm` are undefined, then the frame
-    %                            vector uses the default transformation vector
-    %                            :attr:`DF_FRAME`.
+    %                            then the frame vector uses the default
+    %                            transformation vector :attr:`DF_FRAME`.
     %
     %   DF_FRAME (double, vector): Default frame vector (VQ-transformation) of
     %                              the form :math:`[0, 0, 0, 1, 0, 0, 0]^T`
@@ -89,9 +90,10 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGO
     %   istool     (logical, scalar): Boolean flag to indicate if the volume body defines
     %                                 also a tool to be used by the robot (*read only*).
     %                                 Default: *false*.
-    %   init_frame  (double, vector): (7 x 1) initial frame vector (VQ-transformation)
-    %                                 of the object, in dependency of the given origin
-    %                                 position and orientation (*read only*).
+    %   init_frame  (double, vector): :math:`(7 \times 1)` initial frame vector
+    %                                 (VQ-transformation) of the object, in
+    %                                 dependency of the given origin position
+    %                                 and orientation (*read only*).
     %
     %                                 **Note:** If the attributes :attr:`origin` and
     %                                 :attr:`rotm` are not defined, then the initial
@@ -104,9 +106,9 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGO
     %                                 depends strongly on the given shape of the
     %                                 volume body and can be different to each
     %                                 object.
-    %   com   (double, vector): (3 x 1) Cartesian position of the center of mass
-    %                           (CoM) of the volume body object relative to the
-    %                           given origin (*read only*).
+    %   com   (double, vector): :math:`(3 \times 1)` Cartesian position of the
+    %                           center of mass (CoM) of the volume body object
+    %                           relative to the given origin (*read only*).
     %
     %                           **Note:** By default, the CoM of the object is
     %                           placed at the origin.
@@ -122,8 +124,9 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGO
     %
     %                           **Note:** If :attr:`rho` is not defined, the by
     %                           default the mass value is 0.
-    %   I_cm  (double, matrix): (3 x 3) inertia matrix of the solid volume body
-    %                           object at the center of mass *cm* (*read only*).
+    %   I_cm  (double, matrix): :math:`(3 \times 3)` inertia matrix of the solid
+    %                           volume body object at the center of mass *cm*
+    %                           (*read only*).
     %
     %                           **Note:** If :attr:`rho` is not defined, then the
     %                           inertia of the object is by default the *identity
@@ -152,6 +155,8 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGO
     %   ptInObj(obj, pt_pos): *abstract* -- Determines if some specified points
     %                                       are below the surface (i.e. inside)
     %                                       of the volume body object.
+    % See Also:
+    %   :class:`~WBM.vbCuboid`, :class:`~WBM.vbCylinder` and :class:`~WBM.vbSphere`.
     properties(Abstract, Dependent)
         origin@double vector
         rotm@double   matrix
@@ -201,7 +206,7 @@ classdef (Abstract) vbObject < handle & matlab.mixin.Heterogeneous % & WBM.wbmGO
             %
             % Returns:
             %   default_object: An instance of :class:`~WBM.vbCuboid` with
-            %                   default values to preallocate the memory.
+            %   default values to preallocate the memory.
             default_object = WBM.vbCuboid;
         end
 

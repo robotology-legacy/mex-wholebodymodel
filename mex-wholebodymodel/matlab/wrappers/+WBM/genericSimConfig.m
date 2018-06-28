@@ -1,7 +1,7 @@
 % Copyright (C) 2015-2018, by Martin Neururer
 % Author: Martin Neururer
 % E-mail: martin.neururer@student.tuwien.ac.at / martin.neururer@gmail.com
-% Date:   January, 2018
+% Date:   January-May, 2018
 %
 % Departments:
 %   Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia and
@@ -12,7 +12,7 @@
 % The development of the WBM-Library was made in the context of the master
 % thesis "Learning Task Behaviors for Humanoid Robots" and is an extension
 % for the Matlab MEX whole-body model interface, which was supported by the
-% FP7 EU project CoDyCo (No. 600716 ICT 2011.2.1 Cognitive Systems and
+% FP7 EU-project CoDyCo (No. 600716, ICT-2011.2.1 Cognitive Systems and
 % Robotics (b)), <http://www.codyco.eu>.
 %
 % Permission is granted to copy, distribute, and/or modify the WBM-Library
@@ -29,8 +29,7 @@
 
 classdef genericSimConfig < WBM.wbmSimConfig
     % :class:`!genericSimConfig` is an *data type* (class) and represents the
-    % *generic configuration interface* for the visualizer of the robot
-    % simulation.
+    % *generic configuration* for the visualizer of the robot simulation.
     %
     % Attributes:
     %   custom_view  (double, vector): Custom viewpoint specification in terms of
@@ -59,17 +58,17 @@ classdef genericSimConfig < WBM.wbmSimConfig
     %                                      :math:`[600\:\textrm{(width)}, 650\:\textrm{(height)}]`,
     %                                      in *pixels* (*constant*).
     %   DF_AXES_NBR       (uint8, scalar): Default number of 4 axes graphics objects
-    %                                      in the figure window, to divide the
-    %                                      figure into a (2 x 2) grid (*constant*).
+    %                                      in the figure window, to divide the figure
+    %                                      into a :math:`(2 \times 2)` grid (*constant*).
     %   DF_AXES_POS      (double, matrix): Default positions of each axes graphics
     %                                      object in the figure window, specified
-    %                                      as a (4 x 4) matrix of the form
+    %                                      as a :math:`(4 \times 4)` matrix of the form
     %                                      :math:`[x\:\textrm{(left)}, y\:\textrm{(bottom)}, wid\:\textrm{(width)}, hgt\:\textrm{(height)}]`,
-    %                                      where each row represents an axes
-    %                                      position vector (*constant*).
-    %   DF_AXES_COLORS   (double, matrix): Default (4 x 3) color matrix for the axes
-    %                                      back planes and for the axis lines, tick
-    %                                      values and labels (*constant*).
+    %                                      where each row represents an axes position
+    %                                      vector (*constant*).
+    %   DF_AXES_COLORS   (double, matrix): Default :math:`(4 \times 3)` color matrix
+    %                                      for the axes back planes and for the axis
+    %                                      lines, tick values and labels (*constant*).
     %
     %                                      **Note:** The default color for all axes
     %                                      components is defined as :attr:`!gray80`
@@ -82,21 +81,21 @@ classdef genericSimConfig < WBM.wbmSimConfig
     %                                      Following default axes viewpoints are
     %                                      defined:
     %
-    %                                      .. tabularcolumns:: |c|c|
+    %                                      .. tabularcolumns:: |l|l|
     %
-    %                                      +-----------------+--------------------------------+
-    %                                      | Viewpoint Name: | View Angles :math:`[az, el]`:  |
-    %                                      +=================+================================+
-    %                                      | ``'front'``     | :math:`[\ang{-90}, \ang{1}]`   |
-    %                                      +-----------------+--------------------------------+
-    %                                      | ``'side_l'``    | :math:`[\ang{0}, \ang{1}]`     |
-    %                                      +-----------------+--------------------------------+
-    %                                      | ``'side_r'``    | :math:`[\ang{180}, \ang{1}]`   |
-    %                                      +-----------------+--------------------------------+
-    %                                      | ``'top'``       | :math:`[\ang{-90}, \ang{90}]`  |
-    %                                      +-----------------+--------------------------------+
-    %                                      | ``'custom'``    | :math:`[\ang{-37.5},\ang{30}]` |
-    %                                      +-----------------+--------------------------------+
+    %                                      +-----------------+---------------------------------------+
+    %                                      | Viewpoint Name: | View Angles :math:`[az, el]`:         |
+    %                                      +=================+=======================================+
+    %                                      | ``'front'``     | :math:`[\text{-}\ang{90}, \ang{1}]`   |
+    %                                      +-----------------+---------------------------------------+
+    %                                      | ``'side_l'``    | :math:`[\ang{0}, \ang{1}]`            |
+    %                                      +-----------------+---------------------------------------+
+    %                                      | ``'side_r'``    | :math:`[\ang{180}, \ang{1}]`          |
+    %                                      +-----------------+---------------------------------------+
+    %                                      | ``'top'``       | :math:`[\text{-}\ang{90}, \ang{90}]`  |
+    %                                      +-----------------+---------------------------------------+
+    %                                      | ``'custom'``    | :math:`[\text{-}\ang{37.5},\ang{30}]` |
+    %                                      +-----------------+---------------------------------------+
     %
     %   DF_VWPTS_ANNOT  (cellstr, vector): Default list with following annotation strings (titles)
     %                                      for the default axes viewpoints (*constant*):
@@ -106,24 +105,25 @@ classdef genericSimConfig < WBM.wbmSimConfig
     %                                      visualizer the view of each axes (*constant*):
     %
     %                                         ``{'custom', 'top', 'side_l', 'front'}``.
-    %   DF_AXIS_LIMITS   (double, vector): Default (6 x 1) vector of the form
+    %   DF_AXIS_LIMITS   (double, vector): Default :math:`(6 \times 1)` vector of the form
     %                                      :math:`[x_{min}, x_{max}, y_{min}, y_{max}, z_{min}, z_{max}]`,
     %                                      to specify the axis limits of every Cartesian
     %                                      axes in the figure window (*constant*).
-    %   DF_GROUND_SHAPE  (double, matrix): Default (3 x 4) polygon matrix, consisting of
-    %                                      four rectangular vertex coordinates, which form
-    %                                      the shape of the ground floor plane (*constant*).
+    %   DF_GROUND_SHAPE  (double, matrix): Default :math:`(3 \times 4)` polygon matrix,
+    %                                      consisting of four rectangular vertex coordinates,
+    %                                      which form the shape of the ground floor plane
+    %                                      (*constant*).
     %   DF_GROUND_COLOR  (double, vector): Default color of the ground, specified by
-    %                                      the RGB-triplet :math:`[153  153  204]`
+    %                                      the RGB-triplet :math:`[153, 153, 204]`
     %                                      (hex: #9999CC) (*constant*).
     %   DF_GROUND_COLOR2 (double, vector): Optional default color for the ground, specified
-    %                                      by the RGB-triplet :math:`[201  220  222]`
+    %                                      by the RGB-triplet :math:`[201, 220, 222]`
     %                                      (hex: #C9DCDE) (*constant*).
     %   DF_LIGHT_POS     (double, vector): Default location of the point light, specified
     %                                      by the Cartesian vector :math:`[0.25, 0, 1.25]`
     %                                      (*constant*).
     %   DF_VID_FILENAME    (char, vector): Default filename string for creating a video
-    %                                      file of the the current robot simulation:
+    %                                      file of the current robot simulation:
     %                                      ``'robot-simulation.avi'`` (*constant*).
     %   DF_VID_FPS       (double, scalar): Default rate of video playback in *frames
     %                                      per second* :math:`[\mathrm{fps}]`:
@@ -133,12 +133,12 @@ classdef genericSimConfig < WBM.wbmSimConfig
     %                                                  for the body of the simulated robot.
     %   environment (:class:`~WBM.wbmSimEnvironment`): Data object to define the environment
     %                                                  settings for the robot simulation.
-    %   trajectories (:class:`~WBM.wbmLinkTrajectory`, vector): Array of trajectory objects to show the
-    %                                                           trajectory curves of specific links of
-    %                                                           the robot.
-    %   target_pts (:class:`~WBM.wbmTargetPoint`, vector): Array of target points that should reached
-    %                                                      in the simulation by specific links of the
-    %                                                      robot.
+    %   trajectories (:class:`~WBM.wbmLinkTrajectory`, *vector*): Array of trajectory objects to show the
+    %                                                             trajectory curves of specific links of
+    %                                                             the robot.
+    %   target_pts (:class:`~WBM.wbmTargetPoint`, *vector*): Array of target points that should reached
+    %                                                        in the simulation by specific links of the
+    %                                                        robot.
     %   hWndFigure (:class:`!matlab.ui.Figure`): Figure window for the visualization
     %                                            of the robot simulation.
     %   wnd_title                (char, vector): Title (name) of the figure window.
@@ -162,8 +162,8 @@ classdef genericSimConfig < WBM.wbmSimConfig
     %   nAxes                   (uint8, scalar): Number of axes graphics objects in
     %                                            the figure window (default number:
     %                                            :attr:`~WBM.genericSimConfig.DF_AXES_NBR`).
-    %   hAxes                  (double, vector): (1 x *nAxes*) array with handles
-    %                                            of the created axes objects.
+    %   hAxes                  (double, vector): :math:`(1 \times n_{axes})` array with
+    %                                            handles of the created axes objects.
     %   axes_pos               (double, matrix): Matrix with size and position of
     %                                            each axes within the figure window,
     %                                            specified as row-vectors of the form
@@ -178,18 +178,19 @@ classdef genericSimConfig < WBM.wbmSimConfig
     %                                            names to define the robot simulation at each
     %                                            axes in a distinctive view (default views:
     %                                            :attr:`~WBM.genericSimConfig.DF_AXES_VIEWS`).
-    %   axis_limits            (double, vector): (6 x 1) vector of the form
+    %   axis_limits            (double, vector): :math:`(6 \times 1)` vector of the form
     %                                            :math:`[x_{min}, x_{max}, y_{min}, y_{max}, z_{min}, z_{max}]`,
     %                                            to specify the axis limits of every
     %                                            Cartesian axes in the figure window
     %                                            (default limits: :attr:`~WBM.genericSimConfig.DF_AXIS_LIMITS`).
     %   vwpts_annot              (cell, vector): Row-list with short annotation strings (or titles)
     %                                            for the given viewpoints in the figure window.
-    %   gfx_objects              (cell, vector): (1 x *nAxes*) array of *graphics object handles*
-    %                                            as data container for each axes in the figure
-    %                                            window to store, manipulate and visualize all
-    %                                            graphics objects (environment, robot body,
-    %                                            trajectories and target points) of the simulation.
+    %   gfx_objects              (cell, vector): :math:`(1 \times n_{axes})` array of *graphics
+    %                                            object handles* as data container for each
+    %                                            axes in the figure window to store, manipulate
+    %                                            and visualize all graphics objects (environment,
+    %                                            robot body, trajectories and target points) of
+    %                                            the simulation.
     %   show_light            (logical, scalar): Boolean flag to enable a point light in the
     %                                            simulation environment that radiates from a
     %                                            specified location in all directions
@@ -219,7 +220,7 @@ classdef genericSimConfig < WBM.wbmSimConfig
     %                                            listed in the table of the *legend properties*
     %                                            of Matlab.
     %   lgd_orient               (char, vector): Orientation of the legend, specified by one of
-    %                                            these values: *'vertical'*, *'horizontal'*.
+    %                                            these values: ``'vertical'``, ``'horizontal'``.
     %   mkvideo               (logical, scalar): Boolean flag to create a video of the current
     %                                            robot simulation (default: *false*).
     %
@@ -286,7 +287,8 @@ classdef genericSimConfig < WBM.wbmSimConfig
     %                                            :math:`zfac < 1`, the scene appears smaller
     %                                            (*zoom out*). If :math:`zfac = 1`, then the
     %                                            scene keeps its original size. The row number
-    %                                            of the matrix can grow at most *nAxes* long.
+    %                                            of the matrix can grow at most :math:`n_{axes}`
+    %                                            long.
     %   shift_axes               (cell, matrix): Shift index array to specify which axes of
     %                                            the figure window should be shifted in a
     %                                            particular direction within the axis limits
@@ -300,13 +302,14 @@ classdef genericSimConfig < WBM.wbmSimConfig
     %                                            array represents a column-vector with
     %                                            reference indices to the axes graphics
     %                                            objects in the figure window. The second
-    %                                            element :math:`v_{sh}` describes a (n x 3)
-    %                                            matrix of Cartesian vectors of the form
-    %                                            :math:`[x, y, z]`. Each row-vector of the
-    %                                            matrix specifies the *shift direction* of
-    %                                            the scene of the current axes. The row
-    %                                            numbers of both array elements must be
-    %                                            equal and can grow at most *nAxes* long.
+    %                                            element :math:`v_{sh}` describes a
+    %                                            :math:`(n \times 3)` matrix of Cartesian
+    %                                            vectors of the form :math:`[x, y, z]`.
+    %                                            Each row-vector of the matrix specifies
+    %                                            the *shift direction* of the scene of the
+    %                                            current axes. The row numbers of both array
+    %                                            elements must be equal and can grow at most
+    %                                            :math:`n_{axes}` long.
     properties(Dependent)
         % public properties for fast get/set methods:
         custom_view@double  vector
@@ -417,8 +420,9 @@ classdef genericSimConfig < WBM.wbmSimConfig
             % called in two different ways, where the *keyword arguments* in
             % the square brackets are optional:
             %
-            %   - .. py:method:: genericSimConfig(wnd_title, rob_sim_body[, nax[, env_settings]])
-            %   - .. py:method:: genericSimConfig(wnd_title, rob_sim_body[, [nax|env_settings]])
+            %   - .. py:method:: genericSimConfig(wnd_title, rob_sim_body[, nax, env_settings])
+            %   - .. py:method:: genericSimConfig(wnd_title, rob_sim_body[, env_settings])
+            %   - .. py:method:: genericSimConfig(wnd_title, rob_sim_body[, nax])
             %
             % Arguments:
             %   wnd_title                (char, vector): String to specify the title
@@ -430,9 +434,11 @@ classdef genericSimConfig < WBM.wbmSimConfig
             %
             % Keyword Arguments:
             %   nax                              (int, scalar): The number of axes graphics objects
-            %                                                   to be created in the figure window.
+            %                                                   to be created in the figure window
+            %                                                   (*optional*).
             %   env_settings (:class:`~WBM.wbmSimEnvironment`): Data object to define the environment
-            %                                                   settings for the robot simulation.
+            %                                                   settings for the robot simulation
+            %                                                   (*optional*).
             % Returns:
             %   obj: An instance of the :class:`!genericSimConfig` data type.
             switch nargin
@@ -485,7 +491,8 @@ classdef genericSimConfig < WBM.wbmSimConfig
             %   zoom_fac (double, vector): Vector with the corresponding *zoom factors*
             %                              of the axes that should be zoomed in or out.
             % Note:
-            %   Both vectors must have the same length and can not exceed the size of *nAxes*.
+            %   Both vectors must have the same length and can not exceed the size of
+            %   :math:`n_{axes}`.
             if ( ~isvector(axes_idx) || ~isvector(zoom_fac) )
                 error('genericSimConfig::zoomAxes: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
@@ -517,12 +524,12 @@ classdef genericSimConfig < WBM.wbmSimConfig
             % Arguments:
             %   axes_idx     (int, vector): Vector with the index numbers of the axes
             %                               that should be zoomed in the figure window.
-            %   shift_pos (double, matrix): (n x 3) matrix with the corresponding Cartesian
-            %                               *shift coordinates* of the axes that should be
-            %                               shifted.
+            %   shift_pos (double, matrix): :math:`(n \times 3)` matrix with the
+            %                               corresponding Cartesian *shift coordinates*
+            %                               of the axes that should be shifted.
             % Note:
-            %   The index vector and the shift matrix must have the same length and can not
-            %   exceed the size of *nAxes*.
+            %   The index vector and the shift matrix must have the same length and can
+            %   not exceed the size of :math:`n_{axes}`.
             if ( ~isvector(axes_idx) || ~ismatrix(shift_pos) )
                 error('genericSimConfig::shiftAxes: %s', WBM.wbmErrorMsg.WRONG_VEC_DIM);
             end
@@ -556,8 +563,8 @@ classdef genericSimConfig < WBM.wbmSimConfig
             % Arguments:
             %   vp_name (char, vector): Variable name of the new viewpoint (axes
             %                           orientation name).
-            %   vp    (double, vector): (1 x 3) Cartesian viewpoint position vector.
-            %
+            %   vp    (double, vector): :math:`(1 \times 3)` Cartesian viewpoint
+            %                           position vector.
             % Note:
             %   For flexibility reasons, the viewpoint list may contain more views
             %   than axes are indicated in the figure window.
@@ -581,8 +588,9 @@ classdef genericSimConfig < WBM.wbmSimConfig
             %
             % The method can be called in three different ways:
             %
-            %   - .. py:method:: createVideo(filename[, [rmode, fps]])
-            %   - .. py:method:: createVideo(filename[, [rmode|fps]])
+            %   - .. py:method:: createVideo(filename[, rmode, fps])
+            %   - .. py:method:: createVideo(filename[, rmode])
+            %   - .. py:method:: createVideo(filename[, fps])
             %   - .. py:method:: createVideo()
             %
             % If the parameters are not completely given, then the method uses
@@ -656,6 +664,7 @@ classdef genericSimConfig < WBM.wbmSimConfig
             % Arguments:
             %   rmode (char, vector): Render mode, specified by one of these
             %                         values:
+            %
             %                            - ``'r_fast'``: Fast rendering mode (*childorder*),
             %                              where the objects will be drawn in the order in
             %                              which they are created by the graphics functions
@@ -668,8 +677,8 @@ classdef genericSimConfig < WBM.wbmSimConfig
             %                              method is mostly slow and can cause "animation
             %                              flickering" during the simulation.
             %   vis   (char, vector): Determines if the figure window will be *visible*
-            %                         on the screen, specified as *'on'* or *'off'*
-            %                         (default value: *'on'*).
+            %                         on the screen, specified as ``'on'`` or ``'off'``
+            %                         (default value: ``'on'``).
             % Note:
             %   This method requires a Matlab version of at least R2014b (8.4.0) or higher!
             if isempty(obj.hWndFigure)
