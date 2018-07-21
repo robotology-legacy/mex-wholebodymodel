@@ -28,6 +28,26 @@ slprj/
 # Matlab figures
 *.fig
 
+## LaTeX: -------------------------------------------
+##
+## Ignore all core latex/pdflatex auxiliary
+## and temporary files. 
+##---------------------------------------------------
+*.aux
+*.cls
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.log
+*.out
+*.toc
+
+# LaTeX style files
+*.sty
+
 ## Sublime Text: ------------------------------------
 ##
 ## Ignore projects and workspaces.
