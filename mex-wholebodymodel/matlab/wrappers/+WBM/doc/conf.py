@@ -47,18 +47,34 @@ extensions = ['sphinx.ext.autodoc',
               'sphinxcontrib.bibtex',
               'sphinxcontrib.matlab']
 
+# Render math via JavaScript:
+#   extensions = ['sphinx.ext.mathjax']
+#
+mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML' # the latest release
+
+# Render math as images:
+#   extensions = ['sphinx.ext.imgmath']
+#
+#imgmath_image_format = 'svg'
+#imgmath_latex_preamble = r'''
+#\usepackage{amsmath, amsfonts, amssymb, amsthm}
+#\usepackage{siunitx} % SI-units package
+#'''
+#imgmath_font_size = 11
+
 # GraphViz:
-#extensions = ['sphinx.ext.graphviz']
+#   extensions = ['sphinx.ext.graphviz']
 
 # PlantUML:
-#extensions = ['sphinxcontrib.plantuml']
-
+#   extensions = ['sphinxcontrib.plantuml']
+#
 # Path to the executable file of PlantUML:
 #plantuml = 'java -jar /usr/share/plantuml/plantuml.jar'
 
 # Directory to the Matlab sources of the WBM-Library:
 matlab_src_dir = os.path.abspath('../../')
-# Set the primary language domain to Matlab:
+
+# Set the primary language domain to Matlab.
 primary_domain = 'mat'
 
 # Napoleon settings:
@@ -76,7 +92,7 @@ napoleon_use_rtype = False # (default: True)
 napoleon_use_keyword = False # (default: True)
 
 # Automatic numbering of figures, tables, code-blocks
-# and sections if they have a caption:
+# and sections if they have a caption.
 numfig = True # (default: False)
 
 numfig_format = {'figure': 'Fig. %s', 'table': 'Table %s',
@@ -193,31 +209,99 @@ htmlhelp_basename = 'WBM-Librarydoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 _preamble = r'''
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-\usepackage{siunitx}
+\usepackage{amsmath, amsfonts, amssymb, amsthm} % math packages
+\usepackage{siunitx} % SI-units package
+
+% Spacing between the lines of the document:
+\usepackage{setspace}
+%\onehalfspacing
+%\doublespacing
+\singlespacing
+
+% Footnote back-reference link to move back
+% to the place of the footnote in the text:
+%\usepackage{footnotebackref}
+
+% Control over the typography of the Table of Contents,
+% List of Figures and List of Tables, etc:
+%\usepackage[titles]{tocloft}
+%\cftsetpnumwidth{1.25cm} % box width of the page number
+%\cftsetrmarg{1.5cm}      % title texts will end before reaching the righthand margin
+%\setlength{\cftchapnumwidth}{0.75cm}        % box width of the chapter number
+%\setlength{\cftsecindent}{\cftchapnumwidth} % indentation length of the sections
+%\setlength{\cftsecnumwidth}{1.25cm}         % box width of the section number
+
+% tocbibind:
+%   Enables the titles of the Table of Contents (ToC), the
+%   List of Figures (LoF), the List of Tables (LoT), the
+%   Bibliography and the Index all to be added to the Table
+%   of Contents. It reduces the spaces after heading of the
+%   Table of Contents, figures and tables by applying in
+%   the document for example:
+%       \addtocontents{toc}{\vskip -1.2cm}
+%       \addtocontents{lof}{\vskip -1.2cm}
+%
+%\usepackage[notlot,nottoc,notlof]{}
+
+% Max. depth of counting the sections:
+%   2=subsection, 3=subsubsection
+% Note: Counting below 'subsubsection'
+%       is not recommended.
+\setcounter{secnumdepth}{3}
+
+% Max. depth of the Table of Contents (ToC):
+%   2=subsection, 3=subsubsection
+\setcounter{tocdepth}{2}
 '''
+
+# LaTeX engine to build the document.
+#   'pdflatex' (default), 'xelatex',
+#   'lualatex' and 'platex'.
+latex_engine = 'pdflatex'
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     'papersize': 'a4paper',
 
+    # Flex­i­ble user in­ter­face to cus­tomize the page lay­out.
+    #'geometry': r'\usepackage[vmargin=2.5cm,hmargin=3cm]{geometry}',
+
     # The font size ('10pt', '11pt' or '12pt').
     'pointsize': '11pt',
 
-    # Additional stuff for the LaTeX preamble.
-    'preamble': _preamble,
+    # Accept different input encodings.
+    #'inputenc': r'\usepackage[utf8]{inputenc}',
 
-    # Latex figure (float) alignment
-    'figure_align': 'htbp',
+    # Se­lect font en­cod­ings.
+    #'fontenc': r'\usepackage[T1]{fontenc}',
+
+    # Fontpackage inclusion.
+#     'fontpkg': r'''
+# \setmainfont{DejaVu Serif}
+# \setsansfont{DejaVu Sans}
+# \setmonofont{DejaVu Sans Mono}''',
+
+    # Language package for typographical rules
+    # and hyphenation patterns.
+    'babel': r'\usepackage[english]{babel}',
+
+    # Extensive support for hypertext links in
+    # the doc­ument.
+    #'hyperref': r'\usepackage[breaklinks=true]{hyperref}',
 
     # Avoid blank pages between chapters.
     'classoptions': 'openany, oneside',
 
-    # language package for typographical rules
-    # and hyphenation patterns.
-    'babel': r'\usepackage[english]{babel}'
+    # Predefined chapter heading styles.
+    #   'Bjarne' (default), 'Sonny', 'Lenny', 'Glenn',
+    #   'Conny', 'Rejne' and 'Bjornstrup'.
+    #'fncychap': r'\usepackage[Sonny]{fncychap}',
+
+    # Latex figure (float) alignment
+    'figure_align': 'htbp',
+
+    # Additional stuff for the LaTeX preamble.
+    'preamble': _preamble
 }
 
 
@@ -248,5 +332,5 @@ man_pages = [
 texinfo_documents = [
     (master_doc, 'WBM-Library', u'WBM-Library Documentation',
      author, 'WBM-Library', 'The Whole-Body Model Library for YARP-based Robots.',
-     'Miscellaneous'),
+     'Robotics'),
 ]

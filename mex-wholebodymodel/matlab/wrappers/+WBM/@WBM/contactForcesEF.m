@@ -38,15 +38,15 @@ function [f_c, tau_gen] = contactForcesEF(obj, tau, fe_c, ac, Jc, djcdq, M, c_qv
     %   .. math::
     %      :label: contact_forces_ef
     %
-    %      f_c = \Lambda_c\cdot (a_c + J_c M^{\text{-}1}\cdot (C(q_j, \dot{q}_j) -
+    %      f_c = \Lambda_c (a_c + J_c M^{\text{-}1} (C(q_j, \dot{q}_j) -
     %      \tau_{gen}) - \dot{J}_c\dot{q}_j) - f^{\small C}_e
     %
     % The variable :math:`\Lambda_c = \Upsilon_{c}^{\text{-}1} = (J_c M^{\text{-}1} J_{c}^{T})^{\text{-}1}`
     % denotes the *inertia matrix* (or *pseudo-kinetic energy matrix*
     % :cite:`Khatib1987`) in contact space :math:`\mathrm{C = \{C_1,\ldots,C_k\}}`,
-    % :math:`\tau_{gen} = S_j\cdot (\tau - \tau_{fr})` represents the
+    % :math:`\tau_{gen} = S_j (\tau - \tau_{fr})` represents the
     % *generalized forces* with the *joint selection matrix*
-    % :math:`S_j = [\mathbf{0}_{(6 \times n)}\ \mathbb{I}_n]^T` and the
+    % :math:`S_j = [\mathbf{0}_{(6 \times n)}\enspace \mathbb{I}_n]^T` and the
     % *friction forces* :math:`\tau_{fr}`. The variable :math:`a_c` denotes
     % the *mixed contact accelerations* and :math:`f^{\small C}_e` represents
     % the *external forces* that are acting on the *contact links* in contact
@@ -71,7 +71,7 @@ function [f_c, tau_gen] = contactForcesEF(obj, tau, fe_c, ac, Jc, djcdq, M, c_qv
     %                           **Note:** If the given accelerations are very
     %                           small, then the vector can also be *constant*
     %                           or *zero*.
-    %   Jc    (double, matrix): :math:`(6\cdot m \times n)` Jacobian of the
+    %   Jc    (double, matrix): :math:`(6 m \times n)` Jacobian of the
     %                           *contact constraints* in contact space
     %                           :math:`\mathrm{C = \{C_1,\ldots,C_k\}}`.
     %   djcdq (double, vector): :math:`(6 m \times 1)` product vector of

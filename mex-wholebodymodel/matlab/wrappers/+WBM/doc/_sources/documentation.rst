@@ -29,8 +29,8 @@ frameworks or research projects. The library offers two implemented interface cl
    - ``MultChainTree`` -- A special adapted interface for the *Robotics Toolbox* of *Peter Corke*
      (`www.petercorke.com <http://www.petercorke.com>`_). With this special interface, the iCub
      robot can be easily integrated into research projects that are using for their experiments
-     fixed-base robots of the toolbox. The method names and input arguments of the interface class
-     are almost the same as the methods of the ``SerialLink`` class of the Robotics Toolbox.
+     fixed-base robot models of the toolbox. The method names and input arguments of the interface
+     class are almost the same as the methods of the ``SerialLink`` class of the Robotics Toolbox.
 
 .. [#f1] See `<https://github.com/robotology/yarp-wholebodyinterface>`_.
 .. [#f2] See `<https://www.mathworks.com/help/robotics/coordinate-system-transformations.html>`_.

@@ -44,7 +44,7 @@ function dstvChi = forwardDynamicsHPCEF(obj, t, stvChi, fhTrqControl, hand_conf,
     %
     % where :math:`\mathrm{FD}` denotes the function for the forward dynamics
     % calculations in dependency of the given time step :math:`t \in [t_0, t_f]`
-    % of a given time interval, :math:`f^{\small C_h}_e are the external forces
+    % of a given time interval, :math:`f^{\small C_h}_e` are the external forces
     % in contact space :math:`\mathrm{C}_h` of the hands and the vector variable
     % :math:`\chi` to be integrated (compare also with :cite:`Featherstone2008`,
     % p. 41).

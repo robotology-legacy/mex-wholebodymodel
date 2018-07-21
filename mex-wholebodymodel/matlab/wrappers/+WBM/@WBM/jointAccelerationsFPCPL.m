@@ -33,8 +33,8 @@ function [ddq_j, fd_prms] = jointAccelerationsFPCPL(obj, foot_conf, hand_conf, t
     % acting on the hands of the humanoid robot.
     %
     % The equation for solving the joint accelerations :math:`\ddot{q}_j` of
-    % a closed chain is derived from the dynamic equations of motion (see
-    % :eq:`joint_accelerations`). In order to obtain the joint accelerations
+    % a closed chain (see eq. :eq:`joint_accelerations`) is derived from the
+    % dynamic equations of motion. In order to obtain the joint accelerations
     % from the *closed-loop control system* with *position-regulation*
     % (velocity and position correction) of the feet, the method computes at
     % first the *contact forces* :math:`f_c` of the feet and of the hands, in

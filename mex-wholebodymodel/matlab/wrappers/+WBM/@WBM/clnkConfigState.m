@@ -79,7 +79,7 @@ function clnk_conf = clnkConfigState(obj, varargin)
     %
     %                             **Note:** If the control gain is not defined, then
     %                             by default the method computes the gain value for
-    %                             *critical damping* with :math:`k_v = 2\cdot \sqrt{k_p}`.
+    %                             *critical damping* with :math:`k_v = 2 \sqrt{k_p}`.
     %   rtype     (char, vector): Specifies the *rotation representation type* for the
     %                             desired poses of the links as reference. The rotation
     %                             can be represented either in quaternions ``quat`` or

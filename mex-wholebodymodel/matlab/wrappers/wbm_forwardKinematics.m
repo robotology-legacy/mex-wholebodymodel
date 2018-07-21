@@ -16,8 +16,8 @@ function vqT_lnk = wbm_forwardKinematics(varargin)
     % Output Arguments:
     %   vqT_lnk -- (7 x 1) VQ-transformation [*] from the link frame 'lnk' to the world frame 'wf'.
     %
-    %   [*]: The first 3 elements of the vector are representing the position and
-    %        the last 4 elements are defining the orientation in quaternions.
+    %   [*]: The first 3 elements of the vector represent the position and
+    %        the last 4 elements define the orientation in quaternions.
 
     % Copyright (C) 2014-2017 Robotics, Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
     % Author: Naveen Kuppuswamy (naveen.kuppuswamy@iit.it); Genova, Dec 2014

@@ -41,7 +41,7 @@ function tau_j = inverseDynamics(obj, varargin)
     %   .. math::
     %      :label: equation_of_motion
     %
-    %      \tau_j = M\cdot \ddot{q}_j + C(q_j,\dot{q}_j) + \tau_{fr}
+    %      \tau_j = M \ddot{q}_j + C(q_j,\dot{q}_j) + \tau_{fr}
     %
     % where :math:`C(q_j,\dot{q}_j)` denotes the generalized bias force.
     %
@@ -72,7 +72,7 @@ function tau_j = inverseDynamics(obj, varargin)
     %   .. math::
     %      :label: base_velocity
     %
-    %      \dot{v}_b = \text{-}M_{00}^{\text{-}1}\cdot (M_{01}\cdot \ddot{q}_j + h_0)
+    %      \dot{v}_b = \text{-}M_{00}^{\text{-}1} (M_{01} \ddot{q}_j + h_0)
     %
     % The method can be called by one of the given modes:
     %

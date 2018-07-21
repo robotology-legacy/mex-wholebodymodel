@@ -40,9 +40,9 @@ function vis_data = getFDynVisData(obj, stmChi, fhTrqControl, varargin)
     %
     % Note:
     %   To obtain the correct parameter values of the robot's forward dynamics,
-    %   the torque controller and the forward dynamics method must be the same,
-    %   as used in the computation of the integration output matrix
-    %   :math:`\mathcal{X}` (see ).
+    %   the *torque controller* and the *forward dynamics method* must be the
+    %   same, as used in the computation of the integration output matrix
+    %   :math:`\mathcal{X}`.
     %
     % Following *pose correction types* for the position-regulation system of
     % the forward dynamics will be supported:

@@ -38,20 +38,20 @@ function [f_c, tau_gen] = contactForcesCLPCEF(obj, clnk_conf, tau, fe_c, ac, Jc,
     %   .. math::
     %      :label: contact_forces_clpcef
     %
-    %      f_c = \Lambda_c\cdot (a_c + J_c M^{\text{-}1}\cdot (C(q_j, \dot{q}_j) -
+    %      f_c = \Lambda_c (a_c + J_c M^{\text{-}1} (C(q_j, \dot{q}_j) -
     %      \tau_{gen}) - \dot{J}_c\dot{q}_j - k_v \dot{\varepsilon}_c -
     %      k_p \varepsilon_c) - f^{\small C}_e
     %
     % The variable :math:`\Lambda_c = \Upsilon_{c}^{\text{-}1} = (J_c M^{\text{-}1} J_{c}^{T})^{\text{-}1}`
     % denotes the *inertia matrix* (or *pseudo-kinetic energy matrix*
     % :cite:`Khatib1987`) in contact space :math:`\mathrm{C = \{C_1,\ldots,C_k\}}`,
-    % :math:`\tau_{gen} = S_j\cdot (\tau - \tau_{fr})` represents the
+    % :math:`\tau_{gen} = S_j (\tau - \tau_{fr})` represents the
     % *generalized forces* with the *joint selection matrix*
-    % :math:`S_j = [\mathbf{0}_{(6 \times n)}\ \mathbb{I}_n]^T` and the *friction
-    % forces* :math:`\tau_{fr}`. The variable :math:`a_c` in the formula denotes
-    % the *mixed contact accelerations* and the variables :math:`k_p` and :math:`k_v`
-    % are *stiffness* and *damping control gains* for the closed-loop system. The
-    % variables :math:`\varepsilon_c` and :math:`\dot{\varepsilon}_c = J_c\nu`
+    % :math:`S_j = [\mathbf{0}_{(6 \times n)}\enspace \mathbb{I}_n]^T` and the
+    % *friction forces* :math:`\tau_{fr}`. The variable :math:`a_c` in the formula
+    % denotes the *mixed contact accelerations* and the variables :math:`k_p` and
+    % :math:`k_v` are *stiffness* and *damping control gains* for the closed-loop
+    % system. The variables :math:`\varepsilon_c` and :math:`\dot{\varepsilon}_c = J_c\nu`
     % denoting the *position* and *velocity errors* of the position-regulation
     % system with the *mixed generalized velocities* :math:`\nu`. The force vector
     % :math:`f^{\small C}_e` represents the *external forces* that are acting on

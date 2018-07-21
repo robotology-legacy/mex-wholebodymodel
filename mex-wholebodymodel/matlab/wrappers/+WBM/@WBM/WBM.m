@@ -387,15 +387,15 @@ classdef WBM < WBM.WBMBase
             %   .. math::
             %      :label: contact_forces
             %
-            %      f_c = \Lambda_c\cdot (J_c M^{\text{-}1}\cdot (C(q_j, \dot{q}_j) -
+            %      f_c = \Lambda_c (J_c M^{\text{-}1} (C(q_j, \dot{q}_j) -
             %      \tau_{gen}) - \dot{J}_c\dot{q}_j)\:,
             %
             % where :math:`\Lambda_c = \Upsilon_{c}^{\text{-}1} = (J_c M^{\text{-}1} J_{c}^{T})^{\text{-}1}`
             % denotes the *inertia matrix* (or *pseudo-kinetic energy matrix*
             % :cite:`Khatib1987`) in contact space :math:`\mathrm{C = \{C_1,\ldots,C_k\}}`,
-            % :math:`\tau_{gen} = S_j\cdot (\tau - \tau_{fr})` represents the
+            % :math:`\tau_{gen} = S_j (\tau - \tau_{fr})` represents the
             % *generalized forces* with the *joint selection matrix*
-            % :math:`S_j = [\mathbf{0}_{(6 \times n)}\ \mathbb{I}_n]^T`
+            % :math:`S_j = [\mathbf{0}_{(6 \times n)}\enspace \mathbb{I}_n]^T`
             % and the *friction forces* :math:`\tau_{fr}`.
             %
             % The method can be called as follows:
@@ -525,11 +525,11 @@ classdef WBM < WBM.WBMBase
             %        mass matrix of the robot.
             %      - **c_qv**  (*double, vector*) -- :math:`(n \times 1)` generalized
             %        bias force vector of the robot.
-            %      - **Jc**    (*double, vector*) -- :math:`(6\cdot m \times n)` Jacobian
+            %      - **Jc**    (*double, vector*) -- :math:`(6 m \times n)` Jacobian
             %        of the *contact constraints* in contact space
             %        :math:`\mathrm{C = \{C_1,\ldots,C_k\}}`.
-            %      - **djcdq** (*double, vector*) -- :math:`(6\cdot m \times 1)` vector
-            %        of the product of the contact Jacobian derivative :math:`\dot{J}_c`
+            %      - **djcdq** (*double, vector*) -- :math:`(6 m \times 1)` vector of
+            %        the product of the contact Jacobian derivative :math:`\dot{J}_c`
             %        with the joint velocity :math:`\dot{q}_j`.
             %
             % The variable :math:`m` denotes the *number of contact constraints* of
@@ -609,10 +609,10 @@ classdef WBM < WBM.WBMBase
             % Returns:
             %   [Jc, djcdq]: 2-element tuple containing:
             %
-            %      - **Jc**    (*double, vector*) -- :math:`(6\cdot m \times n)` Jacobian
+            %      - **Jc**    (*double, vector*) -- :math:`(6 m \times n)` Jacobian
             %        of the *contact constraints* in contact space
             %        :math:`\mathrm{C = \{C_1,\ldots,C_k\}}`.
-            %      - **djcdq** (*double, vector*) -- :math:`(6\cdot m \times 1)` bias
+            %      - **djcdq** (*double, vector*) -- :math:`(6 m \times 1)` bias
             %        acceleration vector :math:`\dot{J}_c\dot{q}_j` in contact space
             %        :math:`\mathrm{C}`.
             %
@@ -659,7 +659,7 @@ classdef WBM < WBM.WBMBase
             %   .. math::
             %      :label: joint_accelerations
             %
-            %      \ddot{q}_j = M^{\text{-}1}\cdot (\tau_{gen} - C(q_j, \dot{q}_j) -
+            %      \ddot{q}_j = M^{\text{-}1} (\tau_{gen} - C(q_j, \dot{q}_j) -
             %      (J_{c}^{T}\cdot \text{-}f_c))
             %
             % The method can be called in two different modes:
@@ -793,8 +793,8 @@ classdef WBM < WBM.WBMBase
             % constraints of the floating-base robot.
             %
             % The equation for solving the joint accelerations :math:`\ddot{q}_j`
-            % of a closed chain is derived from the dynamic equations of motion
-            % (see :eq:`joint_accelerations`). In order to obtain the joint
+            % of a closed chain (see eq. :eq:`joint_accelerations`) is derived
+            % from the dynamic equations of motion. In order to obtain the joint
             % accelerations from the *closed-loop control system* with
             % *position-regulation* (velocity and position correction) of the
             % feet, the method computes at first the contact forces :math:`f_c`
@@ -1169,7 +1169,7 @@ classdef WBM < WBM.WBMBase
             %
             %                             **Note:** If the control gain is not defined, then
             %                             by default the method computes the gain value for
-            %                             *critical damping* with :math:`k_v = 2\cdot \sqrt{k_p}`.
+            %                             *critical damping* with :math:`k_v = 2 \sqrt{k_p}`.
             %   rtype     (char, vector): Specifies the *rotation representation type* for the
             %                             desired poses of the links as reference. The rotation
             %                             can be represented either in quaternions ``quat`` or
@@ -1195,10 +1195,10 @@ classdef WBM < WBM.WBMBase
             %
             % The method can be called as follows:
             %
-            %   - .. py:method:: footConfigState(cstate, cmode, vqT_lnk, k_p, k_v[, rtype])
-            %   - .. py:method:: footConfigState(cstate, cmode, veT_lnk, k_p, k_v[, rtype])
-            %   - .. py:method:: footConfigState(cstate, cmode, q_j, k_p[, rtype])
-            %   - .. py:method:: footConfigState(cstate, cmode[, q_j[, rtype]])
+            %   - .. py:method:: handConfigState(cstate, cmode, vqT_lnk, k_p, k_v[, rtype])
+            %   - .. py:method:: handConfigState(cstate, cmode, veT_lnk, k_p, k_v[, rtype])
+            %   - .. py:method:: handConfigState(cstate, cmode, q_j, k_p[, rtype])
+            %   - .. py:method:: handConfigState(cstate, cmode[, q_j[, rtype]])
             %
             % Arguments:
             %   cstate (logical, vector): :math:`(1 \times 2)` boolean vector pair
@@ -1232,7 +1232,7 @@ classdef WBM < WBM.WBMBase
             %
             %                             **Note:** If the control gain is not defined, then
             %                             by default the method computes the gain value for
-            %                             *critical damping* with :math:`k_v = 2\cdot \sqrt{k_p}`.
+            %                             *critical damping* with :math:`k_v = 2 \sqrt{k_p}`.
             %   rtype     (char, vector): Specifies the *rotation representation type* for the
             %                             desired poses of the links as reference. The rotation
             %                             can be represented either in quaternions ``quat`` or
@@ -1689,7 +1689,7 @@ classdef WBM < WBM.WBMBase
             %   .. math::
             %       :label: payload_frame
             %
-            %       {}^{wf}H_{cm} = {}^{wf}H_{lnk}\cdot {}^{lnk}H_{cm}
+            %       {}^{wf}H_{cm} = {}^{wf}H_{lnk} {}^{lnk}H_{cm}
             %
             % The method can be called by one of the given modes:
             %
@@ -1845,8 +1845,10 @@ classdef WBM < WBM.WBMBase
             %   .. math::
             %       :label: inertia_pos_rotm
             %
-            %       &{}^{lnk}R_{cm} = {}^{lnk}R_{\small C_i}\cdot {}^{\small C_i}R_{cm} \quad\text{and}\\
-            %       &{}^{lnk}p_{cm} = {}^{lnk}R_{\small C_i}\cdot {}^{\small C_i}p_{cm}\:,
+            %       \begin{aligned}
+            %           &{}^{lnk}R_{cm} = {}^{lnk}R_{\small C_i} {}^{\small C_i}R_{cm} \quad\text{and}\\[8pt]
+            %           &{}^{lnk}p_{cm} = {}^{lnk}R_{\small C_i} {}^{\small C_i}p_{cm}\:,
+            %       \end{aligned}
             %
             % where :math:`{}^{lnk}R_{cm} = {}^{lnk}R_{\small C_i} = {}^{\small C_i}R_{cm} = \mathbb{I}_3`
             % and :math:`{}^{lnk}p_{cm} = {}^{\small C_i}p_{cm}`. The contact frame
@@ -2051,7 +2053,7 @@ classdef WBM < WBM.WBMBase
             %   .. math::
             %       :label: tool_frame
             %
-            %       {}^{wf}H_{tt} = {}^{wf}H_{ee}\cdot {}^{ee}H_{tt}
+            %       {}^{wf}H_{tt} = {}^{wf}H_{ee} {}^{ee}H_{tt}
             %
             % The method can be called by one of the given modes:
             %
@@ -2142,15 +2144,18 @@ classdef WBM < WBM.WBMBase
             %
             %      {}^{tt[wf]}X_{ee[wf]} =
             %      \begin{bmatrix}
-            %         \mathbb{I}_3 & \text{-}S({}^{wf}R_{ee}\cdot {}^{ee}p_{tt})\cdot \mathbb{I}_3\\
+            %         \mathbb{I}_3 & \text{-}S({}^{wf}R_{ee} {}^{ee}p_{tt}) \mathbb{I}_3\\
             %         \mathbf{0}   & \mathbb{I}_3
             %      \end{bmatrix}\:,
             %
-            % such that :math:`{}^{wf}J_{tt} = {}^{tt[wf]}X_{ee[wf]}\cdot {}^{ee[wf]}X_{ee}`, where
-            % the notations :math:`tt[wf]` and :math:`ee[wf]` denoting the frames with origin
-            % :math:`o_{tt}` and :math:`o_{ee}` with the orientation :math:`[wf]`. The transformation
-            % matrix :math:`X` maps the velocities of the geometric Jacobian in frame *ee* to the
-            % velocities in frame *tt*.
+            % such that :math:`{}^{wf}J_{tt} = {}^{tt[wf]}X_{ee[wf]}\cdot {}^{ee[wf]}X_{ee}`,
+            % where the notations :math:`tt[wf]` and :math:`ee[wf]` denoting the frames with
+            % origin :math:`o_{tt}` and :math:`o_{ee}` with the orientation :math:`[wf]`. The
+            % variable :math:`S` in the transformation matrix denotes the :math:`(3 \times 3)`
+            % *skew-symmetric matrix* of the position and :math:`\mathbb{I}_3` is the
+            % :math:`(3 \times 3)` *identity matrix*. The transformation matrix :math:`X`
+            % maps the velocities of the geometric Jacobian in frame *ee* to the velocities
+            % in frame *tt*.
             %
             % The method can be called by one of the given modes:
             %

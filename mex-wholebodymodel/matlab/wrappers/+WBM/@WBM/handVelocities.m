@@ -38,7 +38,7 @@ function [vc_h, v_prms] = handVelocities(obj, hand_conf, varargin)
     %   .. math::
     %      :label: mixed_hand_velocities
     %
-    %      v_{c_h} = \dot{x}_h = J_{c_h}\cdot \dot{q}_j\:,
+    %      v_{c_h} = \dot{x}_h = J_{c_h}\dot{q}_j\:,
     %
     % where the matrix :math:`J_{c_h}` denotes the contact Jacobian of the hands.
     %

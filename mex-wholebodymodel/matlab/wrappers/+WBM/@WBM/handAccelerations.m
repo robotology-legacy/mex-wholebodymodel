@@ -40,7 +40,7 @@ function [ac_h, a_prms] = handAccelerations(obj, foot_conf, hand_conf, tau, vara
     %   .. math::
     %      :label: mixed_hand_accelerations
     %
-    %      a_{c_h} = \ddot{x}_h = J_{c_h}M^{\text{-}1}\cdot (\tau_{gen} - C(q_j, \dot{q}_j) -
+    %      a_{c_h} = \ddot{x}_h = J_{c_h}M^{\text{-}1} (\tau_{gen} - C(q_j, \dot{q}_j) -
     %      (J^{T}_{c_f}\cdot \text{-}f_{c_f})) + \dot{J}_{c_h}\dot{q}_j\:,
     %
     % where the matrix :math:`J_{c_h}` denotes the contact Jacobian of the hands

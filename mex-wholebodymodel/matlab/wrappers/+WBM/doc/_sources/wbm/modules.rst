@@ -2,7 +2,7 @@ The Whole-Body Model Classes
 ============================
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 3
    :name: wbmtoc
 
 .. automodule:: +WBM

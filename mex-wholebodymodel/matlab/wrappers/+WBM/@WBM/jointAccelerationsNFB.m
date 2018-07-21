@@ -42,7 +42,7 @@ function [ddq_j, fd_prms] = jointAccelerationsNFB(obj, tau, varargin)
     %   .. math::
     %       :label: joint_acceleration_no_ctc_forces
     %
-    %       \ddot{q}_j = M^{\text{-}1}\cdot (\tau_{gen} - C(q_j, \dot{q}_j))
+    %       \ddot{q}_j = M^{\text{-}1} (\tau_{gen} - C(q_j, \dot{q}_j))
     %
     % The method can be called in two different modes:
     %

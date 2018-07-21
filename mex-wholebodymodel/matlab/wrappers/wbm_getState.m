@@ -11,8 +11,8 @@ function [vqT_b, q_j, v_b, dq_j] = wbm_getState()
     %   v_b   -- (6 x 1) generalized base velocity vector.
     %   dq_j  -- (n_dof x 1) joint angle velocity vector in [rad/s].
     %
-    %   [*]: The first 3 elements of the vector are representing the position and
-    %        the last 4 elements are defining the orientation in quaternions.
+    %   [*]: The first 3 elements of the vector represent the position and
+    %        the last 4 elements define the orientation in quaternions.
     %
     % See also:
     %   WBM_UPDATESTATE
