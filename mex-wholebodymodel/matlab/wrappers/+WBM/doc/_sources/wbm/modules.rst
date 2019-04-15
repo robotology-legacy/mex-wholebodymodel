@@ -204,5 +204,5 @@ in the simulation by specific links of the robot.
           (:cite:`Featherstone2008`, chapter 3, pp. 40-42, eq. (3.8)).
 
 .. [#f11] Source from the *velocity control thread*:
-			 `<http://wiki.icub.org/brain/velControlThread_8cpp.html>`_
+			 `<http://www.icub.org/doc/icub-main/velControlThread_8cpp.html>`_
 

@@ -212,6 +212,8 @@ _preamble = r'''
 \usepackage{amsmath, amsfonts, amssymb, amsthm} % math packages
 \usepackage{siunitx} % SI-units package
 
+%\usepackage{bigfoot} % Footnotes for critical editions
+
 % Spacing between the lines of the document:
 \usepackage{setspace}
 %\onehalfspacing
@@ -309,7 +311,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'WBM-Library.tex', u'WBM-Library Documentation',
+    (master_doc, 'WBM-Library.tex', u'The WBM-Library Documentation for YARP-based Robots',
      u'Martin Neururer', 'manual'),
 ]
 

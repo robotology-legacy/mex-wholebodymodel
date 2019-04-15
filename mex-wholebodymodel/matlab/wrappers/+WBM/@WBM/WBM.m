@@ -124,7 +124,7 @@ classdef WBM < WBM.WBMBase
         MAX_JNT_SPEED = 250; % max. joint speed in [ksps] (kilosample(s) per second). [*]
         MAX_JNT_ACC   = 1e6; % max. joint acceleration with 1 [Ms/s^2] (Megasample(s) per second squared). [*]
         MAX_JNT_TRQ   = 1e5; % max. joint torque in [ksps] (kilosample(s) per second).
-        % [*] Source: <http://wiki.icub.org/brain/velControlThread_8cpp.html>
+        % [*] Source: <http://www.icub.org/doc/icub-main/velControlThread_8cpp.html>
 
         % zero-vectors for contact accelerations/velocities
         % and for external force vectors:
